@@ -1,174 +1,174 @@
 package core.basesyntax;
 
-import java.util.List;
+/**
+ * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
+ * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
+ * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
+ */
+public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final float LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_CAPACITY = 16;
+    private int size;
+    private Entry<K, V>[] table;
 
-public class MyLinkedList<T> implements MyLinkedListInterface<T> {
-    int size;
-    Node<T> head;
-    Node<T> tail;
+    public MyHashMap(int tableSize) {
+        if (tableSize < DEFAULT_CAPACITY) {
+            tableSize = DEFAULT_CAPACITY;
+        }
+        table = new Entry[tableSize];
+        size = 0;
+    }
 
-    public MyLinkedList() {
-        this.head = null;
-        this.tail = null;
+    public MyHashMap() {
+        table = new Entry[DEFAULT_CAPACITY];
+        size = 0;
     }
 
     @Override
-    public void add(T value) {
-        if (head == null) {
-            head = new Node(value, null, null);
-            tail = head;
-            size = 1;
+    public void put(final K key, final V value) {
+        if (key == null) {
+            putForNullKey(value);
         } else {
-            Node newTail = new Node(value, tail, null);
-            tail.next = newTail;
-            tail = newTail;
-            size++;
+            reHashing();
+            int hash = key.hashCode();
+            int index = getIndex(hash, table.length);
+            for (Entry e = table[index]; e != null; e = e.next) {
+                Object x;
+                if (e.hash == hash
+                        && ((x = e.key) == key || key.equals(x))) {
+                    e.value = value;
+                    return;
+                }
+            }
+            addEntry(key, value, hash, index);
         }
     }
 
-    @Override
-    public void add(T value, int index) {
-        if (index > size || index < 0) {
-            throw new IndexOutOfBoundsException();
-        }
-        if (index == size) {
-            linkTail(value);
-        } else {
-            link(value, getNodeByIndex(index));
-        }
-    }
-
-    private void linkTail(T value) {
-        Node<T> prev = tail;
-        Node<T> newNode = new Node<T>(value, prev, null);
-        tail = newNode;
-        if (prev == null) {
-            head = newNode;
-        } else {
-            prev.next = newNode;
-        }
+    private void addEntry(K key, V value, int hash, int index) {
+        Entry<K, V> next = table[index];
+        table[index] = new Entry<K, V>(key, value, hash, next);
         size++;
     }
 
-    private void link(T value, Node<T> x) {
-        Node<T> prev = x.prev;
-        Node<T> newNode = new Node<T>(value, prev, x);
-        x.prev = newNode;
-        if (prev == null) {
-            head = newNode;
-        } else {
-            prev.next = newNode;
+    private void putForNullKey(V value) {
+        Entry<K, V> entry;
+        for (entry = table[0]; entry != null; entry = entry.next) {
+            if (entry.key == null) {
+                entry.value = value;
+                return;
+            }
         }
+        table[0] = new Entry<K, V>(null, value, 0, entry);
         size++;
     }
 
-    @Override
-    public void addAll(List<T> list) {
-        for (int i = 0; i < list.size(); i++) {
-            add(list.get(i));
+    private void reHashing() {
+        if (size > table.length * LOAD_FACTOR) {
+            Entry<K, V>[] newTable = new Entry[table.length * 3 / 2];
+            moveTable(newTable);
+            this.table = newTable;
         }
     }
 
-    @Override
-    public T get(int index) {
-        checkIndex(index);
-        return getNodeByIndex(index).item;
-    }
-
-    @Override
-    public void set(T value, int index) {
-        checkIndex(index);
-        Node pointer = getNodeByIndex(index);
-        pointer.item = value;
-    }
-
-    private void checkIndex(int index) {
-        if (index >= size || index < 0) {
-            throw new IndexOutOfBoundsException();
+    private void moveTable(Entry<K, V>[] dest) {
+        Entry<K, V> entry;
+        for (int i = 0; i < table.length; i++) {
+            entry = table[i];
+            if (null == entry) {
+                continue;
+            }
+            while (entry != null) {
+                Entry<K, V> next = entry.next;
+                int index = getIndex(entry.hash, dest.length);
+                entry.next = dest[index];
+                dest[index] = entry;
+                entry = next;
+            }
         }
     }
 
-    private Node<T> getNodeByIndex(int index) {
-        Node returnNode;
-        if (index < (size >> 1)) {
-            returnNode = head;
-            for (int i = 0; i < index; i++) {
-                returnNode = returnNode.next;
-            }
-            return returnNode;
-        } else {
-            returnNode = tail;
-            for (int i = size - 1; i > index; i--) {
-                returnNode = returnNode.prev;
-            }
-            return returnNode;
+    private int getIndex(int hash, int length) {
+        return hash & (length - 1);
+    }
+
+    @Override
+    public V getValue(K key) {
+        if (key == null) {
+            return getForNullKey();
         }
-    }
-
-    @Override
-    public T remove(int index) {
-        checkIndex(index);
-        return (T) unlink(getNodeByIndex(index));
-    }
-
-    @Override
-    public T remove(T t) {
-        if (t == null) {
-            for (Node<T> node = head; node != null; node = node.next) {
-                if (node.item == null) {
-                    return unlink(node);
-                }
+        int hash = key.hashCode();
+        int index = getIndex(hash, table.length);
+        Entry<K, V> entry = table[index];
+        K k;
+        while (entry != null) {
+            if (entry.hash == hash
+                    && ((k = entry.key) == key || k.equals(key))) {
+                return entry.value;
             }
-        } else {
-            for (Node<T> node = head; node != null; node = node.next) {
-                if (node.item.equals(t)) {
-                    return unlink(node);
-                }
-            }
+            entry = entry.next;
         }
         return null;
     }
 
-    private T unlink(Node<T> x) {
-        final T returnData = x.item;
-        final Node<T> next = x.next;
-        final Node<T> prev = x.prev;
-        if (prev == null) {
-            head = next;
-        } else {
-            prev.next = next;
-            x.prev = null;
+    private V getForNullKey() {
+        Entry<K, V> entry = table[0];
+        while (entry != null) {
+            if (entry.key == null) {
+                return entry.value;
+            }
+            entry = entry.next;
         }
-        if (next == null) {
-            tail = prev;
-        } else {
-            next.prev = prev;
-            x.next = null;
-        }
-        x.item = null;
-        size--;
-        return returnData;
+        throw new IndexOutOfBoundsException();
     }
 
     @Override
-    public int size() {
+    public int getSize() {
         return size;
     }
 
-    @Override
-    public boolean isEmpty() {
-        return size == 0;
-    }
+    private static class Entry<K, V> {
+        final int hash;
+        final K key;
+        V value;
+        Entry next;
 
-    private static class Node<T> {
-        T item;
-        Node next;
-        Node prev;
-
-        Node(T item, Node prev, Node next) {
-            this.item = item;
+        public Entry(K key, V value, int hash, Entry next) {
+            this.key = key;
+            this.value = value;
+            this.hash = hash;
             this.next = next;
-            this.prev = prev;
+        }
+
+        public K getKey() {
+            return this.key;
+        }
+
+        public V getValue() {
+            return this.value;
+        }
+
+        public void setValue(V value) {
+            this.value = value;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj instanceof Entry) {
+                Entry o = (Entry) obj;
+                return o.getKey().equals(this.key)
+                        && o.getValue().equals(this.value);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return hash << 16
+                    & (key == null ? 0 : key.hashCode() << 8)
+                    & (value == null ? 0 : value.hashCode());
         }
     }
 }
