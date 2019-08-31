@@ -46,8 +46,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (entry.key.equals(key)) {
                 entry.value = value;
                 return;
-            } else
+            } else {
                 entry = entry.next;
+            }
         }
         if (size++ > threshold) {
             rehash();
