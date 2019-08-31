@@ -17,12 +17,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Entry<K, V>[] table;
     private int size;
-    private float load_factor = 0.75f;
-    private static int default_capacity = 1 << 16;
-    private int threshold = (int) (default_capacity * load_factor);
+    private float loadFactor = 0.75f;
+    private static int defaultCapacity = 1 << 16;
+    private int threshold = (int) (defaultCapacity * loadFactor);
 
     public MyHashMap() {
-        this.table = new Entry[default_capacity];
+        this.table = new Entry[defaultCapacity];
     }
 
     private int hash(K key) {
@@ -65,7 +65,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void rehash() {
         Entry<K, V>[] oldTable = table;
         int newCapacity = table.length * 2 + 1;
-        threshold = (int) (newCapacity * load_factor);
+        threshold = (int) (newCapacity * loadFactor);
         table = new Entry[newCapacity];
         for (int i = table.length - 1; i >= 0; i--) {
             Entry<K, V> entry = oldTable[i];
