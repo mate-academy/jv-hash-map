@@ -97,6 +97,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        resize();
+
         if (key == null && table[0] == null) {
             table[0] = new Node<K, V>(0, null, value, null);
             size++;
@@ -107,8 +109,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
 
-//        resize();
-
         int index = index(hashCode(), capacyty);
         Node<K, V> current = table[index];
         if (current == null) {
@@ -117,17 +117,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         while (current != null) {
-                if (key == current.getKey() || current.getKey().equals(key)) {
-                    current.setValue(value);
-                    return;
-                }
-                current = current.getNext();
+            if (key == current.getKey() || current.getKey().equals(key)) {
+                current.setValue(value);
+                return;
             }
-            current = table[index];
-            table[index] = new Node<K, V>(key.hashCode(), key, value, current);
-            size++;
-            return;
+            current = current.getNext();
         }
+        current = table[index];
+        table[index] = new Node<K, V>(key.hashCode(), key, value, current);
+        size++;
+        return;
+    }
 
     @Override
     public V getValue(K key) {
@@ -167,23 +167,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             setSize(0);
             int newCapacyty = capacyty * 3 / 2;
             setCapacyty(newCapacyty);
-            Node<K, V> oldTable[] = Arrays.copyOf(table, table.length);
+            Node<K, V>[] oldTable = Arrays.copyOf(table, table.length);
             setTable(new Node[capacyty]);
             for (int i = 0; i < oldTable.length; i++) {
                 if (oldTable[i] != null) {
-                    if (oldTable[i].getNext() == null) {
-                        K k = oldTable[i].getKey();
-                        V v = oldTable[i].getValue();
+                    K k = oldTable[i].getKey();
+                    V v = oldTable[i].getValue();
+                    put(k, v);
+                    Node<K, V> node = oldTable[i].getNext();
+                    while (node != null) {
+                        k = node.getKey();
+                        v = node.getValue();
                         put(k, v);
-                        continue;
-                    } else {
-                        Node<K, V> node = oldTable[i].getNext();
-                        while (node != null) {
-                            K k = node.getKey();
-                            V v = node.getValue();
-                            put(k, v);
-                            node = node.getNext();
-                        }
+                        node = node.getNext();
                     }
                 }
             }
