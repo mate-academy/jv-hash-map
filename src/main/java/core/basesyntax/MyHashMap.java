@@ -31,7 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             reHashing();
             int hash = key.hashCode();
-            int index = hash & table.length;
+            int index = hash & (table.length - 1);
             for (Entry e = table[index]; e != null; e = e.next) {
                 if (e.hash == hash
                         && (e.key == key || key.equals(e.key))) {
@@ -77,7 +77,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             while (entry != null) {
                 Entry<K, V> next = entry.next;
-                int index = entry.hash & dest.length;
+                int index = entry.hash & (dest.length - 1);
                 entry.next = dest[index];
                 dest[index] = entry;
                 entry = next;
@@ -92,7 +92,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return getForNullKey();
         }
         int hash = key.hashCode();
-        int index = hash & table.length;
+        int index = hash & (table.length - 1);
         Entry<K, V> entry = table[index];
         K k;
         while (entry != null) {
