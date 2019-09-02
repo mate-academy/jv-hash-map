@@ -15,33 +15,33 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     }
 
-    private Entry<K, V>[] table;
+    private static final float loadFactor = 0.75f;
+    private static final int defaultCapacity = 1 << 16;
+    private Entry<K, V>[] buckets;
     private int size;
-    private float loadFactor = 0.75f;
-    private static int defaultCapacity = 1 << 16;
     private int threshold = (int) (defaultCapacity * loadFactor);
 
     public MyHashMap() {
-        this.table = new Entry[defaultCapacity];
+        this.buckets = new Entry[defaultCapacity];
     }
 
     private int hash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % buckets.length);
     }
 
     @Override
     public void put(K key, V value) {
         int index = hash(key);
-        if (table[index] == null) {
-            table[index] = new Entry<>(key, value);
+        if (buckets[index] == null) {
+            buckets[index] = new Entry<>(key, value);
             size++;
             return;
         }
         if (index == 0) {
-            table[index].value = value;
+            buckets[index].value = value;
             return;
         }
-        Entry<K, V> entry = table[index];
+        Entry<K, V> entry = buckets[index];
         while (entry != null) {
             if (entry.key.equals(key)) {
                 entry.value = value;
@@ -59,22 +59,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void addEntry(K key, V value, int idx) {
         Entry<K, V> entry = new Entry<>(key, value);
-        entry.next = table[idx];
-        table[idx] = entry;
+        entry.next = buckets[idx];
+        buckets[idx] = entry;
     }
 
     private void rehash() {
-        Entry<K, V>[] oldTable = table;
-        int newCapacity = table.length * 2 + 1;
+        Entry<K, V>[] oldTable = buckets;
+        int newCapacity = buckets.length * 2 + 1;
         threshold = (int) (newCapacity * loadFactor);
-        table = new Entry[newCapacity];
-        for (int i = table.length - 1; i >= 0; i--) {
+        buckets = new Entry[newCapacity];
+        for (int i = buckets.length - 1; i >= 0; i--) {
             Entry<K, V> entry = oldTable[i];
             while (entry != null) {
                 int index = hash(entry.key);
                 Entry<K, V> next = entry.next;
-                entry.next = table[index];
-                table[index] = entry;
+                entry.next = buckets[index];
+                buckets[index] = entry;
                 entry = next;
             }
         }
@@ -83,16 +83,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = hash(key);
-        if (table[index] == null) {
+        if (buckets[index] == null) {
             return null;
         }
-        if (index > table.length - 1) {
+        if (index > buckets.length - 1) {
             throw new ArrayIndexOutOfBoundsException();
         }
         if (index == 0) {
-            return table[index].value;
+            return buckets[index].value;
         }
-        Entry<K, V> entry = table[index];
+        Entry<K, V> entry = buckets[index];
         while (entry != null) {
             if (entry.key.equals(key)) {
                 return entry.value;
