@@ -31,11 +31,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             reHashing();
             int hash = key.hashCode();
-            int index = getIndex(hash, table.length);
+            int index = hash & table.length;
             for (Entry e = table[index]; e != null; e = e.next) {
-                Object x;
                 if (e.hash == hash
-                        && ((x = e.key) == key || key.equals(x))) {
+                        && (e.key == key || key.equals(e.key))) {
                     e.value = value;
                     return;
                 }
@@ -64,13 +63,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void reHashing() {
         if (size > table.length * LOAD_FACTOR) {
-            Entry<K, V>[] newTable = new Entry[table.length * 3 / 2];
-            moveTable(newTable);
+            Entry<K, V>[] newTable = moveTable(new Entry[table.length * 3 / 2]);
             this.table = newTable;
         }
     }
 
-    private void moveTable(Entry<K, V>[] dest) {
+    private Entry<K, V>[] moveTable(Entry<K, V>[] dest) {
         Entry<K, V> entry;
         for (int i = 0; i < table.length; i++) {
             entry = table[i];
@@ -79,16 +77,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             while (entry != null) {
                 Entry<K, V> next = entry.next;
-                int index = getIndex(entry.hash, dest.length);
+                int index = entry.hash & dest.length;
                 entry.next = dest[index];
                 dest[index] = entry;
                 entry = next;
             }
         }
-    }
-
-    private int getIndex(int hash, int length) {
-        return hash & (length - 1);
+        return dest;
     }
 
     @Override
@@ -97,7 +92,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return getForNullKey();
         }
         int hash = key.hashCode();
-        int index = getIndex(hash, table.length);
+        int index = hash & table.length;
         Entry<K, V> entry = table[index];
         K k;
         while (entry != null) {
