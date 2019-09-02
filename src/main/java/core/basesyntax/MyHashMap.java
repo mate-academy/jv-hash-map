@@ -23,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Entry<K, V> next;
 
-        public Entry(K key, V value) {
+        private Entry(K key, V value) {
             this.key = key;
             this.value = value;
         }
@@ -59,11 +59,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void putForNullKey(Entry<K, V> nullKeyEntry) {
         if (table[0] == null) {
-            table[0] = nullKeyEntry;
             size++;
-        } else {
-            table[0].value = nullKeyEntry.value;
         }
+        table[0] = nullKeyEntry;
     }
 
     private void checkSize(int size) {
@@ -118,4 +116,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public int getSize() {
         return size;
     }
+
 }
