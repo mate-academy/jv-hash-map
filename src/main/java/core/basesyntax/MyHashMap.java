@@ -7,65 +7,89 @@ package core.basesyntax;
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75d;
-    private static final int BASE_SIZE = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private static final int INDEX_OFF = -1;
+    private int capacity;
     private int size;
-    private int actualSize;
     private Entry[] entries;
 
     public MyHashMap() {
-        this.entries = new Entry[BASE_SIZE];
-        actualSize = 0;
-        size = BASE_SIZE;
+        this.entries = new Entry[DEFAULT_CAPACITY];
+        size = 0;
+        capacity = DEFAULT_CAPACITY;
     }
 
-    private int indexOf(K key) {
-        for (int i = 0; i < actualSize; i++) {
-            if (entries[i].getKey() == null && key == null) {
-                return i;
-            }
-            if (key.equals(entries[i].getKey())) {
-                return i;
-            }
+    private int indexCalculation(K key) {
+        if (key == null) {
+            return 0;
         }
-        return INDEX_OFF;
+        return Math.abs(key.hashCode() % capacity);
     }
 
     private void resize() {
-        if (actualSize > size * LOAD_FACTOR) {
-            size = (int) (size * 2 * LOAD_FACTOR);
-            Entry[] newEntries = new Entry[size];
-            System.arraycopy(entries, 0, newEntries, 0, actualSize);
-            entries = newEntries;
+        if (size > capacity * LOAD_FACTOR) {
+            capacity = (int) (capacity * 2 * LOAD_FACTOR);
+            Entry[] oldEntries = entries;
+            entries = new Entry[capacity];
+            size = 0;
+            for (int i = 0; i < oldEntries.length; i++) {
+                Entry<K, V> temp = oldEntries[i];
+                while (temp != null) {
+                    put(temp.getKey(), temp.getValue());
+                    temp = temp.getNext();
+                }
+            }
         }
     }
 
     @Override
     public void put(K key, V value) {
         resize();
-        if (indexOf(key) == INDEX_OFF) {
-            Entry temp = new Entry(key, value);
-            entries[actualSize] = temp;
-            actualSize++;
+        int index = indexCalculation(key);
+        Entry newEntry = new Entry(key, value, null);
+        if (entries[index] == null) {
+            entries[index] = newEntry;
+            size++;
         } else {
-            Entry temp = new Entry(key, value);
-            entries[indexOf(key)] = temp;
+            Entry tempEntry = entries[index];
+            while (true) {
+                if (key == tempEntry.getKey() || newEntry.getKey().equals(tempEntry.getKey())) {
+                    tempEntry.setValue(value);
+                    break;
+                } else {
+                    if (tempEntry.getNext() == null) {
+                        tempEntry.setNext(newEntry);
+                        size++;
+                        break;
+                    } else {
+                        tempEntry = tempEntry.getNext();
+                    }
+                }
+            }
         }
-        Entry temp = new Entry(key, value);
-        entries[actualSize] = temp;
     }
 
     @Override
     public V getValue(K key) {
-
-        if (indexOf(key) == INDEX_OFF) {
+        int index = indexCalculation(key);
+        Entry tempEntry = entries[index];
+        if (tempEntry == null) {
             return null;
         }
-        return (V) entries[indexOf(key)].getValue();
+        while (true) {
+            if (key == tempEntry.getKey() || key.equals(tempEntry.getKey())) {
+                return (V) tempEntry.getValue();
+            } else {
+                tempEntry = tempEntry.getNext();
+                if (tempEntry == null) {
+                    return null;
+                }
+            }
+        }
     }
 
     @Override
     public int getSize() {
-        return actualSize;
+        return size;
     }
 }

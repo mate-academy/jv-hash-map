@@ -3,15 +3,22 @@ package core.basesyntax;
 public class Entry<K, V> {
     private K key;
     private V value;
+    private Entry<K, V> next;
+
+    public void setNext(Entry<K, V> next) {
+        this.next = next;
+    }
 
     public Entry() {
         this.key = null;
         this.value = null;
+        this.next = null;
     }
 
-    public Entry(K key, V value) {
+    public Entry(K key, V value, Entry<K, V> next) {
         this.key = key;
         this.value = value;
+        this.next = next;
     }
 
     public K getKey() {
@@ -22,6 +29,10 @@ public class Entry<K, V> {
         return value;
     }
 
+    public Entry<K, V> getNext() {
+        return next;
+    }
+
     public void setKey(K key) {
         this.key = key;
     }
@@ -29,4 +40,6 @@ public class Entry<K, V> {
     public void setValue(V value) {
         this.value = value;
     }
+
+
 }
