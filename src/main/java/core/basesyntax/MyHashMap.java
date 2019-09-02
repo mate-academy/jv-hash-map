@@ -24,9 +24,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         if (load >= objects.length * LOAD_FACTOR) {
-            Node<K, V>[] temporary = new Node[objects.length * 3 / 2];
+            Node<K, V>[] temporary = new Node[objects.length * 2];
             temporary[0] = objects[0];
-            for (int i = 1; i < load; i++) {
+            for (int i = 1; i < objects.length; i++) {
                 if (objects[i] != null) {
                     Node<K, V> moveNode = objects[i];
                     temporary[moveNode.hash % temporary.length] = objects[i];
@@ -66,16 +66,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         resize();
         Node<K, V> nodeToAdd = new Node<>(key, value);
         nodeToAdd.hash = hash(key);
-        if (objects[nodeToAdd.hash % objects.length] == null) {
-            objects[nodeToAdd.hash % objects.length] = nodeToAdd;
+        int bucket = nodeToAdd.hash % objects.length;
+        if (objects[bucket] == null) {
+            objects[bucket] = nodeToAdd;
             nodeToAdd.next = null;
             size++;
         } else {
-            Node<K, V> inLinkObject = objects[nodeToAdd.hash % objects.length];
+            Node<K, V> inLinkObject = objects[bucket];
             int count = 0;
             while (inLinkObject != null) {
-                if (nodeToAdd.hash == inLinkObject.hash && (nodeToAdd.key == inLinkObject.key
-                        || nodeToAdd.key.equals(inLinkObject.key))) {
+                if (nodeToAdd.key == inLinkObject.key
+                        || nodeToAdd.key.equals(inLinkObject.key)) {
                     inLinkObject.value = value;
                     count++;
                     break;
@@ -83,7 +84,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 inLinkObject = inLinkObject.next;
             }
             if (count == 0) {
-                inLinkObject = objects[nodeToAdd.hash % objects.length];
+                inLinkObject = objects[bucket];
                 while (inLinkObject.next != null) {
                     inLinkObject = inLinkObject.next;
                 }
@@ -112,10 +113,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        K key;
-        V value;
-        Node<K, V> next;
-        int hash;
+        private K key;
+        private V value;
+        private Node<K, V> next;
+        private int hash;
 
         public Node(K key, V value) {
             this.key = key;
