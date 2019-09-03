@@ -85,35 +85,35 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (initialCapacity <= Integer.MAX_VALUE / 2) {
-            Entry<K, V>[] newTable = new Entry[initialCapacity * 2];
-            for (int i = 0; i < initialCapacity; i++) {
-                Entry<K, V> tempEntry = table[i];
-                while (tempEntry != null) {
-                    int hash = hash(tempEntry.key);
-                    int index = hash % initialCapacity;
-                    if (newTable[index] == null) {
-                        newTable[index] = new Entry<>(tempEntry.key, tempEntry.value, null, hash);
-                    } else {
-                        Entry<K, V> checkEntry = newTable[index];
-                        while (checkEntry != null) {
-                            if (tempEntry.equals(checkEntry)) {
-                                checkEntry.value = tempEntry.value;
-                                break;
-                            }
-                            checkEntry = checkEntry.next;
-                        }
-                        Entry<K, V> newEntry = new Entry<>(tempEntry.key,
-                                tempEntry.value, newTable[index], hash);
-                        newTable[index] = newEntry;
-                    }
-                    tempEntry = tempEntry.next;
-                }
-            }
-            table = newTable;
-            initialCapacity *= 2;
+        if (initialCapacity > Integer.MAX_VALUE / 2) {
+            return;
         }
-
+        Entry<K, V>[] newTable = new Entry[initialCapacity * 2];
+        for (int i = 0; i < initialCapacity; i++) {
+            Entry<K, V> tempEntry = table[i];
+            while (tempEntry != null) {
+                int hash = hash(tempEntry.key);
+                int index = hash % initialCapacity;
+                if (newTable[index] == null) {
+                    newTable[index] = new Entry<>(tempEntry.key, tempEntry.value, null, hash);
+                } else {
+                    Entry<K, V> checkEntry = newTable[index];
+                    while (checkEntry != null) {
+                        if (tempEntry.equals(checkEntry)) {
+                            checkEntry.value = tempEntry.value;
+                            break;
+                        }
+                        checkEntry = checkEntry.next;
+                    }
+                    Entry<K, V> newEntry = new Entry<>(tempEntry.key,
+                        tempEntry.value, newTable[index], hash);
+                    newTable[index] = newEntry;
+                }
+                tempEntry = tempEntry.next;
+            }
+        }
+        table = newTable;
+        initialCapacity *= 2;
     }
 
     private class Entry<K, V> {
