@@ -97,8 +97,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     } else {
                         Entry<K, V> checkEntry = newTable[index];
                         while (checkEntry != null) {
-                            if (tempEntry.key == checkEntry.key
-                                    && tempEntry.hash == checkEntry.hash) {
+                            if (tempEntry.equals(checkEntry)) {
                                 checkEntry.value = tempEntry.value;
                                 break;
                             }
