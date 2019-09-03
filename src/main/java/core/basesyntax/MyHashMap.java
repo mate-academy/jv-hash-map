@@ -17,22 +17,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int load = 0;
-        for (Node<K, V> object: objects) {
-            if (object != null) {
-                load++;
-            }
-        }
-        if (load >= objects.length * LOAD_FACTOR) {
-            Node<K, V>[] temporary = new Node[objects.length * 2];
-            temporary[0] = objects[0];
-            for (int i = 1; i < objects.length; i++) {
-                if (objects[i] != null) {
-                    Node<K, V> moveNode = objects[i];
-                    temporary[moveNode.hash % temporary.length] = objects[i];
+        if (size >= objects.length * LOAD_FACTOR) {
+            size = 0;
+            Node<K, V>[] temporary = objects;
+            objects = new Node[objects.length * 2];
+            for (int i = 0; i < temporary.length; i++) {
+                if (temporary[i] != null) {
+                    Node<K, V> moveNode = temporary[i];
+                    while (moveNode != null) {
+                        put(moveNode.key, moveNode.value);
+                        moveNode = moveNode.next;
+                    }
                 }
             }
-            objects = temporary;
         }
     }
 
