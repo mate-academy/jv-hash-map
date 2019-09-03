@@ -91,7 +91,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table[0] = nullElem;
     }
 
-
     @Override
     public V getValue(K key) {
         if (key == null) {
