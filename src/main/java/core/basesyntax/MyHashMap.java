@@ -94,7 +94,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     } else {
                         Node<K, V> checkKey = newTable[index];
                         while (checkKey != null) {
-                            if (oldNode.key == checkKey.key && oldNode.hash == checkKey.hash) {
+                            if (oldNode.key.equals(checkKey.key)) {
                                 checkKey.value = oldNode.value;
                                 counter = false;
                                 break;
