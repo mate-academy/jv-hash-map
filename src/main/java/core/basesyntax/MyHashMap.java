@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import java.util.Arrays;
-
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
@@ -9,20 +7,14 @@ import java.util.Arrays;
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        public int getHash() {
-            return hash;
         }
 
         public K getKey() {
@@ -35,10 +27,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         public Node<K, V> getNext() {
             return next;
-        }
-
-        public void setHash(int hash) {
-            this.hash = hash;
         }
 
         public void setKey(K key) {
@@ -56,43 +44,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
-    private int capacyty;
+    private int capacity;
     private int size;
     private Node<K, V>[] table;
-    private boolean isSizeChange = false;
 
     public MyHashMap() {
-        capacyty = DEFAULT_CAPACITY;
+        capacity = DEFAULT_CAPACITY;
         size = 0;
         table = new Node[DEFAULT_CAPACITY];
     }
 
-    public int getCapacyty() {
-        return capacyty;
+    public int getCapacity() {
+        return capacity;
     }
 
-    public Node<K, V>[] getTable() {
-        return table;
-    }
-
-    public boolean isSizeChange() {
-        return isSizeChange;
-    }
-
-    public void setCapacyty(int capacyty) {
-        this.capacyty = capacyty;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
     }
 
     public void setTable(Node<K, V>[] table) {
         this.table = table;
-    }
-
-    public void setSizeChange(boolean sizeChange) {
-        isSizeChange = sizeChange;
     }
 
     @Override
@@ -100,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         resize();
 
         if (key == null && table[0] == null) {
-            table[0] = new Node<K, V>(0, null, value, null);
+            table[0] = new Node<K, V>(null, value, null);
             size++;
             return;
         }
@@ -109,10 +80,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
 
-        int index = index(hashCode(), capacyty);
+        int index = index();
         Node<K, V> current = table[index];
         if (current == null) {
-            table[index] = new Node<K, V>(key.hashCode(), key, value, current);
+            table[index] = new Node<K, V>(key, value, current);
             size++;
             return;
         }
@@ -124,7 +95,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             current = current.getNext();
         }
         current = table[index];
-        table[index] = new Node<K, V>(key.hashCode(), key, value, current);
+        table[index] = new Node<K, V>(key, value, current);
         size++;
         return;
     }
@@ -135,7 +106,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return table[0].getValue();
         }
         int hash = key.hashCode();
-        int index = index(hashCode(), capacyty);
+        int index = index();
         Node<K, V> current = table[index];
         if (current == null) {
             return null;
@@ -158,17 +129,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int index(int hash, int capacyty) {
-        return hash % capacyty;
+    private int index() {
+        return hashCode() % capacity;
     }
 
     private void resize() {
-        if (size > LOAD_FACTOR * capacyty) {
-            setSize(0);
-            int newCapacyty = capacyty * 3 / 2;
-            setCapacyty(newCapacyty);
-            Node<K, V>[] oldTable = Arrays.copyOf(table, table.length);
-            setTable(new Node[capacyty]);
+        if (size > LOAD_FACTOR * capacity) {
+            size = 0;;
+            int newCapacyty = capacity * 3 / 2;
+            setCapacity(newCapacyty);
+            Node<K, V>[] oldTable = table;
+            setTable(new Node[capacity]);
             for (int i = 0; i < oldTable.length; i++) {
                 if (oldTable[i] != null) {
                     K k = oldTable[i].getKey();
