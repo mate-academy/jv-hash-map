@@ -30,20 +30,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = new Node<>(key, value, null, hash);
             size++;
         } else {
-            Node<K, V> checkKey = table[index];
-            while (checkKey != null) {
-                if (hash == checkKey.hash) {
-                    if (key == null && key == checkKey.key) {
-                        checkKey.value = value;
+            Node<K, V> oldKey = table[index];
+            while (oldKey != null) {
+                if (hash == oldKey.hash) {
+                    if (key == null && key == oldKey.key) {
+                        oldKey.value = value;
                         counter = false;
                         break;
-                    } else if (key.equals(checkKey.key)) {
-                        checkKey.value = value;
+                    } else if (key.equals(oldKey.key)) {
+                        oldKey.value = value;
                         counter = false;
                         break;
                     }
                 }
-                checkKey = checkKey.next;
+                oldKey = oldKey.next;
             }
             if (counter) {
                 Node<K, V> newNode = new Node<>(key, value, table[index], hash);
@@ -81,39 +81,39 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (capacity <= Integer.MAX_VALUE / 2) {
-            Node<K, V>[] newTable = new Node[capacity * 2];
-            for (int i = 0; i < capacity; i++) {
-                Node<K, V> oldNode = table[i];
-                while (oldNode != null) {
-                    boolean counter = true;
-                    int hash = hash(oldNode.key);
-                    int index = hash % capacity;
-                    if (newTable[index] == null) {
-                        newTable[index] = new Node<>(oldNode.key, oldNode.value, null, hash);
-                    } else {
-                        Node<K, V> checkKey = newTable[index];
-                        while (checkKey != null) {
-                            if (oldNode.key.equals(checkKey.key)) {
-                                checkKey.value = oldNode.value;
-                                counter = false;
-                                break;
-                            }
-                            checkKey = checkKey.next;
-                        }
-                        if (counter) {
-                            Node<K, V> newNode = new Node<>(oldNode.key,
-                                    oldNode.value, newTable[index], hash);
-                            newTable[index] = newNode;
-                        }
-                    }
-                    oldNode = oldNode.next;
-                }
-            }
-            table = newTable;
-            capacity *= 2;
+        if (capacity > Integer.MAX_VALUE / 2) {
+            return;
         }
-
+        Node<K, V>[] newTable = new Node[capacity * 2];
+        for (int i = 0; i < capacity; i++) {
+            Node<K, V> oldNode = table[i];
+            while (oldNode != null) {
+                boolean counter = true;
+                int hash = hash(oldNode.key);
+                int index = hash % capacity;
+                if (newTable[index] == null) {
+                    newTable[index] = new Node<>(oldNode.key, oldNode.value, null, hash);
+                } else {
+                    Node<K, V> oldKey = newTable[index];
+                    while (oldKey != null) {
+                        if (oldNode.key.equals(oldKey.key)) {
+                            oldKey.value = oldNode.value;
+                            counter = false;
+                            break;
+                        }
+                        oldKey = oldKey.next;
+                    }
+                    if (counter) {
+                        Node<K, V> newNode = new Node<>(oldNode.key,
+                                oldNode.value, newTable[index], hash);
+                        newTable[index] = newNode;
+                    }
+                }
+                oldNode = oldNode.next;
+            }
+        }
+        table = newTable;
+        capacity *= 2;
     }
 
     private class Node<K, V> {
