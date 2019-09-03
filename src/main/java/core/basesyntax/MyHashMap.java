@@ -106,7 +106,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                         checkEntry = checkEntry.next;
                     }
                     Entry<K, V> newEntry = new Entry<>(tempEntry.key,
-                        tempEntry.value, newTable[index], hash);
+                            tempEntry.value, newTable[index], hash);
                     newTable[index] = newEntry;
                 }
                 tempEntry = tempEntry.next;
