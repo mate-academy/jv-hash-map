@@ -80,7 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
 
-        int index = index();
+        int index = index(key);
         Node<K, V> current = table[index];
         if (current == null) {
             table[index] = new Node<K, V>(key, value, current);
@@ -106,7 +106,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return table[0].getValue();
         }
         int hash = key.hashCode();
-        int index = index();
+        int index = index(key);
         Node<K, V> current = table[index];
         if (current == null) {
             return null;
@@ -129,15 +129,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int index() {
-        return hashCode() % capacity;
+    private int index(K key) {
+        return key == null ? 0 : Math.abs((key.hashCode() % capacity));
     }
 
     private void resize() {
         if (size > LOAD_FACTOR * capacity) {
             size = 0;;
-            int newCapacyty = capacity * 2;
-            setCapacity(newCapacyty);
+            int newCapacity = capacity * 2;
+            setCapacity(newCapacity);
             Node<K, V>[] oldTable = table;
             setTable(new Node[capacity]);
             for (int i = 0; i < oldTable.length; i++) {
