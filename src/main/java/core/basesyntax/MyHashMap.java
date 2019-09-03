@@ -27,7 +27,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             Node<K, V> currentNode = storage[index];
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < storage.length; i++) {
                 if (key == currentNode.key || newNode.key.equals(currentNode.key)) {
                     currentNode.value = value;
                     break;
@@ -52,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < storage.length; i++) {
             if (key == currentNode.key || key.equals(currentNode.key)) {
                 return currentNode.value;
             } else {
@@ -76,9 +76,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         if (size > storage.length * LOAD_FACTOR) {
-            int newCapacity = (int) (storage.length * LOAD_FACTOR * 2);
             Node<K, V>[] oldStorage = storage;
-            storage = new Node[newCapacity];
+            storage = new Node[storage.length * 2];
             size = 0;
             for (int i = 0; i < oldStorage.length; i++) {
                 Node<K, V> oldNode = oldStorage[i];
