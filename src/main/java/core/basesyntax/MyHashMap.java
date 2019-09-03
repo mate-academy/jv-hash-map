@@ -20,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return key == null ? 0 : hashCode() % tables.length;
+        return key == null ? 0 : Math.abs(key.hashCode() % tables.length);
     }
 
     @Override
@@ -44,8 +44,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 entry = entry.next;
             }
         }
-        resize();
         addEntry(key, value, index);
+        resize();
     }
 
     private void putForNullKey(V value) {
@@ -58,8 +58,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 entry = entry.next;
             }
         }
-        resize();
         addEntry(null, value, getIndex(null));
+        resize();
     }
 
     private void addEntry(K key, V value, int index) {
