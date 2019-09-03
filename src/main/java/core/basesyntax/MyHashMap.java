@@ -142,14 +142,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             setTable(new Node[capacity]);
             for (int i = 0; i < oldTable.length; i++) {
                 if (oldTable[i] != null) {
-                    K k = oldTable[i].getKey();
-                    V v = oldTable[i].getValue();
-                    put(k, v);
+                    K key = oldTable[i].getKey();
+                    V value = oldTable[i].getValue();
+                    put(key, value);
                     Node<K, V> node = oldTable[i].getNext();
                     while (node != null) {
-                        k = node.getKey();
-                        v = node.getValue();
-                        put(k, v);
+                        key = node.getKey();
+                        value = node.getValue();
+                        put(key, value);
                         node = node.getNext();
                     }
                 }
