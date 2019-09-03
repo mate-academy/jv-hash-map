@@ -71,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hashIndex(K key) {
-        return key == null ? 0 : hashCode() % storage.length;
+        return key == null ? 0 : Math.abs(key.hashCode() % storage.length);
     }
 
     private void resize() {
@@ -99,24 +99,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-
-            if (obj instanceof Node) {
-                Node<K, V> node = (Node) obj;
-                return (key.equals(node.key));
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return 31 * 17 + key.hashCode();
         }
     }
 }
