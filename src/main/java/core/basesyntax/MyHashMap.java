@@ -136,7 +136,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         if (size > LOAD_FACTOR * capacity) {
             size = 0;;
-            int newCapacyty = capacity * 3 / 2;
+            int newCapacyty = capacity * 2;
             setCapacity(newCapacyty);
             Node<K, V>[] oldTable = table;
             setTable(new Node[capacity]);
