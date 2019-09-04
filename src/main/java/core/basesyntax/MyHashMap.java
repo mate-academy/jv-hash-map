@@ -25,7 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 elements[0].value = value;
             }
         } else {
-            int index = Math.abs(key.hashCode()) % capacity;
+            int index = key == null ? 0 : Math.abs(key.hashCode()) % capacity;
             if (elements[index] == null) {
                 elements[index] = new Element(key, value, null);
                 size++;
@@ -39,9 +39,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Element<K, V> elementCopy = elements[index];
         boolean flag = false;
         while (elementCopy != null) {
-            if (key.equals(elementCopy.key)) {
+            if (key == elementCopy.key || key.equals(elementCopy.key)) {
                 elementCopy.value = value;
-                flag = true;
+                return;
             }
             elementCopy = elementCopy.next;
         }
@@ -72,10 +72,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return (V) elements[0].value;
         }
-        int index = Math.abs(key.hashCode()) % capacity;
+        int index = key == null ? 0 : Math.abs(key.hashCode()) % capacity;
         Element<K, V> newElementItem = elements[index];
         while (newElementItem != null) {
-            if (key.equals(newElementItem.key)) {
+            if (key == newElementItem.key || key.equals(newElementItem.key)) {
                 return newElementItem.value;
             }
             newElementItem = newElementItem.next;
