@@ -21,9 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (checkSize()) {
-            resize();
-        }
+        resize();
         int index = getIndex(key);
         if (key == null) {
             putForNullKey(value);
@@ -35,12 +33,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         Node<K, V> node = buckets[index];
-        if (checkBucketForExistKey(node, key)) {
-            node.value = value;
-        } else {
-            buckets[index] = new Node<>(key, value, node);
-            size++;
+        while (node != null) {
+            if (node.key.hashCode() == key.hashCode() && node.key.equals(key)) {
+                node.value = value;
+                return;
+            } else {
+                node = node.next;
+            }
         }
+        buckets[index] = new Node<>(key, value, buckets[index]);
+        size++;
     }
 
     @Override
@@ -57,6 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             } else {
                 node = node.next;
             }
+
         }
         return null;
     }
@@ -70,33 +73,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode() % buckets.length);
     }
 
-    private boolean checkSize() {
-        return size >= threshold;
-    }
-
     private void resize() {
-        size = 0;
-        int newCapacity = buckets.length * 2;
-        Node[] oldBuckets = buckets;
-        buckets = new Node[newCapacity];
-        threshold = (int) (buckets.length * LOAD_FACTOR);
-        for (Node<K, V> node : oldBuckets) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+        if (size >= threshold) {
+            size = 0;
+            int newCapacity = buckets.length * 2;
+            Node[] oldBuckets = buckets;
+            buckets = new Node[newCapacity];
+            threshold = (int) (buckets.length * LOAD_FACTOR);
+            for (Node<K, V> node : oldBuckets) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
             }
         }
-    }
-
-    private boolean checkBucketForExistKey(Node<K, V> node, K key) {
-        while (node != null) {
-            if (node.key.hashCode() == key.hashCode() && node.key.equals(key)) {
-                return true;
-            } else {
-                node = node.next;
-            }
-        }
-        return false;
     }
 
     private void putForNullKey(V value) {
@@ -109,7 +99,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node = node.next;
             }
         }
-        buckets[0] = new Node<>(null, value, node);
+        buckets[0] = new Node<>(null, value, buckets[0]);
         size++;
     }
 
