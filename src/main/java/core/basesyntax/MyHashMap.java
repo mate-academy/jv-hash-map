@@ -5,7 +5,6 @@ package core.basesyntax;
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
@@ -76,7 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int newCapacity = table.length * 2 + 1;
         capacity = (int) (newCapacity * LOAD_FACTOR);
         table = new Entry[newCapacity];
-        for (int i = table.length - 1; i >= 0; i--) {
+        for (int i = oldTable.length - 1; i >= 0; i--) {
             Entry<K, V> entry = oldTable[i];
             while (entry != null) {
                 int index = hashCode(entry.key);
