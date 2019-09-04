@@ -14,7 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (nullKeyCheck(key)) {
+        if (key == null) {
             if (nullBucket.getValue() == null && value != null) {
                 entriesCount++;
             }
@@ -45,20 +45,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (nullKeyCheck(key)) {
+        if (key == null) {
             return nullBucket.getValue();
         }
         int index = Math.abs(key.hashCode() % buckets.length);
         if (collisionCheck(index)) {
-            Node<K, V> search = buckets[index];
-            if (search.getKey().equals(key)) {
-                return search.getValue();
+            Node<K, V> requiredNode = buckets[index];
+            if (requiredNode.getKey().equals(key)) {
+                return requiredNode.getValue();
             }
-            while (search.hasNext()) {
-                if (search.getNext().getKey().equals(key)) {
-                    return (V) search.getNext().getValue();
+            while (requiredNode.hasNext()) {
+                if (requiredNode.getNext().getKey().equals(key)) {
+                    return (V) requiredNode.getNext().getValue();
                 }
-                search = search.getNext();
+                requiredNode = requiredNode.getNext();
             }
             System.out.println("Invalid key input");
             return null;
@@ -75,25 +75,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return buckets[index] != null;
     }
 
-    private boolean nullKeyCheck(K key) {
-        return key == null;
-    }
 
     private void resize() {
         if (entriesCount / buckets.length >= LOAD_FACTOR) {
             Node[] temp = new Node[buckets.length];
             for (int i = 0; i < buckets.length; i++) {
-                if (collisionCheck(i)) {
+                if (buckets[i] != null) {
                     temp[i] = buckets[i];
                 }
             }
             buckets = new Node[buckets.length * 2];
             for (int i = 0; i < buckets.length; i++) {
-                if (collisionCheck(i)) {
+                if (buckets[i] != null) {
                     this.put((K) temp[i].getKey(), (V) temp[i].getValue());
-                    Node<K, V> search = temp[i];
-                    while (search.hasNext()) {
-                        this.put((K) search.getNext().getKey(), (V) search.getNext().getValue());
+                    Node<K, V> nodeToCopy = temp[i];
+                    while (nodeToCopy.hasNext()) {
+                        this.put((K) nodeToCopy.getNext().getKey(),
+                                (V) nodeToCopy.getNext().getValue());
                     }
                 }
             }
