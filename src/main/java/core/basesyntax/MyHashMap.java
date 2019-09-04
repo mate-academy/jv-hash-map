@@ -18,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public MyHashMap(int size) {
-        if (size < DEFAULT_CAPACITY) {
+        if (size < 0) {
             size = DEFAULT_CAPACITY;
         }
         nodes = new Node[size];
@@ -59,10 +59,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        reHash();
         if (key == null) {
             putNullKey(value);
         } else {
-            reHash();
             int hash = key.hashCode();
             int index = hash & (nodes.length - 1);
             for (Node node = nodes[index]; node != null; node = node.next) {
