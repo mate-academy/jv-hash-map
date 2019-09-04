@@ -53,7 +53,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> currentNode = oldTable[i];
             if (currentNode != null) {
                 while (currentNode != null) {
-                    put(currentNode.key, currentNode.value);
+                    putValue(indexByHash(currentNode.key), currentNode.key, currentNode.value);
                     currentNode = currentNode.next;
                 }
             }
@@ -65,19 +65,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (basket == null) {
             table[index] = new Node(key, value, null);
         } else {
-            if (basket.key == key) { // check for key == null
+            if (basket.key == key) {
                 basket.value = value;
                 return;
             }
-            Node<K, V> currentNodeInBasket = basket;
-            while (currentNodeInBasket.next != null) {
-                if (currentNodeInBasket.key != null && currentNodeInBasket.key.equals(key)) {
-                    currentNodeInBasket.value = value;
+            while (basket.next != null) {
+                if (basket.key != null && basket.key.equals(key)) {
+                    basket.value = value;
                     return;
                 }
-                currentNodeInBasket = currentNodeInBasket.next;
+                basket = basket.next;
             }
-            currentNodeInBasket.next = new Node(key, value, null);
+            basket.next = new Node(key, value, null);
         }
         size++;
     }
@@ -101,13 +100,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private Node<K, V> next;
         private K key;
         private V value;
+        private Node<K, V> next;
 
         public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
+            this.next = next;
         }
+
     }
 }
