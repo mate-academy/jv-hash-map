@@ -8,68 +8,72 @@ import java.util.Objects;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private Node<K, V>[] nodesArray;
+    private Node<K, V>[] nodes;
     private int size = 0;
-    private int defaultCapacity = 16;
-    private double loadFactor = 0.75;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final double LOAD_FACTOR = 0.75;
 
     public MyHashMap() {
-        nodesArray = new Node[defaultCapacity];
+        nodes = new Node[DEFAULT_CAPACITY];
     }
 
     public MyHashMap(int size) {
-        if (size < defaultCapacity) {
-            size = defaultCapacity;
+        if (size < DEFAULT_CAPACITY) {
+            size = DEFAULT_CAPACITY;
         }
-        nodesArray = new Node[size];
+        nodes = new Node[size];
+    }
+
+    private void putNullKey(V value) {
+        while (nodes[0] != null) {
+            if (nodes[0].key == null) {
+                nodes[0].value = value;
+                return;
+            }
+        }
+        nodes[0] = new Node<>(null, value, 0, nodes[0]);
+        size++;
+    }
+
+    private void reHash() {
+        if (size > nodes.length * LOAD_FACTOR) {
+            Node<K, V>[] newNodesArray = new Node[nodes.length * 2];
+            Node<K, V> node;
+            for (Node<K, V> i : nodes) {
+                node = i;
+                if (node == null) {
+                    continue;
+                }
+
+                while (node != null) {
+                    Node<K, V> next = node.next;
+                    int index = node.hash & (newNodesArray.length - 1);
+                    node.next = newNodesArray[index];
+                    newNodesArray[index] = node;
+                    node = next;
+                }
+            }
+            this.nodes = newNodesArray;
+        }
     }
 
     @Override
     public void put(K key, V value) {
         if (key == null) {
-            Node<K, V> node;
-            for (node = nodesArray[0]; node != null; node = node.next) {
-                if (node.key == null) {
-                    node.value = value;
-                    return;
-                }
-            }
-            nodesArray[0] = new Node<>(null, value, 0, node);
-            size++;
+            putNullKey(value);
         } else {
-            if (size > nodesArray.length * loadFactor) {
-                Node<K, V>[] newNodesArray = new Node[nodesArray.length * 3 / 2];
-                Node<K, V> node;
-
-                for (int i = 0; i < nodesArray.length; i++) {
-                    node = nodesArray[i];
-                    if (node == null) {
-                        continue;
-                    }
-
-                    int index;
-                    while (node != null) {
-                        Node<K, V> next = node.next;
-                        index = node.hash & (newNodesArray.length - 1);
-                        node.next = newNodesArray[index];
-                        newNodesArray[index] = node;
-                        node = next;
-                    }
-                }
-                this.nodesArray = newNodesArray;
-            }
-
+            reHash();
             int hash = key.hashCode();
-            int index = hash & (nodesArray.length - 1);
-            for (Node node = nodesArray[index]; node != null; node = node.next) {
+            int index = hash & (nodes.length - 1);
+            for (Node node = nodes[index]; node != null; node = node.next) {
                 if (node.hash == hash
                         && (node.key == key || key.equals(node.key))) {
                     node.value = value;
                     return;
                 }
             }
-            Node<K, V> next = nodesArray[index];
-            nodesArray[index] = new Node<>(key, value, hash, next);
+            Node<K, V> next = nodes[index];
+            nodes[index] = new Node<>(key, value, hash, next);
             size++;
         }
     }
@@ -77,7 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         if (key == null) {
-            Node<K, V> node = nodesArray[0];
+            Node<K, V> node = nodes[0];
             while (node != null) {
                 if (node.key == null) {
                     return node.value;
@@ -87,14 +91,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             throw new IndexOutOfBoundsException();
         }
 
-        int hash = key.hashCode();
-        int index = hash & (nodesArray.length - 1);
-        Node<K, V> node = nodesArray[index];
-        K tempKey;
-
+        int index = key.hashCode() & (nodes.length - 1);
+        Node<K, V> node = nodes[index];
         while (node != null) {
-            tempKey = node.key;
-            if (node.hash == hash && tempKey.equals(key)) {
+            if (node.key.equals(key)) {
                 return node.value;
             }
             node = node.next;
