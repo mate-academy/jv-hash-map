@@ -10,7 +10,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private Entry<K, V>[] table;
     private int size;
-    private int capacity = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
 
     private static class Entry<K, V> {
         private K key;
@@ -57,7 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 entry = entry.next;
             }
         }
-        if (size++ > capacity) {
+        if (size++ > table.length * LOAD_FACTOR) {
             rehash();
             index = hashCode(key);
         }
@@ -72,9 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void rehash() {
         Entry<K, V>[] oldTable = table;
-        int newCapacity = table.length * 2 + 1;
-        capacity = (int) (newCapacity * LOAD_FACTOR);
-        table = new Entry[newCapacity];
+        table = new Entry[table.length * 2 + 1];
         for (int i = oldTable.length - 1; i >= 0; i--) {
             Entry<K, V> entry = oldTable[i];
             while (entry != null) {
