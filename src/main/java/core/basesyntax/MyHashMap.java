@@ -26,10 +26,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         } else {
             int index = Math.abs(key.hashCode()) % capacity;
-            if (index != 0 && elements[index] == null) {
+            if (elements[index] == null) {
                 elements[index] = new Element(key, value, null);
                 size++;
-            } else if (index != 0) {
+            } else {
                 processAndPut(index, key, value);
             }
         }
