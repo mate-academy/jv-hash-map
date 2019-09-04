@@ -111,13 +111,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= bucketStock.length * LOAD_FACTOR) {
             Node<K, V>[] oldBucketStock = bucketStock;
             bucketStock = new Node[bucketStock.length * 2];
+            size = 0;
             for (int i = 0; i < oldBucketStock.length; i++) {
-                if (bucketStock[i] == null) {
+                if (oldBucketStock[i] == null) {
                     continue;
                 }
-                while (bucketStock[i] != null) {
-                    put(bucketStock[i].key, bucketStock[i].value);
-                    bucketStock[i] = bucketStock[i].nextNode;
+                while (oldBucketStock[i] != null) {
+                    put(oldBucketStock[i].key, oldBucketStock[i].value);
+                    oldBucketStock[i] = oldBucketStock[i].nextNode;
                 }
             }
         }
