@@ -88,7 +88,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = toAssingIndex(key);
-        for(Entry<K,V> temp = buckets[index]; temp != null; temp = temp.next) {
+        for (Entry<K, V> temp = buckets[index]; temp != null; temp = temp.next) {
             if (checkDuplicate(key, temp)) {
                 return temp.value;
             }
