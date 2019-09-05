@@ -25,7 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public MyHashMap() {
-        this.buckets = new Entry[DEFAULT_CAPACITY];
+        buckets = new Entry[DEFAULT_CAPACITY];
         size = 0;
         capacity = DEFAULT_CAPACITY;
     }
@@ -48,7 +48,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         if (size >= capacity * LOAD_FACTOR) {
-            capacity = (capacity * 3) / 2;
+            capacity = capacity * 2;
             Entry[] oldBuckets = buckets;
             buckets = new Entry[capacity];
             size = 0;
@@ -62,6 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        resize();
         Entry newEntry = new Entry(key, value, null);
         int index = toAssingIndex(key);
         if (buckets[index] == null) {
