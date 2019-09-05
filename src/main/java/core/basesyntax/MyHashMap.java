@@ -17,13 +17,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         nodes = new Node[DEFAULT_CAPACITY];
     }
 
-    public MyHashMap(int size) {
-        if (size < 0) {
-            size = DEFAULT_CAPACITY;
-        }
-        nodes = new Node[size];
-    }
-
     private void putNullKey(V value) {
         while (nodes[0] != null) {
             if (nodes[0].key == null) {
