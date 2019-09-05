@@ -17,21 +17,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > elements.length * LOAD_FACTOR) {
             resize();
         }
-        if (key == null) {
-            if (elements[0] == null) {
-                elements[0] = new Element(null, value, null);
-                size++;
-            } else {
-                elements[0].value = value;
-            }
+        int index = key == null ? 0 : Math.abs(key.hashCode()) % capacity;
+        if (elements[index] == null) {
+            elements[index] = new Element(key, value, null);
+            size++;
         } else {
-            int index = key == null ? 0 : Math.abs(key.hashCode()) % capacity;
-            if (elements[index] == null) {
-                elements[index] = new Element(key, value, null);
-                size++;
-            } else {
-                processAndPut(index, key, value);
-            }
+            processAndPut(index, key, value);
         }
     }
 
@@ -72,6 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return (V) elements[0].value;
         }
+
         int index = key == null ? 0 : Math.abs(key.hashCode()) % capacity;
         Element<K, V> newElementItem = elements[index];
         while (newElementItem != null) {
