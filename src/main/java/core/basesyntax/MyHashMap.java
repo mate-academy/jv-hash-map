@@ -48,8 +48,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index].value = value;
             return;
         } else {
-            Node<K, V> e = table[index];
-            table[index] = new Node<>(key, value, e);
+            Node<K, V> moveNode = table[index];
+            table[index] = new Node<>(key, value, moveNode);
         }
         size++;
     }
