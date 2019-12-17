@@ -52,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Entry<K, V> temp =table[countBuckPos(key)];
+        Entry<K, V> temp = table[countBuckPos(key)];
         while (temp != null) {
             if (temp.getKey() == key || (key != null && key.equals(temp.getKey()))) {
                 return temp.getValue();
