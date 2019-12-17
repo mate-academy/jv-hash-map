@@ -8,6 +8,7 @@ import java.util.Objects;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final double LOAD_FACTOR = 0.75;
     private static final int INITIAL_CAPACITY = 16;
     private int size;
     private Bucket[] data;
@@ -30,19 +31,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        int position;
-        if (key == null) {
-            position = 0;
-        } else {
-            position = Math.abs(key.hashCode() % data.length);
-        }
+        int position = calculatePosition(key);
+        Bucket localBucket = new Bucket(key, value);
         if (data[position] == null) {
-            Bucket newBucket = new Bucket(key, value);
-            data[position] = newBucket;
+            data[position] = localBucket;
             size++;
             return;
         }
-        Bucket localBucket = data[position];
+        localBucket = data[position];
         while (localBucket != null) {
             if (Objects.equals(key, localBucket.key)) {
                 localBucket.value = value;
@@ -59,12 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int position;
-        if (key == null) {
-            position = 0;
-        } else {
-            position = Math.abs(key.hashCode() % data.length);
-        }
+        int position = calculatePosition(key);
         Bucket localBucket = data[position];
         while (localBucket != null) {
             if (Objects.equals(key, localBucket.key)) {
@@ -80,8 +71,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private int calculatePosition(K key) {
+        int position;
+        if (key == null) {
+            position = 0;
+        } else {
+            position = Math.abs(key.hashCode() % data.length);
+        }
+        return position;
+    }
+
     private void resize() {
-        if (size >= data.length * 0.75) {
+        if (size >= data.length * LOAD_FACTOR) {
             Bucket[] oldData = data;
             data = new Bucket[oldData.length * 2];
             size = 0;
