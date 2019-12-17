@@ -32,13 +32,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         resize();
         int position = calculatePosition(key);
-        Bucket localBucket = new Bucket(key, value);
+        Bucket<K, V> createdBucket = new Bucket(key, value);
         if (data[position] == null) {
-            data[position] = localBucket;
+            data[position] = createdBucket;
             size++;
             return;
         }
-        localBucket = data[position];
+        Bucket<K, V> localBucket = data[position];
         while (localBucket != null) {
             if (Objects.equals(key, localBucket.key)) {
                 localBucket.value = value;
@@ -49,17 +49,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             localBucket = localBucket.next;
         }
-        localBucket.next = new Bucket(key, value);
+        localBucket.next = createdBucket;
         size++;
     }
 
     @Override
     public V getValue(K key) {
         int position = calculatePosition(key);
-        Bucket localBucket = data[position];
+        Bucket<K, V> localBucket = data[position];
         while (localBucket != null) {
             if (Objects.equals(key, localBucket.key)) {
-                return (V) localBucket.value;
+                return localBucket.value;
             }
             localBucket = localBucket.next;
         }
