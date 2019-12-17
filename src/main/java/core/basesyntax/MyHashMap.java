@@ -43,8 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K, V> node = table[bucket];
         do {
-            if (node.hash == hash && (node.key == key
-                    || node.key != null && node.key.equals(key))) {
+            if (node.key == key || node.key != null && node.key.equals(key)) {
                 return node.value;
             }
             node = node.next;
@@ -80,8 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[bucket] != null) {
             Node<K, V> start = table[bucket];
             do {
-                if (start.hash == hash && (start.key == key
-                        || start.key != null && start.key.equals(key))) {
+                if (start.key == key || start.key != null && start.key.equals(key)) {
                     start.value = value;
                     return true;
                 }
