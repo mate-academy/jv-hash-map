@@ -14,7 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
         capacity = DEFAULT_CAPACITY;
     }
 
@@ -23,14 +23,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         sizeCheck();
         int hash = hashKey(key);
         int bucket = hash % capacity;
+        if (table[bucket] == null) {
+            table[bucket] = new Node<>(hash, key, value, null);
+            size++;
+            return;
+        }
         if (!overwriteDuplicates(bucket, hash, key, value)) {
             Node<K, V> newNode = new Node<>(hash, key, value, null);
-            if (table[bucket] == null) {
-                table[bucket] = newNode;
-                size++;
-            } else {
-                addInBucket(newNode, bucket);
-            }
+            addInBucket(newNode, bucket);
         }
     }
 
@@ -65,9 +65,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         final Node<K, V>[] oldTable = table;
         capacity = capacity << 1;
-        table = (Node<K, V>[]) new Node[capacity];
+        table = new Node[capacity];
         size = 0;
-        for (Node<K, V> node: oldTable) {
+        for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
