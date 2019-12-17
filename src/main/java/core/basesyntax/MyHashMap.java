@@ -49,12 +49,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             if (localBucket.next == null) {
-                localBucket.next = new Bucket(key, value);
-                size++;
-                return;
+                break;
             }
             localBucket = localBucket.next;
         }
+        localBucket.next = new Bucket(key, value);
+        size++;
     }
 
     @Override
