@@ -6,8 +6,8 @@ package core.basesyntax;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private Node<K, V>[] table;
     private int size;
 
@@ -47,13 +47,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else if (table[index].key.equals(key)) {
             table[index].value = value;
             return;
-        } else {
-            Node<K, V> lastNode = table[index];
-            while (lastNode.next != null) {
-                lastNode = lastNode.next;
-            }
-            lastNode.next = new Node<>(key, value, null);
         }
+        Node<K, V> lastNode = table[index];
+        while (lastNode.next != null) {
+            lastNode = lastNode.next;
+        }
+        lastNode.next = new Node<>(key, value, null);
         size++;
     }
 
@@ -73,13 +72,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return table[0].value;
         }
-
         int index = hash(key);
-        if ((index < 0 || index > table.length)
-                || table[index] == null) {
+        if (table[index] == null) {
             return null;
         }
-
         if (table[index].key.equals(key)) {
             return table[index].value;
         } else {
