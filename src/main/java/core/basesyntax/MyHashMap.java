@@ -68,22 +68,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         V value = null;
-
         if (key == null) {
             return table[0].value;
         }
         int index = hash(key);
-        if (table[index] == null) {
-            return null;
-        }
-        if (table[index].key.equals(key)) {
-            return table[index].value;
-        } else {
-            for (Node<K, V> temp = table[index].next; temp != null; temp = temp.next) {
-                if (key.equals(temp.key)) {
-                    value = temp.value;
-                    break;
-                }
+        for (Node<K, V> temp = table[index]; temp != null; temp = temp.next) {
+            if (key.equals(temp.key)) {
+                value = temp.value;
+                break;
             }
         }
         return value;
