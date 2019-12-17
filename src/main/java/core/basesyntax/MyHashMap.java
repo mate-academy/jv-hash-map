@@ -18,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
         capacity = DEFAULT_INITIAL_CAPACITY;
-        threshold = (int) (capacity / DEFAULT_LOAD_FACTOR);
+        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
     }
 
     public MyHashMap(int capacity) {
@@ -27,7 +27,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         this.capacity = capacity;
         table = new Node[capacity];
-        threshold = (int) (capacity / DEFAULT_LOAD_FACTOR);
+        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
