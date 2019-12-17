@@ -27,54 +27,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         resise();
         Entry<K, V> newEntry = new Entry<>(key, value);
-        Entry temp;
-        if (key == null && table[0] == null) {
-            table[0] = newEntry;
+        int position = countBuckPos(newEntry.getKey());
+        Entry temp = table[position];
+        if (temp == null) {
+            table[position] = newEntry;
             size++;
-            return;
-        } else if (key == null && table[0] != null) {
-            temp = table[0];
-            if (temp.getKey() == null) {
-                temp.setValue(value);
-            } else {
-                while (temp.getNext() != null) {
-                    temp = temp.getNext();
-                    if (temp.getKey() == null) {
-                        temp.setValue(value);
-                        return;
-                    }
-                }
-                temp.setNext(newEntry);
-                size++;
-                return;
-            }
             return;
         }
 
-        int position = countBuckPos(newEntry.getKey());
-        if (table[position] == null) {
-            table[position] = newEntry;
-            size++;
-        }
-        if (table[position] != null) {
-            temp = table[position];
-            if (temp.getKey().equals(newEntry.getKey())) {
+        while (temp != null) {
+            if (newEntry.getKey() == temp.getKey() || newEntry.getKey() != null
+                    && newEntry.getKey().equals(temp.getKey())) {
                 temp.setValue(value);
                 return;
             }
-            while (temp.getNext() != null) {
-                if (temp.getKey() != null && temp.getKey().equals(newEntry.getKey())) {
-                    temp.setValue(value);
-                    return;
-                }
-                temp = temp.getNext();
-            }
-            if (temp.getNext() == null && temp.getHash() != newEntry.getHash()) {
+            if (temp.getNext() == null) {
                 temp.setNext(newEntry);
                 size++;
-            } else {
-                temp.setValue(value);
+                return;
             }
+            temp = temp.getNext();
         }
     }
 
