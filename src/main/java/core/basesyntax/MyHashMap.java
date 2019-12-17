@@ -37,7 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : k ^ (k >>> 7) ^ (k >>> 4);
     }
 
-    public int getIndex(int hash, int tableLength) {
+    private int getIndex(int hash, int tableLength) {
         int i = hash % tableLength;
         return i;
     }
@@ -48,7 +48,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public boolean checkBucketValue(int index) {
+    private boolean checkBucketValue(int index) {
         return table[index] != null;
     }
 
@@ -66,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public void putForNull(V value) {
+    private void putForNull(V value) {
         if (checkBucketValue(0)) {
             Node<K, V> node = table[0];
             while (node != null) {
@@ -86,7 +86,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    public V getForNull() {
+    private V getForNull() {
         if (checkBucketValue(0)) {
             Node<K, V> node = table[0];
             while (node != null) {
@@ -157,14 +157,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> nextNode;
 
-        public Node(int hash, K key, V value) {
+        private Node(int hash, K key, V value) {
             this.hash = hash;
             this.key = key;
             this.value = value;
             this.nextNode = null;
         }
 
-        public Node(int hash, K key, V value, Node<K, V> nextNode) {
+        private Node(int hash, K key, V value, Node<K, V> nextNode) {
             this.hash = hash;
             this.key = key;
             this.value = value;
