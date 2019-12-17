@@ -6,8 +6,8 @@ package core.basesyntax;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
     private int capacity = DEFAULT_INITIAL_CAPACITY;
     private int size;
     private Node[] elements = new Node[DEFAULT_INITIAL_CAPACITY];
@@ -17,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > elements.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
-        int index = key == null ? 0 : convertToHash(key);
+        int index = convertToHash(key);
         if (elements[index] == null) {
             size++;
             elements[index] = new Node(key, value, null);
@@ -47,18 +47,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static class Node<K, V> {
-        private K key;
-        private V value;
-        private Node next;
-
-        Node(K key, V value, Node next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     private void resize() {
         size = 0;
         Node[] oldMap = elements;
@@ -72,7 +60,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         capacity *= 2;
     }
 
-    public void hashPut(int index, K key, V value) {
+    private void hashPut(int index, K key, V value) {
         Node<K, V> copyOfNode = elements[index];
         while (copyOfNode != null) {
             if (key == copyOfNode.key || key.equals(copyOfNode.key)) {
@@ -89,8 +77,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int convertToHash(K key) {
         if (key == null) {
             return 0;
-        } else {
-            return Math.abs(key.hashCode()) % elements.length + 1;
+        }
+        return Math.abs(key.hashCode()) % elements.length + 1;
+    }
+
+    private static class Node<K, V> {
+        private K key;
+        private V value;
+        private Node next;
+
+        Node(K key, V value, Node next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
         }
     }
 }
