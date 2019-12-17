@@ -52,6 +52,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         int position = countBuckPos(newEntry.getKey());
+        if (table[position] == null) {
+            table[position] = newEntry;
+            size++;
+        }
         if (table[position] != null) {
             temp = table[position];
             if (temp.getKey().equals(newEntry.getKey())) {
@@ -71,9 +75,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             } else {
                 temp.setValue(value);
             }
-        } else {
-            table[position] = newEntry;
-            size++;
         }
     }
 
