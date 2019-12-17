@@ -9,8 +9,8 @@ import java.util.Objects;
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    static final float LOAD_FACTOR = 0.75f;
-    static final int DEFAULT_BUCKETS = 16;
+    private static final float LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_BUCKETS = 16;
 
     private Node[] table;
     private int buckets;
