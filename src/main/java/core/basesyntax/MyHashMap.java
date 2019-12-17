@@ -9,19 +9,18 @@ import java.util.Objects;
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
-    private int capacity = 16;
+    private static final int CAPACITY = 16;
+    private int initialCapacity;
     public Entry<K, V>[] table;
     private int size = 0;
 
     public MyHashMap() {
-        table = new Entry[capacity];
+        table = new Entry[CAPACITY];
+        initialCapacity = CAPACITY;
     }
 
     private int countBuckPos(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode() % table.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     @Override
@@ -114,10 +113,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public void resise() {
-        if (LOAD_FACTOR * getSize() >= capacity) {
+        if (LOAD_FACTOR * getSize() >= initialCapacity) {
             size = 0;
             Entry<K, V>[] tempTable = table;
-            capacity = capacity * 2;
+            initialCapacity = initialCapacity * 2;
             table = new Entry[table.length * 2];
             for (Entry<K, V> entry : tempTable) {
                 while (entry != null) {
