@@ -75,10 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int convertToHash(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode()) % elements.length + 1;
+        return key == null ? 0 : Math.abs(key.hashCode()) % elements.length + 1;
     }
 
     private static class Node<K, V> {
