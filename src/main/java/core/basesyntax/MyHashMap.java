@@ -23,13 +23,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         sizeCheck();
         int hash = hashKey(key);
         int bucket = hash % capacity;
+        Node<K, V> newNode = new Node<>(hash, key, value, null);
         if (table[bucket] == null) {
-            table[bucket] = new Node<>(hash, key, value, null);
+            table[bucket] = newNode;
             size++;
             return;
         }
-        if (!overwriteDuplicates(bucket, hash, key, value)) {
-            Node<K, V> newNode = new Node<>(hash, key, value, null);
+        if (!overwriteDuplicates(bucket, key, value)) {
             addInBucket(newNode, bucket);
         }
     }
@@ -75,7 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private boolean overwriteDuplicates(int bucket, int hash, K key, V value) {
+    private boolean overwriteDuplicates(int bucket, K key, V value) {
         if (table[bucket] != null) {
             Node<K, V> start = table[bucket];
             do {
