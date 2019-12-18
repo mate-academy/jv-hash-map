@@ -8,49 +8,41 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private int realCapacity;
+    private int capacity;
     private int size;
     private Node<K, V>[] buckets;
 
     public MyHashMap() {
-        this.realCapacity = DEFAULT_INITIAL_CAPACITY;
-        this.buckets = new Node[realCapacity];
+        this.capacity = DEFAULT_INITIAL_CAPACITY;
+        this.buckets = new Node[capacity];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size > realCapacity * DEFAULT_LOAD_FACTOR) {
+        if (size > capacity * DEFAULT_LOAD_FACTOR) {
             resize();
         }
         int index = hash(key);
 
-        if (buckets[index] == null) {
-            buckets[index] = new Node<>(key, value, null);
-            size++;
-        } else {
-            Node<K, V> newNode = buckets[index];
-            while (newNode != null) {
-                if (key == newNode.key || key.equals(newNode.key)) {
-                    newNode.value = value;
-                    return;
-                }
-                newNode = newNode.next;
+        Node<K, V> newNode = buckets[index];
+        while (newNode != null) {
+            if (key == newNode.key || key != null && key.equals(newNode.key)) {
+                newNode.value = value;
+                return;
             }
-            Node<K, V> nextElementOfBucket = new Node<>(key, value, buckets[index]);
-            buckets[index] = nextElementOfBucket;
-            size++;
+            newNode = newNode.next;
         }
+        Node<K, V> nextElementOfBucket = new Node<>(key, value, buckets[index]);
+        buckets[index] = nextElementOfBucket;
+        size++;
     }
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
-            return buckets[0].value;
-        }
         int index = hash(key);
         Node<K, V> newNode = buckets[index];
         while (newNode != null) {
-            if (key.equals(newNode.key)) {
+            if (key == null || key.equals(newNode.key)) {
                 return newNode.value;
             }
             newNode = newNode.next;
@@ -65,9 +57,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        Node[] pastBucket = buckets;
-        buckets = new Node[realCapacity *= 2];
-        for (Node<K, V> futureBucket : pastBucket) {
+        Node[] oldBucket = buckets;
+        buckets = new Node[capacity *= 2];
+        for (Node<K, V> futureBucket : oldBucket) {
             while (futureBucket != null) {
                 put(futureBucket.key, futureBucket.value);
                 futureBucket = futureBucket.next;
@@ -76,7 +68,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return key == null ? 0 : (key.hashCode() & 31) % realCapacity + 1;
+        return key == null ? 0 : (key.hashCode() & 31) % capacity + 1;
     }
 
     private static class Node<K, V> {
