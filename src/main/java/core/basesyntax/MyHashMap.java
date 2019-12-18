@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
@@ -37,34 +39,40 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (sizeCounter >= capacity * DEFAULT_LOAD_FACTORY) {
             resize();
         }
-
         int index = indexByKeyHash(key);
-        Node<K, V> tempNode = elementsTable[index];
-        while (tempNode != null) {
-            if (key == tempNode.key || (key != null && key.equals(tempNode.key))) {
-                tempNode.value = value;
+        if (elementsTable[index] == null) {
+            elementsTable[index] = new Node<>(key, value, null);
+            sizeCounter++;
+        }
+        for (int i = index; i < elementsTable.length; i++) {
+            if (i == elementsTable.length) {
+                resize();
+                put(key, value);
                 return;
             }
-            tempNode = tempNode.next;
+            if (elementsTable[i] == null) {
+                elementsTable[i] = new Node<>(key, value, null);
+                sizeCounter++;
+                return;
+            }
+            if (Objects.equals(elementsTable[i].key, key)) {
+                elementsTable[i].value = value;
+                return;
+            }
         }
-        Node<K, V> newNode = new Node<>(key, value, elementsTable[index]);
-        elementsTable[index] = newNode;
-        sizeCounter++;
     }
 
     @Override
     public V getValue(K key) {
         int index = indexByKeyHash(key);
-        Node<K, V> tempNode = elementsTable[index];
-        if (tempNode == null) {
+        if (elementsTable[index] == null) {
             return null;
         }
 
-        while (tempNode != null) {
-            if (tempNode.key == key || (key != null && key.equals(tempNode.key))) {
-                return tempNode.value;
+        for (int i = index; i < elementsTable.length; i++) {
+            if (Objects.equals(elementsTable[i].key, key)) {
+                return elementsTable[i].value;
             }
-            tempNode = tempNode.next;
         }
         return null;
     }
@@ -84,10 +92,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         capacity *= 2;
         elementsTable = new Node[capacity];
         for (Node<K, V> node : tempNodeArray) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+            if (node == null) {
+                continue;
             }
+            put(node.key, node.value);
         }
     }
 }
