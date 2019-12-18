@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -9,59 +8,52 @@ import java.util.Objects;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    int size = 0;
+    private int size = 0;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
-    private Object[] elementArray;
+    private static final int DEFAULT_CAPACITY = 16;
+    private Node<K, V>[] elementArray;
 
     MyHashMap() {
-        elementArray = new Object[16];
+        elementArray = new Node[DEFAULT_CAPACITY];
     }
 
     MyHashMap(int capacity) {
-        elementArray = new Object[capacity];
+        elementArray = new Node[capacity];
     }
 
     @Override
     public void put(K key, V value) {
-        if (++size > elementArray.length * DEFAULT_LOAD_FACTOR) {
+        if (size > elementArray.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
         int index = hash(key);
 
-        if (index > -1) {
-            Node currentNode = (Node) elementArray[index];
-            if (currentNode == null) {
-                elementArray[index] = new Node(key, value);
+        if (elementArray[index] == null) {
+            elementArray[index] = new Node<>(key, value);
+            size++;
+        } else {
+            if (key == null) {
+                if (Objects.equals(key, elementArray[index].key)) {
+                    elementArray[index].data = value;
+                } else {
+                    Node<K, V> tmp = new Node<>(key, value);
+                    tmp.next = elementArray[index];
+                    elementArray[index] = tmp;
+                    size++;
+                }
             } else {
-                while (currentNode.next != null) {
-                    if (key.equals(currentNode.key)) {
+                Node<K, V> currentNode = elementArray[index];
+                while (currentNode != null) {
+                    if (Objects.equals(currentNode.key, key)) {
                         currentNode.data = value;
-                        size--;
                         return;
                     }
                     currentNode = currentNode.next;
                 }
-                if (key.equals(currentNode.key)) {
-                    currentNode.data = value;
-                    size--;
-                    return;
-                }
-                currentNode.next = new Node(key, value);
-            }
-
-        } else {
-            Node currentNode = (Node) elementArray[0];
-            Node tmp = new Node(null, value);
-            if (currentNode != null) {
-                if (currentNode.key == null) {
-                    currentNode.data = value;
-                    size--;
-                    return;
-                }
-                tmp.next = currentNode;
-                elementArray[0] = tmp;
-            } else {
-                elementArray[0] = tmp;
+                Node<K, V> tmp = new Node<>(key, value);
+                tmp.next = elementArray[index];
+                elementArray[index] = tmp;
+                size++;
             }
         }
     }
@@ -89,11 +81,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Object[] newArray = Arrays.copyOf(elementArray, elementArray.length);
-        elementArray = new Object[size * (size >>> 1)];
-        size = 1;
-        for (Object obj : newArray) {
-            Node element = (Node) obj;
+        Node<K, V>[] newArray = elementArray;
+        elementArray = new Node[size * (size >>> 1)];
+        size = 0;
+        for (Node<K, V> obj : newArray) {
+            Node element = obj;
             while (element != null) {
                 put((K) element.key, (V) element.data);
                 element = element.next;
@@ -103,17 +95,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int hash(Object key) {
         if (key != null) {
-            return Math.abs(key.hashCode() % elementArray.length);
+            return Math.abs(key.hashCode() + 1) % elementArray.length;
         }
-        return -1;
+        return 0;
     }
 
     private class Node<K, V> {
-        K key;
-        V data;
+        private K key;
+        private V data;
         public Node next;
 
-        Node(K key, V data) {
+        private Node(K key, V data) {
             this.key = key;
             this.data = data;
         }
