@@ -70,7 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> node : newArray) {
             Node<K, V> element = node;
             while (element != null) {
-                put( element.key, element.data);
+                put(element.key, element.data);
                 element = element.next;
             }
         }
