@@ -6,9 +6,8 @@ package core.basesyntax;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_INITIAL_CAPACITY = 16;
-    static final float DEFAULT_LOAD_FACTOR = 0.75F;
-    private int bucket;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75F;
     private Node<K, V>[] buckets;
     private int size = 0;
 
@@ -68,12 +67,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         if (size >= (int) buckets.length * DEFAULT_LOAD_FACTOR) {
             Node<K, V>[] oldBuckets = buckets;
-            buckets = new Node[oldBuckets.length * 2]; //here have had a problem with <K, V>. Why?
+            buckets = new Node[oldBuckets.length * 2];
             size = 0;
             for (int i = 0; i < oldBuckets.length; i++) {
-                if (oldBuckets[i] == null) {
-                    continue;
-                }
                 Node<K, V> toAddAgain = oldBuckets[i];
                 while (toAddAgain != null) {
                     put(toAddAgain.key, toAddAgain.value);
@@ -83,12 +79,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    class Node<K, V> {
+    private static class Node<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
 
-        Node(K key, V value, Node<K, V> next) {
+        private Node (K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
