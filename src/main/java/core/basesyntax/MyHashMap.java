@@ -59,20 +59,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void addNewNode(Node<K, V> node, int bucket) {
-        if (table[bucket] == null) {
-            table[bucket] = node;
-            size++;
-            return;
-        }
-        Node<K, V> newNode = table[bucket];
-        while (newNode.nextNode != null) {
-            newNode = newNode.nextNode;
-        }
-        newNode.nextNode = node;
-        size++;
-    }
-
     private void resize() {
         int newCapacity  = table.length * 2;
         Node<K, V>[] oldTable = table;
