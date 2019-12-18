@@ -11,10 +11,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private int size = 0;
 
-    MyHashMap() {
-    }
-
-    private int hash(K key) {
+    private int getIndex(K key) {
         int hash = 31;
         hash = hash * 17 + key.hashCode();
         return key == null ? 0 : Math.abs(hash) % hashTable.length;
@@ -23,13 +20,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (key == null) {
-            putValueWithKeyNull(key, value);
+            if (hashTable[0] == null) {
+                hashTable[0] = new Node<>(key, value, null);
+                size++;
+            } else if (hashTable[0].key == key) {
+                hashTable[0].value = value;
+            } else {
+                Node<K, V> tempNode = hashTable[0];
+                while (tempNode != null) {
+                    if (tempNode.key == key || tempNode.key.equals(key)) {
+                        tempNode.value = value;
+                    }
+                }
+            }
             return;
         }
         if (size > hashTable.length * LOAD_FACTOR) {
             resize();
         }
-        int index = hash(key);
+        int index = getIndex(key);
         if (hashTable[index] == null) {
             hashTable[index] = new Node(key, value, null);
             size++;
@@ -48,32 +57,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void putValueWithKeyNull(K key, V value) {
-        if (hashTable[0] == null) {
-            hashTable[0] = new Node<>(key, value, null);
-            size++;
-        } else if (hashTable[0].key == key) {
-            hashTable[0].value = value;
-        } else {
-            Node<K, V> tempNode = hashTable[0];
-            while (tempNode != null) {
-                if (tempNode.key == key || tempNode.key.equals(key)) {
-                    tempNode.value = value;
-                    return;
-                }
-                tempNode = tempNode.linkToNextNode;
-            }
-            hashTable[0] = new Node<>(key, value, hashTable[0]);
-            size++;
-        }
-    }
-
     @Override
     public V getValue(K key) {
         if (key == null) {
             return (V) hashTable[0].value;
         }
-        int index = hash(key);
+        int index = getIndex(key);
         Node<K, V> newNode = hashTable[index];
         while (newNode != null) {
             if (key.equals(newNode.key)) {
