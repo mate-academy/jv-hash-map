@@ -17,8 +17,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         buckets = new Node[DEFAULT_CAPACITY];
     }
 
-    public MyHashMap(int capaCity) {
-        buckets = new Node[capaCity];
+    public MyHashMap(int capacity) {
+        buckets = new Node[capacity];
     }
 
     @Override
@@ -27,11 +27,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (buckets[0] == null) {
                 size++;
             }
-            buckets[0] = new Node<K, V>(0, null, null, value);
+            buckets[0] = new Node<K, V>(0, key, null, value);
             return;
         }
         if (size >= buckets.length * LOAD_FACTOR) {
-            reSize();
+            resize();
         }
         int index = getHash(key) % (buckets.length - 1);
         if (buckets[index] != null) {
@@ -53,16 +53,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (int i = 0; i < buckets.length; i++) {
-            Node<K, V> tempNode = buckets[i];
-            if (tempNode != null) {
-                while (tempNode != null) {
-                    if (Objects.equals(key,tempNode.key)) {
-                        return tempNode.value;
-                    }
-                    tempNode = tempNode.next;
-                }
+        if (key == null) {
+            return buckets[0].value;
+        }
+        int index = getHash(key) % (buckets.length - 1);
+        Node<K, V> tempNode = buckets[getHash(key) % (buckets.length - 1)];
+        while (tempNode != null) {
+            if (Objects.equals(key,tempNode.key)) {
+                return tempNode.value;
             }
+            tempNode = tempNode.next;
         }
         return null;
     }
@@ -90,13 +90,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void reSize() {
+    private void resize() {
         Node[] newNode = new Node[(buckets.length << 1)];
         for (Node<K, V> localNode : buckets) {
             if (localNode != null) {
-                int newIndex = localNode.hash % newNode.length;
+                int newIndex = localNode.hash % (newNode.length - 1);
                 newNode[newIndex] = localNode;
             }
+
         }
+        buckets = newNode;
     }
 }
