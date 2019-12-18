@@ -2,10 +2,7 @@ package core.basesyntax;
 
 import static java.lang.Math.abs;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
-
 
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
@@ -16,37 +13,39 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V>[] hashTable;
     private int size;
-    private static final int INITIAL_CAPACITY = 2;
-    private static final double LOAD_FACTOR = 0.75d;
-    private int resizeCapacity;
+    private static final int INITIAL_CAPACITY = 16;
+    private static final double LOAD_FACTOR = 0.75;
 
     public MyHashMap() {
         hashTable = new Node[INITIAL_CAPACITY];
-        resizeCapacity = (int) (hashTable.length * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
         extendSize();
-        Node<K, V> newNode = new Node<K, V>(key, value);
-        int index = (key == null) ? 0 : newNode.hash();
+        Node<K, V> newNode = new Node<K, V>(key, value, null);
+        int index = (key == null) ? 0 : newNode.hashCode() % hashTable.length;
+        Node<K, V> node = hashTable[index];
 
         if (hashTable[index] == null) {
-            hashTable[index] = new Node<>(null, null);
-            hashTable[index].nodes.add(newNode);
+            node = new Node<K, V>(key, value, null);
+            hashTable[index] = node;
             size++;
             return;
         }
-        List<Node<K, V>> nodeList = hashTable[index].nodes;
-        for (Node node : nodeList) {
+
+        while (true != false) {
             if (Objects.equals(node.key, newNode.key)) {
-                node.value = value;
+                node.value = newNode.value;
                 return;
             }
+            if (node.next == null) {
+                node.next = newNode;
+                size++;
+                return;
+            }
+            node = node.next;
         }
-        nodeList.add(newNode);
-        size++;
-        return;
     }
 
     @Override
@@ -55,11 +54,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = (key == null) ? 0 : hash(key);
         if (index < hashTable.length && hashTable[index] != null) {
 
-            List<Node<K, V>> list = hashTable[index].nodes;
-            for (Node<K, V> node : list) {
-                if (Objects.equals(node.key, key)) {
-                    return node.value;
+            Node<K, V> noda = hashTable[index];
+            while (noda != null) {
+                if (Objects.equals(noda.key, key)) {
+                    return noda.value;
                 }
+                noda = noda.next;
             }
         }
         return null;
@@ -77,19 +77,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private class Node<K, V> {
 
-        private List<Node<K, V>> nodes;
-        private int hash;
+        private Node<K, V> next;
         private K key;
         private V value;
 
-        public Node(K key, V value) {
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
-            nodes = new LinkedList<Node<K, V>>();
-        }
-
-        private int hash() {
-            return hashCode() % hashTable.length;
+            this.next = next;
         }
 
         @Override
@@ -106,8 +101,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         @Override
         public int hashCode() {
-            hash = key.hashCode() * 31;
-            return Math.abs(hash);
+            return Math.abs(key.hashCode() * 31);
         }
     }
 
@@ -116,18 +110,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         hashTable = new Node[oldHashArray.length << 1];
         size = 0;
         for (Node<K, V> node : oldHashArray) {
-            if (node != null) {
-                for (Node<K, V> newNode : node.nodes) {
-                    put(newNode.key, newNode.value);
-                }
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
+
         }
     }
 
     private void extendSize() {
-
-        if (size > resizeCapacity) {
-            resizeCapacity = resizeCapacity * 2;
+        if (size > hashTable.length * LOAD_FACTOR) {
             arrayResizing();
         }
     }
