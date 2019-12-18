@@ -1,12 +1,14 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final float DEFAULT_LOAD_FACTOR = 0.55f;
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private Node<K, V>[] table;
     private int size;
@@ -25,16 +27,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] copyTable = table;
         table = new Node[table.length * 2];
         for (Node<K, V> node : copyTable) {
-            while (node != null) {
+            if (node != null) {
                 put(node.key, node.value);
-                node = node.next;
             }
         }
     }
 
     @Override
     public void put(K key, V value) {
-        if (size > table.length * DEFAULT_LOAD_FACTOR) {
+        if (size >= table.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
         if (key == null) {
@@ -43,22 +44,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int index = hash(key);
         if (table[index] == null) {
-            table[index] = new Node<>(key, value, null);
-        } else if (table[index].key.equals(key)) {
-            table[index].value = value;
-            return;
+            table[index] = new Node<>(key, value);
+            size++;
+        } else {
+            putWithCollision(key, value, index);
         }
-        Node<K, V> lastNode = table[index];
-        while (lastNode.next != null) {
-            lastNode = lastNode.next;
+    }
+
+    private void putWithCollision(K key, V value, int index) {
+        Node<K, V> pair = new Node<>(key, value);
+        while (table[index] != null) {
+            if (Objects.equals(table[index].key, pair.key)) {
+                table[index].value = value;
+                return;
+            }
+            if (++index >= table.length) {
+                index = 0;
+            }
         }
-        lastNode.next = new Node<>(key, value, null);
+        table[index] = pair;
         size++;
     }
 
     private void putKeyNull(K key, V value) {
         if (table[0] == null) {
-            table[0] = new Node<>(key, value, null);
+            table[0] = new Node<>(key, value);
             size++;
         } else {
             table[0].value = value;
@@ -72,10 +82,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return table[0].value;
         }
         int index = hash(key);
-        for (Node<K, V> temp = table[index]; temp != null; temp = temp.next) {
-            if (key.equals(temp.key)) {
-                value = temp.value;
-                break;
+        while (table[index] != null) {
+            if (key.equals(table[index].key)) {
+                value = table[index].value;
+            }
+            if (++index >= table.length) {
+                index = 0;
             }
         }
         return value;
@@ -89,12 +101,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Node<K, V> {
         private K key;
         private V value;
-        private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
