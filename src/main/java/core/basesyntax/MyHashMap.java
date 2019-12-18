@@ -8,19 +8,36 @@ import java.util.Objects;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final double LOAD_FACTOR = 0.75;
-    private static final int CAPACITY = 16;
+    private static final int CAPACITY = 10;
     private int initialCapacity;
     public Entry<K, V>[] table;
     private int size = 0;
 
     public MyHashMap() {
-        table = new Entry[CAPACITY];
         initialCapacity = CAPACITY;
+        table = new Entry[initialCapacity];
     }
 
     private int countBuckPos(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
+    }
+
+    private void positionNull(int position, Entry<K, V> entry) {
+        table[position] = entry;
+        size++;
+    }
+
+    private boolean putValue(K key, V value, Entry<K, V> currentEntry, int position) {
+        if (currentEntry == null) {
+            positionNull(position, new Entry<>(key, value));
+            return true;
+        }
+        if ((key == null && currentEntry.getKey() == null)
+                || (key != null && key.equals(currentEntry.getKey()))) {
+            currentEntry.setValue(value);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -30,34 +47,45 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int position = countBuckPos(newEntry.getKey());
         Entry temp = table[position];
         if (temp == null) {
-            table[position] = newEntry;
-            size++;
+            positionNull(position, newEntry);
             return;
         }
 
-        while (temp != null) {
-            if (newEntry.getKey() == temp.getKey() || newEntry.getKey() != null
-                    && newEntry.getKey().equals(temp.getKey())) {
-                temp.setValue(value);
-                return;
+        if (temp != null) {
+            for (int i = position; i < table.length; i++) {
+                if (putValue(key, value, temp, i)) {
+                    return;
+                }
+                if (i + 1 < table.length) {
+                    temp = table[i + 1];
+                }
             }
-            if (temp.getNext() == null) {
-                temp.setNext(newEntry);
-                size++;
-                return;
+            for (int i = 0; i < position; i++) {
+                if (putValue(key, value, temp, i)) {
+                    return;
+                }
+                temp = table[i + 1];
             }
-            temp = temp.getNext();
         }
     }
 
     @Override
     public V getValue(K key) {
-        Entry<K, V> temp = table[countBuckPos(key)];
-        while (temp != null) {
-            if (temp.getKey() == key || (key != null && key.equals(temp.getKey()))) {
-                return temp.getValue();
+        int position = countBuckPos(key);
+        Entry<K, V> temp = table[position];
+        if (temp != null) {
+            for (int i = position; i < table.length; i++) {
+                if (temp.getKey() == key || (key != null && key.equals(temp.getKey()))) {
+                    return temp.getValue();
+                }
+                temp = table[i];
             }
-            temp = temp.getNext();
+            for (int i = 0; i < position; i++) {
+                if (temp.getKey() == key || (key != null && key.equals(temp.getKey()))) {
+                    return temp.getValue();
+                }
+                temp = table[i];
+            }
         }
         return null;
     }
@@ -68,31 +96,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public void resise() {
-        if (LOAD_FACTOR * getSize() >= initialCapacity) {
+        if (size == initialCapacity - 1) {
             size = 0;
             Entry<K, V>[] tempTable = table;
             initialCapacity = initialCapacity * 2;
             table = new Entry[table.length * 2];
-            for (Entry<K, V> entry : tempTable) {
-                while (entry != null) {
-                    put(entry.getKey(), entry.getValue());
-                    entry = entry.getNext();
+            for (int i = 0; i < tempTable.length; i++) {
+                if (tempTable[i] != null) {
+                    put(tempTable[i].getKey(), tempTable[i].getValue());
                 }
             }
         }
     }
 
     private static class Entry<K, V> {
-        private int hash;
         private K key;
         private V value;
-        private Entry<K, V> next;
 
         public Entry(K key, V value) {
             this.key = key;
             this.value = value;
-            this.hash = hashCode();
-            this.next = null;
         }
 
         @Override
@@ -104,18 +127,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return false;
             }
             Entry<?, ?> entry = (Entry<?, ?>) o;
-            return hash == entry.hash
-                    && Objects.equals(key, entry.key)
+            return Objects.equals(key, entry.key)
                     && Objects.equals(value, entry.value);
         }
 
         @Override
         public int hashCode() {
             return Math.abs(Objects.hash(key) ^ Objects.hash(value));
-        }
-
-        public int getHash() {
-            return hash;
         }
 
         public K getKey() {
@@ -128,14 +146,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         public void setValue(V value) {
             this.value = value;
-        }
-
-        public Entry<K, V> getNext() {
-            return next;
-        }
-
-        public void setNext(Entry<K, V> next) {
-            this.next = next;
         }
     }
 }
