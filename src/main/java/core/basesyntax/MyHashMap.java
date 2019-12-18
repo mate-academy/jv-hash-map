@@ -68,9 +68,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         elementArray = new Node[size * (size >>> 1)];
         size = 0;
         for (Node<K, V> node : newArray) {
-            Node element = node;
+            Node<K, V> element = node;
             while (element != null) {
-                put((K) element.key, (V) element.data);
+                put( element.key, element.data);
                 element = element.next;
             }
         }
