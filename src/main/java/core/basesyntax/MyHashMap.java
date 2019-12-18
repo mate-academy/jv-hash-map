@@ -24,15 +24,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > table.length * LOAD_FACTOR) {
             resize();
         }
-        if (key == null) {
-            putForNullKey(value);
-        }
         int bucket = findBucket(hash(key));
-        if (findSameNodes(bucket, key)) {
-            exchangeNodes(bucket, key, value);
-        } else {
-            addNewNode(new Node<>(key, value, null), bucket);
+        Node<K, V> node = table[bucket];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
+                return;
+            }
+        node = node.nextNode;
         }
+        Node<K, V> newNode = new Node<>(key, value, table[bucket]);
+        table[bucket] = newNode;
+        size++;
     }
 
     @Override
@@ -68,43 +71,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         newNode.nextNode = node;
         size++;
-    }
-
-    private boolean findSameNodes(int bucket, K key) {
-        Node<K,V> node = table[bucket];
-        if (table[bucket] != null) {
-            do {
-                if (Objects.equals(node.key, key)) {
-                    return true;
-                }
-                node = node.nextNode;
-            } while (node != null);
-        }
-        return false;
-    }
-
-    private void putForNullKey(V value) {
-        Node<K, V> node = new Node<>(null, value, null);
-        if (table[0] == null) {
-            table[0] = node;
-            size++;
-            return;
-        }
-        if (findSameNodes(0, null)) {
-            exchangeNodes(0, null, value);
-        } else {
-            addNewNode(new Node<>(null, value, null), 0);
-        }
-    }
-
-    private void exchangeNodes(int bucket, K key, V value) {
-        Node<K,V> node = table[bucket];
-        do {
-            if (Objects.equals(node.key, key)) {
-                node.value = value;
-            }
-            node = node.nextNode;
-        } while (node != null);
     }
 
     private void resize() {
