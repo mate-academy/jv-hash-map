@@ -17,10 +17,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Entry<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Entry<K, V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Entry<K, V> next;
 
         Entry(int hash, K key, V value, Entry<K, V> next) {
             this.hash = hash;
