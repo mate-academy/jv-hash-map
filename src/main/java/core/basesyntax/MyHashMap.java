@@ -11,7 +11,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Node<K, V> {
         private final K key;
         private V value;
-        private Node<K, V> next;
+        private String status;
 
         public Node(K key, V value) {
             this.key = key;
@@ -89,7 +89,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int index = indexFor(key);
         while (table[index] != null) {
-            if (Objects.equals(key, table[index].key)) {
+            if (Objects.equals(key, table[index].key) && table[index].status == null) {
                 return table[index].value;
             }
             index++;
