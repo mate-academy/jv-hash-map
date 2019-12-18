@@ -51,6 +51,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(hashCode()) % hashTable.length;
     }
 
+    private void resizeHashMap() {
+        int capacity = hashTable.length;
+        if (capacity == MAX_CAPACITY) {
+            return;
+        }
+        if (capacity << 1 >= MAX_CAPACITY) {
+            capacity = MAX_CAPACITY;
+        } else {
+            capacity = capacity << 1;
+        }
+        Node<K, V>[] oldHashTable = hashTable;
+        hashTable = new Node[capacity];
+        size = 0;
+        for (Node<K, V> node : oldHashTable) {
+            if (node != null) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
+            }
+        }
+    }
+
     @Override
     public void put(K key, V value) {
         if (size >= hashTable.length * LOAD_FACTOR) {
@@ -74,29 +97,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 size++;
             }
             node = node.next;
-        }
-    }
-
-    private void resizeHashMap() {
-        int capacity = hashTable.length;
-        if (capacity == MAX_CAPACITY) {
-            return;
-        }
-        if (capacity << 1 >= MAX_CAPACITY) {
-            capacity = MAX_CAPACITY;
-        } else {
-            capacity = capacity << 1;
-        }
-        Node<K, V>[] oldHashTable = hashTable;
-        hashTable = new Node[capacity];
-        size = 0;
-        for (Node<K, V> node : oldHashTable) {
-            if (node != null) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
-            }
         }
     }
 
