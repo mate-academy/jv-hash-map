@@ -22,14 +22,14 @@ public class MyHashMapTest {
 
     @Test
     public void getByNonExistedKey() {
-        MyMap<Car, Integer> myHashMap = new MyHashMap();
+        MyMap<Car, Integer> myHashMap = new MyOpenHashMap();
         Assert.assertNull("Test failed! If key doesn't exist, we shoud return null.",
                 myHashMap.getValue(firstCar));
     }
 
     @Test
     public void putAndGetOk() {
-        MyMap<Car, Integer> myHashMap = new MyHashMap();
+        MyMap<Car, Integer> myHashMap = new MyOpenHashMap();
         myHashMap.put(firstCar, 3);
         myHashMap.put(secondCar, 5);
         myHashMap.put(thirdCar, 1);
@@ -50,7 +50,7 @@ public class MyHashMapTest {
 
     @Test
     public void putTheSameElement() {
-        MyMap<Car, Integer> myHashMap = new MyHashMap();
+        MyMap<Car, Integer> myHashMap = new MyOpenHashMap();
         myHashMap.put(firstCar, 3);
         myHashMap.put(secondCar, 5);
         myHashMap.put(thirdCar, 1);
@@ -74,7 +74,7 @@ public class MyHashMapTest {
 
     @Test
     public void putAndGetByNullKey() {
-        MyMap<Car, Integer> myHashMap = new MyHashMap();
+        MyMap<Car, Integer> myHashMap = new MyOpenHashMap();
         myHashMap.put(null, 3);
         Integer firstActualValue = myHashMap.getValue(null);
         Assert.assertEquals("Test failed! HashMap expects to contain 3 values, but was "
@@ -91,7 +91,7 @@ public class MyHashMapTest {
 
     @Test
     public void putAndGetWithCollision() {
-        MyMap<Plane, Integer> myHashMap = new MyHashMap();
+        MyMap<Plane, Integer> myHashMap = new MyOpenHashMap();
         myHashMap.put(firstPlane, 3);
         myHashMap.put(secondPlane, 5);
         myHashMap.put(thirdPlane, 1);
@@ -112,7 +112,7 @@ public class MyHashMapTest {
 
     @Test
     public void putAndGetByNullKeyWithCollision() {
-        MyMap<Bus, Integer> myHashMap = new MyHashMap();
+        MyMap<Bus, Integer> myHashMap = new MyOpenHashMap();
         myHashMap.put(firstBus, 3);
         myHashMap.put(null, 4);
         myHashMap.put(secondBus, 5);
@@ -138,7 +138,7 @@ public class MyHashMapTest {
 
     @Test
     public void putAndGetTheOverriddenValueByKey() {
-        MyMap<Car, Integer> myHashMap = new MyHashMap();
+        MyMap<Car, Integer> myHashMap = new MyOpenHashMap();
         myHashMap.put(firstCar, 3);
         Assert.assertEquals("Test failed! The size isn't correct. Expected 1 but was "
                 + myHashMap.getSize(), 1, myHashMap.getSize());
@@ -155,7 +155,7 @@ public class MyHashMapTest {
 
     @Test
     public void checkTheHashMapIncrease() {
-        MyMap<Car, Integer> myHashMap = new MyHashMap();
+        MyMap<Car, Integer> myHashMap = new MyOpenHashMap();
         for (int i = 0; i < 1000; i++) {
             Car car = new Car("model_" + i, "color_" + i);
             myHashMap.put(car, i);
@@ -170,14 +170,14 @@ public class MyHashMapTest {
 
     @Test
     public void getSizeOfEmptyHashMap() {
-        MyMap<Car, Integer> myHashMap = new MyHashMap();
+        MyMap<Car, Integer> myHashMap = new MyOpenHashMap();
         Assert.assertEquals("Test failed! The size isn't correct. Expected 0 but was "
                 + myHashMap.getSize(), 0, myHashMap.getSize());
     }
 
     @Test
     public void getSizeWithCollision() {
-        MyMap<Plane, Integer> myHashMap = new MyHashMap();
+        MyMap<Plane, Integer> myHashMap = new MyOpenHashMap();
         myHashMap.put(firstPlane, 3);
         myHashMap.put(secondPlane, 5);
         Assert.assertEquals("Test failed! The size isn't correct. Expected 2 but was "
@@ -186,7 +186,7 @@ public class MyHashMapTest {
 
     @Test
     public void getSizeWithCollisionAtZeroPosition() {
-        MyMap<Bus, Integer> myHashMap = new MyHashMap();
+        MyMap<Bus, Integer> myHashMap = new MyOpenHashMap();
         for (int i = 0; i < 1000; i++) {
             Bus bus = new Bus("model_" + i, "color_" + i);
             myHashMap.put(bus, i);
