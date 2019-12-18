@@ -17,12 +17,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (key == null) {
-            if (hashTable[0] == null) {
-                hashTable[0] = new Node<>(key, value, null);
-                size++;
-            }
-        }
         if (size > hashTable.length * LOAD_FACTOR) {
             resize();
         }
