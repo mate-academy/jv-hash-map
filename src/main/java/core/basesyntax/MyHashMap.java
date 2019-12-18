@@ -11,7 +11,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final float LOAD_FACTOR = 0.75f;
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
-    private static int capacity = DEFAULT_INITIAL_CAPACITY;
     private int size = 0;
 
     private Node[] nodes;
@@ -80,20 +79,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
     private class Node<K, V> {
 
         final K key;
         private V value;
         private Node<K, V> next;
-
-        public Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
 
         public Node(K key, V value, Node<K, V> next) {
             this.key = key;
@@ -103,12 +93,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         public final String toString() {
             return key + "=" + value;
-        }
-
-        public final V setValue(V newValue) {
-            V oldValue = value;
-            value = newValue;
-            return oldValue;
         }
     }
 }
