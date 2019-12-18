@@ -13,11 +13,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private Node<K, V>[] elementArray;
 
-    MyHashMap() {
+    public MyHashMap() {
         elementArray = new Node[DEFAULT_CAPACITY];
     }
 
-    MyHashMap(int capacity) {
+    public MyHashMap(int capacity) {
         elementArray = new Node[capacity];
     }
 
