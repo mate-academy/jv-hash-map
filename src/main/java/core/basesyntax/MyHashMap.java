@@ -73,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHash(final K key) {
-        return  31 * 17  + Math.abs(key.hashCode()>>>20);
+        return  31 * 17  + Math.abs(key.hashCode() >>> 20);
     }
 
     private static class Node<K,V> {
