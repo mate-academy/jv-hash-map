@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
@@ -20,16 +22,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        int idx = indexFor(key);
+        int index = indexFor(key);
         Entry<K, V> entry = new Entry(key, value);
-        if (array[idx] == null) {
-            array[idx] = new Entry(key, value);
+        if (array[index] == null) {
+            array[index] = entry;
             size++;
             return;
         }
-        Entry<K, V> node = array[idx];
+        Entry<K, V> node = array[index];
         while (node != null) {
-            if (key != null && node.key != null && node.key.equals(key) || key == node.key) {
+            if (Objects.equals(node.key, key)) {
                 node.value = entry.value;
                 return;
             }
@@ -45,13 +47,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         V value = null;
-        if (!isExistKey(key)) {
-            return value;
-        }
-        int idx = indexFor(key);
-        Entry<K, V> node = array[idx];
+        int index = indexFor(key);
+        Entry<K, V> node = array[index];
         while (node != null) {
-            if (node.key != null && key != null && node.key.equals(key) || node.key == key) {
+            if (Objects.equals(node.key, key)) {
                 return node.value;
             }
             if (node.next == null) {
@@ -87,10 +86,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private boolean checkSize() {
         return size >= array.length * LOAD_FACTOR;
-    }
-
-    private boolean isExistKey(K key) {
-        return array[indexFor(key)] != null;
     }
 
     private int indexFor(K key) {
