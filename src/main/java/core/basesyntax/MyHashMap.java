@@ -10,14 +10,13 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final float LOAD_FACTOR = 0.75f;
-    private int capacity;
+    private static final int INITIAL_CAPACITY = 16;
     private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        this.capacity = 16;
         this.size = 0;
-        table = new Node[capacity];
+        table = new Node[INITIAL_CAPACITY];
     }
 
     @Override
@@ -29,7 +28,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             putForNullKey(value);
         }
         int bucket = findBucket(hash(key));
-        if (noChangesInBucket(bucket, key, value)) {
+        if (findSameNodes(bucket, key)) {
+            exchangeNodes(bucket, key, value);
+        } else {
             addNewNode(new Node<>(key, value, null), bucket);
         }
     }
@@ -42,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K, V> node = table[bucket];
         do {
-            if (compareKeys(node.key, key)) {
+            if (Objects.equals(node.key, key)) {
                 return node.value;
             }
             node = node.nextNode;
@@ -69,18 +70,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private boolean noChangesInBucket(int bucket, K key, V value) {
+    private boolean findSameNodes(int bucket, K key) {
         Node<K,V> node = table[bucket];
         if (table[bucket] != null) {
             do {
-                if (compareKeys(node.key, key)) {
-                    node.value = value;
-                    return false;
+                if (Objects.equals(node.key, key)) {
+                    return true;
                 }
                 node = node.nextNode;
             } while (node != null);
         }
-        return true;
+        return false;
     }
 
     private void putForNullKey(V value) {
@@ -90,15 +90,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        if (noChangesInBucket(0, null, value)) {
+        if (findSameNodes(0, null)) {
+            exchangeNodes(0, null, value);
+        } else {
             addNewNode(new Node<>(null, value, null), 0);
         }
     }
 
+    private void exchangeNodes(int bucket, K key, V value) {
+        Node<K,V> node = table[bucket];
+        do {
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
+            }
+            node = node.nextNode;
+        } while (node != null);
+    }
+
     private void resize() {
-        capacity = capacity * 2;
+        int newCapacity  = table.length * 2;
         Node<K, V>[] oldTable = table;
-        table = new Node[capacity];
+        table = new Node[newCapacity];
         size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
@@ -114,17 +126,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int findBucket(int hash) {
-        return hash % capacity;
-    }
-
-    private boolean compareKeys(K key1, K key2) {
-        return Objects.equals(key1, key2);
+        return hash & (table.length - 1);
     }
 
     static class Node<K, V> {
         public final K key;
-        V value;
-        Node<K, V> nextNode;
+        public V value;
+        public Node<K, V> nextNode;
 
         private Node(K key, V value, Node<K, V> nextNode) {
             this.key = key;
