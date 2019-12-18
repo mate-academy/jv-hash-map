@@ -39,12 +39,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         int index = indexByKeyHash(key);
-        if (elementsTable[index] == null) {
-            elementsTable[index] = new Node<>(key, value, null);
-            sizeCounter++;
-            return;
+        Node<K, V> tempNode = elementsTable[index];
+        while (tempNode != null) {
+            if (key == tempNode.key || (key != null && key.equals(tempNode.key))) {
+                tempNode.value = value;
+                return;
+            }
+            tempNode = tempNode.next;
         }
-        addToNode(key, value, index);
+        Node<K, V> newNode = new Node<>(key, value, elementsTable[index]);
+        elementsTable[index] = newNode;
+        sizeCounter++;
     }
 
     @Override
@@ -67,20 +72,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return sizeCounter;
-    }
-
-    private void addToNode(K key, V value, int index) {
-        Node<K, V> tempNode = elementsTable[index];
-        while (tempNode != null) {
-            if (key == tempNode.key || (key != null && key.equals(tempNode.key))) {
-                tempNode.value = value;
-                return;
-            }
-            tempNode = tempNode.next;
-        }
-        Node<K, V> newNode = new Node<>(key, value, elementsTable[index]);
-        elementsTable[index] = newNode;
-        sizeCounter++;
     }
 
     private int indexByKeyHash(K key) {
