@@ -24,34 +24,35 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
 
-        Node node = new Node(key, value);
-        if (table[indexFor(key)] == null) {
-            table[indexFor(key)] = node;
+        int indexFor = indexFor(key);
+        Node<K, V> node = new Node<>(key, value);
+        if (table[indexFor] == null) {
+            table[indexFor] = node;
             size++;
             return;
         }
 
-        node = table[indexFor(key)];
-        while (node != null) {
-            if (Objects.equals(key, node.key)) {
-                node.value = value;
+        Node<K, V> exictedNode = table[indexFor];
+        while (exictedNode != null) {
+            if (Objects.equals(key, exictedNode.key)) {
+                exictedNode.value = value;
                 return;
             }
-            if (node.linkToNext == null) {
+            if (exictedNode.linkToNext == null) {
                 break;
             }
-            node = node.linkToNext;
+            exictedNode = exictedNode.linkToNext;
         }
-        node.linkToNext = new Node(key, value);
+        exictedNode.linkToNext = node;
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        Node node = table[indexFor(key)];
+        Node<K,V> node = table[indexFor(key)];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
-                return (V) node.value;
+                return node.value;
             }
             node = node.linkToNext;
         }
