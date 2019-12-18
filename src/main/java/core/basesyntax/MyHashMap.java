@@ -8,7 +8,7 @@ import java.util.Objects;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final double LOAD_FACTOR = 0.75;
+    private static final double LOAD_FACTOR = 0.5;
     private static final int INITIAL_CAPACITY = 16;
     private int size;
     private Bucket[] data;
@@ -20,7 +20,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Bucket<K, V> {
         private K key;
         private V value;
-        private Bucket next;
 
         private Bucket(K key, V value) {
             this.key = key;
@@ -32,36 +31,36 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         resize();
         int position = calculatePosition(key);
-        Bucket<K, V> createdBucket = new Bucket(key, value);
         if (data[position] == null) {
-            data[position] = createdBucket;
+            data[position] = new Bucket(key, value);
             size++;
             return;
         }
-        Bucket<K, V> localBucket = data[position];
-        while (localBucket != null) {
-            if (Objects.equals(key, localBucket.key)) {
-                localBucket.value = value;
+        while (data[position] != null) {
+            if (Objects.equals(key, data[position].key)) {
+                data[position].value = value;
                 return;
             }
-            if (localBucket.next == null) {
-                break;
+            position++;
+            if (position >= data.length) {
+                position = 0;
             }
-            localBucket = localBucket.next;
         }
-        localBucket.next = createdBucket;
+        data[position] = new Bucket(key, value);
         size++;
     }
 
     @Override
     public V getValue(K key) {
         int position = calculatePosition(key);
-        Bucket<K, V> localBucket = data[position];
-        while (localBucket != null) {
-            if (Objects.equals(key, localBucket.key)) {
-                return localBucket.value;
+        while (data[position] != null) {
+            if (Objects.equals(key, data[position].key)) {
+                return (V) data[position].value;
             }
-            localBucket = localBucket.next;
+            position++;
+            if (position >= data.length) {
+                position = 0;
+            }
         }
         return null;
     }
@@ -88,11 +87,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size = 0;
             for (int i = 0; i < oldData.length; i++) {
                 if (oldData[i] != null) {
-                    Bucket<K, V> tempBucket = oldData[i];
-                    while (tempBucket != null) {
-                        put(tempBucket.key, tempBucket.value);
-                        tempBucket = tempBucket.next;
-                    }
+                    put((K) oldData[i].key, (V) oldData[i].value);
                 }
             }
         }
