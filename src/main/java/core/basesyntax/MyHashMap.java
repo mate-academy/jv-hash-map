@@ -9,9 +9,9 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int size = 0;
-    private int capacity = 16;
-    private Node<K, V>[] entries = new Node[capacity];
-    private double loadFactor = 0.75;
+    private static final int CAPACITY = 16;
+    private Node<K, V>[] entries = new Node[CAPACITY];
+    private static final double LOADFACTOR = 0.75;
 
     private static class Node<K, V> {
 
@@ -35,10 +35,34 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private boolean addEntry(Node<K, V> node, Node<K, V>[] entries) {
+        int index = indexOf(node.key);
+        Node<K, V> existingNode = entries[index];
+
+        if (existingNode == null) {
+            entries[index] = node;
+            return true;
+        } else {
+            while (!equals(node.key, existingNode.key) && existingNode.next != null) {
+                existingNode = existingNode.next;
+            }
+            if (equals(node.key, existingNode.key)) {
+                existingNode.value = node.value;
+                return false;
+            }
+            existingNode.next = node;
+            return true;
+        }
+    }
+
     @Override
     public V getValue(K key) {
-        Node<K, V> matchingNode = getMatchingNode(key);
-        return matchingNode == null ? null : matchingNode.value;
+        Node<K, V> existingNode = entries[indexOf(key)];
+
+        while (existingNode != null && !equals(key, existingNode.key)) {
+            existingNode = existingNode.next;
+        }
+        return existingNode == null ? null : existingNode.value;
     }
 
     @Override
@@ -47,13 +71,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean shouldResize() {
-        return size > Math.ceil((double) capacity * loadFactor);
+        return size > Math.ceil((double) CAPACITY * LOADFACTOR);
     }
 
     private void resize() {
-        capacity = size * 2;
 
-        Node<K, V>[] newEntries = new Node[capacity];
+        Node<K, V>[] newEntries = new Node[size * 2];
         for (Node<K, V> node : entries) {
             if (node != null) {
                 setEntry(node, newEntries);
@@ -73,41 +96,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private boolean addEntry(Node<K, V> node, Node<K, V>[] entries) {
-        int index = indexOf(node.key);
-        Node<K, V> existingNode = entries[index];
-
-        if (existingNode == null) {
-            entries[index] = node;
-            return true;
-        } else {
-            while (!equals(node.key, existingNode.key) && existingNode.next != null) {
-                existingNode = existingNode.next;
-            }
-
-            if (equals(node.key, existingNode.key)) {
-                existingNode.value = node.value;
-                return false;
-            }
-
-            existingNode.next = node;
-            return true;
-
-        }
-    }
-
-    private Node<K, V> getMatchingNode(K key) {
-        Node<K, V> existingNode = entries[indexOf(key)];
-
-        while (existingNode != null && !equals(key, existingNode.key)) {
-            existingNode = existingNode.next;
-        }
-
-        return existingNode;
-    }
-
     private int indexOf(K object) {
-        return object == null ? 0 : hashCode(object) & (capacity - 1);
+        return object == null ? 0 : hashCode(object) & (CAPACITY - 1);
     }
 
     private boolean equals(Object o1, Object o2) {
@@ -115,8 +105,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 || (o1 != null && o2 != null && o1.equals(o2));
     }
 
-    private static int hashCode(Object key) {
-        int hc;
-        return (key == null) ? 0 : (hc = key.hashCode()) ^ (hc >>> 16);
+    private int hashCode(Object key) {
+        return (key == null) ? 0 : (key.hashCode() >>> 16);
     }
 }
