@@ -12,9 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size = 0;
 
     private int getIndex(K key) {
-        int hash = 31;
-        hash = hash * 17 + key.hashCode();
-        return key == null ? 0 : Math.abs(hash) % hashTable.length;
+        return key == null ? 0 : Math.abs(31 * 17 + key.hashCode()) % hashTable.length;
     }
 
     @Override
@@ -23,17 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (hashTable[0] == null) {
                 hashTable[0] = new Node<>(key, value, null);
                 size++;
-            } else if (hashTable[0].key == key) {
-                hashTable[0].value = value;
-            } else {
-                Node<K, V> tempNode = hashTable[0];
-                while (tempNode != null) {
-                    if (tempNode.key == key || tempNode.key.equals(key)) {
-                        tempNode.value = value;
-                    }
-                }
             }
-            return;
         }
         if (size > hashTable.length * LOAD_FACTOR) {
             resize();
@@ -45,7 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> tempNode = hashTable[index];
             while (tempNode != null) {
-                if (key == tempNode.key || key.equals(tempNode.key)) {
+                if (key == tempNode.key || key != null && key.equals(tempNode.key)) {
                     tempNode.value = value;
                     return;
                 }
@@ -59,13 +47,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
-            return (V) hashTable[0].value;
-        }
         int index = getIndex(key);
         Node<K, V> newNode = hashTable[index];
         while (newNode != null) {
-            if (key.equals(newNode.key)) {
+            if (key == newNode.key || key != null && key.equals(newNode.key)) {
                 return newNode.value;
             }
             newNode = newNode.linkToNextNode;
