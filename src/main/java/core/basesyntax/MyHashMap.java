@@ -12,12 +12,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private int capacity;
     private Node<K, V>[] table;
-    private int threshold;
     private int size;
 
     public MyHashMap() {
         this.capacity = 16;
-        this.threshold = (int) (capacity * LOAD_FACTOR);
         this.size = 0;
         table = new Node[capacity];
     }
