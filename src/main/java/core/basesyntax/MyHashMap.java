@@ -31,7 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node.value = value;
                 return;
             }
-        node = node.nextNode;
+            node = node.nextNode;
         }
         Node<K, V> newNode = new Node<>(key, value, table[bucket]);
         table[bucket] = newNode;
