@@ -71,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public  int getIndex(final K key){
+    public  int getIndex(final K key) {
         return getHash(key) % (buckets.length - 1);
     }
 
