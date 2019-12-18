@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
@@ -14,12 +16,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = null;
         }
     }
 
     private static final int DEFAULT_CAPACITY = 16;
-    private static final double DEFAULT_LOAD_FACTOR = 0.75;
+    private static final double DEFAULT_LOAD_FACTOR = 0.4;
     private double loadFactor;
     private int capacity;
     Node<K, V>[] table;
@@ -43,20 +44,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
-    private void addNode(K key, V value, int index) {
-        if (size >= table.length * loadFactor) {
-            resize();
-        }
-        Node<K, V> newNode = new Node<K, V>(key, value);
-        if (table[index] == null) {
-            table[index] = newNode;
-        } else {
-            newNode.next = table[index];
-            table[index] = newNode;
-        }
-        size++;
-    }
-
     private void resize() {
         size = 0;
         capacity = capacity * 2;
@@ -67,35 +54,48 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public void transfer(Node<K, V>[] oldTable) {
         for (int i = 0; i < oldTable.length; i++) {
-            Node<K, V> currentNode = oldTable[i];
-            while (currentNode != null) {
-                put(currentNode.key, currentNode.value);
-                currentNode = currentNode.next;
+            if (oldTable[i] != null) {
+                put(oldTable[i].key, oldTable[i].value);
             }
         }
     }
 
     @Override
     public void put(K key, V value) {
+        if (size >= capacity * loadFactor) {
+            resize();
+        }
         int index = indexFor(key);
-        for (Node<K, V> item = table[index]; item != null; item = item.next) {
-            if (item.key == key || (key != null && key.equals(item.key))) {
-                item.value = value;
+        if (table[index] == null) {
+            table[index] = new Node<K, V>(key, value);
+            size++;
+            return;
+        }
+        while (table[index] != null) {
+            if (Objects.equals(key, table[index].key)) {
+                table[index].value = value;
                 return;
             }
+            index++;
+            if (index == capacity) {
+                index = 0;
+            }
         }
-        addNode(key, value, index);
-
+        table[index] = new Node<K, V>(key, value);
+        size++;
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = table[indexFor(key)];
-        while (currentNode != null) {
-            if (currentNode.key == key || (key != null && key.equals(currentNode.key))) {
-                return currentNode.value;
+        int index = indexFor(key);
+        while (table[index] != null) {
+            if (Objects.equals(key, table[index].key)) {
+                return table[index].value;
             }
-            currentNode = currentNode.next;
+            index++;
+            if (index == capacity) {
+                index = 0;
+            }
         }
         return null;
     }
