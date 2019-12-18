@@ -27,43 +27,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int index = hash(key);
-
-        if (elementArray[index] == null) {
-            elementArray[index] = new Node<>(key, value);
-            size++;
-        } else {
-            if (key == null) {
-                if (Objects.equals(key, elementArray[index].key)) {
-                    elementArray[index].data = value;
-                } else {
-                    Node<K, V> tmp = new Node<>(key, value);
-                    tmp.next = elementArray[index];
-                    elementArray[index] = tmp;
-                    size++;
-                }
-            } else {
-                Node<K, V> currentNode = elementArray[index];
-                while (currentNode != null) {
-                    if (Objects.equals(currentNode.key, key)) {
-                        currentNode.data = value;
-                        return;
-                    }
-                    currentNode = currentNode.next;
-                }
-                Node<K, V> tmp = new Node<>(key, value);
-                tmp.next = elementArray[index];
-                elementArray[index] = tmp;
-                size++;
+        Node<K, V> currentNode = elementArray[index];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                currentNode.data = value;
+                return;
             }
+            currentNode = currentNode.next;
         }
+        Node<K, V> tmp = new Node<>(key, value);
+        tmp.next = elementArray[index];
+        elementArray[index] = tmp;
+        size++;
     }
 
     @Override
     public V getValue(K key) {
         int index = hash(key);
-        Node currentNode = (Node) elementArray[0];
+        Node<K, V> currentNode = elementArray[0];
         if (index != -1 && size > 0) {
-            currentNode = (Node) elementArray[index];
+            currentNode = elementArray[index];
             while (currentNode != null) {
                 if (Objects.equals(currentNode.key, key)) {
                     break;
@@ -72,7 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
 
         }
-        return currentNode == null ? null : (V) currentNode.data;
+        return currentNode == null ? null : currentNode.data;
     }
 
     @Override
@@ -84,8 +67,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] newArray = elementArray;
         elementArray = new Node[size * (size >>> 1)];
         size = 0;
-        for (Node<K, V> obj : newArray) {
-            Node element = obj;
+        for (Node<K, V> node : newArray) {
+            Node element = node;
             while (element != null) {
                 put((K) element.key, (V) element.data);
                 element = element.next;
@@ -103,7 +86,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private class Node<K, V> {
         private K key;
         private V data;
-        public Node next;
+        private Node<K, V> next;
 
         private Node(K key, V data) {
             this.key = key;
