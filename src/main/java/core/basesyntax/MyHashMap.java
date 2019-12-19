@@ -25,12 +25,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Node<K, V> {
         private K key;
         private V value;
-        private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 
@@ -41,19 +39,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int index = indexByKeyHash(key);
         if (elementsTable[index] == null) {
-            elementsTable[index] = new Node<>(key, value, null);
+            elementsTable[index] = new Node<>(key, value);
             sizeCounter++;
+            return;
         }
-        for (int i = index; i < elementsTable.length; i++) {
-            if (i == elementsTable.length) {
-                resize();
-                put(key, value);
-                return;
+        for (int i = index; i <= elementsTable.length; i++) {
+            if (i  == elementsTable.length) {
+                i = 0;
             }
             if (elementsTable[i] == null) {
-                elementsTable[i] = new Node<>(key, value, null);
+                elementsTable[i] = new Node<>(key, value);
                 sizeCounter++;
-                return;
+                break;
             }
             if (Objects.equals(elementsTable[i].key, key)) {
                 elementsTable[i].value = value;
