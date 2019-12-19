@@ -50,7 +50,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (elementsTable[i] == null) {
                 elementsTable[i] = new Node<>(key, value);
                 sizeCounter++;
-                break;
+                return;
             }
             if (Objects.equals(elementsTable[i].key, key)) {
                 elementsTable[i].value = value;
