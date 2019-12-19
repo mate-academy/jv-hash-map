@@ -20,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.table = new Node[DEFAULT_LENGTH];
     }
 
-    private int getHash1(K key) {
+    private int getHash(K key) {
         if (key == null) {
             return 0;
         }
@@ -34,7 +34,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void checkCapacity() {
-        if (size >= table.length * LOAD_FACTOR) {
+        if (table[table.length - 1] != null || size >= table.length * LOAD_FACTOR) {
             grow();
         }
     }
@@ -62,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         checkCapacity();
-        int hash = getHash1(key);
+        int hash = getHash(key);
         int index = getIndex(hash);
         while (index < table.length) {
             if (checkBucket(index, hash, key)) {
@@ -72,13 +72,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             index++;
         }
-        grow();
         put(key, value);
     }
 
     @Override
     public V getValue(K key) {
-        int hash = getHash1(key);
+        int hash = getHash(key);
         int index = getIndex(hash);
         while (index < table.length) {
             if (!checkBucketValue(index) && Objects.equals(table[index].key, key)) {
