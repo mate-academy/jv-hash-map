@@ -2,7 +2,6 @@ package core.basesyntax;
 
 public class MyOpenHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final int LEAP_SIZE = 1;
     private static final float DEFAULT_LOAD_FACTOR = 0.5f;
 
     private Pair<K, V>[] table;
@@ -37,7 +36,7 @@ public class MyOpenHashMap<K, V> implements MyMap<K, V> {
                     && table[index].key.equals(key)) {
                 return table[index].value;
             }
-            index += LEAP_SIZE;
+            index++;
             if (index >= capacity) {
                 index -= capacity;
             }
@@ -72,10 +71,10 @@ public class MyOpenHashMap<K, V> implements MyMap<K, V> {
         while (table[index] != null) {
             if (table[index].key == pair.key || table[index].key != null
                     && table[index].key.equals(pair.key)) {
-                table[index] = pair;
+                table[index].value = pair.value;
                 return;
             }
-            index += LEAP_SIZE;
+            index++;
             if (index >= capacity) {
                 index -= capacity;
             }
@@ -85,8 +84,7 @@ public class MyOpenHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hashKey(K key) {
-        int h;
-        return (key == null) ? 0 : Math.abs((h = key.hashCode()) ^ (h >>> 16));
+        return (key == null) ? 0 : Math.abs((key.hashCode()) ^ (key.hashCode() >>> 16));
     }
 
     private static class Pair<K, V> {
