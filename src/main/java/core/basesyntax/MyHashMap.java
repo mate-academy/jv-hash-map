@@ -66,15 +66,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = findIndexByHash(key);
-        while (true) {
+        while (buckets[index] != null) {
             if (buckets[index] != null && Objects.equals(buckets[index].key, key)) {
                 return (V) buckets[index].value;
             }
-            if (index == buckets.length - 1) {
-                return null;
-            }
             index++;
+            if (index == buckets.length - 1) {
+                index = 0;
+            }
         }
+        return null;
     }
 
     private void resizeHashMap() {
