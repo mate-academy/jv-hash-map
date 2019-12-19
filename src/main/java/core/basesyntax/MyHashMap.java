@@ -66,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = findIndexByHash(key);
-        for (int i = 0; i < buckets.length - 1; i++) {
+        while (true) {
             if (buckets[index] != null && Objects.equals(buckets[index].key, key)) {
                 return (V) buckets[index].value;
             }
@@ -75,7 +75,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             index++;
         }
-        return null;
     }
 
     private void resizeHashMap() {
