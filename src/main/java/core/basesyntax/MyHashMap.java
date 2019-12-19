@@ -22,22 +22,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
-    private void positionNull(int position, Entry<K, V> entry) {
+    private void putInEmptyBucket(int position, Entry<K, V> entry) {
         table[position] = entry;
         size++;
-    }
-
-    private boolean putValue(K key, V value, Entry<K, V> currentEntry, int position) {
-        if (currentEntry == null) {
-            positionNull(position, new Entry<>(key, value));
-            return true;
-        }
-        if ((key == null && currentEntry.getKey() == null)
-                || (key != null && key.equals(currentEntry.getKey()))) {
-            currentEntry.setValue(value);
-            return true;
-        }
-        return false;
     }
 
     @Override
@@ -47,25 +34,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int position = countBuckPos(newEntry.getKey());
         Entry temp = table[position];
         if (temp == null) {
-            positionNull(position, newEntry);
+            putInEmptyBucket(position, newEntry);
             return;
         }
+        while (position < table.length) {
+            if (position == table.length - 1) {
+                position = 0;
+            }
 
-        if (temp != null) {
-            for (int i = position; i < table.length; i++) {
-                if (putValue(key, value, temp, i)) {
-                    return;
-                }
-                if (i + 1 < table.length) {
-                    temp = table[i + 1];
-                }
+            temp = table[position];
+            if (temp == null) {
+                putInEmptyBucket(position, new Entry<>(key, value));
+                return;
             }
-            for (int i = 0; i < position; i++) {
-                if (putValue(key, value, temp, i)) {
-                    return;
-                }
-                temp = table[i + 1];
+            if ((key == null && temp.getKey() == null)
+                    || (key != null && key.equals(temp.getKey()))) {
+                temp.setValue(value);
+                return;
             }
+            position++;
         }
     }
 
@@ -74,17 +61,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int position = countBuckPos(key);
         Entry<K, V> temp = table[position];
         if (temp != null) {
-            for (int i = position; i < table.length; i++) {
+            while (position < table.length) {
+                if (position == table.length - 1) {
+                    position = 0;
+                }
                 if (temp.getKey() == key || (key != null && key.equals(temp.getKey()))) {
                     return temp.getValue();
                 }
-                temp = table[i];
-            }
-            for (int i = 0; i < position; i++) {
-                if (temp.getKey() == key || (key != null && key.equals(temp.getKey()))) {
-                    return temp.getValue();
-                }
-                temp = table[i];
+                temp = table[position];
+                position++;
             }
         }
         return null;
