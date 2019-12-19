@@ -35,8 +35,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : key.hashCode();
     }
 
-    private int findIndexByHash(K key, int probingConstant) {
-        return Math.abs((hash(key) + 2 * probingConstant) % buckets.length);
+    private int findIndexByHash(K key) {
+        return Math.abs(hash(key) % buckets.length);
     }
 
     @Override
@@ -44,9 +44,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= buckets.length * LOAD_FACTOR) {
             resizeHashMap();
         }
-        int probingConstant = 0;
+        int index = findIndexByHash(key);
         while (true) {
-            int index = findIndexByHash(key, probingConstant++);
+            if (index == buckets.length - 1) {
+                index = 0;
+            }
             if (buckets[index] == null) {
                 buckets[index] = new Bucket(key, value);
                 size++;
@@ -57,17 +59,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     return;
                 }
             }
+            index++;
         }
     }
 
     @Override
     public V getValue(K key) {
-        int probingConstant = 0;
-        for (int i = 0; i < buckets.length; i++) {
-            int index = findIndexByHash(key, probingConstant++);
+        int index = findIndexByHash(key);
+        for (int i = 0; i < buckets.length - 1; i++) {
             if (buckets[index] != null && Objects.equals(buckets[index].key, key)) {
                 return (V) buckets[index].value;
             }
+            if (index == buckets.length - 1) {
+                return null;
+            }
+            index++;
         }
         return null;
     }
