@@ -8,31 +8,17 @@ import java.util.Objects;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private int defaultCapacity = 16;
-    private K key;
-    private V value;
+    private static final int DEFAULT_CAPACITY = 16;
     private Node<K, V>[] hashTable;
     private static final float LOAD_FACTOR = 0.75f;
     private int size = 0;
 
     MyHashMap() {
-        this.hashTable = new Node[defaultCapacity];
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        MyHashMap<?, ?> myHashMap = (MyHashMap<?, ?>) o;
-        return Objects.equals(key, myHashMap.key);
+        hashTable = new Node[DEFAULT_CAPACITY];
     }
 
     public int hash(K key) {
-        return 31 * 17 + Math.abs(key.hashCode() >>> 20);
+        return 31 * 17 + Math.abs(key.hashCode());
     }
 
     private int index(K key) {
