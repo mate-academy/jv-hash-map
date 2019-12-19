@@ -10,7 +10,6 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPASITY = 16;
     private static final float LOAD_FACTOR = 0.35f;
-    private int greatestCommonDivisor;
     private Bucket[] buckets;
     private int size;
 
@@ -36,19 +35,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : key.hashCode();
     }
 
-    private int findIndexByHash(K key) {
-        int x = 0;
-        while (true) {
-            int index = Math.abs((hash(key) + 2 * x++) % buckets.length);
-            if (buckets[index] == null) {
-                return index;
-            } else {
-                if (Objects.equals(buckets[index].key, key)) {
-                    return index;
-                }
-            }
-
-        }
+    private int findIndexByHash(K key, int probingConstant) {
+        return Math.abs((hash(key) + 2 * probingConstant) % buckets.length);
     }
 
     @Override
@@ -56,20 +44,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= buckets.length * LOAD_FACTOR) {
             resizeHashMap();
         }
-        int index = findIndexByHash(key);
-        if (buckets[index] == null) {
-            buckets[index] = new Bucket(key, value);
-            size++;
-        } else {
-            buckets[index].value = value;
+        int probingConstant = 0;
+        while (true) {
+            int index = findIndexByHash(key, probingConstant++);
+            if (buckets[index] == null) {
+                buckets[index] = new Bucket(key, value);
+                size++;
+                return;
+            } else {
+                if (Objects.equals(buckets[index].key, key)) {
+                    buckets[index].value = value;
+                    return;
+                }
+            }
         }
     }
 
     @Override
     public V getValue(K key) {
-        int index = findIndexByHash(key);
-        if (buckets[index] != null) {
-            return (V) buckets[index].value;
+        int probingConstant = 0;
+        for (int i = 0; i < buckets.length; i++) {
+            int index = findIndexByHash(key, probingConstant++);
+            if (buckets[index] != null && Objects.equals(buckets[index].key, key)) {
+                return (V) buckets[index].value;
+            }
         }
         return null;
     }
