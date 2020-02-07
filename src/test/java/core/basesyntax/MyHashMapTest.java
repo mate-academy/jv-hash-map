@@ -3,6 +3,9 @@ package core.basesyntax;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+
 public class MyHashMapTest {
     private static final Car firstCar = new Car("Audi", "black");
     private static final Car secondCar = new Car("Bmw", "red");
@@ -196,6 +199,57 @@ public class MyHashMapTest {
         for (int i = 0; i < 1000; i++) {
             Assert.assertEquals(Integer.valueOf(i),
                     myHashMap.getValue(new Bus("model_" + i, "color_" + i)));
+        }
+    }
+
+    @Test
+    public void getSizeWithCollisionAtFirstPosition() {
+        MyMap<Plane, Integer> myHashMap = new MyHashMap();
+        for (int i = 0; i < 1000; i++) {
+            Plane plane = new Plane("model_" + i, "color_" + i);
+            myHashMap.put(plane, i);
+        }
+        Assert.assertEquals("Test failed! The size isn't correct. Expected 1000 but was "
+                + myHashMap.getSize(), 1000, myHashMap.getSize());
+        for (int i = 0; i < 1000; i++) {
+            Assert.assertEquals(Integer.valueOf(i),
+                    myHashMap.getValue(new Plane("model_" + i, "color_" + i)));
+        }
+    }
+
+    @Test
+    public void existOnlyOneArrayFieldTest() {
+        MyHashMap hashMap = new MyHashMap();
+        Field[] declaredFields = hashMap.getClass().getDeclaredFields();
+        int count = 0;
+        for (Field field : declaredFields) {
+            if (field.getType().isArray()) {
+                count++;
+            }
+        }
+        Assert.assertEquals("Class MyHashMap shouldn't consist more then one array as a field",
+                1, count);
+    }
+
+    @Test
+    public void checkArrayLengthAfterResizingTest() throws IllegalAccessException {
+        MyMap<Car, Integer> myHashMap = new MyHashMap();
+        for (int i = 0; i < 14; i++) {
+            Car car = new Car("model_" + i, "color_" + i);
+            myHashMap.put(car, i);
+        }
+        for (int i = 0; i < 14; i++) {
+            Assert.assertEquals(Integer.valueOf(i),
+                    myHashMap.getValue(new Car("model_" + i, "color_" + i)));
+        }
+        Field[] declaredFields = myHashMap.getClass().getDeclaredFields();
+        for (Field field : declaredFields) {
+            if (field.getType().isArray()) {
+                field.setAccessible(true);
+                int length = Array.getLength(field.get(myHashMap));
+                Assert.assertEquals("After first resizing, length of array should be " + 32,
+                        32, length);
+            }
         }
     }
 }

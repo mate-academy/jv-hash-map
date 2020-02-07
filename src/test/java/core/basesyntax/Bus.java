@@ -41,6 +41,6 @@ public class Bus {
 
     @Override
     public int hashCode() {
-        return 1;
+        return 0;
     }
 }
