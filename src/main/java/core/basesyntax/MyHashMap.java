@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold) {
+        if (size == threshold) {
             resize();
         }
         int index = getBucket(key, buckets.length);
@@ -38,10 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> element = findNode(key, getBucket(key, buckets.length));
-        if (element != null) {
-            return element.value;
-        }
-        return null;
+        return element != null ? element.value : null;
     }
 
     @Override
@@ -50,10 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucket(K key, int capacity) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode()) % capacity;
+        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 
     private Node findNode(K key, int index) {
