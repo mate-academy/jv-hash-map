@@ -87,7 +87,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Entry<K, V> entry : table) {
             while (entry != null) {
                 int hash = hash(entry.key, newTable.length);
-                ;
                 if (newTable[hash] == null) {
                     newTable[hash] = new Entry<K, V>(entry.key, entry.value, null);
                     entry = entry.next;
