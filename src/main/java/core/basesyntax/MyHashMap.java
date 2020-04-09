@@ -21,17 +21,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        resize();
         if (key == null) {
             putForNullKey(value);
         } else {
             if (table[indexFor(key.hashCode())] == null) {
-                table[indexFor(key.hashCode())] = new Node<K, V>(key.hashCode(), key, value, null);
+                table[indexFor(key.hashCode())] = new Node<K, V>(key, value, null);
                 size++;
             } else {
                 addNodeInQueue(key, value, indexFor(key.hashCode()));
             }
         }
-        resize();
     }
 
     @Override
@@ -63,7 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void putForNullKey(V value) {
         if (table[0] == null) {
-            table[0] = new Node(111, null, value, null);
+            table[0] = new Node(null, value, null);
             size++;
         } else {
             addNodeInQueue(null, value, 0);
@@ -83,8 +83,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 break;
             }
         }
-        int keyHash = (key == null ? 111 : key.hashCode());
-        checked.next = new Node<K, V>(keyHash, key, value, null);
+        checked.next = new Node<K, V>(key, value, null);
         size++;
         return 1;
     }
@@ -116,13 +115,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     static class Node<K, V> {
-        final int hash;
         final K key;
         V value;
         Node<K, V> next;
 
-        Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
