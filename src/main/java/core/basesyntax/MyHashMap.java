@@ -44,8 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean compareKeys(K key1, K key2) {
-        return (getHash(key1) == getHash(key2))
-                && (key1 == null ? key2 == null : key1.equals(key2));
+        return getHash(key1) == getHash(key2) && (key1 == null ? key2 == null : key1.equals(key2));
     }
 
     private int getHash(K key) {
@@ -63,18 +62,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size = increment ? size + 1 : size;
             return;
         }
-        Node<K, V> oldNode = table[index];
-        while (oldNode != null) {
-            if (compareKeys(oldNode.key, key)) {
-                oldNode.value = value;
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (compareKeys(node.key, key)) {
+                node.value = value;
                 return;
             }
-            if (oldNode.next == null) {
-                oldNode.next = new Node<>(key, value, null);
+            if (node.next == null) {
+                node.next = new Node<>(key, value, null);
                 size = increment ? size + 1 : size;
                 return;
             } else {
-                oldNode = oldNode.next;
+                node = node.next;
             }
         }
     }
