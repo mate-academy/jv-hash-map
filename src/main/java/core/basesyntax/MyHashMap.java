@@ -49,8 +49,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHash(K key) {
-        int hashCode = key == null ? 0 : key.hashCode();
-        return hashCode >= 0 ? hashCode : hashCode * (-1);
+        return key == null ? 0 : key.hashCode() >= 0 ? key.hashCode() : key.hashCode() * (-1);
     }
 
     private int getIndex(K key, int length) {
