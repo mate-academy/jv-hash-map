@@ -1,92 +1,105 @@
 package core.basesyntax;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-
-    private Node<K,V>[] hashTable;
     private static final int DEFAULT_CAPACITY = 1 << 4;
-    public static final int MAXIMUM_CAPACITY = 1 << 30;
-    private static final double LOAD_FACTOR = 0.75f;
+    private static final double DEFAULT_LOAD_FACTOR = 0.75f;
     private int size;
+    private Node<K, V>[] hashTable;
 
     public MyHashMap() {
         size = 0;
-        hashTable = (Node<K,V>[]) new Node[DEFAULT_CAPACITY];
+        hashTable = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-
-    }
-
-    static class Node<K,V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K,V> next;
-
-        private Node(int hash, K key, V value, Node<K,V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
+        if ((double) size / hashTable.length >= DEFAULT_LOAD_FACTOR) {
+            resize();
         }
-
-        public final V setValue(V newValue) {
-            V oldValue = value;
-            value = newValue;
-            return oldValue;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Node<?, ?> node = (Node<?, ?>) o;
-            return hash == node.hash &&
-                    Objects.equals(nodes, node.nodes) &&
-                    Objects.equals(key, node.key) &&
-                    Objects.equals(value, node.value);
-        }
-
-        @Override
-        public int hashCode() {
-            hash = 31;
-            hash *= 17 + key.hashCode();
-            hash *= 17 + value.hashCode();
-            hash += nodes.hashCode();
-            return hash;
-        }
-        private int hash() {
-            return hashCode() % hashTable.length;
-        }
-    }
-
-    static final int hash(Object key) {
-        int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+        putNode(key, value, hashTable, true);
     }
 
     @Override
     public V getValue(K key) {
+        Node<K, V> node = hashTable[getIndex(key, hashTable.length)];
+        if (node != null) {
+            while (node != null) {
+                if (compareKeys(key, node.key)) {
+                    return node.value;
+                }
+                node = node.next;
+            }
+        }
         return null;
     }
 
     @Override
     public int getSize() {
-        return 0;
+        return size;
     }
 
+    private boolean compareKeys(K key1, K key2) {
+        return getHash(key1) == getHash(key2) && (key1 == null ? key2 == null : key1.equals(key2));
+    }
 
-    public static void main(String[] args) {
-        System.out.println(2000 >>> 16);
+    private int getHash(K key) {
+        return key == null ? 0 : key.hashCode() >= 0 ? key.hashCode() : key.hashCode() * (-1);
+    }
+
+    private int getIndex(K key, int length) {
+        return getHash(key) % length;
+    }
+
+    private void putNode(K key, V value, Node<K, V>[] table, boolean increment) {
+        int index = getIndex(key, table.length);
+        if (table[index] == null) {
+            table[index] = new Node<>(key, value, null);
+            size = increment ? size + 1 : size;
+            return;
+        }
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (compareKeys(node.key, key)) {
+                node.value = value;
+                return;
+            }
+            if (node.next == null) {
+                node.next = new Node<>(key, value, null);
+                size = increment ? size + 1 : size;
+                return;
+            } else {
+                node = node.next;
+            }
+        }
+    }
+
+    private void resize() {
+        int newCapacity = hashTable.length * 2;
+        Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
+        for (Node<K, V> cell : hashTable) {
+            Node<K, V> node = cell;
+            while (node != null) {
+                putNode(node.key, node.value, newTable, false);
+                node = node.next;
+            }
+        }
+        hashTable = newTable;
+    }
+
+    private static class Node<K, V> {
+        final K key;
+        V value;
+        Node<K, V> next;
+
+        public Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
