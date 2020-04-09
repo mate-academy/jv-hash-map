@@ -82,6 +82,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    public V remove(K key) {
+        int hash = hash(key, table.length);
+        Entry<K, V> entry = table[hash];
+        Entry<K, V> previousEntry = entry;
+        int counterEntry = 0;
+        while (entry != null) {
+            counterEntry++;
+            if (entry.key == null && key == null
+                    || entry.key != null && entry.key.equals(key)) {
+                if (counterEntry == 1) {
+                    table[hash] = entry.next;
+                }
+                previousEntry.next = entry.next;
+                size--;
+                return entry.value;
+            }
+            previousEntry = entry;
+            entry = entry.next;
+        }
+        return null;
+    }
+
     private void resize() {
         Entry<K, V>[] newTable = new Entry[table.length * 2];
         for (Entry<K, V> entry : table) {
