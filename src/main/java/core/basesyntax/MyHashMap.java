@@ -9,11 +9,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
     private static final int DEFAULT_CAPACITY = 16;
     private int size;
+    private int newCapacity;
     private Node<K, V>[] table;
 
     public MyHashMap() {
         size = 0;
         table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        newCapacity = DEFAULT_CAPACITY;
     }
 
     @Override
@@ -26,7 +28,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = table[getIndex(key, table.length)];
+        Node<K, V> node = table[getIndex(key)];
         if (node != null) {
             while (node != null) {
                 if (compareKeys(key, node.key)) {
@@ -51,12 +53,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
-    private int getIndex(K key, int length) {
-        return getHash(key) % length;
+    private int getIndex(K key) {
+        return getHash(key) % newCapacity;
     }
 
     private void putNode(K key, V value, Node<K, V>[] table, boolean increment) {
-        int index = getIndex(key, table.length);
+        int index = getIndex(key);
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
             size = increment ? size + 1 : size;
@@ -72,14 +74,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node.next = new Node<>(key, value, null);
                 size = increment ? size + 1 : size;
                 return;
-            } else {
-                node = node.next;
             }
+            node = node.next;
         }
     }
 
     private void resize() {
-        int newCapacity = table.length * 2;
+        newCapacity = table.length * 2;
         Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
         for (Node<K, V> cell : table) {
             Node<K, V> node = cell;
@@ -92,7 +93,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        final K key;
+        K key;
         V value;
         Node<K, V> next;
 
