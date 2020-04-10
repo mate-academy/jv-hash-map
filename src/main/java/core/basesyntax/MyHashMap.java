@@ -91,9 +91,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] newBucket = new Node[bucket.length * 2];
         Node<K, V>[] oldBucket = bucket;
-        bucket = newBucket;
+        bucket = new Node[bucket.length * 2];;
         size = 0;
         for (Node<K, V> element : oldBucket) {
             while (element != null) {
