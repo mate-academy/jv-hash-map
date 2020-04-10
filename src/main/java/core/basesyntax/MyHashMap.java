@@ -81,13 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean compareKey(K key1, K key2) {
-        if (key1 == null && key2 == null) {
-            return true;
-        }
-        if (key1 != null && key2 != null) {
-            return key1.equals(key2);
-        }
-        return false;
+        return key1 == null ? key2 == null : key1.equals(key2);
     }
 
     private void resize() {
