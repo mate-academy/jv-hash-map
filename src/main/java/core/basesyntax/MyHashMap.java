@@ -69,11 +69,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         if (elementsNumber == threshold) {
             arrayCapacity *= 2;
-            Node[] newTable = new Node[arrayCapacity];
-            for (Node node : nodesArray) {
+            Node<K, V>[] newTable = new Node[arrayCapacity];
+            for (Node<K, V> node : nodesArray) {
                 while (node != null) {
-                    int index = getIndex((K) node.key);
-                    newTable[index] = node;
+                    int index = getIndex(node.key);
+                    Node<K, V> newTableNode = newTable[index];
+                    Node<K, V> oldNode = node;
+                    oldNode.nextNode = newTableNode;
+                    newTable[index] = oldNode;
                     node = node.nextNode;
                 }
             }
