@@ -29,12 +29,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 resize();
             } else {
                 do {
-                    if (presentInEntry.key != null) {
-                        if (key.hashCode() == presentInEntry.key.hashCode()
-                                && (key == presentInEntry.key || key.equals(presentInEntry.key))) {
-                            presentInEntry.value = value;
-                            return;
-                        }
+                    if (presentInEntry.key != null && key.hashCode() == presentInEntry.key.hashCode()
+                            && (key == presentInEntry.key || key.equals(presentInEntry.key))) {
+                        presentInEntry.value = value;
+                        return;
                     }
                     if (presentInEntry.next == null) {
                         break;
@@ -71,10 +69,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return null;
             }
             do {
-                if (temp.key != null) {
-                    if (temp.key.hashCode() == key.hashCode() && key.equals(temp.key)) {
-                        return temp.value;
-                    }
+                if (temp.key != null && temp.key.hashCode() == key.hashCode() && key.equals(temp.key)) {
+                    return temp.value;
                 }
                 temp = temp.next;
             } while (temp != null);
