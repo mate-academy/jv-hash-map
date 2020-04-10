@@ -9,11 +9,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75F;
     private int size;
-    private Object[] table;
+    private Node<K, V>[] table;
 
     public MyHashMap() {
         size = 0;
-        table = new Object[DEFAULT_CAPACITY];
+        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -26,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> nodeByKey = (Node<K, V>) table[hash(key, table.length)];
+        Node<K, V> nodeByKey = table[hash(key, table.length)];
         while (nodeByKey != null) {
             if ((key != null && key.equals(nodeByKey.key)) || key == nodeByKey.key) {
                 return nodeByKey.value;
@@ -41,13 +41,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private boolean addToTable(K key, V value, Object[] table) {
+    private boolean addToTable(K key, V value, Node<K, V>[] table) {
         int hash = hash(key, table.length);
         if (table[hash] == null) {
             table[hash] = new Node<>(key, value, null);
             return true;
         } else {
-            Node<K, V> lastNode = (Node<K, V>) table[hash];
+            Node<K, V> lastNode = table[hash];
             while (lastNode != null) {
                 if ((lastNode.key != null && lastNode.key.equals(key))
                         || lastNode.key == key) {
@@ -65,9 +65,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         if (((float) size) / table.length > LOAD_FACTOR) {
-            Object[] newTable = new Object[table.length * 2];
-            for (Object o : table) {
-                Node<K, V> node = (Node<K, V>) o;
+            Node<K,V>[] newTable = (Node<K, V>[]) new Node[table.length * 2];
+            for (Node<K, V> node : table) {
                 while (node != null) {
                     addToTable(node.key, node.value, newTable);
                     node = node.nextNode;
@@ -77,8 +76,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hash(Object o, int length) {
-        return o != null ? Math.abs(((K) o).hashCode() % length) : 0;
+    private int hash(K key, int length) {
+        return key != null ? Math.abs(key.hashCode() % length) : 0;
     }
 
     private static final class Node<K, V> {
