@@ -7,7 +7,7 @@ package core.basesyntax;
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_ARRAY_CAPACITY = 16;
-    private static final int LOAD_FACTOR = 75;
+    private static final double LOAD_FACTOR = 0.75;
     private Node<K, V>[] buckets;
     private int size;
 
@@ -53,14 +53,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    //////////////////////My_Methods///////////////////////////////////
-
     private int index(K key) {
         return Math.abs(key.hashCode() % (buckets.length));
     }
 
     private boolean ensureCapacity(int size) {
-        return size > (buckets.length * LOAD_FACTOR) / 100;
+        return size > buckets.length * LOAD_FACTOR;
     }
 
     private void putForNullKey(V value) {
@@ -73,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             buckets[0].value = value;
             return;
         }
-        Node<K, V> currentNode = getNoge(buckets[0]);
+        Node<K, V> currentNode = buckets[0];
         while (currentNode.next != null) {
             if (currentNode.next.key == null) {
                 currentNode.next.value = value;
@@ -109,28 +107,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         for (int i = 0; i < oldData.length; i++) {
             if (oldData[i] != null) {
-                putLL(oldData[i]);
+                put(oldData[i].key, oldData[i].value);
+                while (oldData[i].next != null) {
+                    oldData[i] = oldData[i].next;
+                    put(oldData[i].key, oldData[i].value);
+                }
             }
         }
     }
 
-    private void setValue(int index, K key, V value) {
-        buckets[index].key = key;
-        buckets[index].value = value;
-    }
-
     private void setBucket(int index, K key, V value) {
         if (key.equals(buckets[index].key)) {
-            setValue(index, key, value);
+            buckets[index].key = key;
+            buckets[index].value = value;
             return;
         }
-        Node<K, V> currentNode = getNoge(buckets[index]);
+        Node<K, V> currentNode = buckets[index];
         while (currentNode.next != null) {
             if (key.equals(currentNode.next.key)) {
                 currentNode.next.value = value;
                 return;
             }
-            currentNode = getNoge(currentNode.next);
+            currentNode = currentNode.next;
         }
         Node<K, V> entry = new Node(key, value);
         currentNode.next = entry;
@@ -144,7 +142,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key.equals(buckets[index].key)) {
             return buckets[index].value;
         }
-        Node<K, V> currentNode = getNoge(buckets[index]);
+        Node<K, V> currentNode = buckets[index];
         while (currentNode.next != null) {
             if (key.equals(currentNode.next.key)) {
                 return currentNode.next.value;
@@ -153,20 +151,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         return null;
     }
-
-    private Node getNoge(Node node) {
-        return node;
-    }
-
-    private void putLL(Node<K, V> oldNode) {
-        put(oldNode.key, oldNode.value);
-        while (oldNode.next != null) {
-            oldNode = oldNode.next;
-            put(oldNode.key, oldNode.value);
-        }
-    }
-
-    ////////////////////////Class_Node///////////////////////////////
 
     private class Node<K, V> {
         private K key;
