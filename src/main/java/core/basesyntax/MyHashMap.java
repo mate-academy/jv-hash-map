@@ -6,14 +6,14 @@ package core.basesyntax;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_CAPACITY = 1 << 4;
+    private static final int DEFAULT_CAPACITY = 16;
     private static final double DEFAULT_LOAD_FACTOR = 0.75f;
     private int size;
     private Node<K, V>[] hashTable;
 
     public MyHashMap() {
         size = 0;
-        hashTable = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        hashTable = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -80,7 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         int newCapacity = hashTable.length * 2;
-        Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
+        Node<K, V>[] newTable = new Node[newCapacity];
         for (Node<K, V> cell : hashTable) {
             Node<K, V> node = cell;
             while (node != null) {
