@@ -10,7 +10,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
     private int size;
-    private int capacity;
     private float loadFactor;
     private Node<K, V>[] data;
 
@@ -19,9 +18,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public MyHashMap(int mapCapacity, float mapLoadFactor) {
-        capacity = mapCapacity;
         loadFactor = mapLoadFactor;
-        data = new Node[capacity];
+        data = new Node[mapCapacity];
     }
 
     @Override
@@ -39,7 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             data[index] = new Node<K, V>(key, value, data[index]);
         }
         size++;
-        if (size >= capacity * loadFactor) {
+        if (size >= data.length * loadFactor) {
             resize();
         }
     }
@@ -64,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getContainerIndex(K key) {
-        return (key == null) ? 0 : key.hashCode() & (capacity - 1);
+        return (key == null) ? 0 : key.hashCode() & (data.length - 1);
     }
 
     private void locateNode(Node<K, V> node) {
@@ -80,8 +78,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node[] oldHashTable = data;
-        capacity = capacity << 1;
-        data = new Node[capacity];
+        data = new Node[data.length << 1];
 
         for (int i = 0; i < oldHashTable.length; i++) {
             for (Node<K, V> node = oldHashTable[i]; node != null;) {
