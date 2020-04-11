@@ -5,24 +5,23 @@ package core.basesyntax;
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    private static final int CAPACITY = 16;
+    private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
 
     private Entry<K, V>[] table;
-    private double threshold;
     private int size = 0;
 
     public MyHashMap() {
-        table = new Entry[CAPACITY];
+        table = new Entry[INITIAL_CAPACITY];
         size = 0;
     }
 
     @Override
     public void put(K key, V value) {
-        threshold = (double) size / table.length;
-        if (threshold >= LOAD_FACTOR) {
+        if ((double) size / table.length >= LOAD_FACTOR) {
             resize();
         }
         if (key == null) {
@@ -46,30 +45,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         addEntry(hash, key, value);
     }
 
-    private void addEntry(int hash, K key, V value) {
-        table[hash] = new Entry<K, V>(key, value, table[hash]);
-        size++;
-    }
-
-    private void putForNullKey(V value) {
-        Entry<K, V> entry = table[0];
-        while (entry != null) {
-            if (entry.key == null) {
-                entry.value = value;
-                return;
-            }
-            entry = entry.next;
-        }
-        addEntry(0, null, value);
-    }
-
     @Override
     public V getValue(K key) {
         int hash = hash(key, table.length);
         Entry<K, V> entry = table[hash];
         while (entry != null) {
-            if (entry.key == null && key == null
-                    || entry.key != null && entry.key.equals(key)) {
+            if (entry.key == key || entry.key != null && entry.key.equals(key)) {
                 return entry.value;
             }
             entry = entry.next;
@@ -93,8 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int counterEntry = 0;
         while (entry != null) {
             counterEntry++;
-            if (entry.key == null && key == null
-                    || entry.key != null && entry.key.equals(key)) {
+            if (entry.key == key || entry.key != null && entry.key.equals(key)) {
                 if (counterEntry == 1) {
                     table[hash] = entry.next;
                 }
@@ -106,6 +86,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             entry = entry.next;
         }
         return null;
+    }
+
+    private void addEntry(int hash, K key, V value) {
+        table[hash] = new Entry<K, V>(key, value, table[hash]);
+        size++;
+    }
+
+    private void putForNullKey(V value) {
+        Entry<K, V> entry = table[0];
+        while (entry != null) {
+            if (entry.key == null) {
+                entry.value = value;
+                return;
+            }
+            entry = entry.next;
+        }
+        addEntry(0, null, value);
     }
 
     private void resize() {
@@ -130,10 +127,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (kay != null) {
             hashCode = kay.hashCode();
         }
-        if (hashCode < 0) {
-            hashCode = -hashCode;
-        }
-        return hashCode % lengthTable;
+        return Math.abs(hashCode) % lengthTable;
     }
 
     private static class Entry<K, V> {
@@ -141,7 +135,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         V value;
         Entry<K, V> next;
 
-        public Entry(K key, V value, Entry<K, V> next) {
+        private Entry(K key, V value, Entry<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
