@@ -10,30 +10,28 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private Node<K, V>[] nodes;
-    private int capacity;
-    private int size = 0;
-    private int index;
-    private Node<K, V> curNode;
+    private int size;
 
     MyHashMap() {
         nodes = new Node[DEFAULT_CAPACITY];
-        capacity = DEFAULT_CAPACITY;
+        size = 0;
     }
 
     @Override
     public void put(K key, V value) {
-        if (size > 0.75 * capacity) {
+        int index;
+        if (size > 0.75 * nodes.length) {
             resize(nodes);
         }
         if (key == null) {
             index = 0;
         } else {
-            index = Math.abs(key.hashCode()) % capacity;
+            index = Math.abs(key.hashCode()) % nodes.length;
         }
         if (nodes[index] == null) {
             nodes[index] = new Node<>(key, value);
         } else {
-            curNode = nodes[index];
+            Node<K, V> curNode = nodes[index];
             while (curNode.next != null) {
                 if (Objects.equals(curNode.key, key)) {
                     curNode.value = value;
@@ -53,10 +51,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
+        int index;
         if (key == null) {
             index = 0;
         } else {
-            index = Math.abs(key.hashCode()) % capacity;
+            index = Math.abs(key.hashCode()) % nodes.length;
         }
         if (nodes[index] == null) {
             return null;
@@ -64,7 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (nodes[index].next == null) {
             return nodes[index].value;
         }
-        curNode = nodes[index];
+        Node<K, V> curNode = nodes[index];
         while (curNode != null) {
             if (Objects.equals(curNode.key, key)) {
                 return curNode.value;
@@ -80,15 +79,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize(Node<K, V>[] oldNodes) {
-        nodes = new Node[capacity * 2];
-        capacity *= 2;
-        int size = this.size;
+        nodes = new Node[nodes.length * 2];
+        size = 0;
         for (Node<K, V> node : oldNodes) {
             if (node != null) {
                 while (node != null) {
                     put(node.key, node.value);
                     node = node.next;
-                    this.size = size;
                 }
             }
         }
