@@ -37,20 +37,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int keyIndexInMyTable;
-        if (key != null) {
-            keyIndexInMyTable = indexFor(key.hashCode());
-        } else {
-            keyIndexInMyTable = 0;
-        }
+        keyIndexInMyTable = key == null ? 0 : indexFor(key.hashCode());
         V valueReturn = null;
-        if (checkIndex(keyIndexInMyTable)) {
+        if (table[keyIndexInMyTable] != null) {
             Node checked = table[keyIndexInMyTable];
             while (checked != null) {
                 if (Objects.equals(key, checked.key)) {
                     return (V) checked.value;
-                } else {
-                    checked = checked.next;
                 }
+                checked = checked.next;
             }
         }
         return valueReturn;
@@ -94,10 +89,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return code & (table.length - 1);
     }
 
-    private boolean checkIndex(int index) {
-        return table[index] != null;
-    }
-
     private void resize() {
         if (size >= table.length * DEFAULT_LOAD_FACTOR) {
             size = 0;
@@ -115,7 +106,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     static class Node<K, V> {
-        final K key;
+        K key;
         V value;
         Node<K, V> next;
 
