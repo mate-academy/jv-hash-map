@@ -17,13 +17,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         headNode = new Node[CAPACITY];
-        threshold = CAPACITY * LOAD_HASH;
         size = 0;
     }
 
     @Override
     public void put(K key, V value) {
-        if (size == threshold) {
+        if (size == headNode.length * LOAD_HASH) {
             resize();
         }
         int index = receiveHashCode(key, headNode.length);
@@ -78,7 +77,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] newNode = new Node[headNode.length * 2];
-        threshold = newNode.length * LOAD_HASH;
         size = 0;
         Node<K, V>[] oldBuckets = headNode;
         headNode = newNode;
