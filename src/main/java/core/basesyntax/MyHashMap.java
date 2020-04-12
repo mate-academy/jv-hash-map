@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import java.util.Objects;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTORY = 0.75f;
@@ -37,7 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         if (arraySearch(key) != null) {
-            return Objects.requireNonNull(arraySearch(key)).value;
+            return arraySearch(key).value;
         }
         return null;
     }
