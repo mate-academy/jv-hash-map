@@ -8,9 +8,9 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double FILL_FACTOR = 0.75;
+    private static double max_fill;
 
     private Node<K, V>[] buckets;
-    private double max_fill;
     private int size;
 
     public MyHashMap() {
@@ -21,12 +21,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if( size == max_fill) {
+        if (size == max_fill) {
             resize();
         }
         int index = getIndex(key, buckets.length);
         Node<K, V> node = getNode(key, index);
-        if (node != null){
+        if (node != null) {
             node.value = value;
         } else {
             Node<K, V> entry = new Node<>(key, value, buckets[index]);
@@ -56,8 +56,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node getNode(K key, int index) {
         Node<K, V> node = buckets[index];
-        while (node != null){
-            if(key == node.key || key != null && key.equals(node.key)){
+        while (node != null) {
+            if (key == node.key || key != null && key.equals(node.key)) {
                 return node;
             }
             node = node.next;
@@ -72,7 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] deadBuckets = buckets;
         buckets = newBucketsSet;
         for (Node<K,V> bucket: deadBuckets) {
-            while (bucket != null){
+            while (bucket != null) {
                 put(bucket.key, bucket.value);
                 bucket = bucket.next;
             }
