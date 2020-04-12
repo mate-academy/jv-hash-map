@@ -23,14 +23,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        Node<K, V> bucket = buckets[getIndex(key, buckets.length)];
+        Node<K, V> bucket = buckets[getIndex(key)];
         Node<K, V> prevNode;
         if (bucket == null) {
-            buckets[getIndex(key, buckets.length)] = new Node<>(key, value, null);
+            buckets[getIndex(key)] = new Node<>(key, value, null);
             size++;
         } else {
             do {
-                if (compareKey(bucket.key, key)) {
+                if (compareKeys(bucket.key, key)) {
                     bucket.value = value;
                     return;
                 }
@@ -44,9 +44,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> bucket = buckets[getIndex(key, buckets.length)];
+        Node<K, V> bucket = buckets[getIndex(key)];
         while (bucket != null) {
-            if (compareKey(bucket.key, key)) {
+            if (compareKeys(bucket.key, key)) {
                 return bucket.value;
             }
             bucket = bucket.next;
@@ -85,11 +85,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getIndex(K key, int sizeOfBuckets) {
-        return key == null ? 0 : Math.abs((key.hashCode() % sizeOfBuckets));
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs((key.hashCode() % buckets.length));
     }
 
-    private boolean compareKey(K key1, K key2) {
+    private boolean compareKeys(K key1, K key2) {
         return key1 == key2 || key1 != null && key1.equals(key2);
     }
 }
