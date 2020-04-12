@@ -20,10 +20,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > (int)(buckets.length * LOAD_FACTOR)) {
             increaseSize();
         }
-        int bucketIdx = key != null ? (key.hashCode() >>> 1) % buckets.length : 0;
-        Bucket<K, V> bucket = buckets[bucketIdx];
+        int bucketIndex = key != null ? (key.hashCode() >>> 1) % buckets.length : 0;
+        Bucket<K, V> bucket = buckets[bucketIndex];
         if (bucket == null) {
-            buckets[bucketIdx] = new Bucket<>(key, value);
+            buckets[bucketIndex] = new Bucket<>(key, value);
             ++size;
             return;
         }
