@@ -8,12 +8,14 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
     private static final int DEFAULT_CAPACITY = 16;
+    private int newCapacity;
     private int size;
     private Node<K, V>[] table;
 
     public MyHashMap() {
         size = 0;
         table = new Node[DEFAULT_CAPACITY];
+        newCapacity = DEFAULT_CAPACITY;
     }
 
     @Override
@@ -27,7 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = table[getIndex(key, table.length)];
+        Node<K, V> node = table[getIndex(key)];
         if (node != null) {
             while (node != null) {
                 if (compareKeys(key, node.key)) {
@@ -52,12 +54,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
-    private int getIndex(K key, int length) {
-        return getHash(key) % length;
+    private int getIndex(K key) {
+        return getHash(key) % newCapacity;
     }
 
     private void putNode(K key, V value, Node<K, V>[] table, boolean increment) {
-        int index = getIndex(key, table.length);
+        int index = getIndex(key);
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
             size = increment ? size + 1 : size;
