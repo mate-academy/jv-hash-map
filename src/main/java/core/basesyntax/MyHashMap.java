@@ -14,14 +14,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
+        private final K nodeKey;
+        private V nodeValue;
+        private Node<K, V> nextNode;
 
         public Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
+            nodeKey = key;
+            nodeValue = value;
+            nextNode = next;
         }
     }
 
@@ -35,10 +35,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == hashMapArray.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
-        int index = findIndex(key, hashMapArray.length);
-        Node<K, V> newElement = findLastNode(key, index);
+        int index = findIndex(key);
+        Node<K, V> newElement = findLastNode(key);
         if (newElement != null) {
-            newElement.value = value;
+            newElement.nodeValue = value;
         } else {
             hashMapArray[index] = new Node<K, V>(key, value, hashMapArray[index]);
             size++;
@@ -47,10 +47,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = findIndex(key, hashMapArray.length);
-        Node<K, V> newElement = findLastNode(key, index);
+        int index = findIndex(key);
+        Node<K, V> newElement = findLastNode(key);
         if (newElement != null) {
-            return newElement.value;
+            return newElement.nodeValue;
         }
         return null;
     }
@@ -60,20 +60,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int findIndex(K key, int length) {
+    private int findIndex(K key) {
         if (key == null) {
             return 0;
         }
-        return Math.abs(key.hashCode()) % length;
+        return Math.abs(key.hashCode()) % hashMapArray.length;
     }
 
-    private Node findLastNode(K key, int index) {
-        Node<K, V> newNode = hashMapArray[index];
+    private Node findLastNode(K key) {
+        Node<K, V> newNode = hashMapArray[findIndex(key)];
         while (newNode != null) {
-            if (key == newNode.key || key != null && key.equals(newNode.key)) {
+            if (key == newNode.nodeKey || key != null && key.equals(newNode.nodeKey)) {
                 return newNode;
             }
-            newNode = newNode.next;
+            newNode = newNode.nextNode;
         }
         return null;
     }
@@ -85,8 +85,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         hashMapArray = newHashMapArray;
         for (int i = 0; i < oldHashMapArray.length; i++) {
             while (oldHashMapArray[i] != null) {
-                put(oldHashMapArray[i].key, oldHashMapArray[i].value);
-                oldHashMapArray[i] = oldHashMapArray[i].next;
+                put(oldHashMapArray[i].nodeKey, oldHashMapArray[i].nodeValue);
+                oldHashMapArray[i] = oldHashMapArray[i].nextNode;
             }
         }
     }
