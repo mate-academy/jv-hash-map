@@ -16,28 +16,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        size = 0;
     }
 
     @Override
     public void put(K key, V value) {
         resize();
-        if (key == null) {
-            putForNullKey(value);
+
+        if (table[indexFor(key)] == null) {
+            table[indexFor(key)] = new Node<K, V>(key, value, null);
+            size++;
         } else {
-            if (table[indexFor(key.hashCode())] == null) {
-                table[indexFor(key.hashCode())] = new Node<K, V>(key, value, null);
-                size++;
-            } else {
-                addNodeInQueue(key, value, indexFor(key.hashCode()));
-            }
+            addNodeInQueue(key, value, indexFor(key));
         }
     }
 
     @Override
     public V getValue(K key) {
-        int keyIndexInMyTable;
-        keyIndexInMyTable = key == null ? 0 : indexFor(key.hashCode());
+        int keyIndexInMyTable = indexFor(key);
         V valueReturn = null;
         if (table[keyIndexInMyTable] != null) {
             Node checked = table[keyIndexInMyTable];
@@ -54,15 +49,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
-    }
-
-    private void putForNullKey(V value) {
-        if (table[0] == null) {
-            table[0] = new Node(null, value, null);
-            size++;
-        } else {
-            addNodeInQueue(null, value, 0);
-        }
     }
 
     private int addNodeInQueue(K key, V value, int index) {
@@ -83,7 +69,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return 1;
     }
 
-    private int indexFor(int code) {
+    private int indexFor(K key) {
+        if (key == null) {
+            return 0;
+        }
+        int code = key.hashCode();
         code ^= (code >>> 20) ^ (code >>> 12);
         code = code ^ (code >>> 7) ^ (code >>> 4);
         return code & (table.length - 1);
