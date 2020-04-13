@@ -68,8 +68,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public int indexForEntry(K kay) {
-        return kay == null ? 0 : Math.abs(kay.hashCode() % table.length);
+    public int indexForEntry(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private class Entry<K, V> {
