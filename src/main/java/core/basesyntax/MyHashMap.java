@@ -67,7 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hash(Object key) {
+    private int hash(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode()) % bucket.length;
     }
 
