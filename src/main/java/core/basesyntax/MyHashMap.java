@@ -60,9 +60,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-         private K key;
-         private V value;
-         private Node next;
+        private K key;
+        private V value;
+        private Node next;
 
         public Node(K key, V value, Node next) {
             this.key = key;
