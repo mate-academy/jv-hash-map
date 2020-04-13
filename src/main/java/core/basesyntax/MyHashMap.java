@@ -82,16 +82,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        public V value;
-        public K key;
-        Node<K, V> next;
+        private V value;
+        private K key;
+        private Node<K, V> next;
 
-        public Node(K key, V value) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
         }
 
-        public Node<K, V> findNode(K key) {
+        private Node<K, V> findNode(K key) {
             if (Objects.equals(key, this.key)) {
                 return this;
             }
@@ -102,7 +102,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return this.next.findNode(key);
         }
 
-        public void addNode(Node<K, V> node) {
+        private void addNode(Node<K, V> node) {
             if (this.next == null) {
                 this.next = node;
             } else {
