@@ -1,6 +1,7 @@
 package core.basesyntax;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
@@ -27,18 +28,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         Node<K, V> node = buckets[index];
-        boolean nextNode = true;
         do {
-            if (key == node.key || key != null && key.equals(node.key)) {
+            if (Objects.equals(key, node.key)) {
                 node.value = value;
                 return;
             }
             if (node.next == null) {
-                nextNode = false;
+                break;
             } else {
                 node = node.next;
             }
-        } while (nextNode);
+        } while (true);
         node.next = new Node(key, value);
         size++;
     }
@@ -48,7 +48,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> node = buckets[determineIndex(key)];
         if (node != null) {
             do {
-                if (key == node.key || key != null && key.equals(node.key)) {
+                if (Objects.equals(key, node.key)) {
                     return node.value;
                 }
                 node = node.next;
@@ -70,9 +70,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (size > buckets.length * DEFAULT_LOAD_FACTOR) {
+        if (size >= buckets.length * DEFAULT_LOAD_FACTOR) {
             size = 0;
-            final Node[] copyBuckets = Arrays.copyOf(buckets, buckets.length);
+            final Node[] copyBuckets = buckets;
             buckets = new Node[copyBuckets.length * 2];
             for (int i = 0; i < copyBuckets.length; i++) {
                 if (copyBuckets[i] != null) {
