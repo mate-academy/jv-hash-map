@@ -67,17 +67,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node.next = new Node<>(key, value, null);
                 size++;
                 return;
-            } else {
-                node = node.next;
             }
+            node = node.next;
         }
     }
 
     private void resize() {
-        int newCapacity = table.length * 2;
         Node<K, V>[] oldTable = table;
         size = 0;
-        table = (Node<K, V>[]) new Node[newCapacity];
+        table = new Node[table.length * 2];
         for (Node<K, V> cell : oldTable) {
             Node<K, V> node = cell;
             while (node != null) {
