@@ -25,12 +25,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             tableResize();
         }
-        if (key == null) {
-            putForNullKey(value);
-            return;
-        }
-        int index = indexFor(hash(key.hashCode()), table.length);
-        addNode(key, value, index);
+        int index = indexFor(key, table.length);
+        putValue(key, value, index);
     }
 
     @Override
@@ -79,8 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> node : table) {
             while (node != null) {
                 Node<K, V> next = node.next;
-                int newIndex = indexFor(hash(node.key.hashCode()),
-                        newTable.length);
+                int newIndex = indexFor(node.key, newTable.length);
                 node.next = newTable[newIndex];
                 newTable[newIndex] = node;
                 node = next;
@@ -88,45 +83,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void putForNullKey(V value) {
-        if (setValue(table[0], null, value)) {
-            return;
-        }
-        addNode(null, value, 0);
-    }
-
     private int hash(int keyHash) {
         keyHash ^= (keyHash >>> 20) ^ (keyHash >>> 12);
         return keyHash ^ (keyHash >>> 7) ^ (keyHash >>> 4);
     }
 
-    private int indexFor(int hash, int tableLength) {
-        return hash & (tableLength - 1);
+    private int indexFor(K key, int tableLength) {
+        return key == null ? 0 : hash(key.hashCode()) & (tableLength - 1);
     }
 
-    private void addNode(K key, V value, int index) {
-        Node<K, V> first = table[index];
-        if (setValue(first, key, value)) {
+    private void putValue(K key, V value, int index) {
+        Node<K, V> found = getNode(key);
+        if (found != null) {
+            found.value = value;
             return;
         }
-        table[index] = new Node<>(key, value, first);
+        table[index] = new Node<>(key, value, table[index]);
         size++;
     }
-
-    private boolean setValue(Node<K, V> node, K key, V value) {
-        for (Node<K, V> e = node; e != null; e = e.next) {
-            if (Objects.equals(e.key, key)) {
-                e.value = value;
-                return true;
-            }
-        }
-        return false;
-    }
-
-//    private boolean isEqual(K key, K newKey) {
-//        return (key == newKey) || (key != null && key.equals(newKey)
-//                && hash(key.hashCode()) == hash(newKey.hashCode()));
-//    }
 
     private static class Node<K, V> {
         private K key;
