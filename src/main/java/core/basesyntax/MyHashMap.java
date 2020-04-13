@@ -73,9 +73,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Entry<K, V> {
-        Entry<K, V> next;
-        K key;
-        V value;
+        private Entry<K, V> next;
+        private K key;
+        private V value;
 
         private Entry(K key, V value, Entry<K, V> next) {
             this.key = key;
