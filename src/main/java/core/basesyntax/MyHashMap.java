@@ -23,26 +23,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        Node<K, V> newNode = new Node<>(key, value, null);
-        int keyHash = getHash(key);
-        int index = getIndex(keyHash, table.length);
-
+        int index = getIndexByHash(key);
         if (table[index] == null) {
-            table[index] = newNode;
+            table[index] = new Node<>(key, value, null);
             size++;
-        } else if (containsKey(index, key)) {
-            Node<K, V> current = getNode(index, key);
-            current.value = value;
         } else {
-            newNode.next = table[index];
-            table[index] = newNode;
-            size++;
+            Node<K, V> currentNode = getNode(index, key);
+            if (currentNode != null) {
+                currentNode.value = value;
+            } else {
+                table[index] = new Node<>(key, value, table[index]);
+                size++;
+            }
         }
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = getNode(getIndex(getHash(key), table.length), key);
+        Node<K, V> node = getNode(getIndexByHash(key), key);
         return node == null ? null : node.value;
     }
 
@@ -77,21 +75,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private int getIndex(int hash, int capacity) {
-        return hash % capacity;
-    }
-
-    private int getHash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode());
-    }
-
-    private boolean containsKey(int index, K key) {
-        return getNode(index, key) != null;
+    private int getIndexByHash(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private boolean isEqualKey(K key1, K key2) {
-        return getHash(key1) == getHash(key2)
-                && (key1 == null ? key2 == null : key1.equals(key2));
+        return key1 == null ? key2 == null : key1.equals(key2);
     }
 
     private void resize() {
