@@ -9,18 +9,18 @@ import java.util.Objects;
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75F;
     private Node<K, V>[] hashtable;
-    private int size = 0;
-    private float threshold;
+    private int size;
 
     public MyHashMap() {
-        hashtable = new Node[16];
-        threshold = hashtable.length * 0.75f;
+        hashtable = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size == threshold) {
+        if (size == DEFAULT_CAPACITY * LOAD_FACTOR) {
             resize();
         }
         int index = getBucket(key, hashtable.length);
@@ -58,7 +58,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] newBuckets = new Node[hashtable.length * 2];
-        threshold = newBuckets.length * 0.75f;
         size = 0;
         Node<K, V>[] oldBuckets = hashtable;
         hashtable = newBuckets;
