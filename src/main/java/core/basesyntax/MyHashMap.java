@@ -12,7 +12,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private int size;
-    private int buckets;
     private Node[] table;
 
     public MyHashMap() {
@@ -53,7 +52,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[index] == null) {
             table[index] = node;
             size++;
-            buckets++;
         } else {
             Node searchNode = table[index];
             while (true) {
@@ -75,11 +73,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHash(K key) {
-        return key == null ? 0 : key.hashCode() / 13;
+        return key == null ? 0 : key.hashCode();
     }
 
     private void resize() {
-        if (buckets >= table.length * LOAD_FACTOR) {
+        if (size >= table.length * LOAD_FACTOR) {
             Node[] oldTable = table;
             table = new Node[table.length * 2];
             size = 0;
