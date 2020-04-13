@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
@@ -27,12 +29,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (size == 0) {
-            return null;
-        }
-        Node searchNode = table[indexFor(key, table.length)];
+        Node searchNode = table[getIndex(key, table.length)];
         while (true) {
-            if (areKeysEqual(key, (K) searchNode.key)) {
+            if (searchNode == null) {
+                return null;
+            }
+            if (Objects.equals(key, searchNode.key)) {
                 return (V) searchNode.value;
             }
             if (searchNode.next == null) {
@@ -48,7 +50,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void addNode(K key, V value, Node[] table) {
-        int index = indexFor(key, table.length);
+        int index = getIndex(key, table.length);
         Node<K, V> node = new Node<>(getHash(key), key, value, null);
         if (table[index] == null) {
             table[index] = node;
@@ -57,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node searchNode = table[index];
             while (true) {
-                if (areKeysEqual(key, (K) searchNode.key)) {
+                if (Objects.equals(key, searchNode.key)) {
                     searchNode.value = value;
                     break;
                 } else if (searchNode.next == null) {
@@ -70,17 +72,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private boolean areKeysEqual(K key1, K key2) {
-        return getHash(key1) == getHash(key2) && (key1 == null ? key2 == null : key1.equals(key2));
-    }
-
-    private int indexFor(K key, int length) {
+    private int getIndex(K key, int length) {
         return Math.abs(getHash(key) % length);
     }
 
     private int getHash(K key) {
-        //16 is experimentally found value, used to generate more uniq hashCode,
-        //which is needed to pass checkArrayLengthAfterResizingTest()
         return key == null ? 0 : key.hashCode() / 16;
     }
 
