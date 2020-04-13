@@ -51,9 +51,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (nodes[index] == null) {
             return null;
         }
-        if (nodes[index].next == null) {
-            return nodes[index].value;
-        }
         Node<K, V> curNode = nodes[index];
         while (curNode != null) {
             if (Objects.equals(curNode.key, key)) {
