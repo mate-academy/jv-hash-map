@@ -13,11 +13,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Entry<K, V>[] bucketsTable;
     private int size;
-    private int newCapacity;
 
     public MyHashMap() {
         size = 0;
-        newCapacity = 16;
         bucketsTable = new Entry[INITIAL_CAPACITY];
     }
 
@@ -27,20 +25,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (threshold >= DEFAULT_LOAD_FACTOR) {
             resizeTable();
         }
-        if (key == null) {
-            putNullKey(value);
-            return;
-        }
-        int index = key == null
-                ? 0 : getHash(key);
+        int index = getHash(key);
+        Entry<K, V> newEntry = bucketsTable[index];
         if (bucketsTable[index] == null) {
             bucketsTable[index] = new Entry<>(key, value, null);
             size++;
             return;
         }
-        Entry<K, V> newEntry = bucketsTable[index];
         while (newEntry != null) {
-            if (key.equals(newEntry.key)) {
+            if (key == null) {
+                if (newEntry.key == null) {
+                    newEntry.value = value;
+                    return;
+                }
+            } else if (key.equals(newEntry.key)) {
                 newEntry.value = value;
                 return;
             }
@@ -50,23 +48,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private void putNullKey(V value) {
-        Entry<K, V> newEntry = bucketsTable[0];
-        while (newEntry != null) {
-            if (newEntry.key == null) {
-                newEntry.value = value;
-                return;
-            }
-            newEntry = newEntry.nextEntry;
-        }
-        bucketsTable[0] = new Entry<>(null, value, bucketsTable[0]);
-        size++;
-    }
-
     @Override
     public V getValue(K key) {
-        int index = key == null
-                ? 0 : getHash(key);
+        int index = getHash(key);
         Entry<K, V> entry = bucketsTable[index];
         while (entry != null) {
             if (entry.key == key
@@ -84,33 +68,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHash(K key) {
-        return Math.abs(key.hashCode()) % newCapacity;
+        return key == null
+                ? 0 : Math.abs(key.hashCode()) % bucketsTable.length;
     }
 
     private void resizeTable() {
-        newCapacity = bucketsTable.length * 2;
-        Entry<K, V>[] newBucketsTable = new Entry[newCapacity];
-        for (Entry<K, V> entry : bucketsTable) {
+        Entry<K,V>[] tempArray = bucketsTable;
+        bucketsTable = new Entry[bucketsTable.length * 2];
+        for (Entry<K, V> entry : tempArray) {
             while (entry != null) {
-                int index = entry.key == null
-                        ? 0 : getHash(entry.key);
-                if (newBucketsTable[index] == null) {
-                    newBucketsTable[index] = new Entry<>(entry.key, entry.value, null);
-                    entry = entry.nextEntry;
-                    continue;
-                }
-                newBucketsTable[index] = new Entry<>(entry.key, entry.value,
-                        newBucketsTable[index]);
+                int index = getHash(entry.key);
+                bucketsTable[index] = new Entry<>(entry.key, entry.value,
+                        bucketsTable[index]);
+                put(entry.key, entry.value);
                 entry = entry.nextEntry;
             }
         }
-        bucketsTable = newBucketsTable;
     }
 
     private static class Entry<K, V> {
-        K key;
-        V value;
-        Entry<K, V> nextEntry;
+        private K key;
+        private V value;
+        private Entry<K, V> nextEntry;
 
         private Entry(K key, V value, Entry<K, V> nextEntry) {
             this.key = key;
