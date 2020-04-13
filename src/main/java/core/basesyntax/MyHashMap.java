@@ -40,8 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = key != null ? hash(key) : 0;
-        Node<K, V> current = bucket[index];
+        Node<K, V> current = bucket[hash(key)];
         while (current != null) {
             if (Objects.equals(current.key, key)) {
                 return current.value;
