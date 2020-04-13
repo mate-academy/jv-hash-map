@@ -9,14 +9,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
     private static final int RESIZE_RATE = 2;
-    private static final int INITIAL_SIZE = 0;
     private Node<K, V>[] table;
     private int size;
     private int threshold;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        size = INITIAL_SIZE;
         threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
