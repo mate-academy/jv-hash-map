@@ -8,7 +8,8 @@ import java.util.Objects;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_CAPACITY = 16;
+    static final int DEFAULT_CAPACITY = 16;
+    static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] nodes;
     private int size;
 
@@ -19,15 +20,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index;
-        if (size > 0.75 * nodes.length) {
+        if (size > DEFAULT_LOAD_FACTOR * nodes.length) {
             resize(nodes);
         }
-        if (key == null) {
-            index = 0;
-        } else {
-            index = Math.abs(key.hashCode()) % nodes.length;
-        }
+        int index = getIndex(key);
         if (nodes[index] == null) {
             nodes[index] = new Node<>(key, value);
         } else {
@@ -51,12 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index;
-        if (key == null) {
-            index = 0;
-        } else {
-            index = Math.abs(key.hashCode()) % nodes.length;
-        }
+        int index = getIndex(key);
         if (nodes[index] == null) {
             return null;
         }
@@ -88,6 +79,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     node = node.next;
                 }
             }
+        }
+    }
+
+    private int getIndex(K key) {
+        if (key == null) {
+            return 0;
+        } else {
+            return Math.abs(key.hashCode()) % nodes.length;
         }
     }
 
