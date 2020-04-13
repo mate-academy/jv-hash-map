@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        int hash = hash(key, table.length);
+        int hash = hash(key);
         Node<K, V> lastNode = table[hash];
         while (lastNode != null) {
             if (Objects.equals(key, lastNode.key)) {
@@ -41,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> nodeByKey = table[hash(key, table.length)];
+        Node<K, V> nodeByKey = table[hash(key)];
         while (nodeByKey != null) {
             if (Objects.equals(key, nodeByKey.key)) {
                 return nodeByKey.value;
@@ -70,8 +70,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hash(K key, int length) {
-        return key != null ? Math.abs(key.hashCode() % length) : 0;
+    private int hash(K key) {
+        return key != null ? Math.abs(key.hashCode() % table.length) : 0;
     }
 
     private static final class Node<K, V> {
