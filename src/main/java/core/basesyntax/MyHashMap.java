@@ -8,23 +8,23 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double FILL_FACTOR = 0.75;
-    private static double max_fill;
 
+    private double maxFill;
     private Node<K, V>[] buckets;
     private int size;
 
     public MyHashMap() {
         buckets = new Node[DEFAULT_CAPACITY];
-        max_fill = DEFAULT_CAPACITY * FILL_FACTOR;
+        maxFill = DEFAULT_CAPACITY * FILL_FACTOR;
         size = 0;
     }
 
     @Override
     public void put(K key, V value) {
-        if (size == max_fill) {
+        if (size == maxFill) {
             resize();
         }
-        int index = getIndex(key, buckets.length);
+        int index = getIndex(key);
         Node<K, V> node = getNode(key, index);
         if (node != null) {
             node.value = value;
@@ -37,7 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = getNode(key, getIndex(key, buckets.length));
+        Node<K, V> node = getNode(key, getIndex(key));
         return node != null ? node.value : null;
     }
 
@@ -46,12 +46,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(K key, int capacity) {
-        return Math.abs(key.hashCode() % capacity);
-    }
-
-    private int getIndex(K key, int capacity) {
-        return key == null ? 0 : hash(key, capacity);
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % buckets.length);
     }
 
     private Node getNode(K key, int index) {
@@ -67,7 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] newBucketsSet = new Node[buckets.length << 1];
-        max_fill = newBucketsSet.length * FILL_FACTOR;
+        maxFill = newBucketsSet.length * FILL_FACTOR;
         size = 0;
         Node<K, V>[] deadBuckets = buckets;
         buckets = newBucketsSet;
