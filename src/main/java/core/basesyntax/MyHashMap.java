@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
@@ -57,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V> getNode(K key) {
         for (Node<K, V> node : table) {
             while (node != null) {
-                if (isEqual(node.key, key)) {
+                if (Objects.equals(node.key, key)) {
                     return node;
                 }
                 node = node.next;
@@ -113,7 +115,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private boolean setValue(Node<K, V> node, K key, V value) {
         for (Node<K, V> e = node; e != null; e = e.next) {
-            if (isEqual(e.key, key)) {
+            if (Objects.equals(e.key, key)) {
                 e.value = value;
                 return true;
             }
@@ -121,10 +123,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return false;
     }
 
-    private boolean isEqual(K key, K newKey) {
-        return (key == newKey) || (key != null && key.equals(newKey)
-                && hash(key.hashCode()) == hash(newKey.hashCode()));
-    }
+//    private boolean isEqual(K key, K newKey) {
+//        return (key == newKey) || (key != null && key.equals(newKey)
+//                && hash(key.hashCode()) == hash(newKey.hashCode()));
+//    }
 
     private static class Node<K, V> {
         private K key;
