@@ -39,37 +39,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void addNodeInList(K key, V value, int index) {
-        Node<K,V> currentNode = table[index];
-        while (currentNode != null) {
-            if (Objects.equals(key, currentNode.key)) {
-                currentNode.value = value;
-                return;
-            }
-            if (currentNode.next != null) {
-                currentNode = currentNode.next;
-            } else {
-                break;
-            }
-        }
-        currentNode.next = new Node<K, V>(key, value, null);
-        size++;
-    }
-
-    private int indexFor(int keyHashCode) {
-        keyHashCode ^= (keyHashCode >>> 20) ^ (keyHashCode >>> 12);
-        keyHashCode = keyHashCode ^ (keyHashCode >>> 7) ^ (keyHashCode >>> 4);
-        return keyHashCode & (table.length - 1);
-    }
-
     @Override
     public V getValue(K key) {
         int keyIndex;
-        if (key != null) {
-            keyIndex = indexFor(key.hashCode());
-        } else {
-            keyIndex = 0;
-        }
+        keyIndex = (key != null) ? indexFor(key.hashCode()) : 0;
         V valueReturn = null;
         if (table[keyIndex] != null) {
             Node<K, V> checked = table[keyIndex];
@@ -102,6 +75,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
+    }
+
+    private void addNodeInList(K key, V value, int index) {
+        Node<K,V> currentNode = table[index];
+        while (currentNode != null) {
+            if (Objects.equals(key, currentNode.key)) {
+                currentNode.value = value;
+                return;
+            }
+            if (currentNode.next != null) {
+                currentNode = currentNode.next;
+            } else {
+                break;
+            }
+        }
+        currentNode.next = new Node<K, V>(key, value, null);
+        size++;
+    }
+
+    private int indexFor(int keyHashCode) {
+        keyHashCode ^= (keyHashCode >>> 20) ^ (keyHashCode >>> 12);
+        keyHashCode = keyHashCode ^ (keyHashCode >>> 7) ^ (keyHashCode >>> 4);
+        return keyHashCode & (table.length - 1);
     }
 
     private static class Node<K,V> {
