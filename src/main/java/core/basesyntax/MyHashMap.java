@@ -29,7 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = table[getIndex(key)];
+        Node<K, V> node = table[getKeyIndex(key)];
         if (node != null) {
             while (node != null) {
                 if (compareKeys(key, node.key)) {
@@ -54,12 +54,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
-    private int getIndex(K key) {
+    private int getKeyIndex(K key) {
         return getHash(key) % newCapacity;
     }
 
     private void putNode(K key, V value, Node<K, V>[] table, boolean increment) {
-        int index = getIndex(key);
+        int index = getKeyIndex(key);
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
             size = increment ? size + 1 : size;
