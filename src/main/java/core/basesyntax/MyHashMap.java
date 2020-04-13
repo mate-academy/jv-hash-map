@@ -5,14 +5,15 @@ package core.basesyntax;
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_CAPACITY = 16;
-    static final float DEFAULT_FACTOR = 0.75f;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float DEFAULT_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size = 0;
 
     public MyHashMap() {
-        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -25,19 +26,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (table != null) {
-            if (table.length > 0) {
-                if (table[getIndex(key, table.length)] != null) {
-                    Node<K, V> node = table[getIndex(key, table.length)];
-                    if (node != null) {
-                        do {
-                            if (compareKey(node.key, key)) {
-                                return node.value;
-                            }
-                            node = node.next;
-                        } while (node != null);
+        int newIndex = getIndex(key, table.length);
+        if (table[newIndex] != null) {
+            Node<K, V> node = table[newIndex];
+            if (node != null) {
+                do {
+                    if (compareKey(node.key, key)) {
+                        return node.value;
                     }
-                }
+                    node = node.next;
+                } while (node != null);
             }
         }
         return null;
@@ -48,7 +46,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static final int hash(Object key) {
+    private int hash(Object key) {
         return key == null ? 0 : key.hashCode() >= 0 ? key.hashCode() : key.hashCode() * (-1);
     }
 
@@ -96,7 +94,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final K key;
+        private K key;
         private V value;
         private Node<K, V> next;
 
