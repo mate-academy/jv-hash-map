@@ -9,13 +9,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
     private static final int DEFAULT_CAPACITY = 16;
     private int size;
-    private int newCapacity;
     private Node<K, V>[] table;
 
     public MyHashMap() {
         size = 0;
         table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
-        newCapacity = DEFAULT_CAPACITY;
     }
 
     @Override
@@ -54,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return getHash(key) % newCapacity;
+        return getHash(key) % table.length;
     }
 
     private void putNode(K key, V value, Node<K, V>[] table, boolean increment) {
@@ -80,16 +78,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        newCapacity = table.length * 2;
-        Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
-        for (Node<K, V> cell : table) {
+        int newCapacity = table.length * 2;
+        Node<K,V>[] prevTable = table;
+        table = (Node<K, V>[]) new Node[newCapacity];
+        for (Node<K, V> cell : prevTable) {
             Node<K, V> node = cell;
             while (node != null) {
-                putNode(node.key, node.value, newTable, false);
+                putNode(node.key, node.value, table, false);
                 node = node.next;
             }
         }
-        table = newTable;
     }
 
     private static class Node<K, V> {
