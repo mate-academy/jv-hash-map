@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import java.util.Objects;
-
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
@@ -12,12 +10,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
 
-    private Bucket<K, V>[] buckets = new Bucket[DEFAULT_CAPACITY];
+    private Bucket<K, V>[] buckets;
+    private float threshold;
     private int size;
+
+    public MyHashMap() {
+        buckets = new Bucket[DEFAULT_CAPACITY];
+        threshold = DEFAULT_CAPACITY * LOAD_FACTOR;
+        size = 0;
+    }
 
     @Override
     public void put(K key, V value) {
-        if (size > (int)(buckets.length * LOAD_FACTOR)) {
+        if (size == threshold) {
             increaseSize();
         }
         int bucketIndex = key != null ? (key.hashCode() >>> 1) % buckets.length : 0;
@@ -28,7 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         do {
-            if (Objects.equals(bucket.key, key)) {
+            if (key == bucket.key || key != null && key.equals(bucket.key)) {
                 bucket.value = value;
                 return;
             }
@@ -41,6 +46,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         ++size;
     }
 
+    @Override
+    public V getValue(K key) {
+        int bucketIdx = key != null ? (key.hashCode() >>> 1) % buckets.length : 0;
+        Bucket<K, V> bucket = buckets[bucketIdx];
+        for (; bucket != null; bucket = bucket.next) {
+            if (key == bucket.key || key != null && key.equals(bucket.key)) {
+                return bucket.value;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
     private void increaseSize() {
         Bucket<K, V>[] oldBuckets = buckets;
         buckets = new Bucket[buckets.length << 1];
@@ -51,23 +73,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 bucket = bucket.next;
             }
         }
-    }
-
-    @Override
-    public V getValue(K key) {
-        int bucketIdx = key != null ? (key.hashCode() >>> 1) % buckets.length : 0;
-        Bucket<K, V> bucket = buckets[bucketIdx];
-        for (; bucket != null; bucket = bucket.next) {
-            if (Objects.equals(bucket.key, key)) {
-                return bucket.value;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
     }
 
     private static class Bucket<K, V> {
