@@ -26,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == trashHold) {
             resize();
         }
-        int index = getIndex(key, buckets.length);
+        int index = getIndex(key);
         Entry<K, V> checkEntry = getEntry(key, index);
 
         if (checkEntry != null) {
@@ -40,7 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Entry<K, V> entry = getEntry(key, getIndex(key, buckets.length));
+        Entry<K, V> entry = getEntry(key, getIndex(key));
         return entry != null ? entry.value : null;
     }
 
@@ -49,8 +49,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getIndex(K key, int capacity) {
-        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % buckets.length);
     }
 
     private void resize() {
@@ -79,9 +79,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     class Entry<K, V> {
-        final K key;
-        V value;
-        Entry<K, V> next;
+        private K key;
+        private V value;
+        private Entry<K, V> next;
 
         public Entry(K key, V value, Entry<K, V> next) {
             this.key = key;
