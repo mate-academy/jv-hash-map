@@ -20,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        ResizeIfNeeded();
+        resizeIfNeeded();
         int index = getBucketIndex(key);
         if (buckets[index] == null) {
             buckets[index] = new Node(key, value);
@@ -82,7 +82,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode() % (buckets.length));
     }
 
-    private void ResizeIfNeeded() {
+    private void resizeIfNeeded() {
         if (size < buckets.length * LOAD_FACTOR) {
             return;
         }
