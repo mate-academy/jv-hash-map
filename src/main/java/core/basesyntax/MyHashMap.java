@@ -73,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int counterEntry = 0;
         while (entry != null) {
             counterEntry++;
-            if (entry.key == key || entry.key != null && entry.key.equals(key)) {
+            if (Objects.equals(entry.key, key)) {
                 if (counterEntry == 1) {
                     table[hash] = entry.next;
                 }
