@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
@@ -27,7 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             Node<K, V> current = getCurrent(bucket[index], newNode);
-            if (compareKey(current.key, key)) {
+            if (Objects.equals(current.key, key)) {
                 current.value = value;
             } else {
                 current.next = newNode;
@@ -41,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = key != null ? hash(key) : 0;
         Node<K, V> current = bucket[index];
         while (current != null) {
-            if (compareKey(current.key, key)) {
+            if (Objects.equals(current.key, key)) {
                 return current.value;
             }
             current = current.next;
@@ -55,9 +57,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K,V> {
-        final K key;
-        V value;
-        Node<K,V> next;
+        private final K key;
+        private V value;
+        private Node<K,V> next;
 
         Node(K key, V value) {
             this.key = key;
@@ -72,16 +74,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V> getCurrent(Node<K, V> startNode, Node<K, V> newNode) {
         Node<K, V> current = startNode;
         while (current.next != null) {
-            if (compareKey(current.key, newNode.key)) {
+            if (Objects.equals(current.key, newNode.key)) {
                 return current;
             }
             current = current.next;
         }
         return current;
-    }
-
-    private boolean compareKey(K key1, K key2) {
-        return key1 == null ? key2 == null : key1.equals(key2);
     }
 
     private void resize() {
@@ -94,6 +92,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 element = element.next;
             }
         }
-
     }
 }
