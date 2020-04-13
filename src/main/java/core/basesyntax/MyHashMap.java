@@ -20,10 +20,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size > buckets.length * DEFAULT_LOAD_FACTOR) {
+        if (size >= buckets.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
-        int index = hash(key);
+        int index = getIndex(key);
         if (buckets[index] == null) {
             buckets[index] = new Node<K, V>(key, value, null);
         } else {
@@ -46,7 +46,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = hash(key);
+        int index = getIndex(key);
         Node<K, V> currentNode = buckets[index];
         if (currentNode == null) {
             return null;
@@ -54,9 +54,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
                 return currentNode.value;
-            } else {
-                currentNode = currentNode.next;
             }
+            currentNode = currentNode.next;
         }
         return null;
     }
@@ -66,7 +65,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(K key) {
+    private int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % buckets.length;
     }
 
@@ -79,15 +78,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             while (currentNode != null) {
                 put(currentNode.key, currentNode.value);
                 currentNode = currentNode.next;
-                oldBuckets[index] = null;
             }
         }
     }
 
     private static class Node<K, V> {
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         public Node(K key, V value, Node<K, V> next) {
             this.key = key;
