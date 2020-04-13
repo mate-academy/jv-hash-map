@@ -1,26 +1,24 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private final int defaultCapacity = 16;
-    private final float loadFactor = 0.75F;
+    static final int DEFAULT_CAPACITY = 16;
+    static final float LOAD_FACTOR = 0.75F;
 
-    private Node<K,V>[] mass;
+    private Node<K,V>[] buckets;
     private int size;
     private int capacity;
 
     MyHashMap() {
-        mass = new Node[defaultCapacity];
+        buckets = new Node[DEFAULT_CAPACITY];
         this.size = 0;
-        capacity = defaultCapacity;
+        capacity = DEFAULT_CAPACITY;
     }
 
     @Override
     public void put(K key, V value) {
         int index = hash(key);
-        if (size >= defaultCapacity * loadFactor) {
-            newCapacity();
-        }
-        Node<K, V> collusionNode = mass[index];
+        resize();
+        Node<K, V> collusionNode = buckets[index];
         while (collusionNode != null) {
             if (key == collusionNode.key
                     || key != null && key.equals(collusionNode.key)) {
@@ -29,18 +27,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             collusionNode = collusionNode.next;
         }
-        collusionNode = new Node<>(key,value,mass[index]);
-        mass[index] = collusionNode;
+        collusionNode = new Node<>(key,value,buckets[index]);
+        buckets[index] = collusionNode;
         size++;
     }
 
     @Override
     public V getValue(K key) {
         int index = hash(key);
-        if (index >= capacity || index < 0) {
-            newCapacity();
-        }
-        Node<K,V> collusionNode = mass[index];
+        resize();
+        Node<K,V> collusionNode = buckets[index];
         if (collusionNode == null) {
             return null;
         }
@@ -61,21 +57,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % defaultCapacity);
+        return (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
-    private void newCapacity() {
-        Node<K, V>[]newNode = new Node[2 * capacity];
-        for (int i = 0; i < mass.length; i++) {
-            newNode[i] = mass[i];
+    private void resize() {
+        if (size >= capacity * LOAD_FACTOR) {
+            capacity = 2 * capacity;
+            Node<K, V>[] newNode = new Node[capacity];
+            Node<K, V>[] newBuckets = buckets;
+            buckets = newNode;
+            size = 0;
+            for (Node<K, V> node : newBuckets) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
+            }
         }
-        mass = newNode;
     }
 
     private class Node<K,V> {
-        Node<K, V> next;
-        K key;
-        V value;
+        private Node<K, V> next;
+        private K key;
+        private V value;
 
         private Node(K key, V value, Node<K,V> next) {
             this.next = next;
