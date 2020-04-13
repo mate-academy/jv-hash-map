@@ -14,13 +14,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         threshold = DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR;
-        bucket = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
+        bucket = new Node[DEFAULT_INITIAL_CAPACITY];
         size = 0;
     }
 
     @Override
     public void put(K key, V value) {
-        int index = getBucket(key);
+        int index = getBucketIndex(key);
         if (bucket[index] == null) {
             bucket[index] = new Node<>(key, value, null);
         } else {
@@ -39,7 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = getNode(getBucket(key), key);
+        Node<K, V> node = getNode(getBucketIndex(key), key);
         return node == null ? null : node.value;
     }
 
@@ -51,7 +51,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] resize() {
         size = 0;
         Node<K,V>[] oldBucket = bucket;
-        bucket = (Node<K,V>[]) new Node[bucket.length << 1];
+        bucket = new Node[bucket.length << 1];
         threshold = bucket.length * DEFAULT_LOAD_FACTOR;
         for (Node<K, V> node : oldBucket) {
             while (node != null) {
@@ -73,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private int getBucket(K key) {
+    private int getBucketIndex(K key) {
         int hash;
         return key == null ? 0 : ((hash = key.hashCode()) ^ (hash >>> 16)) & (bucket.length - 1);
     }
