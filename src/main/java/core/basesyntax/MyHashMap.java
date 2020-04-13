@@ -39,7 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V> searchIfElementExists(K key, int index) {
         Node<K, V> element = data[index];
         while (element != null) {
-            if (key == element.key || key != null && Objects.equals(key, element.key)) {
+            if (Objects.equals(key, element.key)) {
                 return element;
             }
             element = element.next;
