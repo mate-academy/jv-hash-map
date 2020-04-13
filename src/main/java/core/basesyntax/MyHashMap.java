@@ -24,11 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if ((double) size / table.length >= LOAD_FACTOR) {
             resize();
         }
-        if (key == null) {
-            putForNullKey(value);
-            return;
-        }
-        int hash = hash(key, table.length);
+        int hash = hash(key);
         if (table[hash] == null) {
             table[hash] = new Entry<K, V>(key, value, null);
             size++;
@@ -36,18 +32,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Entry<K, V> entry = table[hash];
         while (entry != null) {
-            if (key.equals(entry.key)) {
+            if (entry.key == key || key != null && key.equals(entry.key)) {
                 entry.value = value;
                 return;
             }
             entry = entry.next;
         }
-        addEntry(hash, key, value);
+        table[hash] = new Entry<K, V>(key, value, table[hash]);
+        size++;
     }
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key, table.length);
+        int hash = hash(key);
         Entry<K, V> entry = table[hash];
         while (entry != null) {
             if (entry.key == key || entry.key != null && entry.key.equals(key)) {
@@ -68,7 +65,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public V remove(K key) {
-        int hash = hash(key, table.length);
+        int hash = hash(key);
         Entry<K, V> entry = table[hash];
         Entry<K, V> previousEntry = entry;
         int counterEntry = 0;
@@ -88,46 +85,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private void addEntry(int hash, K key, V value) {
-        table[hash] = new Entry<K, V>(key, value, table[hash]);
-        size++;
-    }
-
-    private void putForNullKey(V value) {
-        Entry<K, V> entry = table[0];
-        while (entry != null) {
-            if (entry.key == null) {
-                entry.value = value;
-                return;
-            }
-            entry = entry.next;
-        }
-        addEntry(0, null, value);
-    }
-
     private void resize() {
-        Entry<K, V>[] newTable = new Entry[table.length * 2];
-        for (Entry<K, V> entry : table) {
+        Entry<K, V>[] oldTable = table;
+        table = new Entry[table.length * 2];
+        for (Entry<K, V> entry : oldTable) {
             while (entry != null) {
-                int hash = hash(entry.key, newTable.length);
-                if (newTable[hash] == null) {
-                    newTable[hash] = new Entry<K, V>(entry.key, entry.value, null);
+                int hash = hash(entry.key);
+                if (table[hash] == null) {
+                    table[hash] = new Entry<K, V>(entry.key, entry.value, null);
                     entry = entry.next;
                     continue;
                 }
-                newTable[hash] = new Entry<K, V>(entry.key, entry.value, newTable[hash]);
+                table[hash] = new Entry<K, V>(entry.key, entry.value, table[hash]);
                 entry = entry.next;
             }
         }
-        table = newTable;
     }
 
-    private int hash(K kay, int lengthTable) {
-        int hashCode = 0;
-        if (kay != null) {
-            hashCode = kay.hashCode();
-        }
-        return Math.abs(hashCode) % lengthTable;
+    private int hash(K kay) {
+        return kay == null ? 0 : Math.abs(kay.hashCode()) % table.length;
     }
 
     private static class Entry<K, V> {
