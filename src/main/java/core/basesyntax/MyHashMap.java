@@ -6,12 +6,14 @@ package core.basesyntax;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final double LOAD_FACTOR = 0.75;
     private Node<K, V>[] table;
     private int size = 0;
-    private int arrayCapacity = 16;
+    private int arrayCapacity = DEFAULT_CAPACITY;
 
     public MyHashMap() {
-        this.table = new Node[16];
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -22,11 +24,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             putForNull(newNode);
             return;
         }
-        if (table[index(newNode.key)] == null) {
-            table[index(newNode.key)] = newNode;
+        int index = getIndex(newNode.key);
+        if (table[index] == null) {
+            table[index] = newNode;
             size++;
         } else {
-            Node currentNode = table[index(newNode.key)];
+            Node currentNode = table[index];
             while (currentNode != null) {
                 if (newNode.key.equals(currentNode.key)) {
                     currentNode.value = newNode.value;
@@ -44,7 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = key == null ? table[0] : table[index(key)];
+        Node<K, V> currentNode = key == null ? table[0] : table[getIndex(key)];
         while (currentNode != null) {
             if ((currentNode.key == null && key == null)
                     || (currentNode.key != null && currentNode.key.equals(key))) {
@@ -63,11 +66,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int index(K key) {
+    private int getIndex(K key) {
         return Math.abs(key.hashCode()) % (arrayCapacity - 1);
     }
 
-    private Node<K, V> theLastNode(Node<K, V> node) {
+    private Node<K, V> getTheLastNode(Node<K, V> node) {
         Node<K, V> currentNode = node;
         while (currentNode.next != null) {
             currentNode = currentNode.next;
@@ -76,7 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (0.75 * table.length > size) {
+        if (LOAD_FACTOR * table.length > size) {
             return;
         }
         Node<K, V>[] newTable = new Node[table.length * 2];
@@ -84,11 +87,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> node: table) {
             Node<K, V> currentNode = node;
             while (currentNode != null) {
-                int index = index(currentNode.key);
+                int index = getIndex(currentNode.key);
                 if (newTable[index] == null) {
                     newTable[index] = currentNode;
                 } else {
-                    theLastNode(newTable[index]).next = currentNode;
+                    getTheLastNode(newTable[index]).next = currentNode;
                 }
                 Node<K, V> copy = currentNode;
                 currentNode = currentNode.next;
