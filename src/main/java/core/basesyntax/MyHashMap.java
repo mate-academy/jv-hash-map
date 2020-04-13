@@ -18,10 +18,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if ((double) size / table.length >= DEFAULT_LOAD_FACTOR) {
+        double threshold = table.length * DEFAULT_LOAD_FACTOR;
+        if (size == threshold) {
             resize();
         }
-        putNode(key, value, table, true);
+        putNode(key, value);
     }
 
     @Override
@@ -44,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean compareKeys(K key1, K key2) {
-        return getHash(key1) == getHash(key2) && (key1 == null ? key2 == null : key1.equals(key2));
+        return key1 == null ? key2 == null : key1.equals(key2);
     }
 
     private int getHash(K key) {
@@ -55,11 +56,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return getHash(key) % table.length;
     }
 
-    private void putNode(K key, V value, Node<K, V>[] table, boolean increment) {
+    private void putNode(K key, V value) {
         int index = getIndex(key);
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
-            size = increment ? size + 1 : size;
+            size++;
             return;
         }
         Node<K, V> node = table[index];
@@ -70,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             if (node.next == null) {
                 node.next = new Node<>(key, value, null);
-                size = increment ? size + 1 : size;
+                size++;
                 return;
             }
             node = node.next;
@@ -80,11 +81,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         int newCapacity = table.length * 2;
         Node<K,V>[] prevTable = table;
+        size = 0;
         table = (Node<K, V>[]) new Node[newCapacity];
         for (Node<K, V> cell : prevTable) {
             Node<K, V> node = cell;
             while (node != null) {
-                putNode(node.key, node.value, table, false);
+                putNode(node.key, node.value);
                 node = node.next;
             }
         }
