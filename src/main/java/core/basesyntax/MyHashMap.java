@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
@@ -67,7 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         while (currentNode != null) {
-            if (isEqualKey(currentNode.key, key)) {
+            if (Objects.equals(currentNode.key, key)) {
                 return currentNode;
             }
             currentNode = currentNode.next;
@@ -77,10 +79,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getIndexByHash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
-    }
-
-    private boolean isEqualKey(K key1, K key2) {
-        return key1 == null ? key2 == null : key1.equals(key2);
     }
 
     private void resize() {
