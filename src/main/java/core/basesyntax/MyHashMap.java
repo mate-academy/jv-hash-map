@@ -14,7 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
 
     private Entry<K, V>[] table;
-    private int size = 0;
+    private int size;
 
     public MyHashMap() {
         table = new Entry[INITIAL_CAPACITY];
