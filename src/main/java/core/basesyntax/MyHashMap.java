@@ -10,7 +10,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
     private Node<K, V>[] table;
     private int size = 0;
-    private int arrayCapacity = DEFAULT_CAPACITY;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
@@ -67,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return Math.abs(key.hashCode()) % (arrayCapacity - 1);
+        return Math.abs(key.hashCode()) % (table.length - 1);
     }
 
     private Node<K, V> getTheLastNode(Node<K, V> node) {
@@ -82,23 +81,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (LOAD_FACTOR * table.length > size) {
             return;
         }
-        Node<K, V>[] newTable = new Node[table.length * 2];
-        arrayCapacity = newTable.length;
-        for (Node<K, V> node: table) {
+        Node<K, V>[] copy = table;
+        table = new Node[table.length * 2];
+        for (Node<K, V> node: copy) {
             Node<K, V> currentNode = node;
             while (currentNode != null) {
                 int index = getIndex(currentNode.key);
-                if (newTable[index] == null) {
-                    newTable[index] = currentNode;
+                if (table[index] == null) {
+                    table[index] = currentNode;
                 } else {
-                    getTheLastNode(newTable[index]).next = currentNode;
+                    getTheLastNode(table[index]).next = currentNode;
                 }
-                Node<K, V> copy = currentNode;
+                Node<K, V> copyOfNode = currentNode;
                 currentNode = currentNode.next;
-                copy.next = null;
+                copyOfNode.next = null;
             }
         }
-        table = newTable;
     }
 
     private void putForNull(Node newNode) {
