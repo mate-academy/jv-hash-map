@@ -8,7 +8,6 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75d;
-    private int capacity;
     private int size;
     private Entry[] buckets;
 
@@ -27,14 +26,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         buckets = new Entry[DEFAULT_CAPACITY];
         size = 0;
-        capacity = DEFAULT_CAPACITY;
     }
 
     private int toAssingIndex(K key) {
         if (key == null) {
             return 0;
         }
-        return Math.abs(key.hashCode() % capacity);
+        return Math.abs(key.hashCode() % buckets.length);
     }
 
     private void transfer(Entry<K, V>[] oldBuckets) {
@@ -47,10 +45,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (size >= capacity * LOAD_FACTOR) {
-            capacity = capacity * 2;
+        if (size >= buckets.length * LOAD_FACTOR) {
             Entry[] oldBuckets = buckets;
-            buckets = new Entry[capacity];
+            buckets = new Entry[buckets.length * 2];
             size = 0;
             transfer(oldBuckets);
         }
