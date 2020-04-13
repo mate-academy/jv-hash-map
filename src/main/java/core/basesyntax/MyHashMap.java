@@ -46,12 +46,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getHash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode());
-    }
-
     private int getKeyIndex(K key) {
-        return getHash(key) % table.length;
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private void putNode(K key, V value) {
