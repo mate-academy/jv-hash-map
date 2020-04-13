@@ -8,7 +8,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     static final int DEFAULT_CAPACITY = 16;
-    private double loadFactor = 0.75;
+    static final Double loadFactor = 0.75;
     private int overload;
     private Node<K, V>[] data;
     private int elementsData;
@@ -16,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         data = new Node[DEFAULT_CAPACITY];
         elementsData = 0;
-        overload = data.length * (int) loadFactor;
+        overload = data.length * loadFactor.intValue();
     }
 
     @Override
@@ -24,17 +24,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (elementsData == overload) {
             resize();
         }
-        Node<K, V> element = search(key, hash(key));
+        Node<K, V> element = searchIfElementExists(key, hash(key));
         if (element == null) {
             Node<K, V> buffer = new Node<>(key, value, data[hash(key)]);
             data[hash(key)] = buffer;
-            elementsData += 1;
+            elementsData++;
             return;
         }
         element.value = value;
     }
 
-    private Node<K, V> search(K key, int index) {
+    private Node<K, V> searchIfElementExists(K key, int index) {
         Node<K, V> element = data[index];
         while (element != null) {
             if (key == element.key || key != null && key.equals(element.key)) {
@@ -47,7 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = search(key, hash(key));
+        Node<K, V> node = searchIfElementExists(key, hash(key));
         return node != null ? node.value : null;
     }
 
@@ -58,7 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] newData = new Node[data.length * 2];
-        overload = newData.length * (int) loadFactor;
+        overload = newData.length * loadFactor.intValue();
         elementsData = 0;
         Node<K, V>[] buffer = data.clone();
         data = newData;
