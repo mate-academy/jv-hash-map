@@ -23,9 +23,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (size > threshold) {
-            resize(nodes.length * 2);
+            resize();
         }
-        int index = countBucketNumber(key);
+        int index = getBucketNumber(key);
         Node<K, V> existing = getNode(key, index);
         if (existing == null) {
             Node<K, V> newNode = new Node<>(key, value, nodes[index]);
@@ -38,7 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = getNode(key, countBucketNumber(key));
+        Node<K, V> node = getNode(key, getBucketNumber(key));
         return node == null ? null : node.value;
     }
 
@@ -47,7 +47,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resize(int newCapacity) {
+    private void resize() {
+        int newCapacity = nodes.length * 2;
         threshold = newCapacity * LOAD_FACTOR;
         Node<K, V>[] newNodes = new Node[newCapacity];
         Node<K, V>[] oldNodes = nodes;
@@ -72,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private int countBucketNumber(K key) {
+    private int getBucketNumber(K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % nodes.length;
     }
 
