@@ -21,12 +21,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
+        int index = indexFor(key);
 
-        if (table[indexFor(key)] == null) {
-            table[indexFor(key)] = new Node<K, V>(key, value, null);
+        if (table[index] == null) {
+            table[index] = new Node<K, V>(key, value, null);
             size++;
         } else {
-            addNodeInQueue(key, value, indexFor(key));
+            addNodeInQueue(key, value, index);
         }
     }
 
@@ -51,12 +52,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int addNodeInQueue(K key, V value, int index) {
+    private void addNodeInQueue(K key, V value, int index) {
         Node checked = table[index];
         while (checked != null) {
             if (Objects.equals(key, checked.key)) {
                 checked.value = value;
-                return 0;
+                return;
             }
             if (checked.next != null) {
                 checked = checked.next;
@@ -66,7 +67,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         checked.next = new Node<K, V>(key, value, null);
         size++;
-        return 1;
     }
 
     private int indexFor(K key) {
