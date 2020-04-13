@@ -9,51 +9,57 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
+    private static double threshold;
 
-    private Bucket<K, V>[] buckets = new Bucket[DEFAULT_CAPACITY];
+    private Bucket<K, V>[] buckets;
     private int size;
+
+    public MyHashMap() {
+        buckets = new Bucket[DEFAULT_CAPACITY];
+        threshold = DEFAULT_CAPACITY * LOAD_FACTOR;
+        size = 0;
+    }
 
     @Override
     public void put(K key, V value) {
-        if (size == DEFAULT_CAPACITY * LOAD_FACTOR) {
+        if (size == threshold) {
             increaseSize();
         }
-        int bucketIndex = key != null ? (key.hashCode() >>> 1) % buckets.length : 0;
-        Bucket<K, V> bucket = buckets[bucketIndex];
-        if (bucket == null) {
-            buckets[bucketIndex] = new Bucket<>(key, value);
-            ++size;
-            return;
+        int bucketIndex = getBucketIndex(key, buckets.length);
+        Bucket<K, V> bucket = getBucket(key, bucketIndex);
+        if (bucket != null) {
+            bucket.value = value;
+        } else {
+            Bucket<K, V> bucketEntry = new Bucket<>(key, value, buckets[bucketIndex]);
+            buckets[bucketIndex] = bucketEntry;
+            size++;
         }
-        do {
-            if (key == bucket.key || key != null && key.equals(bucket.key)) {
-                bucket.value = value;
-                return;
-            }
-            if (bucket.next == null) {
-                break;
-            }
-            bucket = bucket.next;
-        } while (true);
-        bucket.next = new Bucket<>(key, value);
-        ++size;
     }
 
     @Override
     public V getValue(K key) {
-        int bucketIndex = key != null ? (key.hashCode() >>> 1) % buckets.length : 0;
-        Bucket<K, V> bucket = buckets[bucketIndex];
-        for (; bucket != null; bucket = bucket.next) {
-            if (key == bucket.key || key != null && key.equals(bucket.key)) {
-                return bucket.value;
-            }
-        }
-        return null;
+        Bucket<K, V> bucket = getBucket(key, getBucketIndex(key, buckets.length));
+        return bucket != null ? bucket.value : null;
     }
 
     @Override
     public int getSize() {
         return size;
+    }
+
+    private int getBucketIndex(K key, int capacity) {
+        return key != null ? (key.hashCode() >>> 1) % buckets.length : 0;
+    }
+
+    private Bucket getBucket(K key, int index) {
+        Bucket<K, V> bucket = buckets[index];
+        while (bucket != null) {
+            if (key == bucket.key || key != null && key.equals(bucket.key)) {
+                return bucket;
+            }
+            bucket = bucket.next;
+        }
+        return null;
     }
 
     private void increaseSize() {
@@ -73,9 +79,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Bucket<K, V> next;
 
-        Bucket(K key, V value) {
+        Bucket(K key, V value, Bucket<K, V> next) {
             this.key = key;
             this.value = value;
+            this.next = next;
         }
     }
 }
