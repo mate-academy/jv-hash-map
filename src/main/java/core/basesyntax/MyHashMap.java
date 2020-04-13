@@ -38,7 +38,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = getBucketIndex(key);
-        return findValue(index, key);
+        if (buckets[index] == null) {
+            return null;
+        }
+        Node<K, V> currentNode = buckets[index];
+        do {
+            if (Objects.equals(key, currentNode.key)) {
+                return currentNode.value;
+            }
+            currentNode = currentNode.next;
+        } while (currentNode != null);
+        return null;
     }
 
     @Override
@@ -62,20 +72,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> entry = new Node(key, value);
         currentNode.next = entry;
         size++;
-    }
-
-    private V findValue(int index, K key) {
-        if (buckets[index] == null) {
-            return null;
-        }
-        Node<K, V> currentNode = buckets[index];
-        do {
-            if (Objects.equals(key, currentNode.key)) {
-                return currentNode.value;
-            }
-            currentNode = currentNode.next;
-        } while (currentNode != null);
-        return null;
     }
 
     private int getBucketIndex(K key) {
