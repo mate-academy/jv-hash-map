@@ -82,8 +82,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private Node<K, V> next;
         private K key;
         private V value;
-        private Node<K, V> last;
-        private Node<K, V> first;
 
         public Node(K entryKey, V entryValue, Node<K, V> nextNode) {
             key = entryKey;
