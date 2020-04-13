@@ -10,39 +10,30 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     static final float LOAD_FACTOR_DEFAULT = 0.75f;
-    static final int CAPACITY = 16;
+    static final int DEFAULT_CAPACITY = 16;
     private Node<K, V> [] table;
     private int size;
 
     public MyHashMap() {
-        table = new Node[CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
         size = 0;
     }
 
     @Override
     public void put(K key, V value) {
         resize();
-        if (key == null) {
-            if (table[0] == null) {
-                table[0] = new Node<K,V>(null, value, null);
-                size++;
-            } else {
-                addNodeInList(null, value, 0);
-            }
+        if (table[indexFor(key)] == null) {
+            table[indexFor(key)] = new Node<K, V>(key, value, null);
+            size++;
         } else {
-            if (table[indexFor(key.hashCode())] == null) {
-                table[indexFor(key.hashCode())] = new Node<K, V>(key, value, null);
-                size++;
-            } else {
-                addNodeInList(key, value, indexFor(key.hashCode()));
-            }
+            addNodeInList(key, value, indexFor(key));
         }
     }
 
     @Override
     public V getValue(K key) {
         int keyIndex;
-        keyIndex = (key != null) ? indexFor(key.hashCode()) : 0;
+        keyIndex = indexFor(key);
         V valueReturn = null;
         if (table[keyIndex] != null) {
             Node<K, V> checked = table[keyIndex];
@@ -84,20 +75,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode.value = value;
                 return;
             }
-            if (currentNode.next != null) {
-                currentNode = currentNode.next;
-            } else {
-                break;
+            if (currentNode.next == null) {
+                currentNode.next = new Node<K, V>(key, value, null);
+                size++;
             }
+            currentNode = currentNode.next;
         }
-        currentNode.next = new Node<K, V>(key, value, null);
-        size++;
     }
 
-    private int indexFor(int keyHashCode) {
-        keyHashCode ^= (keyHashCode >>> 20) ^ (keyHashCode >>> 12);
-        keyHashCode = keyHashCode ^ (keyHashCode >>> 7) ^ (keyHashCode >>> 4);
-        return keyHashCode & (table.length - 1);
+    private int indexFor(K key) {
+        if (key == null) {
+            return 0;
+        } else {
+            int keyHashCode = key.hashCode();
+            keyHashCode ^= (keyHashCode >>> 20) ^ (keyHashCode >>> 12);
+            keyHashCode = keyHashCode ^ (keyHashCode >>> 7) ^ (keyHashCode >>> 4);
+            return keyHashCode & (table.length - 1);
+        }
     }
 
     private static class Node<K,V> {
