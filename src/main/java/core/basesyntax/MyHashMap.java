@@ -30,13 +30,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> node = table[getKeyIndex(key)];
-        if (node != null) {
-            while (node != null) {
-                if (Objects.equals(key, node.key)) {
-                    return node.value;
-                }
-                node = node.next;
+        while (node != null) {
+            if (Objects.equals(key, node.key)) {
+                return node.value;
             }
+            node = node.next;
         }
         return null;
     }
