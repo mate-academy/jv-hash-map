@@ -57,11 +57,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] newBuckets = new Node[hashtable.length * 2];
+
         size = 0;
-        Node<K, V>[] oldBuckets = hashtable;
-        hashtable = newBuckets;
-        for (Node<K, V> bucket : oldBuckets) {
+        Node<K, V>[] current = hashtable;
+        hashtable = new Node[hashtable.length * 2];
+        for (Node<K, V> bucket : current) {
             while (bucket != null) {
                 put(bucket.key, bucket.value);
                 bucket = bucket.next;
