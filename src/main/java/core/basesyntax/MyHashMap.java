@@ -10,19 +10,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
 
-    private Bucket<K, V>[] buckets;
-    private float threshold;
+    private Bucket<K, V>[] buckets = new Bucket[DEFAULT_CAPACITY];
     private int size;
-
-    public MyHashMap() {
-        buckets = new Bucket[DEFAULT_CAPACITY];
-        threshold = DEFAULT_CAPACITY * LOAD_FACTOR;
-        size = 0;
-    }
 
     @Override
     public void put(K key, V value) {
-        if (size == threshold) {
+        if (size == DEFAULT_CAPACITY * LOAD_FACTOR) {
             increaseSize();
         }
         int bucketIndex = key != null ? (key.hashCode() >>> 1) % buckets.length : 0;
@@ -48,8 +41,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int bucketIdx = key != null ? (key.hashCode() >>> 1) % buckets.length : 0;
-        Bucket<K, V> bucket = buckets[bucketIdx];
+        int bucketIndex = key != null ? (key.hashCode() >>> 1) % buckets.length : 0;
+        Bucket<K, V> bucket = buckets[bucketIndex];
         for (; bucket != null; bucket = bucket.next) {
             if (key == bucket.key || key != null && key.equals(bucket.key)) {
                 return bucket.value;
