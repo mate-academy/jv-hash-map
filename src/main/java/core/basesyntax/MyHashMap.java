@@ -14,13 +14,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        threshold = (int)(table.length * DEFAULT_LOAD_FACTOR);
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
     }
 
     private class Node<K, V> {
         K key;
         V value;
-        Node<K,V> next;
+        Node<K, V> next;
 
         public Node(K key, V value, Node<K, V> next) {
             this.key = key;
@@ -34,25 +34,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        if (key == null) {
-            if (table[0] == null) {
-                table[0] = new Node<>(key, value, null);
-                size++;
-            } else {
-                table[0] = new Node<>(key, value, null);
-            }
-            return;
-        }
         Node<K, V> node;
-        int index = hash(key.hashCode());
-        if (index == 0) {
-            index++;
-        }
+        int index = hash(key);
         if (table[index] == null) {
-            table[index] = node = new Node<>(key, value, null);
+            table[index] = new Node<>(key, value, null);
         } else {
             node = table[index];
-            if (node.key.equals(key)) {
+            if (node.key == null || node.key.equals(key)) {
                 node.value = value;
                 return;
             }
@@ -95,16 +83,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(int hashcode) {
-        return hashcode < 0 ? -hashcode % table.length : hashcode % table.length;
+    private int hash(K key) {
+        return key == null ? 0
+                : key.hashCode() == 0 ? 1
+                : key.hashCode() < 0
+                ? -key.hashCode() % table.length
+                : key.hashCode() % table.length;
     }
 
     private void resize() {
-        Node<K,V>[] oldTable = new Node[table.length];
-        threshold = (int)(table.length * 2 * DEFAULT_LOAD_FACTOR);
+        Node<K, V>[] oldTable = new Node[table.length];
+        threshold = (int) (table.length * 2 * DEFAULT_LOAD_FACTOR);
         System.arraycopy(table, 0, oldTable, 0, table.length);
         table = new Node[table.length * 2];
-        Node<K,V> node;
+        Node<K, V> node;
         size = 0;
         for (int i = 0; i < oldTable.length; i++) {
             if (oldTable[i] != null) {
