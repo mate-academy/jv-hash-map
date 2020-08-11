@@ -8,7 +8,7 @@ import java.util.Objects;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
     private Node<K,V>[] table;
@@ -16,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
 
     public MyHashMap() {
-        this(DEFAULT_INITIAL_CAPACITY);
+        this(DEFAULT_CAPACITY);
     }
 
     public MyHashMap(int initialCapacity) {
@@ -24,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             throw new IllegalArgumentException("Illegal initial capacity: "
                                                + initialCapacity);
         }
-        int capacity = DEFAULT_INITIAL_CAPACITY;
+        int capacity = DEFAULT_CAPACITY;
         while (capacity < initialCapacity) {
             capacity <<= 1;
         }
@@ -33,27 +33,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     static class Node<K, V> {
-        int hash;
         K key;
         V value;
         Node<K, V> next;
 
-        public Node(int hash, K key, V value) {
-            this.hash = hash;
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-        }
-
-        public Node(Node<K, V> node) {
-            hash = node.hash;
-            key = node.key;
-            value = node.value;
         }
     }
 
     @Override
     public void put(K key, V value) {
-        putNode(new Node<>(hash(key), key, value));
+        putNode(new Node<>(key, value));
     }
 
     @Override
@@ -85,14 +77,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (newLength * DEFAULT_LOAD_FACTOR);
         for (Node<K, V> node : oldTable) {
             while (node != null) {
-                putNode(new Node<>(node));
+                putNode(new Node<>(node.key, node.value));
                 node = node.next;
             }
         }
     }
 
     private void putNode(Node<K, V> newNode) {
-        int bucket = (table.length - 1) & newNode.hash;
+        int bucket = (table.length - 1) & hash(newNode.key);
         Node<K, V> existNode = table[bucket];
         if (existNode == null) {
             table[bucket] = newNode;
