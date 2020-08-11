@@ -12,7 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
     private Node<K, V>[] buckets;
-    private float threshold;
+    private final float threshold;
     private int size;
 
     public MyHashMap() {
