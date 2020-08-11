@@ -42,6 +42,39 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    public V remove(K key) {
+        int basket = getHash(key) % table.length;
+        Node<K, V> previousBasketNode = null;
+        Node<K, V> currentBasketNode = table[basket];
+        while (currentBasketNode != null) {
+            if (Objects.equals(currentBasketNode.key, key)) {
+                if (previousBasketNode != null) {
+                    previousBasketNode.next = currentBasketNode.next;
+                } else {
+                    table[basket] = currentBasketNode.next;
+                }
+                size--;
+                return currentBasketNode.value;
+            }
+            previousBasketNode = currentBasketNode;
+            currentBasketNode = currentBasketNode.next;
+        }
+        return null;
+    }
+
+    public boolean remove(K key, V value) {
+        Node<K, V> searchedNode = findNodeByKey(key);
+        if (searchedNode != null && searchedNode.value.equals(value)) {
+            remove(key);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean containsKey(K key) {
+        return findNodeByKey(key) != null;
+    }
+
     private int getHash(K key) {
         if (key == null) {
             return 0;
@@ -62,12 +95,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> findNodeByKey(K key) {
-        Node<K, V> currentBucketNode = table[getHash(key) % table.length];
-        while (currentBucketNode != null) {
-            if (Objects.equals(currentBucketNode.key, key)) {
-                return currentBucketNode;
+        Node<K, V> currentBasketNode = table[getHash(key) % table.length];
+        while (currentBasketNode != null) {
+            if (Objects.equals(currentBasketNode.key, key)) {
+                return currentBasketNode;
             }
-            currentBucketNode = currentBucketNode.next;
+            currentBasketNode = currentBasketNode.next;
         }
         return null;
     }
@@ -77,7 +110,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K,V> next) {
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
