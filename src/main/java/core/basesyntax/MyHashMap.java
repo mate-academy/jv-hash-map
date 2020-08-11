@@ -54,24 +54,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return 0;
         }
-        int index = key.hashCode() % table.length;
-        return Math.max(index, 0);
+        return (key.hashCode() >>> 16) % table.length;
+
     }
 
     private void linkNode(Node<K, V> node, int index) {
         Node<K, V> curNode = table[index];
+        Node<K, V> tempNode = null;
         if (Objects.equals(node.key, curNode.key)) {
-            table[index] = node;
+            table[index].value = node.value;
             return;
         }
-        while (curNode.next != null) {
+        while (curNode != null) {
             if (Objects.equals(node.key, curNode.key)) {
                 curNode.value = node.value;
                 return;
             }
+            tempNode = curNode;
             curNode = curNode.next;
         }
-        curNode.next = node;
+        tempNode.next = node;
         size++;
     }
 
