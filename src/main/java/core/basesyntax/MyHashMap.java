@@ -81,11 +81,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int getBasketIndex(K key) {
         if (key == null) {
             return 0;
-        } else if (key.hashCode() > 0) {
-            return key.hashCode() % currentCapacity;
-        } else {
-            return (key.hashCode() % currentCapacity) * -1;
         }
+        return Math.abs(key.hashCode()) % currentCapacity;
     }
 
     private static class Node<K,V> {
