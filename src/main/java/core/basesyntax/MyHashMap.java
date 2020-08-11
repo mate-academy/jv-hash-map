@@ -17,75 +17,90 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         elements = new Node[DEFAULT_CAPACITY];
         threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
+        size = 0;
     }
 
     @Override
     public void put(K key, V value) {
-        if (checkKeyByNull(key)){
-            putForNullKey(value);
-            return;
-        }
-        int hash = getHashCode(key);
-        int index = getIndex(hash);
-        if (elements[index] == null){
-            elements[index] = new Node<>(key,value,null);
-        } else{
+        int index = getIndex(getHashCode(key));
+        if (elements[index] == null) {
+            elements[index] = new Node<>(key, value, null);
+        } else {
             Node<K, V> temp = elements[index];
-            while(temp.next != null){
-                if (key == temp.key || Objects.equals(key,temp.key)){
+            while (temp != null
+                    && (temp.next != null || Objects.equals(key, temp.key))) {
+                if (Objects.equals(key, temp.key)) {
                     temp.value = value;
                     return;
                 }
                 temp = temp.next;
             }
-            temp.next = new Node<>(key,value,null);
+            temp.next = new Node<>(key, value, null);
         }
         size++;
-        if (size > threshold){
-            resize();
-        }
+        checkSize();
     }
 
-    // TODO:
     @Override
     public V getValue(K key) {
+        int index = key == null ? 0 : getIndex(getHashCode(key));
+        Node<K, V> temp = elements[index];
+        while (temp != null) {
+            if (Objects.equals(temp.key, key)) {
+                return temp.value;
+            }
+            temp = temp.next;
+        }
         return null;
     }
 
-    // TODO:
     @Override
     public int getSize() {
         return size;
     }
 
-    private boolean checkKeyByNull(K key){
-        return key == null;
+    private int getHashCode(K key) {
+        if (key == null) {
+            return 0;
+        } else {
+            int hashCode = key.hashCode();
+            return hashCode ^ (hashCode >>> DEFAULT_CAPACITY);
+        }
     }
 
-    private int getHashCode(K key){
-        int hashCode = key.hashCode();
-        return hashCode ^ (hashCode >>> DEFAULT_CAPACITY);
-    }
-
-    private int getIndex(int hash){
+    private int getIndex(int hash) {
         return hash & (elements.length - 1);
     }
 
-    // TODO:
-    private boolean putForNullKey(V value){
-        return false;
-    }
-    // TODO:
-    private boolean resize(){
+    private boolean resize() {
+        size = 0;
+        int newSize = elements.length << 1;
+        Node<K, V>[] tempElements = elements;
+        elements = new Node[newSize];
+        threshold = (int) (newSize * LOAD_FACTOR);
+        for (Node<K, V> temp : tempElements) {
+            while (temp != null) {
+                put(temp.key, temp.value);
+                temp = temp.next;
+            }
+        }
         return true;
     }
 
-    private static class Node<K,V>{
+    private boolean checkSize() {
+        if (size > threshold) {
+            resize();
+            return true;
+        }
+        return false;
+    }
+
+    private static class Node<K, V> {
         final K key;
         V value;
-        Node <K, V> next;
+        Node<K, V> next;
 
-        public Node(K key, V value, Node<K,V> next) {
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
