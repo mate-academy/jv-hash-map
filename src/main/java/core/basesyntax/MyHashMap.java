@@ -32,12 +32,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         K key;
         V value;
         Node<K, V> next;
 
-        public Node(K key, V value) {
+        Node(K key, V value) {
             this.key = key;
             this.value = value;
         }
@@ -50,7 +50,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int bucket = (table.length - 1) & hash(key);
+        int bucket = indexFor(key);
         for (Node<K, V> node = table[bucket]; node != null; node = node.next) {
             if (Objects.equals(key, node.key)) {
                 return node.value;
@@ -62,6 +62,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    public V remove(K key) {
+        int bucket = indexFor(key);
+        Node<K, V> node = table[bucket];
+        if (node != null) {
+            if (Objects.equals(key, node.key)) {
+                table[bucket] = node.next;
+                size--;
+                return node.value;
+            }
+            for (; node.next != null; node = node.next) {
+                if (Objects.equals(key, node.next.key)) {
+                    V value = node.next.value;
+                    node.next = node.next.next;
+                    size--;
+                    return value;
+                }
+            }
+        }
+        return null;
+    }
+
+    private int indexFor(K key) {
+        return (table.length - 1) & hash(key);
     }
 
     private int hash(Object key) {

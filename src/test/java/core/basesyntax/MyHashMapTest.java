@@ -252,4 +252,53 @@ public class MyHashMapTest {
             }
         }
     }
+
+    @Test
+    public void removeTest() {
+        MyMap<Car, Integer> myHashMap = new MyHashMap();
+        myHashMap.put(firstCar, 3);
+        myHashMap.put(secondCar, 5);
+        myHashMap.put(thirdCar, 1);
+        Assert.assertEquals(3, myHashMap.getSize());
+
+        Integer removeValue = myHashMap.remove(firstCar);
+        Integer removeNull = myHashMap.remove(firstCar);
+        Assert.assertEquals("Test failed! The size isn't correct. Expected 2 but was "
+                                                     + myHashMap.getSize(), 2, myHashMap.getSize());
+        Assert.assertEquals("Test failed! expect to remove 3 value, but was "
+                            + removeValue, Integer.valueOf(3), removeValue);
+        Assert.assertNull("Test failed! expect to remove null value but was "
+                            + removeNull, removeNull);
+        myHashMap.remove(secondCar);
+        myHashMap.remove(thirdCar);
+        Assert.assertEquals("Test failed! The size isn't correct. Expected 0 but was "
+                            + myHashMap.getSize(), 0, myHashMap.getSize());
+    }
+
+    @Test
+    public void removeWithCollisionTest() {
+        MyMap<Plane, Integer> myHashMap = new MyHashMap();
+        myHashMap.put(firstPlane, 3);
+        myHashMap.put(secondPlane, 5);
+        myHashMap.put(thirdPlane, 1);
+
+        Assert.assertEquals(3, myHashMap.getSize());
+
+        Integer removeSecond = myHashMap.remove(secondPlane);
+        Integer removeNull = myHashMap.remove(secondPlane);
+        Assert.assertEquals("Test failed! The size isn't correct. Expected 2 but was "
+                            + myHashMap.getSize(), 2, myHashMap.getSize());
+        Assert.assertEquals("Test failed! expect to remove 5 value, but was "
+                            + removeSecond, Integer.valueOf(5), removeSecond);
+        Assert.assertNull("Test failed! expect to remove null value but was "
+                          + removeNull, removeNull);
+        Integer removeFirst = myHashMap.remove(firstPlane);
+        Integer removeThird = myHashMap.remove(thirdPlane);
+        Assert.assertEquals("Test failed! The size isn't correct. Expected 0 but was "
+                            + myHashMap.getSize(), 0, myHashMap.getSize());
+        Assert.assertEquals("Test failed! expect to remove 3 value, but was "
+                            + removeFirst, Integer.valueOf(3), removeFirst);
+        Assert.assertEquals("Test failed! expect to remove 1 value, but was "
+                            + removeThird, Integer.valueOf(1), removeThird);
+    }
 }
