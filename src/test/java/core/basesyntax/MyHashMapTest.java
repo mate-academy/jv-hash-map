@@ -255,7 +255,7 @@ public class MyHashMapTest {
 
     @Test
     public void removeTest() {
-        MyMap<Car, Integer> myHashMap = new MyHashMap();
+        MyMap<Car, Integer> myHashMap = new MyHashMap<>();
         myHashMap.put(firstCar, 3);
         myHashMap.put(secondCar, 5);
         myHashMap.put(thirdCar, 1);
@@ -277,7 +277,7 @@ public class MyHashMapTest {
 
     @Test
     public void removeWithCollisionTest() {
-        MyMap<Plane, Integer> myHashMap = new MyHashMap();
+        MyMap<Plane, Integer> myHashMap = new MyHashMap<>();
         myHashMap.put(firstPlane, 3);
         myHashMap.put(secondPlane, 5);
         myHashMap.put(thirdPlane, 1);

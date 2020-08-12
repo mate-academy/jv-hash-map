@@ -45,7 +45,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        putNode(new Node<>(key, value));
+        Node<K, V> newNode = new Node<>(key, value);
+        int position = indexFor(newNode.key);
+        Node<K, V> existNode = table[position];
+        if (existNode == null) {
+            table[position] = newNode;
+        } else {
+            while (existNode.next != null || Objects.equals(existNode.key, newNode.key)) {
+                if (Objects.equals(existNode.key, newNode.key)) {
+                    existNode.value = newNode.value;
+                    return;
+                }
+                existNode = existNode.next;
+            }
+            existNode.next = newNode;
+        }
+        if (++size > threshold) {
+            resize();
+        }
     }
 
     @Override
@@ -102,29 +119,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (newLength * DEFAULT_LOAD_FACTOR);
         for (Node<K, V> node : oldTable) {
             while (node != null) {
-                putNode(new Node<>(node.key, node.value));
+                put(node.key, node.value);
                 node = node.next;
             }
-        }
-    }
-
-    private void putNode(Node<K, V> newNode) {
-        int bucket = (table.length - 1) & hash(newNode.key);
-        Node<K, V> existNode = table[bucket];
-        if (existNode == null) {
-            table[bucket] = newNode;
-        } else {
-            while (existNode.next != null || Objects.equals(existNode.key, newNode.key)) {
-                if (Objects.equals(existNode.key, newNode.key)) {
-                    existNode.value = newNode.value;
-                    return;
-                }
-                existNode = existNode.next;
-            }
-            existNode.next = newNode;
-        }
-        if (++size > threshold) {
-            resize();
         }
     }
 }
