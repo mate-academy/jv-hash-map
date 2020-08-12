@@ -73,8 +73,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hashGen(K key) {
-        if () {
-
+        if (key == null) {
+            return 0;
         }
         int hash = key.hashCode();
         hash ^= (hash >>> 20) ^ (hash >>> 12);
