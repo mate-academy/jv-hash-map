@@ -7,10 +7,11 @@ package core.basesyntax;
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
+    private static final int DEFAULT_CAPACITY = 16;
 
     private int size;
     private Node<K, V>[] table;
-    private int capacity = 16;
+    private int capacity = DEFAULT_CAPACITY;
     private int threshold = (int) (LOAD_FACTOR * capacity);
 
     public MyHashMap() {
@@ -25,14 +26,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             currNode = table[0];
         } else {
-            keyHash = hashGen(key.hashCode());
+            keyHash = hashGen(key);
             index = calculateIndex(keyHash, table.length);
             currNode = table[index];
         }
         if (currNode != null) {
             while (currNode != null) {
-                if (currNode.hash == keyHash && (currNode.key == key
-                        || key != null && key.equals(currNode.key))) {
+                if (currNode.key == key || key != null && key.equals(currNode.key)) {
                     currNode.value = value;
                     return;
                 }
@@ -53,13 +53,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             currNode = table[0];
         } else {
-            keyHash = hashGen(key.hashCode());
+            keyHash = hashGen(key);
             currNode = table[calculateIndex(keyHash, table.length)];
         }
         if (currNode != null) {
             while (currNode != null) {
-                if (currNode.hash == keyHash
-                        && currNode.key == key || (key != null && key.equals(currNode.key))) {
+                if (currNode.key == key || (key != null && key.equals(currNode.key))) {
                     return currNode.value;
                 }
                 currNode = currNode.next;
@@ -73,7 +72,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hashGen(int hash) {
+    private int hashGen(K key) {
+        if () {
+
+        }
+        int hash = key.hashCode();
         hash ^= (hash >>> 20) ^ (hash >>> 12);
         return hash ^ (hash >>> 7) ^ (hash >>> 4);
     }
