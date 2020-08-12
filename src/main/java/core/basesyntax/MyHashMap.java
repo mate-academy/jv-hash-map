@@ -8,18 +8,16 @@ import java.util.Objects;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
     private Node<K, V>[] buckets;
-    private final float threshold;
+    private float threshold;
     private int size;
 
     public MyHashMap() {
         buckets = new Node[DEFAULT_INITIAL_CAPACITY];
         threshold = DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR;
-        size = 0;
-
     }
 
     @Override
@@ -27,7 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        int position = calculateBucket(key, buckets.length);
+        int position = calculateBucket(key);
         Node<K, V> element = findNode(key, position);
         if (element != null) {
             element.value = value;
@@ -40,7 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> element = findNode(key, calculateBucket(key, buckets.length));
+        Node<K, V> element = findNode(key, calculateBucket(key));
         if (element != null) {
             return element.value;
         }
@@ -61,15 +59,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             element = element.next;
         }
         return null;
-
     }
 
-    private int calculateBucket(K key, int capacity) {
-        if (key == null) {
-            return 0;
-        } else {
-            return Math.abs(key.hashCode()) % capacity;
-        }
+    private int calculateBucket(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % buckets.length;
     }
 
     private void resize() {
