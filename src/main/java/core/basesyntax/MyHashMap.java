@@ -27,7 +27,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
 
-        int index = indexFor(key.hashCode(), table.length);
+        int index = indexFor(hash(key.hashCode()), table.length);
         Node<K, V> node = table[index];
         while (node != null) {
             if (key.equals(node.key)) {
@@ -52,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
 
-        int index = indexFor(key.hashCode(), table.length);
+        int index = indexFor(hash(key.hashCode()), table.length);
         Node<K, V> node = table[index];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
@@ -112,7 +112,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     newTable[0] = new Node<>(null, node.value, nextNode);
                 }
 
-                int newIndex = indexFor(node.key.hashCode(), newTable.length);
+                int newIndex = indexFor(hash(node.key.hashCode()), newTable.length);
                 Node<K, V> nextNode = newTable[newIndex];
                 newTable[newIndex] = new Node<>(node.key, node.value, nextNode);
 
