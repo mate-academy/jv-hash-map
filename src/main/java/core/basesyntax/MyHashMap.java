@@ -17,7 +17,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
         treshhold = table.length * LOAD_FACTOR;
-        size = 0;
     }
 
     @Override
