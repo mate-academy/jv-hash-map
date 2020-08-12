@@ -14,7 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private float treshhold;
 
-    MyHashMap() {
+    public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
         treshhold = table.length * LOAD_FACTOR;
     }
@@ -24,12 +24,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == treshhold) {
             resize();
         }
-        Node<K, V> element = getNodeByIndex(key, indexFor(key));
+        int index = indexFor(key);
+        Node<K, V> element = getNodeByIndex(key, index);
         if (element != null) {
             element.value = value;
         } else {
-            Node<K, V> newElement = new Node<>(key, value, table[indexFor(key)]);
-            table[indexFor(key)] = newElement;
+            Node<K, V> newElement = new Node<>(key, value, table[index]);
+            table[index] = newElement;
             size++;
         }
     }
