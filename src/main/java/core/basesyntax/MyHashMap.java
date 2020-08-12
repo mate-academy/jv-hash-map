@@ -51,11 +51,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int indexFor(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return (key.hashCode() >>> 16) % table.length;
-
+        return key == null ? 0 : ((key.hashCode() & (table.length - 1)));
     }
 
     private void linkNode(Node<K, V> node, int index) {
