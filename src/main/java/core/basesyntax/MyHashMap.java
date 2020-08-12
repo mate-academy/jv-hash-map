@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
@@ -20,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (size >= LOAD_FACTOR * currentCapacity) {
-            resizeBasket();
+            resize();
         }
         Node<K,V> inputNode = new Node<>(key, value, null);
         int basketIndex = getBasketIndex(key);
@@ -31,13 +33,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             while (nodeInBasket.next != null) {
-                if (nodeInBasket.key == key || (key != null && key.equals(nodeInBasket.key))) {
+                if (Objects.equals(key, nodeInBasket.key)) {
                     nodeInBasket.value = value;
                     return;
                 }
                 nodeInBasket = nodeInBasket.next;
             }
-            if (nodeInBasket.key == key || (key != null && key.equals(nodeInBasket.key))) {
+            if (Objects.equals(key, nodeInBasket.key)) {
                 nodeInBasket.value = value;
             } else {
                 nodeInBasket.next = inputNode;
@@ -51,8 +53,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         Node<K,V> node = baskets[getBasketIndex(key)];
         while (node != null) {
-            if ((node.key == null || key == null)
-                    ? node.key == key : node.key.equals(key)) {
+            if (Objects.equals(key, node.key)) {
                 return node.value;
             }
             node = node.next;
@@ -65,8 +66,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resizeBasket() {
-        currentCapacity = currentCapacity * 2;
+    private void resize() {
+        currentCapacity *= 2;
         size = 0;
         Node<K,V>[] previous = baskets;
         baskets = new Node[currentCapacity];
@@ -79,16 +80,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBasketIndex(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode()) % currentCapacity;
+        return key == null ? 0 : (Math.abs(key.hashCode()) % currentCapacity);
     }
 
     private static class Node<K,V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
+        final K key;
+        V value;
+        Node<K, V> next;
 
         private Node(K key, V value, Node<K,V> next) {
             this.key = key;
