@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
@@ -10,14 +12,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int threshold;
     private Node<K, V>[] table;
-    private int size = 0;
+    private int size;
 
     public MyHashMap() {
+        size = 0;
         table = new Node[DEFAULT_CAPACITY];
         threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
     }
 
-    private class Node<K, V> {
+    private static class Node<K, V> {
         K key;
         V value;
         Node<K, V> next;
@@ -35,7 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         Node<K, V> node;
-        int index = hash(key);
+        int index = getIndex(key);
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
         } else {
@@ -62,15 +65,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return table[0].value;
         }
-        for (Node<K, V> kvNode : table) {
-            if (kvNode != null) {
-                if (kvNode.key != null && kvNode.key.equals(key)) {
-                    return kvNode.value;
+        for (Node<K, V> node : table) {
+            if (node != null) {
+                if (Objects.equals(node.key, key)) {
+                    return node.value;
                 }
-                while (kvNode.next != null) {
-                    kvNode = kvNode.next;
-                    if (kvNode.key.equals(key)) {
-                        return kvNode.value;
+                while (node.next != null) {
+                    node = node.next;
+                    if (Objects.equals(node.key, key)) {
+                        return node.value;
                     }
                 }
             }
@@ -83,12 +86,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(K key) {
+    private int getIndex(K key) {
         return key == null ? 0
                 : key.hashCode() == 0 ? 1
-                : key.hashCode() < 0
-                ? -key.hashCode() % table.length
-                : key.hashCode() % table.length;
+                : Math.abs(key.hashCode()) % table.length;
     }
 
     private void resize() {
