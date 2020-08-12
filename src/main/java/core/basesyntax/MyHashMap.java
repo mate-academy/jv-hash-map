@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
@@ -24,8 +26,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             arrayValues[getIndex(key)] = new Node<>(key, value);
         } else {
             Node<K, V> nodeFromList = arrayValues[getIndex(key)];
-            while (checkKey(nodeFromList.key, key) || nodeFromList.next != null) {
-                if (checkKey(nodeFromList.key, key)) {
+            while (Objects.equals(nodeFromList.key, key) || nodeFromList.next != null) {
+                if (Objects.equals(nodeFromList.key, key)) {
                     nodeFromList.value = value;
                     return;
                 }
@@ -43,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         Node<K, V> tempNode = arrayValues[getIndex(key)];
         while (tempNode != null) {
-            if (checkKey(tempNode.key, key)) {
+            if (Objects.equals(tempNode.key, key)) {
                 return tempNode.value;
             }
             tempNode = tempNode.next;
@@ -58,10 +60,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
-    }
-
-    private boolean checkKey(K keyInArray, K key) {
-        return keyInArray != null && keyInArray.equals(key) || keyInArray == key;
     }
 
     private void resize() {
