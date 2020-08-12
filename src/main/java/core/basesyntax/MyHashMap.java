@@ -41,7 +41,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (Entry<K, V> holder = buckets[indexToAssign(key)]; holder != null; holder = holder.next) {
+        for (Entry<K, V> holder = buckets[indexToAssign(key)]; holder != null;
+                                                                holder = holder.next) {
             if (holder.key == key || (holder.key != null && holder.key.equals(key))) {
                 return holder.value;
             }
