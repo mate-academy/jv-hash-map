@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        putEntry(table, new Entry<>(key, value, null));
+        putEntry(table, new Entry<>(key, value));
     }
 
     @Override
@@ -93,10 +93,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Entry<K, V> next;
 
-        public Entry(K key, V value, Entry<K, V> next) {
+        public Entry(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 
