@@ -8,13 +8,13 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    private static final int CAPACITY = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75d;
     private Node<K, V>[] buckets;
     private int size;
 
     public MyHashMap() {
-        buckets = new Node[CAPACITY];
+        buckets = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -30,13 +30,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         buckets[index] = node;
         size++;
-
     }
 
     @Override
     public V getValue(K key) {
         int index = getIndex(key);
-        return buckets[index] != null ? getElement(key, index) : null;
+        Node<K, V> node = buckets[index];
+        while (node != null) {
+            if (check(node.key, key)) {
+                return node.value;
+            }
+            node = node.next;
+        }
+        return null;
     }
 
     @Override
@@ -64,37 +70,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private boolean resize() {
-        Node<K, V>[] oldArray = new Node[buckets.length];
-        System.arraycopy(buckets, 0, oldArray, 0, buckets.length);
+    private void resize() {
+        Node<K, V>[] oldArray = buckets;
         buckets = new Node[buckets.length * 2];
         size = 0;
-        for (int i = 0; i < oldArray.length; i++) {
-            if (oldArray[i] != null) {
-                Node<K, V> node = oldArray[i];
-                put(oldArray[i].key, oldArray[i].value);
-                iterationsList(node);
+        for (Node<K, V> node : oldArray) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
-        return true;
-    }
-
-    private void iterationsList(Node<K, V> node) {
-        while (node.next != null) {
-            node = node.next;
-            put(node.key, node.value);
-        }
-    }
-
-    private V getElement(K key, int index) {
-        Node<K, V> node = buckets[index];
-        while (node.next != null) {
-            if (check(node.key, key)) {
-                return node.value;
-            }
-            node = node.next;
-        }
-        return check(node.key, key) ? node.value : null;
     }
 
     private int getIndex(K key) {
