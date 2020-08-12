@@ -15,11 +15,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         loadFactor = DEFAULT_LOAD_FACTOR;
     }
 
-    public MyHashMap(int initialCapacity) {
-        table = (Node<K, V>[]) new Node[initialCapacity];
-        loadFactor = DEFAULT_LOAD_FACTOR;
-    }
-
     @Override
     public void put(K key, V value) {
         if (key == null) {
