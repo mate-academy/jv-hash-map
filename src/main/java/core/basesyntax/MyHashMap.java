@@ -26,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > elementArray.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
-        int index = hash(key);
+        int index = getIndex(key);
         Node<K, V> currentNode = elementArray[index];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
@@ -35,24 +35,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             currentNode = currentNode.next;
         }
-        Node<K, V> tmp = new Node<>(key, value);
-        tmp.next = elementArray[index];
-        elementArray[index] = tmp;
+        Node<K, V> newNode = new Node<>(key, value);
+        newNode.next = elementArray[index];
+        elementArray[index] = newNode;
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        int index = hash(key);
-        Node<K, V> currentNode = elementArray[0];
-        if (index != -1 && size > 0) {
-            currentNode = elementArray[index];
-            while (currentNode != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    break;
-                }
-                currentNode = currentNode.next;
+        int index = getIndex(key);
+        Node<K, V> currentNode = elementArray[index];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                break;
             }
+            currentNode = currentNode.next;
         }
         return currentNode == null ? null : currentNode.value;
     }
@@ -75,7 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hash(Object key) {
+    private int getIndex(Object key) {
         if (key != null) {
             return Math.abs(key.hashCode() + 1) % elementArray.length;
         }
