@@ -39,10 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> element = findNode(key, calculateBucket(key));
-        if (element != null) {
-            return element.value;
-        }
-        return null;
+        return element != null ? element.value : null;
     }
 
     @Override
