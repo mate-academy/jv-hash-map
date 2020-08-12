@@ -12,7 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
 
-    private List<Entry<K, V>>[] elementData;
+    private LinkedList<Entry<K, V>>[] elementData;
     private int size;
     private int currentCapacity = DEFAULT_CAPACITY;
 
@@ -41,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resizeAndTransfer() {
         currentCapacity = currentCapacity * 2;
-        List[] oldElementData = elementData;
+        LinkedList<Entry<K, V>>[] oldElementData = elementData;
         elementData = new LinkedList[currentCapacity];
         size = 0;
         for (List<Entry<K, V>> list : oldElementData) {
@@ -92,14 +92,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         if (!replaced) {
-            list.add(new Entry<K, V>(key, value, index));
+            list.add(new Entry<K, V>(key, value));
             size++;
         }
     }
 
     private void addEntry(K key, V value, int index) {
-        List list = new LinkedList();
-        list.add(new Entry<K, V>(key, value, index));
+        LinkedList<Entry<K, V>> list = new LinkedList();
+        list.add(new Entry<>(key, value));
         elementData[index] = list;
         size++;
     }
@@ -109,14 +109,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Entry<K, V> {
-        int hashCode;
         K key;
         V value;
 
-        Entry(K key, V value, int index) {
-            if (key != null) {
-                this.hashCode = key.hashCode();
-            }
+        Entry(K key, V value) {
             this.key = key;
             this.value = value;
         }
