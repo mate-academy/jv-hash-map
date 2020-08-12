@@ -22,21 +22,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resizeAndTransfer();
         }
 
-        if (key == null) {
-            putForNullKey(value);
-            return;
-        }
-
-        int index = getIndexFor(key.hashCode());
+        int index = getIndex(key);
         if (elementData[index] == null) {
-            addEntry(key, value, index);
+            Entry<K, V> entry = new Entry<>(key, value);
+            elementData[index] = entry;
+            size++;
         } else {
             replaceOrAddEntry(key, value, index);
         }
     }
 
     private void resizeAndTransfer() {
-
         Entry<K, V>[] oldElementData = elementData;
         elementData = new Entry[elementData.length * 2];
         size = 0;
@@ -51,7 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = key == null ? 0 : getIndexFor(key.hashCode());
+        int index = getIndex(key);
         Entry<K, V> entry = elementData[index];
         if (entry == null) {
             return null;
@@ -74,45 +70,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void putForNullKey(V value) {
-        if (null == elementData[0]) {
-            addEntry(null, value, 0);
-            return;
-        }
-        replaceOrAddEntry(null, value, 0);
-    }
-
     private void replaceOrAddEntry(K key, V value, int index) {
-        boolean replaced = false;
         Entry<K, V> entry = elementData[index];
-
-        while (!replaced) {
+        while (entry != null) {
             if (theSameKey(key, entry.key)) {
                 entry.value = value;
-                replaced = true;
-            }
-
-            if (entry.next != null) {
-                entry = entry.next;
-            } else {
                 break;
             }
-        }
-
-        if (!replaced) {
-            entry.next = new Entry<>(key, value);
-            size++;
+            if (entry.next == null) {
+                entry.next = new Entry<>(key, value);
+                size++;
+                break;
+            }
+            entry = entry.next;
         }
     }
 
-    private void addEntry(K key, V value, int index) {
-        Entry<K, V> entry = new Entry<>(key, value);
-        elementData[index] = entry;
-        size++;
-    }
-
-    private int getIndexFor(int hashCode) {
-        return Math.abs(hashCode) % elementData.length;
+    private int getIndex(K key) {
+        if (key == null) {
+            return 0;
+        }
+        return Math.abs(key.hashCode()) % elementData.length;
     }
 
     private static class Entry<K, V> {
