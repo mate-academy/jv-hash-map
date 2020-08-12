@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
@@ -19,25 +21,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = 0;
-        if (key != null) {
-            index = Math.abs(key.hashCode()) % currentCapacity;
-        }
+        int index = getHash(key);
         Node<K, V> newElement = new Node<>(key, value);
         if (hashMapList[index] != null) {
             Node<K, V> element = hashMapList[index];
-            do {
-                if ((key == null || element.key == null || element.key.hashCode() == key.hashCode())
-                        && ((element.key == key) || (key != null && key.equals(element.key)))) {
+            Node<K, V> prevElement = element;
+            while (element != null) {
+                if (Objects.equals(key, element.key)) {
                     element.value = value;
                     return;
                 }
-                if (element.nextItem == null) {
-                    break;
-                }
+                prevElement = element;
                 element = element.nextItem;
-            } while (true);
-            element.nextItem = newElement;
+            }
+            prevElement.nextItem = newElement;
         } else {
             hashMapList[index] = newElement;
         }
@@ -47,21 +44,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (size == 0) {
-            return null;
+        int index = getHash(key);
+        if (size != 0) {
+            Node<K, V> element = hashMapList[index];
+            do {
+                if (Objects.equals(key, element.key)) {
+                    return element.value;
+                }
+                element = element.nextItem;
+            } while (element != null);
         }
-        int index = 0;
-        if (key != null) {
-            index = Math.abs(key.hashCode()) % currentCapacity;
-        }
-        Node<K, V> element = hashMapList[index];
-        do {
-            if ((key == null || element.key == null || element.key.hashCode() == key.hashCode())
-                    && ((element.key == key) || (key != null && key.equals(element.key)))) {
-                return element.value;
-            }
-            element = element.nextItem;
-        } while (element != null);
         return null;
     }
 
@@ -71,10 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void addElement(Node<K, V>[] list, Node<K, V> node) {
-        int index = 0;
-        if (node.key != null) {
-            index = Math.abs(node.key.hashCode()) % currentCapacity;
-        }
+        int index = getHash(node.key);
         if (list[index] != null) {
             Node<K, V> element = list[index];
             while (element.nextItem != null) {
@@ -110,6 +99,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private int getHash(K key) {
+        if (key != null) {
+            return Math.abs(key.hashCode()) % currentCapacity;
+        }
+        return 0;
+    }
+
     private static class Node<K, V> {
         private K key;
         private V value;
@@ -118,6 +114,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public Node(K key, V value) {
             this.key = key;
             this.value = value;
+        }
+
+        public Node(K key, V value, Node<K, V> nextItem) {
+            this.key = key;
+            this.value = value;
+            this.nextItem = nextItem;
         }
     }
 }
