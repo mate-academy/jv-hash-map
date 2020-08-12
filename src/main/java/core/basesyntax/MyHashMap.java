@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
@@ -28,7 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         for (Entry holder = buckets[indexToAssign(key)]; holder != null; holder = holder.next) {
-            if (holder.key == key || (holder.key != null && holder.key.equals(key))) {
+            if (Objects.equals(holder.key, key)) {
                 holder.value = value;
                 break;
             } else if (holder.next == null) {
@@ -43,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         for (Entry<K, V> holder = buckets[indexToAssign(key)]; holder != null;
                                                                 holder = holder.next) {
-            if (holder.key == key || (holder.key != null && holder.key.equals(key))) {
+            if (Objects.equals(holder.key, key)) {
                 return holder.value;
             }
         }
@@ -68,10 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int indexToAssign(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return (key.hashCode()) & (buckets.length - 1);
+        return key == null ? 0 : (key.hashCode()) & (buckets.length - 1);
     }
 
     private void resize() {
