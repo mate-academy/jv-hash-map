@@ -7,8 +7,8 @@ package core.basesyntax;
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    static final int INITIAL_CAPACITY = 16;
-    static final float LOAD_FACTOR = 0.75f;
+    private static final int INITIAL_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75f;
     private int size;
     private int capacity;
     private Node<K, V>[] arrayValues;
@@ -21,17 +21,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (arrayValues[getIndex(key)] == null) {
-            arrayValues[getIndex(key)] = new Node<>(key, value, null);
+            arrayValues[getIndex(key)] = new Node<>(key, value);
         } else {
             Node<K, V> nodeFromList = arrayValues[getIndex(key)];
-            while (checkKey(nodeFromList.getKey(), key) || nodeFromList.getNext() != null) {
-                if (checkKey(nodeFromList.getKey(), key)) {
-                    nodeFromList.setValue(value);
+            while (checkKey(nodeFromList.key, key) || nodeFromList.next != null) {
+                if (checkKey(nodeFromList.key, key)) {
+                    nodeFromList.value = value;
                     return;
                 }
-                nodeFromList = nodeFromList.getNext();
+                nodeFromList = nodeFromList.next;
             }
-            nodeFromList.next = new Node<>(key, value, null);
+            nodeFromList.next = new Node<>(key, value);
         }
         size++;
         if (checkSize()) {
@@ -43,10 +43,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         Node<K, V> tempNode = arrayValues[getIndex(key)];
         while (tempNode != null) {
-            if (checkKey(tempNode.getKey(), key)) {
-                return tempNode.getValue();
+            if (checkKey(tempNode.key, key)) {
+                return tempNode.value;
             }
-            tempNode = tempNode.getNext();
+            tempNode = tempNode.next;
         }
         return null;
     }
@@ -71,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         arrayValues = new Node[capacity];
         for (int i = 0; i < tempArray.length; i++) {
             while (tempArray[i] != null) {
-                put(tempArray[i].getKey(), tempArray[i].getValue());
+                put(tempArray[i].key, tempArray[i].value);
                 tempArray[i] = tempArray[i].next;
             }
         }
@@ -86,31 +86,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : Math.abs((h = 37 + key.hashCode()) ^ (h >>> 16));
     }
 
-    public static class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        Node(K key, V value, MyHashMap.Node<K, V> next) {
+        Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public Node<K, V> getNext() {
-            return next;
-        }
-
-        public void setValue(V newValue) {
-            value = newValue;
         }
     }
 }
