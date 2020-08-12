@@ -12,20 +12,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
     private int size;
     private int currentCapacity;
-    private int userCapacity;
-    private Node<K, V>[] arrayOfElement;
+    private Node<K, V>[] arrayOfElements;
 
     public MyHashMap() {
         size = 0;
         currentCapacity = DEFAULT_CAPACITY;
-        arrayOfElement = new Node[DEFAULT_CAPACITY];
+        arrayOfElements = new Node[DEFAULT_CAPACITY];
     }
 
     public MyHashMap(int userCapacity) {
         if (userCapacity <= 0) {
-            throw new RuntimeException("Array size is incorrect");
+            throw new RuntimeException("Initial capacity is incorrect");
         }
-        arrayOfElement = new Node[userCapacity];
+        arrayOfElements = new Node[userCapacity];
         currentCapacity = userCapacity;
         size = 0;
     }
@@ -37,18 +36,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putIntoArray(K key, V value) {
-        if (arrayOfElement[getIndexElementArray(key)] == null) {
-            arrayOfElement[getIndexElementArray(key)] = new Node<>(key, value, null);
+        if (arrayOfElements[getIndexElementArray(key)] == null) {
+            arrayOfElements[getIndexElementArray(key)] = new Node<>(key, value);
             size++;
             return;
         } else {
-            Node<K, V> existNode = arrayOfElement[getIndexElementArray(key)];
+            Node<K, V> existNode = arrayOfElements[getIndexElementArray(key)];
             for (Node<K, V> i = existNode; i != null; i = i.next) {
                 if (Objects.equals(i.key, key)) {
                     i.value = value;
                     break;
                 } else if (i.next == null) {
-                    Node<K, V> newNode = new Node<>(key, value, null);
+                    Node<K, V> newNode = new Node<>(key, value);
                     i.next = newNode;
                     size++;
                     break;
@@ -59,10 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (size == 0) {
-            return null;
-        }
-        for (Node<K, V> i = arrayOfElement[getIndexElementArray(key)]; i != null; i = i.next) {
+        for (Node<K, V> i = arrayOfElements[getIndexElementArray(key)]; i != null; i = i.next) {
             if (Objects.equals(i.key, key)) {
                 return i.value;
             }
@@ -76,7 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndexElementArray(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % arrayOfElement.length;
+        return key == null ? 0 : Math.abs(key.hashCode()) % arrayOfElements.length;
     }
 
     private void checkSize() {
@@ -87,10 +83,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        int modifiedLength = currentCapacity * 2;
-        Node<K, V>[] copyElementNode = arrayOfElement;
-        arrayOfElement = new Node[modifiedLength];
-        currentCapacity = modifiedLength;
+        currentCapacity *= 2;
+        Node<K, V>[] copyElementNode = arrayOfElements;
+        arrayOfElements = new Node[currentCapacity];
         for (Node<K, V> elementNode : copyElementNode) {
             for (Node<K, V> i = elementNode; i != null; i = i.next) {
                 putIntoArray(i.key, i.value);
@@ -98,15 +93,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private static class Node<K,V> {
+    private static class Node<K, V> {
         final K key;
         V value;
         Node<K, V> next;
 
-        Node(K key, V value, Node<K, V> next) {
+        Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
