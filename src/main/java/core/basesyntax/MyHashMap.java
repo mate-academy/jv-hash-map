@@ -115,11 +115,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
         }
-
-        public Node(K key, V value, Node<K, V> nextItem) {
-            this.key = key;
-            this.value = value;
-            this.nextItem = nextItem;
-        }
     }
 }
