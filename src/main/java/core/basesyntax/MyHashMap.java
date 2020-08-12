@@ -3,15 +3,15 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final double loadFactor = 0.75;
-    private static final int defaultCapacity = 16;
+    private static final double LOAD_FACTOR = 0.75;
+    private static final int DEFAULT_CAPACITY = 16;
     private Node<K, V>[] table;
     private int size;
     private int threshold;
 
     public MyHashMap() {
-        this.table = new Node[defaultCapacity];
-        this.threshold = (int) (defaultCapacity * loadFactor);
+        this.table = new Node[DEFAULT_CAPACITY];
+        this.threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
@@ -57,10 +57,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void linkNode(Node<K, V> node, int index) {
         Node<K, V> curNode = table[index];
         Node<K, V> tempNode = null;
-        if (Objects.equals(node.key, curNode.key)) {
-            table[index].value = node.value;
-            return;
-        }
         while (curNode != null) {
             if (Objects.equals(node.key, curNode.key)) {
                 curNode.value = node.value;
@@ -77,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = table;
         table = (Node<K, V>[]) new Node[oldTable.length * 2];
         size = 0;
-        threshold = (int) (table.length * loadFactor);
+        threshold = (int) (table.length * LOAD_FACTOR);
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
