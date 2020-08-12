@@ -20,10 +20,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        Node<K, V> newNode = new Node<>(hashGen(key), key, value, null);
-        Node<K, V> bucket = buckets[findBucket(key)];
+        Node<K, V> newNode = new Node<>(key, value, null);
+        int index = findIndex(key);
+        Node<K, V> bucket = buckets[index];
         if (bucket == null) {
-            buckets[findBucket(key)] = newNode;
+            buckets[index] = newNode;
             size++;
             return;
         }
@@ -44,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == 0) {
             return null;
         }
-        Node<K, V> nodeToFind = buckets[findBucket(key)];
+        Node<K, V> nodeToFind = buckets[findIndex(key)];
         while (nodeToFind != null) {
             if (Objects.equals(key, nodeToFind.key)) {
                 return nodeToFind.value;
@@ -78,18 +79,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : key.hashCode();
     }
 
-    private int findBucket(K key) {
+    private int findIndex(K key) {
         return Math.abs(hashGen(key) % buckets.length);
     }
 
     private static class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
