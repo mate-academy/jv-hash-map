@@ -252,32 +252,4 @@ public class MyHashMapTest {
             }
         }
     }
-
-    @Test
-    public void put() {
-    }
-
-    @Test
-    public void getValue() {
-    }
-
-    @Test
-    public void getSize() {
-    }
-
-    @Test
-    public void remove() {
-    }
-
-    @Test
-    public void testRemove() {
-    }
-
-    @Test
-    public void containsValue() {
-    }
-
-    @Test
-    public void containsKey() {
-    }
 }

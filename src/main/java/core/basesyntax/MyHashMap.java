@@ -4,23 +4,23 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
-    private static final double LOAD_FACTOR = 0.75;
+    private static final float LOAD_FACTOR = 0.75f;
     private int size = 0;
-    private Node<K, V>[] tab;
+    private Node<K, V>[] table;
 
     public MyHashMap() {
-        tab = new Node[INITIAL_CAPACITY];
+        table = new Node[INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= tab.length * LOAD_FACTOR) {
+        if (size >= table.length * LOAD_FACTOR) {
             resize();
         }
         Node<K, V> keyN = findNode(key);
         if (keyN == null) {
-            int basket = getHash(key) % tab.length;
-            tab[basket] = new Node<>(key, value, tab[basket]);
+            int basket = getHash(key) % table.length;
+            table[basket] = new Node<>(key, value, table[basket]);
             size++;
         } else {
             keyN.value = value;
@@ -39,15 +39,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public V remove(K key) {
-        int basket = getHash(key) % tab.length;
+        int basket = getHash(key) % table.length;
         Node<K, V> prevBasketNode = null;
-        Node<K, V> currentBNode = tab[basket];
+        Node<K, V> currentBNode = table[basket];
         while (currentBNode != null) {
             if (Objects.equals(currentBNode.key, key)) {
                 if (prevBasketNode != null) {
                     prevBasketNode.next = currentBNode.next;
                 } else {
-                    tab[basket] = currentBNode.next;
+                    table[basket] = currentBNode.next;
                 }
                 size--;
                 return currentBNode.value;
@@ -68,7 +68,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public boolean containsValue(V value) {
-        for (Node<K, V> basketNode : tab) {
+        for (Node<K, V> basketNode : table) {
             while (basketNode != null) {
                 if (Objects.equals(basketNode.value, value)) {
                     return true;
@@ -92,8 +92,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        Node<K, V>[] oldTab = tab;
-        tab = new Node[tab.length * 2];
+        Node<K, V>[] oldTab = table;
+        table = new Node[table.length * 2];
         for (Node<K, V> basketNode : oldTab) {
             while (basketNode != null) {
                 put(basketNode.key, basketNode.value);
@@ -103,7 +103,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> findNode(K key) {
-        Node<K, V> currentBNode = tab[getHash(key) % tab.length];
+        Node<K, V> currentBNode = table[getHash(key) % table.length];
         while (currentBNode != null) {
             if (Objects.equals(currentBNode.key, key)) {
                 return currentBNode;
