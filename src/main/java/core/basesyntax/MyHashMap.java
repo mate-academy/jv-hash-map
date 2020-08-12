@@ -10,29 +10,29 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     public static final int DEFAULT_CAPACITY = 16;
     public static final double LOAD_FACTOR = 0.75;
-    private Node<K, V>[] storage;
+    private Node<K, V>[] nodeArray;
     private int size;
     private int currentCapacity;
 
     public MyHashMap() {
         currentCapacity = DEFAULT_CAPACITY;
-        storage = new Node[currentCapacity];
+        nodeArray = new Node[currentCapacity];
         size = 0;
     }
 
     @Override
     public void put(K key, V value) {
-        if (size + 1 > currentCapacity * LOAD_FACTOR) {
+        if (size >= currentCapacity * LOAD_FACTOR) {
             resize();
         }
         Node<K, V> node = new Node<>(key, value);
         int index = getIndex(node.key);
-        if (storage[index] == null) {
-            storage[index] = node;
+        if (nodeArray[index] == null) {
+            nodeArray[index] = node;
             size++;
             return;
         }
-        Node<K, V> element = storage[index];
+        Node<K, V> element = nodeArray[index];
         while (element != null) {
             if (Objects.equals(element.key, key)) {
                 element.value = value;
@@ -41,22 +41,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             element = element.next;
         }
         if (element == null) {
-            getLastLinkedValue(storage[index]).next = node;
+            getLastLinkedValue(nodeArray[index]).next = node;
         }
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> element = storage[getIndex(key)];
-        V result = null;
+        Node<K, V> element = nodeArray[getIndex(key)];
         while (element != null) {
             if (Objects.equals(element.key, key)) {
-                result = element.value;
+                return element.value;
             }
             element = element.next;
         }
-        return result;
+        return null;
     }
 
     @Override
@@ -69,9 +68,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        final Node<K, V>[] tempStorage = storage;
-        storage = new Node[currentCapacity * 2];
-        currentCapacity = storage.length;
+        final Node<K, V>[] tempStorage = nodeArray;
+        nodeArray = new Node[currentCapacity * 2];
+        currentCapacity = nodeArray.length;
         size = 0;
         for (int i = 0; i < tempStorage.length; i++) {
             Node<K, V> element = tempStorage[i];
