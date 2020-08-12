@@ -23,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         resize();
         if (buckets[indexToAssign(key)] == null) {
-            buckets[indexToAssign(key)] = new Entry(key, value, null);
+            buckets[indexToAssign(key)] = new Entry<>(key, value, null);
             size++;
             return;
         }
@@ -32,8 +32,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 holder.value = value;
                 break;
             } else if (holder.next == null) {
-                Entry toExtend = buckets[indexToAssign(key)];
-                buckets[indexToAssign(key)] = new Entry(key, value, toExtend);
+                Entry<K, V> toExtend = buckets[indexToAssign(key)];
+                buckets[indexToAssign(key)] = new Entry<>(key, value, toExtend);
                 size++;
             }
         }
@@ -41,9 +41,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (Entry holder = buckets[indexToAssign(key)]; holder != null; holder = holder.next) {
+        for (Entry<K, V> holder = buckets[indexToAssign(key)]; holder != null; holder = holder.next) {
             if (holder.key == key || (holder.key != null && holder.key.equals(key))) {
-                return (V) holder.value;
+                return holder.value;
             }
         }
         return null;
@@ -78,7 +78,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Entry[] currentBuckets = buckets;
             buckets = new Entry[currentBuckets.length * 2];
             transfer(currentBuckets);
-            threshold = (int) (currentBuckets.length * LOAD_FACTOR);
+            threshold = (int) (buckets.length * LOAD_FACTOR);
         }
     }
 
@@ -87,11 +87,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             while (element != null) {
                 if (buckets[indexToAssign(element.key)] == null) {
                     buckets[indexToAssign(element.key)]
-                            = new Entry(element.key, element.value, null);
+                            = new Entry<>(element.key, element.value, null);
                 } else {
-                    Entry present = buckets[indexToAssign(element.key)];
+                    Entry<K, V> present = buckets[indexToAssign(element.key)];
                     buckets[indexToAssign(element.key)]
-                            = new Entry(element.key, element.value, present);
+                            = new Entry<>(element.key, element.value, present);
                 }
                 element = element.next;
             }
