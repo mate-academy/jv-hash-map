@@ -22,13 +22,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = getIndex(getHashCode(key));
+        int index = getIndex(key);
         if (elements[index] == null) {
             elements[index] = new Node<>(key, value, null);
         } else {
             Node<K, V> temp = elements[index];
-            while (temp != null
-                    && (temp.next != null || Objects.equals(key, temp.key))) {
+            while (temp.next != null || Objects.equals(key, temp.key)) {
                 if (Objects.equals(key, temp.key)) {
                     temp.value = value;
                     return;
@@ -43,7 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = key == null ? 0 : getIndex(getHashCode(key));
+        int index = key == null ? 0 : getIndex(key);
         Node<K, V> temp = elements[index];
         while (temp != null) {
             if (Objects.equals(temp.key, key)) {
@@ -59,17 +58,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getHashCode(K key) {
+    private int getIndex(K key) {
         if (key == null) {
             return 0;
         } else {
             int hashCode = key.hashCode();
-            return hashCode ^ (hashCode >>> DEFAULT_CAPACITY);
+            return (hashCode ^ (hashCode >>> DEFAULT_CAPACITY))
+                    & (elements.length - 1);
         }
-    }
-
-    private int getIndex(int hash) {
-        return hash & (elements.length - 1);
     }
 
     private boolean resize() {
