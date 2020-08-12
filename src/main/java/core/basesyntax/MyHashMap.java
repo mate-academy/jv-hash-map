@@ -64,27 +64,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public boolean remove(K key, V value) {
         Node<K, V> searchedNode = findNodeByKey(key);
-        if (searchedNode != null && Objects.equals(searchedNode.value,value)) {
+        if (searchedNode != null && Objects.equals(searchedNode.value, value)) {
             remove(key);
             return true;
         }
         return false;
     }
 
-    public boolean containsKey(K key) {
-        return findNodeByKey(key) != null;
-    }
-
     public boolean containsValue(V value) {
         for (Node<K, V> basketNode : table) {
             while (basketNode != null) {
-               if (Objects.equals(basketNode.value, value)) {
-                   return true;
-               }
+                if (Objects.equals(basketNode.value, value)) {
+                    return true;
+                }
                 basketNode = basketNode.next;
             }
         }
         return false;
+    }
+
+    public boolean containsKey(K key) {
+        return findNodeByKey(key) != null;
     }
 
     private int getHash(K key) {
