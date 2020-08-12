@@ -38,7 +38,47 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    @Override
+    public V remove(K key) {
+        int basket = getHash(key) % tab.length;
+        Node<K, V> prevBasketNode = null;
+        Node<K, V> currentBNode = tab[basket];
+        while (currentBNode != null) {
+            if (Objects.equals(currentBNode.key, key)) {
+                if (prevBasketNode != null) {
+                    prevBasketNode.next = currentBNode.next;
+                } else {
+                    tab[basket] = currentBNode.next;
+                }
+                size--;
+                return currentBNode.value;
+            }
+            prevBasketNode = currentBNode;
+            currentBNode = currentBNode.next;
+        }
+        return null;
+    }
+
+    public boolean remove(K key, V value) {
+        Node<K, V> searchNode = findNode(key);
+        if (searchNode != null && Objects.equals(searchNode.value, value)) {
+            remove(key);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean containsValue(V value) {
+        for (Node<K, V> basketNode : tab) {
+            while (basketNode != null) {
+                if (Objects.equals(basketNode.value, value)) {
+                    return true;
+                }
+                basketNode = basketNode.next;
+            }
+        }
+        return false;
+    }
+    
     public boolean containsKey(K key) {
         return findNode(key) != null;
     }
