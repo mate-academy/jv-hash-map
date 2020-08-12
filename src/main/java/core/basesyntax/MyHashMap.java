@@ -22,13 +22,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         Node<K, V> newNode = new Node<>(key, value, null);
-        if (key == null) {
-            if (hashMap[0] == null) {
-                size++;
-            }
-            hashMap[0] = newNode;
-            return;
-        }
         int index = getIndex(key);
         if (hashMap[index] == null) {
             hashMap[index] = newNode;
@@ -36,9 +29,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         Node<K, V> tempNode = hashMap[index];
-
         while (tempNode.next != null) {
-            if (key.equals(tempNode.key)) {
+            if (tempNode.key == key || tempNode.key != null && key.equals(tempNode.key)) {
                 tempNode.value = value;
                 return;
             }
@@ -81,21 +73,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] tempArray = hashMap;
+        size = 0;
         int newLength = hashMap.length * 2;
+        Node<K, V>[] tempArray = hashMap;
         hashMap = new Node[newLength];
         for (Node<K, V> node : tempArray) {
+            if (node == null) {
+                continue;
+            }
             while (node != null) {
-                int index = getIndex(node.key);
-                if (hashMap[index] == null) {
-                    hashMap[index] = node;
-                    return;
-                }
-                Node<K, V> tempNode = node;
-                while (tempNode.next != null) {
-                    tempNode = tempNode.next;
-                }
-                tempNode.next = new Node<>(node.key, node.value, null);
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
