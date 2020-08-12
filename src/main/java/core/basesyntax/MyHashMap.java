@@ -57,7 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return hash(key) % capacity;
+        return (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
     private boolean checkKey(K keyInArray, K key) {
@@ -66,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        capacity = capacity * 2;
+        capacity *= 2;
         Node<K, V>[] tempArray = arrayValues;
         arrayValues = new Node[capacity];
         for (int i = 0; i < tempArray.length; i++) {
@@ -79,11 +79,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private boolean checkSize() {
         return (size > (arrayValues.length * LOAD_FACTOR));
-    }
-
-    private int hash(K key) {
-        int h;
-        return (key == null) ? 0 : Math.abs((h = 37 + key.hashCode()) ^ (h >>> 16));
     }
 
     private static class Node<K, V> {
