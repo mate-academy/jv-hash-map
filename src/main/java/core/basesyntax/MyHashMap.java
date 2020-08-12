@@ -6,14 +6,14 @@ package core.basesyntax;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int INITIAL_CAPASITY = 16;
+    private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
     private int size;
     private Node<K, V>[] hashMap;
 
     public MyHashMap() {
         size = 0;
-        hashMap = new Node[INITIAL_CAPASITY];
+        hashMap = new Node[INITIAL_CAPACITY];
     }
 
     @Override
@@ -36,12 +36,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         Node<K, V> tempNode = hashMap[index];
+
         while (tempNode.next != null) {
             if (key.equals(tempNode.key)) {
                 tempNode.value = value;
                 return;
             }
             tempNode = tempNode.next;
+        }
+        if (tempNode.key == key || tempNode.key != null && tempNode.key.equals(key)) {
+            tempNode.value = value;
+            return;
         }
         tempNode.next = newNode;
         size++;
@@ -69,6 +74,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
+        if (key == null) {
+            return 0;
+        }
         return Math.abs(key.hashCode()) % (hashMap.length) + 1;
     }
 
