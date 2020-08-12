@@ -1,24 +1,142 @@
 package core.basesyntax;
 
-/**
- * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
- * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
- * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
- */
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+
+    private Node<K, V>[] table;
+    private float loadFactor;
+    private int size;
+
+    public MyHashMap() {
+        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        loadFactor = DEFAULT_LOAD_FACTOR;
+    }
+
+    public MyHashMap(int initialCapacity) {
+        table = (Node<K, V>[]) new Node[initialCapacity];
+        loadFactor = DEFAULT_LOAD_FACTOR;
+    }
 
     @Override
     public void put(K key, V value) {
+        if (key == null) {
+            putForNullKey(value);
+            return;
+        }
 
+        int index = indexFor(key.hashCode(), table.length);
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (key.equals(node.key)) {
+                node.value = value;
+                return;
+            }
+            node = node.next;
+        }
+
+        addNode(key, value, index);
     }
 
     @Override
     public V getValue(K key) {
+        if (key == null) {
+            Node<K, V> node = table[0];
+            while (node != null) {
+                if (Objects.equals(key, node.key)) {
+                    return node.value;
+                }
+                node = node.next;
+            }
+        }
+
+        int index = indexFor(key.hashCode(), table.length);
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (Objects.equals(key, node.key)) {
+                return node.value;
+            }
+            node = node.next;
+        }
+
         return null;
     }
 
     @Override
     public int getSize() {
-        return 0;
+        return size;
+    }
+
+    private int hash(int h) {
+        h ^= (h >>> 20) ^ (h >>> 12);
+        return h ^ (h >>> 7) ^ (h >>> 4);
+    }
+
+    private int indexFor(int hash, int length) {
+        return hash & (length - 1);
+    }
+
+    private void addNode(K key, V value, int index) {
+        Node<K, V> node = table[index];
+        table[index] = new Node<>(key, value, node);
+        size++;
+        if (size > table.length * loadFactor) {
+            resize(table.length * 2);
+        }
+    }
+
+    private void putForNullKey(V value) {
+        Node<K, V> node = table[0];
+        while (node != null) {
+            if (node.key == null) {
+                node.value = value;
+                return;
+            }
+            node = node.next;
+        }
+        addNode(null, value, 0);
+    }
+
+    private void resize(int newCapacity) {
+        Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
+        transfer(newTable);
+    }
+
+    private void transfer(Node<K, V>[] newTable) {
+        for (Node<K, V> node : table) {
+            while (node != null) {
+                if (node.key == null) {
+                    Node<K, V> nextNode = newTable[0];
+                    newTable[0] = new Node<>(null, node.value, nextNode);
+                }
+
+                int newIndex = indexFor(node.key.hashCode(), newTable.length);
+                Node<K, V> nextNode = newTable[newIndex];
+                newTable[newIndex] = new Node<>(node.key, node.value, nextNode);
+
+                node = node.next;
+            }
+        }
+        table = newTable;
+    }
+
+    private class Node<K, V> {
+        K key;
+        V value;
+        Node<K, V> next;
+
+        Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+            next = null;
+        }
+
+        Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
