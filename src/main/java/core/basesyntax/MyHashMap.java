@@ -8,22 +8,22 @@ import java.util.Objects;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    final int defaultCapacity = 16;
-    final float loadFactor = 0.75f;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
-    private int treshhold;
+    private float treshhold;
 
     MyHashMap() {
-        table = new Node[defaultCapacity];
-        treshhold = (int)(table.length * loadFactor);
+        table = new Node[DEFAULT_CAPACITY];
+        treshhold = table.length * LOAD_FACTOR;
         size = 0;
     }
 
     @Override
     public void put(K key, V value) {
         if (size == treshhold) {
-            reSize();
+            resize();
         }
         Node<K, V> element = getNodeByIndex(key, indexFor(key));
         if (element != null) {
@@ -38,10 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> element = getNodeByIndex(key, indexFor(key));
-        if (element != null) {
-            return element.value;
-        }
-        return null;
+        return (element != null) ? element.value : null;
     }
 
     @Override
@@ -49,7 +46,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void reSize() {
+    private void resize() {
         Node<K, V>[] temp = table;
         table = new Node[temp.length * 2];
         size = 0;
