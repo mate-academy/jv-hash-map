@@ -33,7 +33,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node = node.next;
         }
-        Node<K, V> newNode = new Node<>(key, value, array[index]);
+        Node<K, V> newNode = new Node<>(key, value);
+        newNode.next = array[index];
         array[index] = newNode;
         size++;
     }
@@ -77,10 +78,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         V value;
         Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
