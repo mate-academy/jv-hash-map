@@ -5,70 +5,66 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
     private static final int INITIAL_CAPACITY = 16;
     private int threshold;
-    private int capacity;
     private int size;
     private Node<K, V>[] table;
 
     public MyHashMap() {
         table = new Node[INITIAL_CAPACITY];
         threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
-        capacity = INITIAL_CAPACITY;
     }
 
     @Override
     public void put(K key, V value) {
-        if (isEnoughSpace(size) == false) {
-            resize(capacity);
+        if (!isEnoughSpace(size)) {
+            resize();
         }
-        if (key == null) {
-            putForNullKey(value);
-        } else {
-            int h = hash(key);
-            int index = indexFor(h, capacity);
-            Node<K, V> nodes = table[index];
-            while (nodes != null) {
-                if (nodes.key != null && nodes.key.equals(key)) {
-                    nodes.value = value;
-                    return;
-                }
-                nodes = nodes.next;
-            }
-            addNode(key, value, index);
-            size++;
-        }
-    }
-
-    private void putForNullKey(V value) {
-        Node<K, V> node = table[0];
-        while (node != null) {
-            if (node.key == null) {
-                node.value = value;
+        int index = indexFor(key);
+        Node<K, V> nodes = table[index];
+        while (nodes != null) {
+            if (nodes.key == key
+                    || (nodes.key != null && nodes.key.equals(key))) {
+                nodes.value = value;
                 return;
             }
-            node = node.next;
+            nodes = nodes.next;
         }
-        addNode(null, value, 0);
+        Node<K, V> node = table[index];
+        table[index] = new Node<>(key, value, node);
         size++;
     }
 
-    private int hash(K key) {
-        int h = key.hashCode();
-        h ^= (h >>> 20) ^ (h >>> 12);
-        return h ^ (h >>> 7) ^ (h >>> 4);
-    }
-
-    private int indexFor(int h, int length) {
-        return h & (length - 1);
-    }
-
-    private void addNode(K key, V value, int index) {
+    @Override
+    public V getValue(K key) {
+        int index = indexFor(key);
         Node<K, V> node = table[index];
-        table[index] = new Node<>(key, value, node);
+        while (node != null) {
+            if (node.key == key
+                    || (node.key != null && node.key.equals(key))) {
+                return node.value;
+            }
+            node = node.next;
+        }
+        return null;
     }
 
-    private void resize(int newCapacity) {
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    private int indexFor(K key) {
+        if (key == null) {
+            return 0;
+        }
+        int hash = key.hashCode();
+        hash ^= (hash >>> 20) ^ (hash >>> 12);
+        hash ^= hash ^ (hash >>> 7) ^ (hash >>> 4);
+        return hash & (table.length - 1);
+    }
+
+    private void resize() {
         Node<K, V>[] oldTable = table;
-        Node<K, V>[] newTable = new Node[newCapacity];
+        Node<K, V>[] newTable = new Node[table.length * 2];
         table = newTable;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
@@ -76,50 +72,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node = node.next;
             }
         }
-        threshold = (int) (newCapacity * LOAD_FACTOR);
-    }
-
-    @Override
-    public V getValue(K key) {
-        if (key == null) {
-            V v = getForNullKey();
-            return v;
-        }
-        int h = hash(key);
-        int index = indexFor(h, capacity);
-        Node<K, V> node = table[index];
-        while (node != null) {
-            if (node.key != null && node.key.equals(key)) {
-                return node.value;
-            }
-            node = node.next;
-        }
-        return null;
-    }
-
-    private V getForNullKey() {
-        Node<K, V> node = table[0];
-        while (node != null) {
-            if (node.key == null) {
-                return node.value;
-            }
-            node = node.next;
-        }
-        return null;
+        threshold = (int) (newTable.length * LOAD_FACTOR);
     }
 
     private boolean isEnoughSpace(int length) {
         if (length <= threshold) {
             return true;
         }
-        capacity = capacity * 2;
         size = 0;
         return false;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
     }
 
     private static class Node<K, V> {
