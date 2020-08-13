@@ -13,7 +13,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V>[] nodes;
     private int size;
-    private float threshold;
 
     public MyHashMap() {
         nodes = new Node[DEFAULT_CAPACITY];
