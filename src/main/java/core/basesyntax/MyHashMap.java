@@ -12,7 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOADFACTOR = 0.75f;
     private static final int CAPACITY = 16;
     private int threshold;
-    private int size = 0;
+    private int size;
     private Node<K, V>[] table;
 
     public MyHashMap() {
@@ -20,14 +20,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.threshold = (int) (CAPACITY * LOADFACTOR);
     }
 
-    private int findIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
-    }
-
     @Override
     public void put(K key, V value) {
         if (size == threshold) {
-            ensureCapa();
+            ensureCapacity();
         }
         int index = findIndex(key);
         Node<K, V> node = getNode(key, index);
@@ -40,7 +36,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void ensureCapa() {
+    private void ensureCapacity() {
         Node<K, V>[] oldArray = table;
         table = (Node<K, V>[]) new Node[oldArray.length * 2];
         size = 0;
@@ -78,6 +74,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             node = node.next;
         }
         return null;
+    }
+
+    private int findIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private static class Node<K, V> {
