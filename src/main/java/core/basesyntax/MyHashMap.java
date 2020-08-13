@@ -43,11 +43,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Entry<K, V> currentEntry = table[index];
         while (currentEntry != null) {
             if (Objects.equals(currentEntry.key, key)) {
-                return currentEntry.value
+                return currentEntry.value;
             }
             currentEntry = currentEntry.next;
         }
-        return currentEntry;
+        return null;
     }
 
     @Override
