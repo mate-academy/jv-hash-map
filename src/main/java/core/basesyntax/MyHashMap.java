@@ -10,6 +10,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
+    private static final int STEP_INCREASE_CAPACITY = 2;
     private int threshold;
     private int size;
     private Node<K, V>[] map;
@@ -59,11 +60,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int stepIncreaseCapacity = 2;
-        Node<K, V>[] newMap = new Node[DEFAULT_CAPACITY * stepIncreaseCapacity];
         size = 0;
         Node<K, V>[] oldMap = map;
-        map = newMap;
+        map = new Node[DEFAULT_CAPACITY * STEP_INCREASE_CAPACITY];;
         for (Node<K, V> value : oldMap) {
             while (value != null) {
                 put(value.key, value.value);
@@ -74,7 +73,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getNodeIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % map.length);
-
     }
 
     private Node<K, V> searchNode(K key, int nodeIndex) {
