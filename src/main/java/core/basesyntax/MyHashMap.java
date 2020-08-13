@@ -8,34 +8,50 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
-    private int capacity;
     private int size;
-    private Node<K, V>[] map;
+    private Node<K, V>[] baskets;
 
     public MyHashMap() {
-        size = 0;
-        map = new Node[DEFAULT_CAPACITY];
-        capacity = DEFAULT_CAPACITY;
+        baskets = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         resize();
-        Node<K, V> currentNode = findNode(key);
-        if (currentNode == null) {
-            Node<K, V> newNode = new Node<>(key, value);
-            map[size + 1] = newNode;
+        int index = getIndex(key);
+        Node<K,V> newNode = new Node<>(key, value, null);
+        if (baskets[index] == null) {
+            baskets[index] = newNode;
             size++;
-        } else {
-            currentNode.value = value;
+            return;
         }
+        Node<K,V> oldNode = baskets[index];
+        if (oldNode.key == key || oldNode.key != null && oldNode.key.equals(key)) {
+            oldNode.value = value;
+            return;
+        }
+        while (oldNode.next != null) {
+            if (oldNode.key == key || oldNode.key != null && oldNode.key.equals(key)) {
+                oldNode.value = value;
+                return;
+            }
+            oldNode = oldNode.next;
+        }
+        oldNode.next = newNode;
+        size++;
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = findNode(key);
-        if (currentNode != null) {
-            return currentNode.value;
+        int index = getIndex(key);
+        Node<K, V> currentNode = baskets[index];
+        while (currentNode != null) {
+            if (currentNode.key == key
+                    || currentNode.key != null
+                    && currentNode.key.equals(key)) {
+                return currentNode.value;
+            }
+            currentNode = currentNode.next;
         }
         return null;
     }
@@ -45,35 +61,33 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private Node<K, V> findNode(K newKey) {
-        for (Node<K, V> node : map) {
-            if (node != null) {
-                if (node.key == newKey || node.key != null && node.key.equals(newKey)) {
-                    return node;
+    private void resize() {
+        if (size >= baskets.length * DEFAULT_LOAD_FACTOR) {
+            Node<K, V>[] oldBaskets = baskets;
+            baskets = new Node[baskets.length * 2];
+            size = 0;
+            for (Node<K, V> node : oldBaskets) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
                 }
             }
         }
-        return null;
     }
 
-    private void resize() {
-        if (size >= DEFAULT_LOAD_FACTOR * capacity) {
-            Node<K, V>[] newMap = new Node[capacity * 2];
-            if (capacity >= 0) {
-                System.arraycopy(map, 0, newMap, 0, capacity);
-            }
-            map = newMap;
-            capacity *= 2;
-        }
+    private int getIndex(Object key) {
+        return key == null ? 0 : (key.hashCode() & baskets.length - 1);
     }
 
     private static class Node<K, V> {
         K key;
         V value;
+        Node<K, V> next;
 
-        public Node(K key, V value) {
+        Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
+            this.next = next;
         }
     }
 }
