@@ -6,25 +6,22 @@ package core.basesyntax;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_CAPACITY = 1 << 4;
+    private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTORY = 0.75;
 
     private Node<K, V>[] table;
-    private int capacity;
-    private int size;
+    private int size = 0;
 
     public MyHashMap() {
-        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
-        capacity = DEFAULT_CAPACITY;
-        size = 0;
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= capacity * LOAD_FACTORY) {
+        if (size >= table.length * LOAD_FACTORY) {
             resize();
         }
-        int index = key == null ? 0 : indexFor(hash(key.hashCode()));
+        int index = key == null ? 0 : indexFor(key);
         Node<K, V> temp = table[index];
         if (temp == null) {
             table[index] = new Node<>(key, value, null);
@@ -48,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = key == null ? 0 : indexFor(hash(key.hashCode()));
+        int index = key == null ? 0 : indexFor(key);
         Node<K, V> temp = table[index];
         while (temp != null) {
             if (key != null ? key.equals(temp.key) : temp.key == null) {
@@ -64,19 +61,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(int h) {
-        h ^= (h >>> 20) ^ (h >>> 12);
-        return h ^ (h >>> 7) ^ (h >>> 4);
-    }
-
-    private int indexFor(int hash) {
-        return hash & (capacity - 1);
+    private int indexFor(K key) {
+        return key == null ? null : key.hashCode() & (table.length - 1);
     }
 
     private void resize() {
-        capacity = capacity * 2;
         Node<K, V>[] oldTable = table;
-        table = (Node<K, V>[]) new Node[capacity];
+        table = new Node[oldTable.length * 2];
         size = 0;
         for (int i = 0; i < oldTable.length; i++) {
             Node<K, V> temp = oldTable[i];
