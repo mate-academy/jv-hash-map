@@ -23,30 +23,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        Node<K, V> temp = table[indexFor(key)];
-        if (temp == null) {
-            temp = new Node(key, value, null);
+        Node<K, V> temp;
+        if (table[indexFor(key)] == null) {
+            table[indexFor(key)] = new Node<K, V>(key, value, null);
         } else {
-            if (Objects.equals(temp.key, key)) {
+            temp = table[indexFor(key)];
+            if (Objects.equals(key, temp.key)) {
                 temp.value = value;
                 return;
             }
-            while (temp != null || Objects.equals(key, temp.key)) {
-                if (key == null && temp.key == null || Objects.equals(key, temp.key)) {
+            while (temp != null) {
+                if (Objects.equals(key, temp.key)) {
                     temp.value = value;
                     return;
                 }
                 temp = temp.next;
             }
-            temp.next = new Node<>(key, value, null);
+            temp = new Node<>(key, value, table[indexFor(key)]);
+            table[indexFor(key)] = temp;
         }
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        for (Node<K, V> node = table[indexFor(key)]; node != null;
-             node = node.next) {
+        for (Node<K, V> node = table[indexFor(key)]; node != null; node = node.next) {
             if (Objects.equals(node.key, key)) {
                 return node.value;
             }
@@ -61,6 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         if (size > threshold) {
+            size = 0;
             Node<K, V>[] oldTable = table;
             table = new Node[oldTable.length * 2];
             threshold = (int) (table.length * LOAD_FACTOR);
@@ -74,7 +76,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int indexFor(K key) {
-        return key == null ? 0 : (key.hashCode()) & (table.length - 1);
+        return key == null ? 0 : Math.abs((key.hashCode())) % (table.length - 1);
     }
 
     private static class Node<K, V> {
