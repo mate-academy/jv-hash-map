@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
@@ -21,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K, V> node = new Node<>(key, value, null);
-        int index = hash(key);
+        int index = indexOf(key);
 
         if (size >= threshold) {
             resize();
@@ -32,7 +34,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> tmp = table[index];
             while (tmp != null) {
-                if (tmp.key == key || tmp.key != null && tmp.key.equals(key)) {
+                if (Objects.equals(tmp.key, key)) {
                     tmp.value = value;
                     return;
                 }
@@ -49,14 +51,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = hash(key);
+        int index = indexOf(key);
 
         if (table[index] == null) {
             return null;
         }
         Node<K, V> tmp = table[index];
         while (tmp.next != null) {
-            if (tmp.key == key || tmp.key != null && tmp.key.equals(key)) {
+            if (Objects.equals(tmp.key, key)) {
                 return tmp.value;
             }
             tmp = tmp.next;
@@ -85,7 +87,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hash(K key) {
+    private int indexOf(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
