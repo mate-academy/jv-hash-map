@@ -8,26 +8,13 @@ import java.util.Objects;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int initialCapacity = 16;
     private static final double loadFactor = 0.75;
+    private int initialCapacity = 16;
     private int elementCount;
-    private Cell[] hashMap;
+    private Cell<K, V>[] hashMap;
 
     public MyHashMap() {
         hashMap = new Cell[initialCapacity];
-    }
-
-    private void resize() {
-        elementCount = 0;
-        Cell<K, V>[] oldHashMap = hashMap;
-        hashMap = new Cell[hashMap.length * 2];
-        for (Cell cell : oldHashMap) {
-            while (cell != null) {
-                put((K) cell.key, (V) cell.getValue());
-                cell = cell.next;
-            }
-        }
-        getSize();
     }
 
     @Override
@@ -37,7 +24,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Cell<K, V> currentCell = getCell(key);
         if (currentCell == null) {
-            hashMap[getCellNumber(key)] = new Cell<>(key, value, hashMap[getCellNumber(key)]);
+            int bucket = getCellNumber(key);
+            hashMap[bucket] = new Cell<>(key, value, hashMap[bucket]);
             elementCount++;
         } else {
             currentCell.value = value;
@@ -46,10 +34,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Cell currentCell = hashMap[getCellNumber(key)];
+        Cell<K, V> currentCell = hashMap[getCellNumber(key)];
         while (currentCell != null) {
             if (Objects.equals(currentCell.getKey(), key)) {
-                return (V) currentCell.getValue();
+                return currentCell.getValue();
             }
             currentCell = currentCell.next;
         }
@@ -61,8 +49,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return elementCount;
     }
 
+    private void resize() {
+        elementCount = 0;
+        Cell<K, V>[] oldHashMap = hashMap;
+        hashMap = new Cell[hashMap.length * 2];
+        for (Cell<K, V> cell : oldHashMap) {
+            while (cell != null) {
+                put(cell.getKey(), cell.getValue());
+                cell = cell.next;
+            }
+        }
+    }
+
     private int getCellNumber(K key) {
-        return key == null ? 0 : (Math.abs(key.hashCode()) - 1) % initialCapacity + 1;
+        return key == null ? 0 : (Math.abs(key.hashCode())) % initialCapacity + 1;
     }
 
     private Cell<K, V> getCell(K key) {
@@ -76,7 +76,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private class Cell<K, V> {
+    private static class Cell<K, V> {
         private K key;
         private V value;
         private Cell<K, V> next;
@@ -93,10 +93,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         public K getKey() {
             return key;
-        }
-
-        public int getSize() {
-            return elementCount;
         }
     }
 }
