@@ -12,11 +12,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] buckets;
     private int size;
-    private float threshold;
+    private int threshold;
 
     public MyHashMap() {
         buckets = new Node[DEFAULT_CAPACITY];
-        threshold = DEFAULT_CAPACITY * LOAD_FACTOR;
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
@@ -74,6 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 bucket = bucket.next;
             }
         }
+        threshold = (int) (buckets.length * LOAD_FACTOR);
     }
 
     private Node<K, V> getLastLinkedValue(Node<K, V> node) {
