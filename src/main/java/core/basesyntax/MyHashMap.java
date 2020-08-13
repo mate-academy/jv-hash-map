@@ -101,14 +101,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 if (Objects.equals(node, newNode)) {
                     return true;
                 }
-                if (node.next != null) {
-                    Node<K, V> collisionNode = node;
-                    while (collisionNode.next != null) {
-                        if (Objects.equals(collisionNode, newNode)) {
-                            return true;
-                        }
-                        collisionNode = collisionNode.next;
+                Node<K, V> collisionNode = node;
+                while (collisionNode.next != null) {
+                    if (Objects.equals(collisionNode, newNode)) {
+                        return true;
                     }
+                    collisionNode = collisionNode.next;
                 }
             }
         }
