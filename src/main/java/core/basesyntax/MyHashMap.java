@@ -15,17 +15,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
 
     public MyHashMap() {
-        this.table = new Node[DEFAULT_INITIAL_CAPACITY];
-        this.threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
+        threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value);
-        int bucket = (table.length - 1) & hash(newNode.key);
-        Node<K, V> node = table[bucket];
+        int index = (table.length - 1) & hash(key);
+        Node<K, V> node = table[index];
         if (node == null) {
-            table[bucket] = newNode;
+            table[index] = newNode;
         } else {
             while (node.next != null || Objects.equals(node.key, newNode.key)) {
                 if (Objects.equals(node.key, newNode.key)) {
@@ -36,7 +36,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node.next = newNode;
         }
-        if (++size > threshold) {
+        if (size++ > threshold) {
             resize();
         }
     }
@@ -87,7 +87,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(Object key) {
-        int hash;
-        return (key == null) ? 0 : (hash = key.hashCode()) ^ (hash >>> 16);
+        return (key == null) ? 0 : key.hashCode();
     }
 }
