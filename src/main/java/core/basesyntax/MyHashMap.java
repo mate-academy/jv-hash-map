@@ -19,17 +19,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         bucket = new Node[DEFAULT_CAPACITY];
     }
 
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         int index = indexFor(key);
@@ -71,7 +60,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public int getSize() {
-        return this.size;
+        return size;
     }
 
     private int hashGen(K key) {
@@ -82,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.abs(hashGen(key) % bucket.length);
     }
 
-    void resize() {
+    private void resize() {
         size = 0;
         Node<K, V>[] oldBucket = bucket;
         bucket = new Node[oldBucket.length * 2];
@@ -91,6 +80,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 put(node.key, node.value);
                 node = node.next;
             }
+        }
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value) {
+            this.key = key;
+            this.value = value;
         }
     }
 }
