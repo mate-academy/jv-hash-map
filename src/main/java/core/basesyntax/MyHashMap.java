@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
@@ -19,19 +21,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         resize();
         int index = getIndex(key);
-        Node<K,V> newNode = new Node<>(key, value, null);
+        Node<K,V> newNode = new Node<>(key, value);
         if (baskets[index] == null) {
             baskets[index] = newNode;
             size++;
             return;
         }
         Node<K,V> oldNode = baskets[index];
-        if (oldNode.key == key || oldNode.key != null && oldNode.key.equals(key)) {
+        if (Objects.equals(oldNode.key, key)) {
             oldNode.value = value;
             return;
         }
         while (oldNode.next != null) {
-            if (oldNode.key == key || oldNode.key != null && oldNode.key.equals(key)) {
+            if (Objects.equals(oldNode.key, key)) {
                 oldNode.value = value;
                 return;
             }
@@ -46,9 +48,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Node<K, V> currentNode = baskets[index];
         while (currentNode != null) {
-            if (currentNode.key == key
-                    || currentNode.key != null
-                    && currentNode.key.equals(key)) {
+            if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
@@ -84,10 +84,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         V value;
         Node<K, V> next;
 
-        Node(K key, V value, Node<K, V> next) {
+        Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
