@@ -9,7 +9,7 @@ import java.util.Objects;
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int CAPACITY = 16;
-    private static final double LOAD_LEVEL = 0.75;
+    private static final double LOAD_FACTOR = 0.75;
     private Node<K, V>[] table;
     private int size;
 
@@ -19,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= table.length * LOAD_LEVEL) {
+        if (size >= table.length * LOAD_FACTOR) {
             resize();
         }
         int index = findIndex(key);
@@ -30,11 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        if (Objects.equals(key, node.key)) {
-            node.value = value;
-            return;
-        }
-        while (node.next != null) {
+        while (node.next != null || Objects.equals(key, node.key)) {
             if (Objects.equals(key, node.key)) {
                 node.value = value;
                 return;
@@ -65,7 +61,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int findIndex(K key) {
         if (key != null) {
-            return ((key.hashCode() & (table.length - 1)));
+            return key.hashCode() & (table.length - 1);
         }
         return 0;
     }
@@ -82,7 +78,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    class Node<K, V> {
+    private class Node<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
