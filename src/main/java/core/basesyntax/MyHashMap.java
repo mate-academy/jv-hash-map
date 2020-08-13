@@ -17,28 +17,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         checkSize();
-        Node<K, V> node;
         int index = getIndex(key);
-        if (storage[index] == null) {
-            storage[index] = new Node<>(key, value, null);
-            size++;
-            return;
-        }
-        node = storage[index];
-        if (node.key == null || node.key.equals(key)) {
-            node.value = value;
-            return;
-        }
-        while (node.next != null) {
-            node = node.next;
-            if (node.key.equals(key)) {
-                node.value = value;
-                return;
+        Node<K, V> currentNode = storage[index];
+        while (currentNode != null) {
+            if (key == currentNode.key || currentNode.key != null && currentNode.key.equals(key)) {
+                break;
             }
+            currentNode = currentNode.next;
         }
-        node = new Node<>(key, value, storage[index]);
-        storage[index] = node;
-        size++;
+        if (currentNode != null) {
+            currentNode.value = value;
+        } else {
+            Node<K, V> newNode = new Node<>(key, value, storage[index]);
+            storage[index] = newNode;
+            size++;
+        }
     }
 
     @Override
@@ -64,29 +57,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private boolean checkSize() {
+    private void checkSize() {
         if (size >= threshold) {
             resize();
-            return true;
         }
-        return false;
     }
 
     private int getIndex(K key) {
-        if (key == null) {
-            return 0;
-        }
-        if (key.hashCode() == 0) {
-            return 1;
-        }
-        return Math.abs(key.hashCode()) % storage.length;
+        return key == null ? 0 : Math.abs(key.hashCode()) % storage.length;
     }
 
     private void resize() {
-        Node<K, V>[] oldStorage = new Node[storage.length];
-        threshold = (int) (storage.length * 2 * LOAD_FACTOR);
-        System.arraycopy(storage, 0, oldStorage, 0, storage.length);
+        Node<K, V>[] oldStorage = storage;
         storage = new Node[storage.length * 2];
+        threshold = (int) (storage.length * LOAD_FACTOR);
         Node<K, V> node;
         size = 0;
         for (int i = 0; i < oldStorage.length; i++) {
