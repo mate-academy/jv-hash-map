@@ -56,10 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        if (key != null) {
-            return Math.abs(key.hashCode()) % table.length;
-        }
-        return 0;
+        return key != null ? Math.abs(key.hashCode()) % table.length : 0;
     }
 
     private void resize() {
