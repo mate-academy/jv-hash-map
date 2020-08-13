@@ -58,7 +58,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public int getSize() {
-        //System.out.println(elementCount);
         return elementCount;
     }
 
