@@ -28,11 +28,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = hashIndex(key);
         if (storage[index] != null) {
             Node<K, V> node = storage[index];
-            if (putWithKey(key, value, (Node<K, V>) node)) return;
+            if (putWithKey(key, value, (Node<K, V>) node)) {
+                return;
+            }
             if (!Objects.equals(node.key, key)) {
                 while (node.next != null) {
                     node = node.next;
-                    if (putWithKey(key, value, node)) return;
+                    if (putWithKey(key, value, node)) {
+                        return;
+                    }
                 }
                 linkLast(node, key, value);
             }
