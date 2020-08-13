@@ -43,7 +43,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 linkLast(node, key, value);
             }
-
         } else {
             storage[index] = new Node<>(key, value);
         }
@@ -113,7 +112,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return false;
     }
 
-    private void linkLast (Node<K, V> node, K key, V value) {
+    private void linkLast(Node<K, V> node, K key, V value) {
         node.next = new Node<>(key, value);
     }
 
