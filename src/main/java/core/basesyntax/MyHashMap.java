@@ -35,11 +35,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
             if (!Objects.equals(node.key, key)) {
                 while (node.next != null) {
+                    node = node.next;
                     if (Objects.equals(node.key, key)) {
                         node.value = value;
                         return;
                     }
-                    node = node.next;
                 }
                 linkLast(node, key, value);
             }
