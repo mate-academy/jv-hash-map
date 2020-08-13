@@ -7,13 +7,13 @@ package core.basesyntax;
  */
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int ARRAY_LENGTH = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTORY = 0.75d;
     private Node<K, V>[] buckets;
     private int size = 0;
 
     public MyHashMap() {
-        buckets = new Node[ARRAY_LENGTH];
+        buckets = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -74,7 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return 0;
         }
-        return (key.hashCode() & (buckets.length - 1));
+        return key.hashCode() & (buckets.length - 1);
     }
 
     private void resize() {
