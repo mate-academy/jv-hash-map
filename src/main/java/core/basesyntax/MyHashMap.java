@@ -7,16 +7,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private Node<K, V>[] buckets;
     private int size;
-    private int capacity;
+    private int threshold;
 
     public MyHashMap() {
         buckets = new Node[DEFAULT_CAPACITY];
-        capacity = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size == capacity) {
+        if (size == threshold) {
             resize();
         }
         int index = getIndex(key);
