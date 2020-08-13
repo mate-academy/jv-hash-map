@@ -6,8 +6,8 @@ package core.basesyntax;
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_CAPACITY = 16;
-    static final double LOAD_FACTOR = 0.75;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final double LOAD_FACTOR = 0.75;
     private double threshold;
 
     private Node<K, V>[] table;
@@ -21,10 +21,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         checkCapacity();
-
-        int bucket = getHash(key) % DEFAULT_CAPACITY;
+        int bucket = getHash(key) % table.length;
         if (table[bucket] == null) {
-            table[bucket] = new Node(getHash(key), key, value, null);
+            table[bucket] = new Node(key, value, null);
             size++;
             return;
         }
@@ -32,39 +31,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (current.key == null || current.key.equals(key)) {
             current.value = value;
             return;
-        } else {
-            while (current.next != null) {
-                if (key == current.key || key != null && key.equals(current.key)) {
-                    current.value = value;
-                    return;
-                } else {
-                    current = current.next;
-                }
-            }
         }
-        Node newNode = new Node(getHash(key), key, value, null);
-        current.next = newNode;
-        size++;
+        while (current.next != null) {
+            if (key == current.key || key != null && key.equals(current.key)) {
+                current.value = value;
+                return;
+            }
+            current = current.next;
+        }
 
+        current.next = new Node(key, value, null);;
+        size++;
     }
 
     @Override
     public V getValue(K key) {
-        int bucket = getHash(key) % DEFAULT_CAPACITY;
+        int bucket = getHash(key) % table.length;
         Node current = table[bucket];
         if (current != null) {
-            while (current.next != null) {
+            while (current != null) {
                 if (key == current.key || key != null && key.equals(current.key)) {
                     return (V) current.value;
-                } else {
-                    current = current.next;
                 }
+                current = current.next;
             }
-        } else {
-            return null;
         }
-
-        return (V) current.value;
+        return null;
     }
 
     @Override
@@ -97,13 +89,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     static class Node<K, V> {
-        final int hash;
         final K key;
         V value;
         Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
