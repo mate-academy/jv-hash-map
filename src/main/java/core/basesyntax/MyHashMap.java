@@ -68,19 +68,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] oldStorage = storage;
-        storage = new Node[storage.length * 2];
-        threshold = (int) (storage.length * LOAD_FACTOR);
-        Node<K, V> node;
+        Node<K, V>[] newStorage = new Node[storage.length * 2];
+        threshold = (int)(newStorage.length * LOAD_FACTOR);
         size = 0;
-        for (int i = 0; i < oldStorage.length; i++) {
-            if (oldStorage[i] != null) {
-                node = oldStorage[i];
-                put(node.key, node.value);
-                while (node.next != null) {
-                    node = node.next;
-                    put(node.key, node.value);
-                }
+        Node<K, V>[] oldBuckets = storage;
+        storage = newStorage;
+        for (Node<K, V> oldNode : oldBuckets) {
+            while (oldNode != null) {
+                put(oldNode.key, oldNode.value);
+                oldNode = oldNode.next;
             }
         }
     }
