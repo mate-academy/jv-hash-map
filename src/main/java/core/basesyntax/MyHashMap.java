@@ -39,15 +39,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public V remove(K key) {
-        int basket = getHash(key) % table.length;
+        int index = getHash(key) % table.length;
         Node<K, V> prevBasketNode = null;
-        Node<K, V> currentBNode = table[basket];
+        Node<K, V> currentBNode = table[index];
         while (currentBNode != null) {
             if (Objects.equals(currentBNode.key, key)) {
                 if (prevBasketNode != null) {
                     prevBasketNode.next = currentBNode.next;
                 } else {
-                    table[basket] = currentBNode.next;
+                    table[index] = currentBNode.next;
                 }
                 size--;
                 return currentBNode.value;
