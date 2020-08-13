@@ -28,18 +28,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = hashIndex(key);
         if (storage[index] != null) {
             Node<K, V> node = storage[index];
-            if (Objects.equals(node.key, key)) {
-                node.value = value;
-                return;
-            }
-
+            if (putWithKey(key, value, (Node<K, V>) node)) return;
             if (!Objects.equals(node.key, key)) {
                 while (node.next != null) {
                     node = node.next;
-                    if (Objects.equals(node.key, key)) {
-                        node.value = value;
-                        return;
-                    }
+                    if (putWithKey(key, value, node)) return;
                 }
                 linkLast(node, key, value);
             }
@@ -47,7 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             storage[index] = new Node<>(key, value);
         }
         size++;
-        capacityCheck();
+        resize();
     }
 
     @Override
@@ -71,7 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key != null ? Math.abs(key.hashCode() % currentCapacity) : 0;
     }
 
-    private void capacityCheck() {
+    private void resize() {
         if (size > (storage.length * LOAD_FACTOR)) {
             size = 0;
             currentCapacity *= 2;
@@ -86,11 +79,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private boolean putWithKey(K key, V value, Node<K, V> node) {
+        if (Objects.equals(node.key, key)) {
+            node.value = value;
+            return true;
+        }
+        return false;
+    }
+
     private boolean suchElementExists(K key, V value) {
         if (size == 0) {
             return false;
         }
-
         for (Node<K, V> node : storage) {
             if (node != null) {
                 Node<K, V> newNode = new Node<>(key, value);
@@ -108,7 +108,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-
         return false;
     }
 
