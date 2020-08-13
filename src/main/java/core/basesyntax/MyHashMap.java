@@ -78,26 +78,4 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        MyHashMap<?, ?> myHashMap = (MyHashMap<?, ?>) o;
-        return Float.compare(myHashMap.LOAD_FACTOR, LOAD_FACTOR) == 0
-                && DEFAULT_CAPACITY == myHashMap.DEFAULT_CAPACITY
-                && size == myHashMap.size
-                && Arrays.equals(table, myHashMap.table);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Objects.hash(LOAD_FACTOR, DEFAULT_CAPACITY, size);
-        result = 31 * result + Arrays.hashCode(table);
-        return result;
-    }
 }
