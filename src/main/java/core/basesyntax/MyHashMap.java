@@ -62,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getCellNumber(K key) {
-        return key == null ? 0 : (key.hashCode() & hashMap.length - 1);
+        return key == null ? 0 : key.hashCode() & (hashMap.length - 1);
     }
 
     private Cell<K, V> getCell(K key) {
