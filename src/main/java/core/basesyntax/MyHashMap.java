@@ -8,15 +8,15 @@ import java.util.Objects;
  */
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private int size;
-    private final double loadFactor = 0.75;
-    private final int defaultDefinition = 16;
-    private Node<K, V>[] bucket;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final double LOAD_FACTOR = 0.75;
+    private Node<K, V>[] nodes;
     private int threshold;
+    private int size;
 
     public MyHashMap() {
-        bucket = new Node[defaultDefinition];
-        threshold = (int) (defaultDefinition * loadFactor);
+        nodes = new Node[DEFAULT_CAPACITY];
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
@@ -26,12 +26,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int index = indexFor(key);
         Node<K, V> node = new Node<>(key, value);
-        if (bucket[index] == null) {
-            bucket[index] = node;
+        if (nodes[index] == null) {
+            nodes[index] = node;
             size++;
             return;
         }
-        Node<K, V> currentNode = bucket[index];
+        Node<K, V> currentNode = nodes[index];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, node.key)) {
                 currentNode.value = node.value;
@@ -46,26 +46,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void resize() {
-        size = 0;
-        Node<K, V>[]tempBucket = bucket;
-        bucket = (Node<K, V>[]) new Node[bucket.length * 2];
-        threshold = (int) (bucket.length * loadFactor);
-        for (Node<K, V> node : tempBucket) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
-            }
-        }
-    }
-
     @Override
     public V getValue(K key) {
         int index = indexFor(key);
-        Node<K, V> currentNode = bucket[index];
+        Node<K, V> currentNode = nodes[index];
         while (currentNode != null) {
-            if ((currentNode.key == key)
-                    || (currentNode.key != null && currentNode.key.equals(key))) {
+            if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
@@ -79,10 +65,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public int indexFor(K key) {
-        return key == null ? 0 : (key.hashCode()) & (bucket.length - 1);
+        return key == null ? 0 : (key.hashCode()) & (nodes.length - 1);
     }
 
-    private class Node<K, V> {
+    private void resize() {
+        size = 0;
+        Node<K, V>[]tempBucket = nodes;
+        nodes = (Node<K, V>[]) new Node[nodes.length * 2];
+        threshold = (int) (nodes.length * LOAD_FACTOR);
+        for (Node<K, V> node : tempBucket) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
+        }
+    }
+
+    private static class Node<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
