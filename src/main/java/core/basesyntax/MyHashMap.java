@@ -60,9 +60,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        size = 0;
         Node<K, V>[] oldMap = map;
-        map = new Node[DEFAULT_CAPACITY * STEP_INCREASE_CAPACITY];;
+        map = new Node[DEFAULT_CAPACITY * STEP_INCREASE_CAPACITY];
+        size = 0;
         for (Node<K, V> value : oldMap) {
             while (value != null) {
                 put(value.key, value.value);
