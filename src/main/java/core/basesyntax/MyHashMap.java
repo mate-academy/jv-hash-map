@@ -9,12 +9,12 @@ import java.util.Objects;
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
-    private int initialCapacity = 16;
+    private static final int INITIAL_CAPACITY = 16;
     private int elementCount;
     private Cell<K, V>[] hashMap;
 
     public MyHashMap() {
-        hashMap = new Cell[initialCapacity];
+        hashMap = new Cell[INITIAL_CAPACITY];
     }
 
     @Override
@@ -62,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getCellNumber(K key) {
-        return key == null ? 0 : (Math.abs(key.hashCode())) % hashMap.length + 1;
+        return key == null ? 0 : (key.hashCode() & hashMap.length - 1);
     }
 
     private Cell<K, V> getCell(K key) {
