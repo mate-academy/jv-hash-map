@@ -17,13 +17,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= table.length * LOAD_FACTOR) {
             resize();
         }
-        Node<K, V> keyN = findNode(key);
-        if (keyN == null) {
-            int basket = getHash(key) % table.length;
-            table[basket] = new Node<>(key, value, table[basket]);
+        Node<K, V> nodeFromTable = findNode(key);
+        if (nodeFromTable == null) {
+            int index = getHash(key) % table.length;
+            table[index] = new Node<>(key, value, table[index]);
             size++;
         } else {
-            keyN.value = value;
+            nodeFromTable.value = value;
         }
     }
 
@@ -113,7 +113,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
