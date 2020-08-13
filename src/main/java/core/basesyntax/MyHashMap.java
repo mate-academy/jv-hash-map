@@ -34,11 +34,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = findTheIndex(key);
-        Node currentNode = array[index];
+        Node<K, V> currentNode = array[index];
         while (currentNode != null) {
             if ((currentNode.key == key)
                     || (currentNode.key != null && currentNode.key.equals(key))) {
-                return (V) currentNode.value;
+                return currentNode.value;
             }
             currentNode = currentNode.next;
         }
