@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         checkCapacity();
-        int bucket = getHash(key) % table.length;
+        int bucket = getIndex(key);
         if (table[bucket] == null) {
             table[bucket] = new Node(key, value, null);
             size++;
@@ -40,21 +40,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             current = current.next;
         }
 
-        current.next = new Node(key, value, null);;
+        current.next = new Node(key, value, null);
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        int bucket = getHash(key) % table.length;
-        Node current = table[bucket];
-        if (current != null) {
-            while (current != null) {
-                if (key == current.key || key != null && key.equals(current.key)) {
-                    return (V) current.value;
-                }
-                current = current.next;
+        int bucket = getIndex(key);
+        Node<K, V> current = table[bucket];
+        while (current != null) {
+            if (key == current.key || key != null && key.equals(current.key)) {
+                return current.value;
             }
+            current = current.next;
         }
         return null;
     }
@@ -64,8 +62,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getHash(K key) {
-        return key == null ? 0 : key.hashCode() & (table.length - 1);
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() + 1) % table.length;
     }
 
     private void checkCapacity() {
@@ -74,7 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private Node<K, V>[] resize() {
+    private void resize() {
         Node<K, V>[] oldTab = table;
         table = new Node[oldTab.length * 2];
         threshold = table.length * LOAD_FACTOR;
@@ -85,7 +83,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 oldNode = oldNode.next;
             }
         }
-        return table;
     }
 
     static class Node<K, V> {
