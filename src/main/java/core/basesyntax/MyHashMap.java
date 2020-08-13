@@ -10,7 +10,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTORY = 0.75;
 
     private Node<K, V>[] table;
-    private int size = 0;
+    private int size;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= table.length * LOAD_FACTORY) {
             resize();
         }
-        int index = key == null ? 0 : indexFor(key);
+        int index = indexFor(key);
         Node<K, V> temp = table[index];
         if (temp == null) {
             table[index] = new Node<>(key, value, null);
@@ -45,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = key == null ? 0 : indexFor(key);
+        int index = indexFor(key);
         Node<K, V> temp = table[index];
         while (temp != null) {
             if (key != null ? key.equals(temp.key) : temp.key == null) {
@@ -62,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int indexFor(K key) {
-        return key == null ? null : key.hashCode() & (table.length - 1);
+        return key == null ? 0 : key.hashCode() & (table.length - 1);
     }
 
     private void resize() {
