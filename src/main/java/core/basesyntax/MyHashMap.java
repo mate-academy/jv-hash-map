@@ -38,16 +38,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int index = getIndex(key);
         Node<K, V> node = storage[index];
-        if (node != null) {
+        while (node != null) {
             if (Objects.equals(node.key, key)) {
                 return node.value;
             }
-            while (node.next != null) {
-                node = node.next;
-                if (Objects.equals(node.key, key)) {
-                    return node.value;
-                }
-            }
+            node = node.next;
         }
         return null;
     }
@@ -69,7 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] newStorage = new Node[storage.length * 2];
-        threshold = (int)(newStorage.length * LOAD_FACTOR);
+        threshold = (int) (newStorage.length * LOAD_FACTOR);
         size = 0;
         Node<K, V>[] oldBuckets = storage;
         storage = newStorage;
