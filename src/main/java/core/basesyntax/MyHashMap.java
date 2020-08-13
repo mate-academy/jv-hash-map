@@ -1,12 +1,14 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 /**
  * <p>Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`.
  * Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...)
  * За бажанням можна реалізувати інші методи інтрефейсу Map.</p>
  */
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static int DEFAULT_CAPACITY = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private static float LOAD_FACTOR = 0.75f;
 
     private Node<K, V>[] array;
@@ -48,7 +50,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean checkNodeKey(K currentKey, K key) {
-        return currentKey != null && currentKey.equals(key) || currentKey == key;
+        return Objects.equals(currentKey,key);
     }
 
     @Override
@@ -85,7 +87,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         K key;
         V value;
         Node<K, V> next;
