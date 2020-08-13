@@ -37,16 +37,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
-            Node<K, V> node = table[0];
-            while (node != null) {
-                if (key == node.key) {
-                    return node.value;
-                }
-                node = node.next;
-            }
-        }
-
         int index = indexFor(hash(key), table.length);
         Node<K, V> node = table[index];
         while (node != null) {
