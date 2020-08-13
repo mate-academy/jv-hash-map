@@ -22,27 +22,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (suchElementExists(key, value)) {
-            return;
-        }
         int index = hashIndex(key);
-        if (storage[index] != null) {
-            Node<K, V> node = storage[index];
-            if (putWithKey(key, value, (Node<K, V>) node)) {
+        Node<K, V> node = storage[index];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
                 return;
             }
-            if (!Objects.equals(node.key, key)) {
-                while (node.next != null) {
-                    node = node.next;
-                    if (putWithKey(key, value, node)) {
-                        return;
-                    }
-                }
-                linkLast(node, key, value);
-            }
-        } else {
-            storage[index] = new Node<>(key, value);
+            node = node.next;
         }
+        Node<K, V> newNode = new Node<>(key, value);
+        newNode.next = storage[index];
+        storage[index] = newNode;
         size++;
         resize();
     }
@@ -81,40 +72,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-    }
-
-    private boolean putWithKey(K key, V value, Node<K, V> node) {
-        if (Objects.equals(node.key, key)) {
-            node.value = value;
-            return true;
-        }
-        return false;
-    }
-
-    private boolean suchElementExists(K key, V value) {
-        if (size == 0) {
-            return false;
-        }
-        for (Node<K, V> node : storage) {
-            if (node != null) {
-                Node<K, V> newNode = new Node<>(key, value);
-                if (Objects.equals(node, newNode)) {
-                    return true;
-                }
-                Node<K, V> collisionNode = node;
-                while (collisionNode.next != null) {
-                    if (Objects.equals(collisionNode, newNode)) {
-                        return true;
-                    }
-                    collisionNode = collisionNode.next;
-                }
-            }
-        }
-        return false;
-    }
-
-    private void linkLast(Node<K, V> node, K key, V value) {
-        node.next = new Node<>(key, value);
     }
 
     private static class Node<K, V> {
