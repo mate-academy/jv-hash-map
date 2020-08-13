@@ -74,10 +74,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             currentCapacity *= 2;
             Node<K, V>[] tempStorage = storage;
             storage = new Node[currentCapacity];
-            for (int i = 0; i < tempStorage.length; i++) {
-                while (tempStorage[i] != null) {
-                    put(tempStorage[i].key, tempStorage[i].value);
-                    tempStorage[i] = tempStorage[i].next;
+            for (Node<K, V> tempNode : tempStorage) {
+                while (tempNode != null) {
+                    put(tempNode.key, tempNode.value);
+                    tempNode = tempNode.next;
                 }
             }
         }
