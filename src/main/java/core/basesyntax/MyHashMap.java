@@ -34,12 +34,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putToList(Node<K, V> oldNode, Node<K, V> newNode) {
-        if (checkNodeKey(oldNode.key, newNode.key)) {
+        if (Objects.equals(oldNode.key, newNode.key)) {
             oldNode.value = newNode.value;
             return;
         }
         while (oldNode.next != null) {
-            if (checkNodeKey(oldNode.key, newNode.key)) {
+            if (Objects.equals(oldNode.key, newNode.key)) {
                 oldNode.value = newNode.value;
                 return;
             }
@@ -49,16 +49,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private boolean checkNodeKey(K currentKey, K key) {
-        return Objects.equals(currentKey,key);
-    }
-
     @Override
     public V getValue(K key) {
         int index = hashCodeIndex(key);
         Node<K, V> node = array[index];
         while (node != null) {
-            if (checkNodeKey(node.key, key)) {
+            if (Objects.equals(node.key, key)) {
                 return node.value;
             }
             node = node.next;
