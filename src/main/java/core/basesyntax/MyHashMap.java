@@ -15,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (!isEnoughSpace(size)) {
+        if (size == threshold) {
             resize();
         }
         int index = indexFor(key);
@@ -56,13 +56,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return 0;
         }
-        int hash = key.hashCode();
-        hash ^= (hash >>> 20) ^ (hash >>> 12);
-        hash ^= hash ^ (hash >>> 7) ^ (hash >>> 4);
-        return hash & (table.length - 1);
+        return key.hashCode() & (table.length - 1);
     }
 
     private void resize() {
+        size = 0;
         Node<K, V>[] oldTable = table;
         Node<K, V>[] newTable = new Node[table.length * 2];
         table = newTable;
@@ -73,14 +71,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         threshold = (int) (newTable.length * LOAD_FACTOR);
-    }
-
-    private boolean isEnoughSpace(int length) {
-        if (length <= threshold) {
-            return true;
-        }
-        size = 0;
-        return false;
     }
 
     private static class Node<K, V> {
