@@ -22,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
 
-        int index = indexFor(hash(key.hashCode()), table.length);
+        int index = indexFor(hash(key), table.length);
         Node<K, V> node = table[index];
         while (node != null) {
             if (key.equals(node.key)) {
@@ -47,7 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
 
-        int index = indexFor(hash(key.hashCode()), table.length);
+        int index = indexFor(hash(key), table.length);
         Node<K, V> node = table[index];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
@@ -64,9 +64,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(int h) {
-        h ^= (h >>> 20) ^ (h >>> 12);
-        return h ^ (h >>> 7) ^ (h >>> 4);
+    private int hash(Object key) {
+        int hash;
+        return (key == null) ? 0 : (hash = key.hashCode()) ^ (hash >>> 16);
     }
 
     private int indexFor(int hash, int length) {
@@ -107,7 +107,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     newTable[0] = new Node<>(null, node.value, nextNode);
                 }
 
-                int newIndex = indexFor(hash(node.key.hashCode()), newTable.length);
+                int newIndex = indexFor(hash(node.key), newTable.length);
                 Node<K, V> nextNode = newTable[newIndex];
                 newTable[newIndex] = new Node<>(node.key, node.value, nextNode);
 
