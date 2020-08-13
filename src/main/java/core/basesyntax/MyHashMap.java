@@ -8,12 +8,12 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final double LOAD_FACTOR = 0.75;
-    private static final int BASKETS = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private int size;
     private Node<K, V>[] array;
 
     public MyHashMap() {
-        array = new Node[BASKETS];
+        array = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -50,7 +50,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    class Node<K, V> {
+    private class Node<K, V> {
         final K key;
         V value;
         Node<K, V> next;
@@ -82,7 +82,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    public void resize() {
+    private void resize() {
         Node<K, V>[] oldArray = array;
         array = (Node<K, V>[]) new Node[oldArray.length * 2];
         size = 0;
