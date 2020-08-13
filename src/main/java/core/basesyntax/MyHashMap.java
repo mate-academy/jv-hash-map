@@ -11,18 +11,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
 
-    private Node<K, V>[] buckets;
+    private Node<K, V>[] nodes;
     private int size;
     private float threshold;
 
     public MyHashMap() {
-        buckets = new Node[DEFAULT_CAPACITY];
+        nodes = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         int index = getIndex(key);
-        Node<K, V> node = buckets[index];
+        Node<K, V> node = nodes[index];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
                 node.value = value;
@@ -31,10 +31,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             node = node.next;
         }
         Node<K, V> newNode = new Node<>(key, value);
-        newNode.next = buckets[index];
-        buckets[index] = newNode;
+        newNode.next = nodes[index];
+        nodes[index] = newNode;
         size++;
-        if (size >= buckets.length * LOAD_FACTOR) {
+        if (size >= nodes.length * LOAD_FACTOR) {
             resize();
         }
     }
@@ -42,9 +42,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = getIndex(key);
-        Node<K, V> node = buckets[index];
+        Node<K, V> node = nodes[index];
         while (node != null) {
-            if (node.key == key || node.key != null && node.key.equals(key)) {
+            if (Objects.equals(node.key, key)) {
                 return node.value;
             }
             node = node.next;
@@ -52,10 +52,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
+    @Override
+    public int getSize() {
+        return size;
+    }
+
     private void resize() {
         size = 0;
-        Node<K, V>[] oldBusckets = buckets;
-        buckets = new Node[buckets.length * 2];
+        Node<K, V>[] oldBusckets = nodes;
+        nodes = new Node[nodes.length * 2];
         for (Node<K, V> node : oldBusckets) {
             while (node != null) {
                 put(node.key, node.value);
@@ -65,15 +70,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return key == null ? 0 : ((key.hashCode() & (buckets.length - 1)));
+        return key == null ? 0 : ((key.hashCode() & (nodes.length - 1)));
     }
 
-    @Override
-    public int getSize() {
-        return size;
-    }
-
-    static class Node<K, V> {
+    private static class Node<K, V> {
         K key;
         V value;
         Node<K, V> next;
