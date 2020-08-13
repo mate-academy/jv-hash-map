@@ -125,7 +125,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node(K key, V value) {
             this.key = key;
             this.value = value;
-            next = null;
         }
 
         Node(K key, V value, Node<K, V> next) {
