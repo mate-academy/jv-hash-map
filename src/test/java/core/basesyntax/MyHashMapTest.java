@@ -2,7 +2,6 @@ package core.basesyntax;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 
@@ -107,6 +106,28 @@ public class MyHashMapTest {
         Integer thirdActualValue = myHashMap.getValue(thirdPlane);
         Assert.assertEquals("Test failed! HashMap expects to contain 3 values, but was "
                 + firstActualValue, Integer.valueOf(3), firstActualValue);
+        Assert.assertEquals("Test failed! HashMap expects to contain 5 values, but was "
+                + secondActualValue, Integer.valueOf(5), secondActualValue);
+        Assert.assertEquals("Test failed! HashMap expects to contain 1 values, but was "
+                + thirdActualValue, Integer.valueOf(1), thirdActualValue);
+    }
+
+    @Test
+    public void putAndGetWithCollisionAndReplaceValue() {
+        MyMap<Plane, Integer> myHashMap = new MyHashMap();
+        myHashMap.put(firstPlane, 3);
+        myHashMap.put(secondPlane, 5);
+        myHashMap.put(thirdPlane, 1);
+        myHashMap.put(firstPlane, 4);
+
+        Assert.assertEquals("Test failed! The size isn't correct. Expected 3 but was "
+                + myHashMap.getSize(), 3, myHashMap.getSize());
+
+        Integer firstActualValue = myHashMap.getValue(firstPlane);
+        Integer secondActualValue = myHashMap.getValue(secondPlane);
+        Integer thirdActualValue = myHashMap.getValue(thirdPlane);
+        Assert.assertEquals("Test failed! HashMap expects to contain 3 values, but was "
+                + firstActualValue, Integer.valueOf(4), firstActualValue);
         Assert.assertEquals("Test failed! HashMap expects to contain 5 values, but was "
                 + secondActualValue, Integer.valueOf(5), secondActualValue);
         Assert.assertEquals("Test failed! HashMap expects to contain 1 values, but was "

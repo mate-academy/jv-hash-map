@@ -1,6 +1,9 @@
 # jv-hash-map
-Реалізувати свою HashMap, а саме методи `put(K key, V value)`, `getValue()` та `getSize()`. 
+Let's create your own HashMap and implement methods:
+- `put(K key, V value)` 
+- `getValue()` 
+- `getSize()`
 
-Дотриматися основних вимог щодо реалізації мапи (initial capacity, load factor, resize...) 
+Be attentive with basic requirements for the implementation of the map (initial capacity, load factor, resize ...)
 
-За бажанням можна реалізувати інші методи інтрефейсу Map.
+P.s: you can implement other methods of the Map interface.
