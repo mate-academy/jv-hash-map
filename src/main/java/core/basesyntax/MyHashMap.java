@@ -15,14 +15,34 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] localTable = new Node[capacity * TABLE_MULTIPLIER];
         capacity *= TABLE_MULTIPLIER;
         threshold = (int) (capacity * LOAD_FACTOR);
-        for (Node node: table) {
-            Node<K, V> localNode = node;
-            while (localNode != null) {
-                setNode(localTable, localNode);
-                localNode = localNode.next;
+        for (int i = 0; i < capacity / 2; i++) {
+            if (table[i] != null) {
+                Node<K, V> localNode = table[i];
+                setNodes(localTable, localNode);
             }
         }
         table = localTable;
+    }
+
+    private void setNodes(Node<K, V>[] localTable, Node node) {
+        Node<K, V> localNode = node;
+        while (localNode != null) {
+            int hash = (localNode.key == null) ? 0 : Math.abs(localNode.key.hashCode());
+            if (localTable[hash % capacity] == null) {
+                int i = hash % capacity;
+                localTable[i] = localNode;
+                localNode = localNode.next;
+                localTable[i].next = null;
+            } else {
+                Node<K, V> localNode1 = localTable[hash % capacity];
+                while (localNode1.next != null) {
+                    localNode1 = localNode1.next;
+                }
+                localNode1.next = localNode;
+                localNode = localNode.next;
+                localNode1.next.next = null;
+            }
+        }
     }
 
     private void setNode(Node<K, V>[] localTable, Node node) {
@@ -35,6 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         while (localNode.next != null) {
             localNode = localNode.next;
         }
+        node.next = null;
         localNode.next = node;
     }
 
