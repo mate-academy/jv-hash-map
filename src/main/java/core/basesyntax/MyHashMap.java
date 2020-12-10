@@ -18,35 +18,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] localTable = new Node[capacity * TABLE_MULTIPLIER];
         capacity *= TABLE_MULTIPLIER;
         threshold = (int) (capacity * LOAD_FACTOR);
-        for (int i = 0; i < capacity / 2; i++) {
-            if (table[i] != null) {
-                Node<K, V> localNode = table[i];
-                setNodes(localTable, localNode);
-            }
-        }
-        table = localTable;
-    }
-
-    private void setNodes(Node<K, V>[] localTable, Node node) {
-        Node<K, V> localNode = node;
-        while (localNode != null) {
-            int hash = (localNode.key == null) ? 0 : Math.abs(localNode.key.hashCode());
-            if (localTable[hash % capacity] == null) {
-                int i = hash % capacity;
-                localTable[i] = localNode;
-                localNode = localNode.next;
-                localTable[i].next = null;
-            } else {
-                Node<K, V> localNode1 = localTable[hash % capacity];
-                while (localNode1.next != null) {
-                    localNode1 = localNode1.next;
-                }
-                localNode1.next = localNode;
-                localNode = localNode.next;
-                localNode1.next.next = null;
+        Node<K, V>[] localTable = table;
+        table = new Node[capacity];
+        for (int i = 0; i < localTable.length; i++) {
+            while (localTable[i] != null) {
+                put(localTable[i].key, localTable[i].value);
+                localTable[i] = localTable[i].next;
+                size--;
             }
         }
     }
