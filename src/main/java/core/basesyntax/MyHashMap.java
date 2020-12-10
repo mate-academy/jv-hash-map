@@ -64,11 +64,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key != null) {
             hash = Math.abs(key.hashCode());
         }
-        if (size == 0) {
-            size++;
-            table[hash % capacity] = new Node<>(hash, key, value, null);
-            return;
-        }
         if (checkKeys(key, value)) {
             return;
         }
