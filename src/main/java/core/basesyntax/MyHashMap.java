@@ -89,7 +89,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.abs(key == null ? 0 : key.hashCode());
     }
 
-    private class Node<K, V> {
+    private static class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
