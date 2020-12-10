@@ -2,23 +2,21 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    private Node<K, V>[] map;
-    private int size;
-    private double threshold;
     private static final double LOAD_FACTOR = 0.75;
     private static final int INITIAL_CAPACITY = 16;
     private static final int CAPACITY_MULTIPLIER = 2;
+    private Node<K, V>[] map;
+    private int size;
+    private double threshold;
 
-    public MyHashMap () {
+    public MyHashMap() {
+        this.map = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
         this.threshold = INITIAL_CAPACITY * LOAD_FACTOR;
         this.size = 0;
     }
 
     @Override
     public void put(K key, V value) {
-        if (size == 0) {
-            map = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
-        }
         if (size >= threshold) {
             resize();
         }
@@ -29,70 +27,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             Node<K, V> iterationNode = map[index];
-            if (newNode.key == null) {
-                if (iterationNode == null) {
-                    iterationNode = newNode;
-                    size++;
-                    return;
-                } else {
-                    while (iterationNode.next != null) {
-                        if (iterationNode.key == null) {
-                            iterationNode.value = newNode.value;
-                            return;
-                        }
-                        iterationNode = iterationNode.next;
-                    }
-                    iterationNode.next = newNode;
-                    size++;
-                }
-            } else {
-                if (iterationNode == null) {
-                    iterationNode = newNode;
-                    size++;
-                    return;
-                } else {
-                    while (iterationNode.next != null) {
-                        if (iterationNode.key != null && iterationNode.key.equals(newNode.key)) {
-                            iterationNode.value = newNode.value;
-                            return;
-                        }
-                        iterationNode = iterationNode.next;
-                    }
-                    iterationNode.next = newNode;
-                    size++;
-                }
-            }
-            /*
-            Node<K, V> iterationNode = map[index];
             while (iterationNode.next != null) {
-                if ((newNode.key == null && iterationNode.key == null)
-                        || iterationNode.key.equals(newNode.key)) {
-                    iterationNode = newNode;
-                    return;
-                } else {
-                    iterationNode = iterationNode.next;
+                if (isSameKey(iterationNode, key)) {
+                    iterationNode.value = newNode.value;
+                    break;
                 }
+                iterationNode = iterationNode.next;
             }
-            iterationNode.next = newNode;
-            size++;
-
-             */
+            if (isSameKey(iterationNode, key)) {
+                iterationNode.value = newNode.value;
+            } else {
+                iterationNode.next = newNode;
+                size++;
+            }
         }
     }
 
-    private V analyzeNode(Node<K, V> node, K key) {
-        if (key == null) {
-            if (node.key == null) {
-                return node.value;
-            } else {
-                return null;
-            }
-        } else {
-            if (node.key.equals(key)) {
-                return node.value;
-            }
-            return null;
-        }
+    private boolean isSameKey(Node<K, V> iterationNode, K key) {
+        return (key == null && iterationNode.key == null)
+                || (iterationNode.key != null && iterationNode.key.equals(key));
     }
 
     @Override
@@ -102,22 +55,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int index = getHashCode(key) % map.length;
         Node<K, V> iterationNode = map[index];
-        if (iterationNode == null) {
-            return null;
-        } else if (key == null) {
-            while (iterationNode != null) {
-                if (iterationNode.key == null) {
-                    return iterationNode.value;
-                }
-                iterationNode = iterationNode.next;
+        while (iterationNode != null) {
+            if (isSameKey(iterationNode, key)) {
+                return iterationNode.value;
             }
-        } else {
-            while (iterationNode != null) {
-                if (iterationNode.key != null && iterationNode.key.equals(key)) {
-                    return iterationNode.value;
-                }
-                iterationNode = iterationNode.next;
-            }
+            iterationNode = iterationNode.next;
         }
         return null;
     }
@@ -147,13 +89,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.abs(key == null ? 0 : key.hashCode());
     }
 
-     private class Node<K, V> {
+    private class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        Node (K key, V value) {
+        Node(K key, V value) {
             this.hash = MyHashMap.getHashCode(key);
             this.key = key;
             this.value = value;
