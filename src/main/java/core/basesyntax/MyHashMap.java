@@ -45,9 +45,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         localNode.next = node;
     }
 
-    private boolean checkKeys(K key, V value) {
-        int hash = (key == null) ? 0 : Math.abs(key.hashCode());
-        Node localNode = table[hash % capacity];
+    private boolean checkKeysDuplicate(K key, V value) {
+        Node localNode = table[(key == null ? 0 : Math.abs(key.hashCode())) % capacity];
         while (localNode != null) {
             if (Objects.equals(localNode.key, key)) {
                 localNode.value = value;
@@ -60,17 +59,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int hash = 0;
-        if (key != null) {
-            hash = Math.abs(key.hashCode());
-        }
-        if (checkKeys(key, value)) {
+        if (checkKeysDuplicate(key, value)) {
             return;
         }
         if (++size > threshold) {
             resize();
         }
-        setNode(table, new Node<>(hash, key, value, null));
+        setNode(table, new Node<>(key == null ? 0 : Math.abs(key.hashCode()), key, value, null));
     }
 
     @Override
