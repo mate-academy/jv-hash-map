@@ -34,6 +34,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         capacity = capacity * GROWTH_FACTOR;
         threshold = (int) (capacity * loadFactor);
         Node<K, V>[] newTable = (Node<K, V>[]) new Node[capacity];
+        for (Node<K, V> node : table) {
+            while (node != null) {
+                put(node, newTable);
+                node = node.next;
+            }
+        }
+        table = newTable;
     };
 
     private void put(Node<K, V> node, Node<K, V>[] table) {
