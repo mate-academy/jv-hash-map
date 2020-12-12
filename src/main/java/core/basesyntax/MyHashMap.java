@@ -9,11 +9,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
 
     public MyHashMap() {
+        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-
+        size++;
     }
 
     @Override
@@ -26,13 +27,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resize(){};
+    private void resize(){
+
+    };
 
     /*
-    returns hash value for rearrangement of the table after resize;
+    returns hash value (position in the table) for rearrangement of the
+    table after resize;
      */
     private int getHash(Node<K, V> node){
-        return 0;
+        return node.key.hashCode() % capacity;
     }
 
     private static class Node<K, V> {
