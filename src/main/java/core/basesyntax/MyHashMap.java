@@ -6,6 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private int size;
     private int actualCapacity;
+    private Node<K, V>[] table;
 
     @Override
     public void put(K key, V value) {
