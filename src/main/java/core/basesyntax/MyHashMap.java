@@ -41,7 +41,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[hash] != null) {
             Node<K, V> tableNode = table[hash];
             while (tableNode.next != null) {
-                if (tableNode.key.equals(node.key)) {
+                if (node.key == tableNode.key
+                        || tableNode.key != null && tableNode.key.equals(node.key)) {
                     tableNode.value = node.value;
                     return;
                 }
