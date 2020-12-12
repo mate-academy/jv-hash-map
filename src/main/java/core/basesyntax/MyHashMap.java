@@ -20,8 +20,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public int getSize() {
-        return 0;
+        return size;
     }
+
+    private void resize;
 
     private static class Node<K, V> {
         private Node<K, V> next;
