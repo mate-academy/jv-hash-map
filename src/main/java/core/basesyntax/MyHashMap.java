@@ -36,12 +36,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] newTable = (Node<K, V>[]) new Node[capacity];
     };
 
+    private void put(Node<K, V> node, Node<K, V>[] table) {
+        int hash = getHash(node);
+        if (table[hash] != null) {
+            Node<K, V> tableNode = table[hash];
+            while (tableNode.next != null) {
+                if (tableNode.key.equals(node.key)) {
+                    tableNode.value = node.value;
+                    return;
+                }
+                tableNode = tableNode.next;
+            }
+            tableNode.next = node;
+        } else {
+            table[hash] = node;
+        }
+    }
+
     /*
     returns hash value (position in the table) for rearrangement of the
     table after resize;
      */
     private int getHash(Node<K, V> node){
-        return node.key.hashCode() % capacity;
+        return node.key == null ? 0 : node.key.hashCode() % capacity;
     }
 
     private static class Node<K, V> {
