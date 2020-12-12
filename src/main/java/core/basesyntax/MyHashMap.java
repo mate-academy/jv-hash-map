@@ -23,6 +23,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
+        for (Node<K, V> node : table) {
+            while (node != null) {
+                if (key == node.key ||
+                        node.key != null
+                                && node.key.equals(key)) {
+                    return node.value;
+                }
+                node = node.next;
+            }
+        }
         return null;
     }
 
