@@ -45,19 +45,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void put(Node<K, V> node, Node<K, V>[] table) {
         int hash = getHash(node);
-        if (table[hash] != null) {
-            Node<K, V> tableNode = table[hash];
+        if (table[hash] != null) { // check if bucket is empty
+            Node<K, V> tableNode = table[hash]; // bucked wasn't empty,
+                                                // we look for keys to match or link to last node in list
             while (tableNode.next != null) {
                 if (node.key == tableNode.key
-                        || tableNode.key != null && tableNode.key.equals(node.key)) {
+                        || tableNode.key != null
+                        && tableNode.key.equals(node.key)) {
                     tableNode.value = node.value;
                     return;
                 }
                 tableNode = tableNode.next;
-            }
+            } // loop ends here
             tableNode.next = node;
         } else {
-            table[hash] = node;
+            table[hash] = node; // bucket was empty, we assign to it a node
         }
     }
 
