@@ -13,7 +13,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         capacity = DEFAULT_CAPACITY;
         threshold = (int) (LOAD_FACTOR * capacity);
-        table = new Node[capacity];
+        table = (Node<K, V>[]) new Node[capacity];
         size = 0;
     }
 
@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         capacity = capacity << 1;
         threshold = (int) (capacity * LOAD_FACTOR);
         Node<K, V>[] localTable = table;
-        table = new Node[capacity];
+        table = (Node<K, V>[]) new Node[capacity];
         for (int i = 0; i < localTable.length; i++) {
             while (localTable[i] != null) {
                 put(localTable[i].key, localTable[i].value);
@@ -31,22 +31,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void setNode(Node<K, V>[] localTable, Node node) {
-        Node<K, V> localNode = localTable[node.hash % capacity];
+    private void setNode(Node<K, V> node) {
+        Node<K, V> localNode = table[node.hash % capacity];
         if (localNode == null) {
-            node.next = null;
-            localTable[node.hash % capacity] = node;
+            table[node.hash % capacity] = node;
             return;
         }
         while (localNode.next != null) {
             localNode = localNode.next;
         }
-        node.next = null;
         localNode.next = node;
     }
 
     private boolean checkKeysDuplicate(K key, V value) {
-        Node localNode = table[(key == null ? 0 : Math.abs(key.hashCode())) % capacity];
+        Node<K, V> localNode = table[(key == null ? 0 : Math.abs(key.hashCode())) % capacity];
         while (localNode != null) {
             if (Objects.equals(localNode.key, key)) {
                 localNode.value = value;
@@ -65,7 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (++size > threshold) {
             resize();
         }
-        setNode(table, new Node<>(key == null ? 0 : Math.abs(key.hashCode()), key, value, null));
+        setNode(new Node<>(key == null ? 0 : Math.abs(key.hashCode()), key, value, null));
     }
 
     @Override
@@ -89,7 +87,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    class Node<K, V> {
+    private static class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
