@@ -8,6 +8,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int actualCapacity;
     private Node<K, V>[] table;
 
+    public MyHashMap() {
+    }
+
     @Override
     public void put(K key, V value) {
 
@@ -23,7 +26,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resize;
+    private void resize(){};
+
+    /*
+    returns hash value for rearrangement of the table after resize;
+     */
+    private int getHash(Node<K, V> node){
+        return 0;
+    }
 
     private static class Node<K, V> {
         private Node<K, V> next;
