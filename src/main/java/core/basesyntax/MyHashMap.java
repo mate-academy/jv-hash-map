@@ -15,6 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        putToTable(new Node<>(getHash(key), ));
         size++;
     }
 
@@ -66,6 +67,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
      */
     private int getHash(Node<K, V> node) {
         return node.key == null ? 0 : node.key.hashCode() % capacity;
+    }
+
+    private int getHash(K key) {
+        return key == null ? 0 : key.hashCode() % capacity;
     }
 
     private static class Node<K, V> {
