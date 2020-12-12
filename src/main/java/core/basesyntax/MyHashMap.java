@@ -31,7 +31,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize(){
-
+        capacity = capacity * GROWTH_FACTOR;
+        threshold = (int) (capacity * loadFactor);
+        Node<K, V>[] newTable = (Node<K, V>[]) new Node[capacity];
     };
 
     /*
