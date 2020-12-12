@@ -30,24 +30,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resize(){
+    private void resize() {
         capacity = capacity * GROWTH_FACTOR;
         threshold = (int) (capacity * loadFactor);
         Node<K, V>[] newTable = (Node<K, V>[]) new Node[capacity];
-        for (Node<K, V> node : table) {
+        for (Node<K, V> node : table) { //Transfer values to new array
             while (node != null) {
-                put(node, newTable);
+                putToTable(node, newTable);
                 node = node.next;
             }
         }
         table = newTable;
-    };
+    }
 
-    private void put(Node<K, V> node, Node<K, V>[] table) {
+    private void putToTable(Node<K, V> node, Node<K, V>[] table) {
         int hash = getHash(node);
         if (table[hash] != null) { // check if bucket is empty
-            Node<K, V> tableNode = table[hash]; // bucked wasn't empty,
-                                                // we look for keys to match or link to last node in list
+            Node<K, V> tableNode = table[hash];
             while (tableNode.next != null) {
                 if (node.key == tableNode.key
                         || tableNode.key != null
@@ -67,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     returns hash value (position in the table) for rearrangement of the
     table after resize;
      */
-    private int getHash(Node<K, V> node){
+    private int getHash(Node<K, V> node) {
         return node.key == null ? 0 : node.key.hashCode() % capacity;
     }
 
