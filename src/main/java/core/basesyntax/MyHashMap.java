@@ -15,8 +15,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        putToTable(new Node<>(getHash(key), ));
-        size++;
+        if (++size == threshold) {
+            resize();
+        }
+        putToTable(new Node<>(getHash(key), key,  value, null), table);
     }
 
     @Override
