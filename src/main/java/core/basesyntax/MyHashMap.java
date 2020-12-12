@@ -10,6 +10,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        capacity = DEFAULT_CAPACITY;
+        threshold = (int) (capacity * loadFactor);
     }
 
     @Override
