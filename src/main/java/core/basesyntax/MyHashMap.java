@@ -3,6 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float loadFactor = 0.75f;
+    private static final short GROWTH_FACTOR = 2;
     private int threshold;
     private int size;
     private int capacity;
