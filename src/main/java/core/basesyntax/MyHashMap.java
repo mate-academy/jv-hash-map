@@ -27,9 +27,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         for (Node<K, V> node : table) {
             while (node != null) {
-                if (key == node.key ||
-                        node.key != null
-                                && node.key.equals(key)) {
+                if (Objects.equals(node.key, key)) {
                     return node.value;
                 }
                 node = node.next;
@@ -60,11 +58,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> node = new Node<>(getHash(key), key, value, null);
         if (table[node.hash] == null) {
             table[node.hash] = node;
-            size++;
+            size = resize ? size : size + 1;
             return;
         }
         Node<K, V> tableNode = table[node.hash];
-        while (tableNode.next != null) {
+        while (tableNode.next != null
+                || Objects.equals(tableNode.key, node.key)) {
             if (Objects.equals(tableNode.key, node.key)) {
                 tableNode.value = node.value;
                 return;
@@ -77,14 +76,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getHash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % capacity);
-    }
-
-    private void updateHash(){
-        for (Node<K, V> node : table) {
-            while (node != null) {
-                node.hash = getHash(node.key);
-            }
-        }
     }
 
     private static class Node<K, V> {
