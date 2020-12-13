@@ -24,12 +24,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public boolean containsKey(K key) {
-        for (Node<K, V> node : table) {
-            while (node != null) {
-                if (Objects.equals(key, node.key)) {
-                    return true;
-                }
+        Node<K, V> node = table[getHash(key)];
+        while (node != null) {
+            if (Objects.equals(key, node.key)) {
+                return true;
             }
+            node = node.next;
         }
         return false;
     }
@@ -64,12 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public boolean isEmpty() {
-        for (Node<K, V> node : table) {
-            if (node != null) {
-                return false;
-            }
-        }
-        return true;
+        return size == 0;
     }
 
     private void resize() {
