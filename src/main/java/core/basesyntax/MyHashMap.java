@@ -1,5 +1,6 @@
 package core.basesyntax;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -21,6 +22,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         putToTable(key, value, table, false);
+    }
+
+    public void putAll(Map<K, V> map) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            put(entry.getKey(), entry.getValue());
+        }
     }
 
     public boolean containsKey(K key) {
