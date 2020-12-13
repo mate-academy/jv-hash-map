@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -107,6 +109,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public boolean isEmpty() {
         return size == 0;
+    }
+
+    public List<V> getValues() {
+        List<V> list = new ArrayList<>();
+        if (size == 0) {
+            return list;
+        }
+        for (Node<K, V> node : table) {
+            while (node != null) {
+                list.add(node.value);
+                node = node.next;
+            }
+        }
+        return list;
     }
 
     private void resize() {
