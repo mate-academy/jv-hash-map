@@ -24,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public boolean containsKey(K key) {
-        for(Node<K, V> node : table) {
+        for (Node<K, V> node : table) {
             while (node != null) {
                 if (Objects.equals(key, node.key)) {
                     return true;
@@ -35,7 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public boolean containsValue(V value) {
-        for(Node<K, V> node : table) {
+        for (Node<K, V> node : table) {
             while (node != null) {
                 if (Objects.equals(value, node.value)) {
                     return true;
@@ -61,6 +61,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    public boolean isEmpty() {
+        for (Node<K, V> node : table) {
+            if (node != null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void resize() {
