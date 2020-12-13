@@ -60,8 +60,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public V remove(K key) {
         Node<K, V> node = table[getHash(key)];
-
-
+        if (node == null) {
+            return null;
+        }
+        if (Objects.equals(key, node.key)) {
+            table[getHash(key)] = node.next;
+            return node.value;
+        }
+        Node<K, V> next = node.next;
+        while (next != null) {
+            if (Objects.equals(next.key, key)) {
+                node.next = next.next;
+                return next.value;
+            }
+            node = node.next;
+            next = next.next;
+        }
         return null;
     }
 
