@@ -56,8 +56,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = newTable;
     }
 
-    private void putToTable(K key, V vale, Node<K, V>[] table, boolean resize) {
-
+    private void putToTable(K key, V value, Node<K, V>[] table, boolean resize) {
+        Node<K, V> node = new Node<>(getHash(key), key, value, null);
+        if (table[node.hash] == null) {
+            table[node.hash] = node;
+            size++;
+            return;
+        }
+        Node<K, V> tableNode = table[node.hash];
+        while (tableNode.next != null) {
+            if (Objects.equals(tableNode.key, node.key)) {
+                tableNode.value = node.value;
+                return;
+            }
+            tableNode = tableNode.next;
+        }
+        tableNode.next = node;
+        size = resize ? size : size + 1;
     }
 
     private int getHash(K key) {
