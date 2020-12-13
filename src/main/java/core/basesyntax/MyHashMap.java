@@ -58,6 +58,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
+    public V remove(K key) {
+        Node<K, V> node = table[getHash(key)];
+
+
+        return null;
+    }
+
     @Override
     public int getSize() {
         return size;
