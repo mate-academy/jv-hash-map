@@ -23,6 +23,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         putToTable(key, value, table, false);
     }
 
+    public boolean containsKey(K key) {
+        for(Node<K, V> node : table) {
+            while (node != null) {
+                if (Objects.equals(key, node.key)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean containsValue(V value) {
+        for(Node<K, V> node : table) {
+            while (node != null) {
+                if (Objects.equals(value, node.value)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     @Override
     public V getValue(K key) {
         for (Node<K, V> node : table) {
