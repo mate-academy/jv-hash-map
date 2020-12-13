@@ -58,6 +58,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
+    /*
+    wasn't tested
+     */
     public V remove(K key) {
         Node<K, V> node = table[getHash(key)];
         if (node == null) {
@@ -77,6 +80,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             next = next.next;
         }
         return null;
+    }
+
+    /*
+    removes false if key wasn't found in the HashMap
+    true if such a key was found, thus removed
+     */
+    public boolean remove(K key, V value) {
+        if (remove(key) == null) {
+            return false;
+        }
+        return true;
     }
 
     @Override
