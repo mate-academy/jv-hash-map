@@ -14,7 +14,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         capacity = DEFAULT_CAPACITY;
         threshold = (int) (LOAD_FACTOR * capacity);
         table = (Node<K, V>[]) new Node[capacity];
-        size = 0;
     }
 
     private void resize() {
@@ -44,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean checkKeysDuplicate(K key, V value) {
-        Node<K, V> localNode = table[getHase(key) % capacity];
+        Node<K, V> localNode = table[getHash(key) % capacity];
         while (localNode != null) {
             if (Objects.equals(localNode.key, key)) {
                 localNode.value = value;
@@ -63,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (++size > threshold) {
             resize();
         }
-        setNode(new Node<>(getHase(key), key, value, null));
+        setNode(new Node<>(getHash(key), key, value, null));
     }
 
     @Override
@@ -71,7 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == 0) {
             return null;
         }
-        Node<K, V> localNode = table[getHase(key) % capacity];
+        Node<K, V> localNode = table[getHash(key) % capacity];
         while (localNode != null) {
             if (Objects.equals(localNode.key, key)) {
                 return localNode.value;
@@ -86,7 +85,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getHase(K key) {
+    private int getHash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
