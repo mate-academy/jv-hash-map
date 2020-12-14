@@ -27,19 +27,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             Node<K, V> iterationNode = map[index];
-            while (iterationNode.next != null) {
+            while (iterationNode.next != null || isSameKey(iterationNode, key)) {
                 if (isSameKey(iterationNode, key)) {
                     iterationNode.value = newNode.value;
-                    break;
+                    return;
                 }
                 iterationNode = iterationNode.next;
             }
-            if (isSameKey(iterationNode, key)) {
-                iterationNode.value = newNode.value;
-            } else {
-                iterationNode.next = newNode;
-                size++;
-            }
+            iterationNode.next = newNode;
+            size++;
+
         }
     }
 
@@ -73,7 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldMap = map;
         map = (Node<K, V>[]) new Node[oldMap.length * CAPACITY_MULTIPLIER];
         size = 0;
-        threshold *= 2;
+        threshold *= CAPACITY_MULTIPLIER;
         for (Node<K, V> node : oldMap) {
             if (node != null) {
                 this.put(node.key, node.value);
