@@ -77,12 +77,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         if (Objects.equals(key, node.key)) {
             table[getHash(key)] = node.next;
+            size--;
             return node.value;
         }
         Node<K, V> next = node.next;
         while (next != null) {
             if (Objects.equals(next.key, key)) {
                 node.next = next.next;
+                size--;
                 return next.value;
             }
             node = node.next;
