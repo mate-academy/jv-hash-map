@@ -23,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        putToTable(key, value, table, false);
+        putToTable(key, value, table);
     }
 
     public void putAll(Map<K, V> map) {
@@ -131,18 +131,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] newTable = (Node<K, V>[]) new Node[capacity];
         for (Node<K, V> node : table) { //Transfer
             while (node != null) {
-                putToTable(node.key, node.value, newTable, true);
+                putToTable(node.key, node.value, newTable);
                 node = node.next;
+                size--;
             }
         }
         table = newTable;
     }
 
-    private void putToTable(K key, V value, Node<K, V>[] table, boolean resize) {
+    private void putToTable(K key, V value, Node<K, V>[] table) {
         Node<K, V> node = new Node<>(getHash(key), key, value, null);
         if (table[node.hash] == null) {
             table[node.hash] = node;
-            size = resize ? size : size + 1;
+            size++;
             return;
         }
         Node<K, V> tableNode = table[node.hash];
@@ -155,7 +156,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             tableNode = tableNode.next;
         }
         tableNode.next = node;
-        size = resize ? size : size + 1;
+        size++;
     }
 
     private int getHash(K key) {
