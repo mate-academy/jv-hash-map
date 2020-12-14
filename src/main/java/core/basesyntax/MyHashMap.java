@@ -3,7 +3,7 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final float LOAD_FACTORY = 0.75f;
+    private static final float LOAD_FACTOR = 0.75f;
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final int CAPACITY_AND_THRESHOLD_MULTIPLIER = 2;
     private final int capacity;
@@ -15,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         capacity = DEFAULT_INITIAL_CAPACITY;
         table = (Node<K, V>[]) new Node[capacity];
-        threshold = (int) (DEFAULT_INITIAL_CAPACITY * LOAD_FACTORY);
+        threshold = (int) (DEFAULT_INITIAL_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
@@ -76,23 +76,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void isUniqueKey(Node<K, V> current) {
         int indexForValue = indexInTable(current.key);
         Node<K, V> checkedNode = table[indexForValue];
-        if (isEquals(current.key, checkedNode.key)) {
-            checkedNode.value = current.value;
-        } else {
-            while (checkedNode.next != null) {
-                if (isEquals(current.key, checkedNode.key)) {
-                    checkedNode.value = current.value;
-                    return;
-                }
-                checkedNode = checkedNode.next;
-            }
+        while (checkedNode.next != null) {
             if (isEquals(current.key, checkedNode.key)) {
                 checkedNode.value = current.value;
                 return;
             }
-            checkedNode.next = current;
-            size++;
+            checkedNode = checkedNode.next;
         }
+        if (isEquals(current.key, checkedNode.key)) {
+            checkedNode.value = current.value;
+            return;
+        }
+        checkedNode.next = current;
+        size++;
     }
 
     private boolean isEquals(K key, K secondKey) {
