@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int capacity = 16;
@@ -68,7 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V> getNode(int hash, K key) {
         Node<K, V> node = table[getIndex(hash)];
         while (node != null) {
-            if (node.key == key || node.key != null && node.key.equals(key)) {
+            if (Objects.equals(node.key, key)) {
                 break;
             }
             node = node.next;
