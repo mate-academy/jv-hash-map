@@ -53,10 +53,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         int newThreshold = threshold * CAPACITY_AND_THRESHOLD_MULTIPLIER;
         int newCapacity = capacity * CAPACITY_AND_THRESHOLD_MULTIPLIER;
-        Node<K, V>[] oldTable = table;
-        table = (Node<K, V>[]) new Node[newCapacity];
         threshold = newThreshold;
         size = 0;
+        Node<K, V>[] oldTable = table;
+        table = (Node<K, V>[]) new Node[newCapacity];
         for (Node<K, V> currentNode : oldTable) {
             while (currentNode != null) {
                 put(currentNode.key, currentNode.value);
