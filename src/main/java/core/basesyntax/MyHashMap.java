@@ -16,49 +16,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = (Node<K, V>[]) new Node[capacity];
     }
 
-    private void resize() {
-        capacity = capacity << 1;
-        threshold = (int) (capacity * LOAD_FACTOR);
-        Node<K, V>[] localTable = table;
-        table = (Node<K, V>[]) new Node[capacity];
-        for (int i = 0; i < localTable.length; i++) {
-            while (localTable[i] != null) {
-                put(localTable[i].key, localTable[i].value);
-                localTable[i] = localTable[i].next;
-                size--;
-            }
-        }
-    }
-
-    private void setNode(Node<K, V> node) {
-        Node<K, V> localNode = table[node.hash % capacity];
-        if (localNode == null) {
-            table[node.hash % capacity] = node;
-            return;
-        }
-        while (localNode.next != null) {
-            localNode = localNode.next;
-        }
-        localNode.next = node;
-    }
-
-    private boolean checkKeysDuplicate(K key, V value) {
-        Node<K, V> localNode = table[getHash(key) % capacity];
-        while (localNode != null) {
-            if (Objects.equals(localNode.key, key)) {
-                localNode.value = value;
-                return true;
-            }
-            localNode = localNode.next;
-        }
-        return false;
-    }
-
     @Override
     public void put(K key, V value) {
-        if (checkKeysDuplicate(key, value)) {
-            return;
-        }
         if (++size > threshold) {
             resize();
         }
@@ -89,7 +48,49 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
+    private void resize() {
+        capacity = capacity << 1;
+        threshold = (int) (capacity * LOAD_FACTOR);
+        Node<K, V>[] localTable = table;
+        table = (Node<K, V>[]) new Node[capacity];
+        for (int i = 0; i < localTable.length; i++) {
+            while (localTable[i] != null) {
+                put(localTable[i].key, localTable[i].value);
+                localTable[i] = localTable[i].next;
+                size--;
+            }
+        }
+    }
+
+    private void setNode(Node<K, V> node) {
+        Node<K, V> localNode = table[node.hash % capacity];
+        if (localNode == null) {
+            table[node.hash % capacity] = node;
+            return;
+        }
+        while (localNode.next != null) {
+            if (checkNodes(node, localNode)) {
+                return;
+            }
+            localNode = localNode.next;
+        }
+        if (checkNodes(node, localNode)) {
+            return;
+        }
+        localNode.next = node;
+    }
+
+    private boolean checkNodes(Node<K,V> node1, Node<K,V> node2) {
+        if (Objects.equals(node1.key, node2.key)) {
+            size--;
+            node2.value = node1.value;
+            return true;
+        }
+        return false;
+    }
+
     private static class Node<K, V> {
+
         private final int hash;
         private final K key;
         private V value;
