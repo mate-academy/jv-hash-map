@@ -79,8 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> getNode(Object key) {
-        int hash = Objects.hashCode(key);
-        if (table != null && table.length > 0) {
+        if (table.length > 0) {
             for (Node<K, V> node : table) {
                 if (node != null) {
                     if ((key == null && node.key == null)
@@ -112,16 +111,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
             this.hash = hash;
         }
-//
-//        public final boolean equals(Object o) {
-//            if (o == this)
-//                return true;
-//            if (o instanceof Map.Entry) {
-//                Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
-//                return Objects.equals(key, e.getKey()) &&
-//                        Objects.equals(value, e.getValue());
-//            }
-//            return false;
-//        }
     }
 }
