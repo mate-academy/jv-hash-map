@@ -25,7 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void putVal(int hash, K key, V value) {
         int currentPosition = hash % (table.length - 1);
-        Node<K, V> tempNode = new Node<>(hash, key, value, null);
+        Node<K, V> tempNode = new Node<>(key, value, null);
         if (table[currentPosition] == null) {
             table[currentPosition] = tempNode;
             size++;
@@ -45,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = table[hash(key) % (table.length - 1)];
+        Node<K, V> currentNode = table[getIndex(hash(key))];
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
                 return currentNode.value;
@@ -66,10 +66,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        Node<K, V>[] newTable = table;
-        table = new Node[newTable.length << 1];
-        for (int i = 0; i < newTable.length; i++) {
-            Node<K, V> currentNode = newTable[i];
+        Node<K, V>[] oldTable = table;
+        table = new Node[oldTable.length << 1];
+        for (int i = 0; i < oldTable.length; i++) {
+            Node<K, V> currentNode = oldTable[i];
             if (currentNode != null) {
                 while (currentNode != null) {
                     putVal(hash(currentNode.key), currentNode.key, currentNode.value);
@@ -79,14 +79,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private int getIndex(int hash) {
+        return hash % (table.length - 1);
+    }
+
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
