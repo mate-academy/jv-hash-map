@@ -7,15 +7,14 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final short GROWTH_FACTOR = 2;
-    private int threshold = 12; //initial threshold value
+    private static final float LOAD_FACTOR = 0.75f;
+    private int threshold;
     private int size;
-    private int capacity;
     private Node<K, V>[] table;
 
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
-        capacity = DEFAULT_CAPACITY;
+        threshold = (int) (table.length * LOAD_FACTOR);
     }
 
     @Override
@@ -33,7 +32,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public boolean containsKey(K key) {
-        Node<K, V> node = table[getHash(key)];
+        Node<K, V> node = table[getIndex(key, table.length)];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
                 return true;
@@ -57,7 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = table[getHash(key)];
+        Node<K, V> node = table[getIndex(key, table.length)];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
                 return node.value;
@@ -71,12 +70,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     wasn't tested
      */
     public V remove(K key) {
-        Node<K, V> node = table[getHash(key)];
+        Node<K, V> node = table[getIndex(key, table.length)];
         if (node == null) {
             return null;
         }
         if (Objects.equals(key, node.key)) {
-            table[getHash(key)] = node.next;
+            table[getIndex(key, table.length)] = node.next;
             size--;
             return node.value;
         }
@@ -93,10 +92,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    /*
-    removes false if key wasn't found in the HashMap
-    true if such a key was found, thus removed
-     */
     public boolean remove(K key, V value) {
         if (remove(key) == null) {
             return false;
@@ -128,10 +123,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        capacity = capacity * GROWTH_FACTOR;
-        threshold = threshold * GROWTH_FACTOR;
-        Node<K, V>[] newTable = (Node<K, V>[]) new Node[capacity];
-        for (Node<K, V> node : table) { //Transfer
+        int newCapacity = table.length * 2;
+        threshold = (int) (threshold * LOAD_FACTOR);
+        Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
+        for (Node<K, V> node : table) {
             while (node != null) {
                 putToTable(node.key, node.value, newTable);
                 node = node.next;
@@ -142,13 +137,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putToTable(K key, V value, Node<K, V>[] table) {
-        Node<K, V> node = new Node<>(getHash(key), key, value, null);
-        if (table[node.hash] == null) {
-            table[node.hash] = node;
+        Node<K, V> node = new Node<>(getIndex(key, table.length), key, value, null);
+        if (table[node.index] == null) {
+            table[node.index] = node;
             size++;
             return;
         }
-        Node<K, V> tableNode = table[node.hash];
+        Node<K, V> tableNode = table[node.index];
         while (tableNode.next != null
                 || Objects.equals(tableNode.key, node.key)) {
             if (Objects.equals(tableNode.key, node.key)) {
@@ -161,21 +156,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private int getHash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
+    private int getIndex(K key, int tableCapacity) {
+        return key == null ? 0 : Math.abs(key.hashCode() % tableCapacity);
     }
 
     private static class Node<K, V> {
         private Node<K, V> next;
         private K key;
         private V value;
-        private int hash;
+        private int index;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
+        public Node(int index, K key, V value, Node<K, V> next) {
             this.next = next;
             this.key = key;
             this.value = value;
-            this.hash = hash;
+            this.index = index;
         }
     }
 }
