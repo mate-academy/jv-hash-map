@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 16;
     static final float LOAD_FACTOR = 0.75f;
@@ -46,23 +48,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (tab == null || tab.length == 0) {
             tab = resize();
         }
-        elementIndex = hash(key) % tab.length;
-        if (tab[Math.abs(elementIndex)] == null) {
-            tab[Math.abs(elementIndex)] = new Node<>(hash, key, value, null);
+        elementIndex = Math.abs(hash(key) % tab.length);
+        if (tab[elementIndex] == null) {
+            tab[elementIndex] = new Node<>(hash, key, value, null);
             size++;
         } else {
-            Node<K, V> head = tab[Math.abs(elementIndex)];
+            Node<K, V> head = tab[elementIndex];
             while (head != null) {
-                if ((key == head.key && head.hash == hash && key == null)
-                        || (head.key != null && head.key.equals(key)) && head.hash == hash) {
+                if (Objects.equals(head.key, key)) {
                     head.value = value;
                     break;
-                } else {
-                    if (head.next == null) {
-                        head.next = new Node<>(hash, key, value, null);
-                        size++;
-                        break;
-                    }
+                }
+                if (head.next == null) {
+                    head.next = new Node<>(hash, key, value, null);
+                    size++;
+                    break;
                 }
                 head = head.next;
             }
@@ -76,8 +76,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTab = table;
         int oldCapacity = (oldTab == null) ? 0 : oldTab.length;
         int oldThreshold = threshold;
-        int newCapacity = 0;
-        int newThreshold = 0;
+        int newCapacity;
+        int newThreshold;
         if (oldCapacity != 0) {
             newCapacity = oldCapacity * 2;
             newThreshold = oldThreshold * 2;
@@ -90,11 +90,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         table = newTab;
         if (oldTab != null) {
-            for (int i = 0; i < oldCapacity; i++) {
-                Node<K, V> head = oldTab[i];
-                while (head != null) {
-                    putValue(head.hash, head.key, head.value);
-                    head = head.next;
+            for (Node<K, V> node : oldTab) {
+                while (node != null) {
+                    putValue(node.hash, node.key, node.value);
+                    node = node.next;
                 }
             }
         }
@@ -102,7 +101,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(Object key) {
-        return (key == null) ? 0 : (key.hashCode() * 31);
+        return (key == null) ? 0 : (key.hashCode());
     }
 
     private static class Node<K, V> {
