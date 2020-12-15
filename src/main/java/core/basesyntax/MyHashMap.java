@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
@@ -44,27 +46,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        while(currentNode.next != null) {
-            if (currentNode.key == key || (currentNode.key != null
-                    && currentNode.hashCode == key.hashCode()
-                    && currentNode.key.equals(key))) {
+        while (currentNode.next != null) {
+            if (Objects.equals(key, currentNode.key)) {
                 currentNode.value = value;
                 return;
             }
             currentNode = currentNode.next;
         }
-        currentNode.next = new Node<>(key, value, null);
-        size++;
+        if (Objects.equals(key, currentNode.key)) {
+            currentNode.value = value;
+        } else {
+            currentNode.next = new Node<>(key, value, null);
+            size++;
+        }
     }
 
     @Override
     public V getValue(K key) {
         int index = indexFor(key);
         Node<K,V> currentNode = table[index];
-        while(currentNode != null) {
-            if (key == currentNode.key || (key != null
-                    && currentNode.hashCode == key.hashCode()
-                    && key.equals(currentNode.key))) {
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
@@ -92,13 +94,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 continue;
             }
             Node<K,V> currentNode = source[i];
-            while(currentNode != null) {
+            while (currentNode != null) {
                 put(currentNode.key, currentNode.value);
                 currentNode = currentNode.next;
             }
         }
     }
-
 
     private void putForNullKey(V value) {
         Node<K,V> currentNode = table[0];
@@ -107,7 +108,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        while(currentNode.key != null && currentNode.next != null) {
+        while (currentNode.key != null && currentNode.next != null) {
             currentNode = currentNode.next;
         }
         if (currentNode.key == null) {
