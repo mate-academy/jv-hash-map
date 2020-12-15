@@ -2,81 +2,96 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
-    private static final int LOAD_FACTOR = 2;
+    private static final float LOAD_FACTOR = 0.75F;
+    private static final int MULTIPLIER = 2;
     private Node<K, V>[] array;
-    private static int capacity;
-    private int size = 0;
+    private int size;
     private int threshold;
 
     MyHashMap() {
-        array = new Node[INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        putValue(hash(key), key, value);
-        size++;
-    }
-
-    private void putValue(int position, K key, V value) {
-        Node<K, V>[] tempArray;
-        int tempHash = hash(key);
-
-        //в случае если мапа пустая
-        if (array == null || array.length == 0) {
+        if (mapIsEmpty()) {
             array = resize();
         }
-        /* в случае, если мапа не пустая и два варианта
-        1. Если ячейка массива пустая, добавим.
-        2. Если ячейка массива не пустая, добавим.
-         */
+        int tempHash = hash(key);
         if (array[tempHash] == null) {
             array[tempHash] = new Node<>(tempHash, key, value, null);
         } else {
-            // Нужна доп проверка, а есть ли уже этот ключ TODO
+            if (isEqual(key, array[tempHash].key)) {
+                array[tempHash].value = value;
+                return;
+            }
             Node<K, V> tempNode = array[tempHash];
             while (tempNode.next != null) {
+                if (isEqual(key, tempNode.next.key)) {
+                    tempNode.next.value = value;
+                    return;
+                }
                 tempNode = tempNode.next;
             }
-            tempNode = new Node<>(tempHash, key, value, null);
+            tempNode.next = new Node<>(tempHash, key, value, null);
         }
         if (++size > threshold) {
             resize();
         }
     }
 
-    private Node<K, V>[] resize() {
-        Node<K, V>[] tempArray = array;
-        array = new Node[tempArray.length * LOAD_FACTOR];
-        for (Node<K, V> tempNode : tempArray) {
-            if (tempNode != null) {
-                put(tempNode.key, tempNode.value);
-                if (tempNode.next != null) {
-
-                }
-            }
-        }
-
-
-        return array;
+    private boolean isEqual(K keyOne, K keyTwo) {
+        return (keyOne == keyTwo) || (keyOne != null && keyOne.equals(keyTwo));
     }
 
-    private Node<K, V> takeLastNode(Node<K, V> node) {
-        while (node.next != null) {
-            node = node.next;
+
+    private Node<K, V>[] resize() {
+        if (size == 0) {
+            array = new Node[INITIAL_CAPACITY];
+            threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
+            return array;
         }
-        return node;
+       // capacity = array.length;
+        Node<K, V>[] tempArray = array;
+        array = (Node<K, V>[]) new Node[array.length * MULTIPLIER];
+        threshold = (int) (array.length * LOAD_FACTOR);
+        size = 0;
+        for (Node<K, V> tempNode : tempArray) {
+            while (tempNode != null) {
+                put(tempNode.key, tempNode.value);
+                tempNode = tempNode.next;
+            }
+        }
+        return null;
     }
 
     private int hash(Object key) {
         int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+        return Math.abs(((key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16)) % array.length);
     }
 
     @Override
     public V getValue(K key) {
+        if (mapIsEmpty()) {
+            return null;
+        }
+        int hashKey = hash(key);
+        Node<K, V> tempNode = array[hashKey];
+        if (isEqual(tempNode.key, key)) {
+            return tempNode.value;
+        }
+        while (tempNode.next != null) {
+            if (isEqual(tempNode.next.key, key)) {
+                return tempNode.next.value;
+            }
+            tempNode = tempNode.next;
+        }
         return null;
     }
+
+    private boolean mapIsEmpty() {
+        return array == null || array.length == 0;
+    }
+
 
     @Override
     public int getSize() {
