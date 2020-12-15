@@ -22,6 +22,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         addElement(key, value, array);
     }
 
+    @Override
+    public V getValue(K key) {
+        int index = Math.abs(key == null ? 0 : (key.hashCode() % array.length));
+        Node<K, V> current = array[index];
+        while (current != null) {
+            if (Objects.equals(current.key, key)) {
+                return current.value;
+            }
+            current = current.next;
+        }
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
     private void addElement(K key, V value, Node<K, V>[] currentArray) {
         int keyHashCode = key == null ? 0 : key.hashCode();
         int index = keyHashCode % currentArray.length;
@@ -65,24 +83,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         threshold = (int) (newLength * DEFAULT_LOAD_FACTOR);
         return newArray;
-    }
-
-    @Override
-    public V getValue(K key) {
-        int index = Math.abs(key == null ? 0 : (key.hashCode() % array.length));
-        Node<K, V> current = array[index];
-        while (current != null) {
-            if (Objects.equals(current.key, key)) {
-                return current.value;
-            }
-            current = current.next;
-        }
-        return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
     }
 
     private static class Node<K, V> {
