@@ -10,9 +10,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private double threshold;
 
     public MyHashMap() {
-        this.map = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
-        this.threshold = INITIAL_CAPACITY * LOAD_FACTOR;
-        this.size = 0;
+        map = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
+        threshold = INITIAL_CAPACITY * LOAD_FACTOR;
     }
 
     @Override
@@ -20,11 +19,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        Node<K, V> newNode = new Node<>(key, value);
+        Node<K, V> newNode = new Node<>(key, value, getHashCode(key));
         int index = newNode.hash % map.length;
         if (map[index] == null) {
             map[index] = newNode;
-            size++;
         } else {
             Node<K, V> iterationNode = map[index];
             while (iterationNode.next != null || isSameKey(iterationNode, key)) {
@@ -35,9 +33,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 iterationNode = iterationNode.next;
             }
             iterationNode.next = newNode;
-            size++;
-
         }
+        size++;
     }
 
     private boolean isSameKey(Node<K, V> iterationNode, K key) {
@@ -70,19 +67,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldMap = map;
         map = (Node<K, V>[]) new Node[oldMap.length * CAPACITY_MULTIPLIER];
         size = 0;
-        threshold *= CAPACITY_MULTIPLIER;
+        threshold = map.length * CAPACITY_MULTIPLIER;
         for (Node<K, V> node : oldMap) {
             if (node != null) {
-                this.put(node.key, node.value);
+                put(node.key, node.value);
                 while (node.next != null) {
-                    this.put(node.next.key, node.next.value);
+                    put(node.next.key, node.next.value);
                     node = node.next;
                 }
             }
         }
     }
 
-    private static <K> int getHashCode(K key) {
+    private int getHashCode(K key) {
         return Math.abs(key == null ? 0 : key.hashCode());
     }
 
@@ -92,8 +89,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        Node(K key, V value) {
-            this.hash = MyHashMap.getHashCode(key);
+        Node(K key, V value, int hash) {
+            this.hash = hash;
             this.key = key;
             this.value = value;
             this.next = null;
