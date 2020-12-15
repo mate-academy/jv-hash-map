@@ -35,10 +35,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > treshold) {
             resize();
         }
-        if (key == null) {
-            putForNullKey(value);
-            return;
-        }
         int index = indexFor(key);
         Node<K,V> currentNode = table[index];
         if (currentNode == null) {
@@ -46,25 +42,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        while (currentNode.next != null) {
+        while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
                 currentNode.value = value;
                 return;
+            } else if (currentNode.next == null) {
+                currentNode.next = new Node<>(key, value, null);
+                size++;
+                return;
             }
             currentNode = currentNode.next;
-        }
-        if (Objects.equals(key, currentNode.key)) {
-            currentNode.value = value;
-        } else {
-            currentNode.next = new Node<>(key, value, null);
-            size++;
         }
     }
 
     @Override
     public V getValue(K key) {
-        int index = indexFor(key);
-        Node<K,V> currentNode = table[index];
+        Node<K,V> currentNode = table[indexFor(key)];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
@@ -81,11 +74,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K,V>[] newTable = (Node<K,V>[]) new Node[table.length * 2];
-        Node<K,V>[] tempTable = table;
+        Node<K,V>[] oldTable = table;
         table = newTable;
         size = 0;
-        transfer(tempTable);
-        treshold = (int) (newTable.length * LOAD_FACTOR);
+        transfer(oldTable);
+        treshold = (int) (table.length * LOAD_FACTOR);
     }
 
     private void transfer(Node<K,V>[] source) {
@@ -98,24 +91,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 put(currentNode.key, currentNode.value);
                 currentNode = currentNode.next;
             }
-        }
-    }
-
-    private void putForNullKey(V value) {
-        Node<K,V> currentNode = table[0];
-        if (currentNode == null) {
-            table[0] = new Node<>(null, value, null);
-            size++;
-            return;
-        }
-        while (currentNode.key != null && currentNode.next != null) {
-            currentNode = currentNode.next;
-        }
-        if (currentNode.key == null) {
-            currentNode.value = value;
-        } else {
-            currentNode.next = new Node<>(null, value, null);
-            size++;
         }
     }
 
