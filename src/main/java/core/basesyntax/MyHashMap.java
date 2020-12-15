@@ -87,10 +87,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Objects.equals(key, secondKey);
     }
 
-    private int hash(K key) {
-        return Math.abs(key == null ? 0 : key.hashCode());
-    }
-
     private int indexInTable(K key) {
         return Math.abs(key == null ? 0 : key.hashCode() % table.length);
     }
