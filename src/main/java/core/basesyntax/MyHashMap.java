@@ -6,18 +6,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
     private int currentSize;
-    private Node<K, V>[] node;
+    private Node<K, V>[] nodes;
 
     public MyHashMap() {
-        node = new Node[DEFAULT_INITIAL_CAPACITY];
+        nodes = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         resize();
-        Node<K, V> currentNode = node[getIndex(key)];
+        Node<K, V> currentNode = nodes[getIndex(key)];
         if (currentNode == null) {
-            node[getIndex(key)] = new Node<>(key, value);
+            nodes[getIndex(key)] = new Node<>(key, value);
             currentSize++;
             return;
         }
@@ -34,7 +34,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = node[getIndex(key)];
+        Node<K, V> currentNode = nodes[getIndex(key)];
         if (currentNode == null) {
             return null;
         }
@@ -50,13 +50,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (currentSize > node.length * LOAD_FACTOR) {
-            currentSize = node.length * 2;
-            Node<K, V>[] oldNode = new Node[currentSize];
-            Node<K, V>[] newNode = node;
-            node = oldNode;
+        if (currentSize > nodes.length * LOAD_FACTOR) {
+            int newCapacity = nodes.length * 2;
+            Node<K, V>[] oldNodes = new Node[newCapacity];
+            Node<K, V>[] newNodes = nodes;
+            nodes = oldNodes;
             currentSize = 0;
-            for (Node<K, V> eachNode: newNode) {
+            for (Node<K, V> eachNode: newNodes) {
                 while (eachNode != null) {
                     put(eachNode.key, eachNode.value);
                     eachNode = eachNode.next;
@@ -66,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % node.length;
+        return key == null ? 0 : Math.abs(key.hashCode()) % nodes.length;
     }
 
     private static class Node<K, V> {
