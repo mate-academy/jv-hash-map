@@ -21,9 +21,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
             ++size;
-        } else {
-            putInFullBucket(index, key, value);
+        return;
         }
+        putInFullBucket(index, key, value);
     }
 
     @Override
@@ -64,10 +64,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             size = 0;
             Node<K, V>[] oldTable = table;
-            int oldCapacity = oldTable == null ? 0 : oldTable.length;
+            int oldCapacity = oldTable.length;
             threshold = threshold << 1;
             table = new Node[oldCapacity << 1];
-            if (oldTable != null) {
                 for (Node<K, V> node : oldTable) {
                     if (node != null) {
                         put(node.key, node.value);
@@ -79,11 +78,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-    }
 
-    private Node<K, V> getNode(Object key) {
-        if (table.length > 0) {
-            for (Node<K, V> node : table) {
+    private Node<K, V> getNode(K key) {
+            Node<K, V> node = table[getIndexForBucket(key)];
                 if (node != null) {
                     if ((key == null && node.key == null)
                             || (key != null && key.equals(node.key))) {
@@ -97,10 +94,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                         }
                     }
                 }
+                return null;
             }
-        }
-        return null;
-    }
+
 
     private static class Node<K, V> {
         final K key;
