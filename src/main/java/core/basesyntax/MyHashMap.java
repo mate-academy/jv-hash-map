@@ -29,7 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         Node<K, V> current = bucketArray[bucket];
         while (current != null) {
-            if (isKeysEquals(key, current.key)) {
+            if (Objects.equals(key, current.key)) {
                 current.value = value; //if keys equals change old value to new
                 return;
             }
@@ -50,7 +50,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         while (current != null) {
-            if (isKeysEquals(key, current.key)) {
+            if (Objects.equals(key, current.key)) {
                 return current.value;
             }
             current = current.next;
@@ -81,10 +81,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-    }
-
-    private boolean isKeysEquals(K key1, K key2) {
-        return Objects.equals(key1, key2);
     }
 
     private class Node<K, V> {
