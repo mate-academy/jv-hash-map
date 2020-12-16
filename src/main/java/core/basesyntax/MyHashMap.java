@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > threshold) {
             resize();
         }
-        setNode(new Node<>(getHash(key), key, value, null));
+        setNode(new Node<>(key, value, null));
     }
 
     @Override
@@ -63,19 +63,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void setNode(Node<K, V> node) {
-        int localHash = node.hash % capacity;
+        int localHash = getHash(node.key) % capacity;
         Node<K, V> localNode = table[localHash];
         if (localNode == null) {
             table[localHash] = node;
             size++;
             return;
         }
-        while (localNode.next != null || Objects.equals(localNode.key, node.key)) {
+        while (localNode.next != null) {
             if (Objects.equals(localNode.key, node.key)) {
                 localNode.value = node.value;
                 return;
             }
             localNode = localNode.next;
+        }
+        if (Objects.equals(localNode.key, node.key)) {
+            localNode.value = node.value;
+            return;
         }
         localNode.next = node;
         size++;
@@ -83,13 +87,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static class Node<K, V> {
 
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
