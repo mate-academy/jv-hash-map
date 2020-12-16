@@ -1,5 +1,6 @@
 package core.basesyntax;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -10,24 +11,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int hash;
     private Node<K, V>[] nodesArray;
 
+    public MyHashMap() {
+        nodesArray = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
+        capacity = nodesArray.length;
+    }
 
     @Override
     public void put(K key, V value) {
-        initializeArr();
+        if (size >= capacity*LOAD_FACTOR) {
+            resize();
+        }
+
         hash = setHash(key);
         Node<K, V> newNode = new Node<>(hash, key, value, null);
         if (nodesArray[hash] != null) {
             Node<K, V> iterrarion = nodesArray[hash];
-            if(Objects.equals(iterrarion.key, key)){
-                iterrarion.value = newNode.value;
-                return;
-            }
-            while (iterrarion.next != null){
+           while (iterrarion.next != null){
                 if(Objects.equals(iterrarion.key,key)) {
                     iterrarion.value = value;
                     return;
                 }
                 iterrarion = iterrarion.next;
+            }
+            if(Objects.equals(iterrarion.key, key)){
+                iterrarion.value = newNode.value;
+                return;
             }
             iterrarion.next = newNode;
             size++;
@@ -71,14 +79,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             capacity = INITIAL_CAPACITY;
             return;
         }
-            if(size > nodesArray.length*LOAD_FACTOR) {
+            if(size > capacity*LOAD_FACTOR) {
             resize();
         }
     }
 
     private void resize() {
-
-    }
+        Node<K, V>[] oldTable = nodesArray;
+        nodesArray = (Node<K, V>[]) new Node[capacity * 2];
+        capacity = nodesArray.length;
+        size = 0;
+            for(Node<K, V> node : oldTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
+            }
+        }
 
     private class Node<K, V> {
         int hash;
@@ -92,7 +109,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
+
     }
-
-
 }
