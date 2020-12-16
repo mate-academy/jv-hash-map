@@ -89,9 +89,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putForNullKey(V value) {
-        for (Node<K,V> e = table[0]; e != null; e = e.next) {
-            if (e.key == null) {
-                e.value = value;
+        for (Node<K,V> elem = table[0]; elem != null; elem = elem.next) {
+            if (elem.key == null) {
+                elem.value = value;
                 return;
             }
         }
