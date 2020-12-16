@@ -12,18 +12,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         treshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
-        size = 0;
         table = (Node<K,V>[]) new Node[DEFAULT_CAPACITY];
     }
 
     private class Node<K,V> {
-        private int hashCode;
         private K key;
         private V value;
         private Node<K,V> next;
 
         public Node(K key, V value, Node<K,V> next) {
-            this.hashCode = (key != null) ? key.hashCode() : 0;
             this.key = key;
             this.value = value;
             this.next = next;
@@ -46,7 +43,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (Objects.equals(key, currentNode.key)) {
                 currentNode.value = value;
                 return;
-            } else if (currentNode.next == null) {
+            }
+            if (currentNode.next == null) {
                 currentNode.next = new Node<>(key, value, null);
                 size++;
                 return;
@@ -83,9 +81,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void transfer(Node<K,V>[] source) {
         for (int i = 0; i < source.length; i++) {
-            if (source[i] == null) {
-                continue;
-            }
             Node<K,V> currentNode = source[i];
             while (currentNode != null) {
                 put(currentNode.key, currentNode.value);
