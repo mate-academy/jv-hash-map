@@ -63,10 +63,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void setNode(Node<K, V> node) {
-        int localHash = getHash(node.key) % capacity;
-        Node<K, V> localNode = table[localHash];
+        int indexOfBucket = getHash(node.key) % capacity;
+        Node<K, V> localNode = table[indexOfBucket];
         if (localNode == null) {
-            table[localHash] = node;
+            table[indexOfBucket] = node;
             size++;
             return;
         }
@@ -86,7 +86,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-
         private final K key;
         private V value;
         private Node<K, V> next;
