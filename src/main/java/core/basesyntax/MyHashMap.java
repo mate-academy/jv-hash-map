@@ -72,15 +72,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] newNodes = nodes;
         int capacity = nodes.length * 2;
         threshold = capacity * LOAD_FACTOR;
+        size = 0;
+        Node<K, V>[] newNodes = nodes;
         nodes = (Node<K, V>[]) new Node[capacity];
         for (Node<K, V> newNode : newNodes) {
             while (newNode != null) {
                 put(newNode.key, newNode.value);
                 newNode = newNode.next;
-                --size;
             }
         }
     }
