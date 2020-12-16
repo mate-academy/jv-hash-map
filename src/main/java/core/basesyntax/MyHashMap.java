@@ -9,17 +9,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
 
     MyHashMap() {
+        array = new Node[INITIAL_CAPACITY];
+        threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        if (mapIsEmpty()) {
-            resize();
-        }
         int tempHash = this.hash(key);
         int index = hashIndex(tempHash);
         if (array[index] == null) {
-            array[index] = new Node<>(tempHash, key, value, null);
+            array[index] = new Node<>(key, value, null);
         } else {
             if (isEqual(key, array[index].key)) {
                 array[index].value = value;
@@ -33,7 +32,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 tempNode = tempNode.next;
             }
-            tempNode.next = new Node<>(tempHash, key, value, null);
+            tempNode.next = new Node<>(key, value, null);
         }
         if (++size > threshold) {
             resize();
@@ -45,11 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (size == 0) {
-            array = new Node[INITIAL_CAPACITY];
-            threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
-            return;
-        }
+
         Node<K, V>[] tempArray = array;
         array = (Node<K, V>[]) new Node[array.length * MULTIPLIER];
         threshold = (int) (array.length * LOAD_FACTOR);
@@ -104,13 +99,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private int hash;
         private Node<K, V> next;
         private K key;
         private V value;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
