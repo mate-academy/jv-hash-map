@@ -13,18 +13,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         this.defaultTable = new Node[DEFAULT_INITIAL_CAPACITY];
-        this.size = 0;
         this.threshold = (int)(DEFAULT_LOAD * DEFAULT_INITIAL_CAPACITY);
     }
 
     private static class Node<K, V> {
-        private int hashCode;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hashCode = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -33,10 +30,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int hash = hashcode(key);
-        int index = hash % DEFAULT_INITIAL_CAPACITY;
+        int index = hashcode(key) % DEFAULT_INITIAL_CAPACITY;
         if (defaultTable[index] == null) {
-            defaultTable[index] = new Node<>(hash, key, value, null);
+            defaultTable[index] = new Node<>(key, value, null);
             size++;
             return;
         }
@@ -48,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             currentNode = currentNode.next;
         }
-        currentNode.next = new Node<>(hash, key, value, null);
+        currentNode.next = new Node<>(key, value, null);
         size++;
         if (size == threshold) {
             resize();
@@ -62,10 +58,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (currentNode == null) {
             return null;
         }
-        while (!(Objects.equals(key, currentNode.key))) {
+        while ((currentNode.next != null) || (Objects.equals(currentNode.key, key))) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
+            }
             currentNode = currentNode.next;
         }
-        return currentNode.value;
+        return null;
     }
 
     @Override
