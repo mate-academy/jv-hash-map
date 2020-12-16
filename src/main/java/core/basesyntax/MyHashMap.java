@@ -17,14 +17,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size > capacity * LOAD_FACTOR) {
-            resize();
-        }
-        int hash = setHash(key);
+       int hash = setHash(key);
         Node<K, V> newNode = new Node<>(hash, key, value, null);
         if (nodesArray[hash] == null) {
             nodesArray[hash] = newNode;
-            size++;
+            checkSize(size++);
             return;
         }
         if (nodesArray[hash] != null) {
@@ -41,7 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             node.next = newNode;
-            size++;
+            checkSize(size++);
         }
     }
 
@@ -64,6 +61,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private void checkSize(int size) {
+       if (size > capacity * LOAD_FACTOR) {
+           resize();
+       } else {
+           size++;
+       }
     }
 
     private int setHash(K key) {
