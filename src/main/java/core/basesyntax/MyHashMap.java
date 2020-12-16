@@ -3,6 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     public static final int DEFAULT_INITIAL_CAPACITY = 16;
     public static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    public static final int CAPACITY_INCREASER = 2;
 
     Node<K, V>[] bucketArray = new Node[DEFAULT_INITIAL_CAPACITY];
     private int size = 0;
@@ -19,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             Node<K, V> current = bucketArray[bucket];
-            while (1 == 1) {
+            for (int i = 0; i < size; i++) {
                 if (key == null ? key == current.key : key.equals(current.key)) {
                     current.value = value; //if keys equals change old value to new
                     return;
@@ -40,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int bucket = bucket(key);
         Node<K, V> current = bucketArray[bucket];
-        while (1 == 1) {
+        for (int i = 0; i < size; i++) {
             if (current == null) {
                 return null;
             }
@@ -49,6 +50,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             current = current.next;
         }
+        return null;
     }
 
     @Override
@@ -63,10 +65,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldArray = bucketArray;
-        bucketArray = new Node[oldArray.length * 2];
-        for (Node<K, V> n : oldArray) {
-            if (n != null) {
-                put(n.key, n.value);
+        bucketArray = new Node[oldArray.length * CAPACITY_INCREASER];
+        int iterations = size;
+        size = 0;
+        for (Node<K, V> node : oldArray) {
+            for (int i = 0; i < iterations; i++) {
+                if (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
             }
         }
     }
