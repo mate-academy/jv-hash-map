@@ -30,7 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = hashcode(key) % DEFAULT_INITIAL_CAPACITY;
+        int index = hashcode(key) % defaultTable.length;
         if (defaultTable[index] == null) {
             defaultTable[index] = new Node<>(key, value, null);
             size++;
@@ -53,7 +53,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = Math.abs(hashcode(key)) % DEFAULT_INITIAL_CAPACITY;
+        int index = hashcode(key) % defaultTable.length;
         Node<K, V> currentNode = defaultTable[index];
         if (currentNode == null) {
             return null;
