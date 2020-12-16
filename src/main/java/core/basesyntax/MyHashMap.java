@@ -28,8 +28,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> value;
-        return (value = getNode(key)) == null ? null : value.value;
+        Node<K, V> node = table[getIndexForBucket(key)];
+        if (node != null) {
+            if ((key == null && node.key == null)
+                    || (key != null && key.equals(node.key))) {
+                return node.value;
+            }
+            while (node.next != null) {
+                node = node.next;
+                if ((key == null && node.key == null)
+                        || (key != null && key.equals(node.key))) {
+                    return node.value;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
@@ -78,25 +91,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-
-    private Node<K, V> getNode(K key) {
-            Node<K, V> node = table[getIndexForBucket(key)];
-                if (node != null) {
-                    if ((key == null && node.key == null)
-                            || (key != null && key.equals(node.key))) {
-                        return node;
-                    }
-                    while (node.next != null) {
-                        node = node.next;
-                        if ((key == null && node.key == null)
-                                || (key != null && key.equals(node.key))) {
-                            return node;
-                        }
-                    }
-                }
-                return null;
-            }
-
 
     private static class Node<K, V> {
         final K key;
