@@ -56,15 +56,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         if (size != 0) {
             Node<K, V> node = nodes[getHash(key)];
-            while(node != null) {
-                if (Objects.equals(node.key, key)){
+            while (node != null) {
+                if (Objects.equals(node.key, key)) {
                     return node.value;
                 }
                 node = node.next;
             }
-    }
-    return null;
-
+        }
+        return null;
     }
 
     @Override
@@ -78,7 +77,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = capacity * LOAD_FACTOR;
         nodes = (Node<K, V>[]) new Node[capacity];
         for (Node<K, V> newNode : newNodes) {
-            while(newNode != null) {
+            while (newNode != null) {
                 put(newNode.key, newNode.value);
                 newNode = newNode.next;
                 --size;
