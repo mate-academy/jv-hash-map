@@ -7,7 +7,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int CAPACITY_INCREASER = 2;
 
-    Node<K, V>[] bucketArray;
+    private Node<K, V>[] bucketArray;
     private int size;
 
     public MyHashMap() {
