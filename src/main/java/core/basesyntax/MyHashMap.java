@@ -20,11 +20,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
             threshold = (int) (table.length * LOAD_FACTOR);
         }
-        putVal(hash(key), key, value);
+        putVal(key, value);
     }
 
-    private void putVal(int hash, K key, V value) {
-        int currentPosition = hash % (table.length - 1);
+    private void putVal(K key, V value) {
+        int currentPosition = getIndex(key);
         Node<K, V> tempNode = new Node<>(key, value, null);
         if (table[currentPosition] == null) {
             table[currentPosition] = tempNode;
@@ -45,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = table[getIndex(hash(key))];
+        Node<K, V> currentNode = table[getIndex(key)];
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
                 return currentNode.value;
@@ -72,14 +72,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> currentNode = oldTable[i];
             if (currentNode != null) {
                 while (currentNode != null) {
-                    putVal(hash(currentNode.key), currentNode.key, currentNode.value);
+                    putVal(currentNode.key, currentNode.value);
                     currentNode = currentNode.next;
                 }
             }
         }
     }
 
-    private int getIndex(int hash) {
+    private int getIndex(K key) {
+        int hash = hash(key);
         return hash % (table.length - 1);
     }
 
