@@ -11,12 +11,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
+        size = 0;
     }
 
     @Override
     public void put(K key, V value) {
+        Node<K, V> current = getNode(key);
+        if (Objects.equals(current.key, key)) {
+            current.value = value;
+            return;
+        }
+        if (current == null) {
+            size++;
+            if (size > getThreshold()) {
 
-
+            }
+            table[getIndex(key)] = new Node<>(key, value, null);
+            return;
+        }
+        while (current.next != null) {
+            current = current.next;
+        }
+        current.next = new Node<>(key, value, null);
     }
 
     @Override
@@ -24,8 +40,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> current = getNode(key);
         return current == null ? null : current.value;
     }
-
-
 
     @Override
     public int getSize() {
