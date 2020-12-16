@@ -5,22 +5,28 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75F;
-    private static int capacity = 1;
-    private int size = 0;
+    private static int capacity;
+    private int size;
     private Node<K, V>[] nodesArray;
 
     public MyHashMap() {
         nodesArray = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
         capacity = nodesArray.length;
+        size = 0;
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= capacity * LOAD_FACTOR) {
+        if (size > capacity * LOAD_FACTOR) {
             resize();
         }
         int hash = setHash(key);
         Node<K, V> newNode = new Node<>(hash, key, value, null);
+        if (nodesArray[hash] == null) {
+            nodesArray[hash] = newNode;
+            size++;
+            return;
+        }
         if (nodesArray[hash] != null) {
             Node<K, V> node = nodesArray[hash];
             while (node.next != null) {
@@ -37,26 +43,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             node.next = newNode;
             size++;
         }
-        if (nodesArray[hash] == null) {
-            nodesArray[hash] = newNode;
-            size++;
-        }
     }
 
     @Override
     public V getValue(K key) {
         int hash = setHash(key);
-        if (nodesArray == null || nodesArray[hash] == null) {
-            return null;
-        }
-        Node<K, V> node = nodesArray[hash];
-        while (node.next != null) {
-            if (Objects.equals(node.key,key)) {
-                return node.value;
+        if (nodesArray != null && nodesArray[hash] != null) {
+            Node<K, V> node = nodesArray[hash];
+            while (node.next != null) {
+                if (Objects.equals(node.key, key)) {
+                    return node.value;
+                }
+                node = node.next;
             }
-            node = node.next;
+            return node.value;
         }
-        return node.value;
+        return null;
     }
 
     @Override
