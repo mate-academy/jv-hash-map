@@ -17,22 +17,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         thresholdCheck();
         Node<K, V> previous = nodes[getHash(key)];
         if (previous == null) {
-            nodes[getHash(key)] = new Node<>(key, value, null);
+            nodes[getHash(key)] = new Node<K, V>(key, value, null);
             size++;
             return;
         }
-        while (true) {
+        while (previous.next != null || Objects.equals(previous.key,key)) {
             if (Objects.equals(previous.key, key)) {
                 previous.value = value;
                 return;
             }
-            if (previous.next == null) {
-                previous.next = new Node<>(key, value, null);
-                size++;
-                return;
-            }
             previous = previous.next;
         }
+        previous.next = new Node<>(key, value, null);
+        size++;
     }
 
     @Override
