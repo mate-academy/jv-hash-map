@@ -17,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-       int hash = setHash(key);
+        int hash = setHash(key);
         Node<K, V> newNode = new Node<>(hash, key, value, null);
         if (nodesArray[hash] == null) {
             nodesArray[hash] = newNode;
@@ -64,11 +64,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void checkSize(int size) {
-       if (size > capacity * LOAD_FACTOR) {
-           resize();
-       } else {
-           size++;
-       }
+        if (size > capacity * LOAD_FACTOR) {
+            resize();
+        } else {
+            size++;
+        }
     }
 
     private int setHash(K key) {
