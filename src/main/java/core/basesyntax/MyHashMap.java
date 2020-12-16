@@ -37,7 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int indexWantedValue = indexInTable(key);
         Node<K, V> wantedNode = table[indexWantedValue];
         while (wantedNode != null) {
-            if (isEquals(wantedNode.key, key)) {
+            if (Objects.equals(wantedNode.key, key)) {
                 return wantedNode.value;
             }
             wantedNode = wantedNode.next;
@@ -69,22 +69,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int indexForValue = indexInTable(current.key);
         Node<K, V> checkedNode = table[indexForValue];
         while (checkedNode.next != null) {
-            if (isEquals(current.key, checkedNode.key)) {
+            if (Objects.equals(current.key, checkedNode.key)) {
                 checkedNode.value = current.value;
                 return;
             }
             checkedNode = checkedNode.next;
         }
-        if (isEquals(current.key, checkedNode.key)) {
+        if (Objects.equals(current.key, checkedNode.key)) {
             checkedNode.value = current.value;
             return;
         }
         checkedNode.next = current;
         size++;
-    }
-
-    private boolean isEquals(K key, K secondKey) {
-        return Objects.equals(key, secondKey);
     }
 
     private int indexInTable(K key) {
