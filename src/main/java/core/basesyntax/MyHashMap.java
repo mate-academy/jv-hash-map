@@ -1,9 +1,9 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    public static final int DEFAULT_INITIAL_CAPACITY = 16;
-    public static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    public static final int CAPACITY_INCREASER = 2;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int CAPACITY_INCREASER = 2;
 
     Node<K, V>[] bucketArray;
     private int size;
@@ -26,8 +26,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         Node<K, V> current = bucketArray[bucket];
-        for (int i = 0; i < size; i++) {
-            if (key == null ? key == current.key : key.equals(current.key)) {
+        while (current != null) {
+            if (isKeysEquals(key, current.key)) {
                 current.value = value; //if keys equals change old value to new
                 return;
             }
@@ -44,11 +44,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> current = bucketArray[bucket(key)];
-        for (int i = 0; i < size; i++) {
-            if (current == null) {
-                return null;
-            }
-            if (key == null ? key == current.key : key.equals(current.key)) {
+        if (current == null) {
+            return null;
+        }
+        while (current != null) {
+            if (isKeysEquals(key, current.key)) {
                 return current.value;
             }
             current = current.next;
@@ -79,6 +79,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
+    }
+
+    private boolean isKeysEquals(K key1, K key2) {
+        return key1 == null ? key1 == key2 : key1.equals(key2);
     }
 
     private class Node<K, V> {
