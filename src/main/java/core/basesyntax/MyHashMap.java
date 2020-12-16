@@ -53,11 +53,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (capacity * LOAD_FACTOR);
         Node<K, V>[] localTable = table;
         table = (Node<K, V>[]) new Node[capacity];
+        size = 0;
         for (int i = 0; i < localTable.length; i++) {
             while (localTable[i] != null) {
                 put(localTable[i].key, localTable[i].value);
                 localTable[i] = localTable[i].next;
-                size--;
             }
         }
     }
