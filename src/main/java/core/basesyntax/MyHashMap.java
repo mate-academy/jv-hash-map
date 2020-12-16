@@ -9,7 +9,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size = 0;
     private int capacity = DEFAULT_CAPACITY;
     private int threshold;
-    private Node<K, V>[] table = new Node[DEFAULT_CAPACITY];
+    private Node<K, V>[] table;
+
+    public MyHashMap() {
+        this.table = new Node[DEFAULT_CAPACITY];
+    }
 
     class Node<K, V> {
         private final int hash;
