@@ -22,26 +22,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = setHash(key);
         Node<K, V> newNode = new Node<>(hash, key, value, null);
         if (nodesArray[hash] != null) {
-            Node<K, V> iterrarion = nodesArray[hash];
-            while (iterrarion.next != null) {
-                if (Objects.equals(iterrarion.key,key)) {
-                    iterrarion.value = value;
+            Node<K, V> node = nodesArray[hash];
+            while (node.next != null) {
+                if (Objects.equals(node.key,key)) {
+                    node.value = value;
                     return;
                 }
-                iterrarion = iterrarion.next;
+                node = node.next;
             }
-            if (Objects.equals(iterrarion.key, key)) {
-                iterrarion.value = newNode.value;
+            if (Objects.equals(node.key, key)) {
+                node.value = newNode.value;
                 return;
             }
-            iterrarion.next = newNode;
+            node.next = newNode;
             size++;
         }
         if (nodesArray[hash] == null) {
             nodesArray[hash] = newNode;
             size++;
         }
-
     }
 
     @Override
@@ -50,14 +49,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (nodesArray == null || nodesArray[hash] == null) {
             return null;
         }
-        Node<K, V> iterrarion = nodesArray[hash];
-        while (iterrarion.next != null) {
-            if (Objects.equals(iterrarion.key,key)) {
-                return iterrarion.value;
+        Node<K, V> node = nodesArray[hash];
+        while (node.next != null) {
+            if (Objects.equals(node.key,key)) {
+                return node.value;
             }
-            iterrarion = iterrarion.next;
+            node = node.next;
         }
-        return iterrarion.value;
+        return node.value;
     }
 
     @Override
@@ -71,13 +70,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        Node<K, V>[] oldTable = nodesArray;
+        Node<K, V>[] node = nodesArray;
         nodesArray = (Node<K, V>[]) new Node[capacity * 2];
         capacity = nodesArray.length;
-        for (Node<K, V> node : oldTable) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+        for (Node<K, V> nodes : node) {
+            while (nodes != null) {
+                put(nodes.key, nodes.value);
+                nodes = nodes.next;
             }
         }
     }
