@@ -20,8 +20,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> current = bucketArray[bucket];
             while (1 == 1) {
-                if (key == null ? key == current.key : key.equals(current.key)) { //if keys equals change old value to new
-                    current.value = value;
+                if (key == null ? key == current.key : key.equals(current.key)) {
+                    current.value = value; //if keys equals change old value to new
                     return;
                 } else {
                     if (current.next == null) { //if its end of a list put new Node
