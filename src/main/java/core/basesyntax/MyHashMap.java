@@ -3,8 +3,8 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_INITIAL_CAPACITY = 16;
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int threshold;
     private int size;
     private Node<K, V>[] table;
@@ -17,13 +17,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        int hash = Math.abs(Objects.hashCode(key));
-        int index = hash % table.length;
+        int index = getIndexForBucket(key);
         if (table[index] == null) {
-            table[index] = new Node<>(key, value, hash, null);
+            table[index] = new Node<>(key, value, null);
             ++size;
         } else {
-            putInFullBucket(index, hash, key, value);
+            putInFullBucket(index, key, value);
         }
     }
 
@@ -38,7 +37,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void putInFullBucket(int index, int hash, K key, V value) {
+    private int getIndexForBucket(K key) {
+        return Math.abs(Objects.hashCode(key)) % table.length;
+    }
+
+    private void putInFullBucket(int index, K key, V value) {
         Node<K, V> currentNode = table[index];
         if ((key == null && currentNode.key == null)
                 || (key != null && key.equals(currentNode.key))) {
@@ -52,7 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     return;
                 }
             }
-            currentNode.next = new Node<>(key, value, hash, null);
+            currentNode.next = new Node<>(key, value, null);
             ++size;
         }
     }
@@ -103,13 +106,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         final K key;
         V value;
         Node<K, V> next;
-        final int hash;
 
-        public Node(K key, V value, int hash, Node<K, V> next) {
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
-            this.hash = hash;
         }
     }
 }
