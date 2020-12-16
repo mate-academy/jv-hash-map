@@ -16,23 +16,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> current = getNode(key);
-        if (Objects.equals(current.key, key)) {
-            current.value = value;
-            return;
-        }
+        Node<K, V> current = table[getIndex(key)];
         if (current == null) {
-            size++;
-            if (size > getThreshold()) {
-
-            }
             table[getIndex(key)] = new Node<>(key, value, null);
-            return;
+        } else {
+            boolean flag = true;
+            while (flag) {
+                if (Objects.equals(current.key, key)) {
+                    current.value = value;
+                    return;
+                }
+                if (current.next == null) {
+                    flag = false;
+                } else {
+                    current = current.next;
+                }
+            }
+            current.next = new Node<>(key, value, null);
         }
-        while (current.next != null) {
-            current = current.next;
+        size++;
+        if (size > getThreshold()) {
+            resize();
         }
-        current.next = new Node<>(key, value, null);
     }
 
     @Override
@@ -44,6 +49,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private void resize() {
+        int newSize = table.length * 2;
+        Node<K, V>[] newTable = (Node<K, V>[]) new Node[newSize];
+        transfer(newTable);
+    }
+
+    private void transfer(Node<K, V>[] newTable) {
+        Node<K, V>[] tmp = table;
+        table = newTable;
+        for (Node<K, V> node : tmp) {
+            while (node != null) {
+                put(node.key, node.value);
+                size--;
+                node = node.next;
+            }
+        }
     }
 
     private Node<K,V> getNode(K key) {
@@ -58,7 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        int hash = key == null ? 0 : key.hashCode();
+        int hash = key == null ? 0 : key.hashCode() < 0 ? key.hashCode() * (-1) : key.hashCode();
         return hash % table.length;
     }
 
