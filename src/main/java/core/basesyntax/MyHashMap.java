@@ -8,26 +8,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private int threshold;
 
-    MyHashMap() {
+    public MyHashMap() {
         array = new Node[INITIAL_CAPACITY];
         threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        int tempHash = this.hash(key);
-        int index = hashIndex(tempHash);
+        int index = hashIndex(key);
         if (array[index] == null) {
             array[index] = new Node<>(key, value, null);
         } else {
-            if (isEqual(key, array[index].key)) {
-                array[index].value = value;
-                return;
-            }
             Node<K, V> tempNode = array[index];
-            while (tempNode.next != null) {
-                if (isEqual(key, tempNode.next.key)) {
-                    tempNode.next.value = value;
+            while (tempNode.next != null || isEqual(key, tempNode.key)) {
+                if (isEqual(key, tempNode.key)) {
+                    tempNode.value = value;
                     return;
                 }
                 tempNode = tempNode.next;
@@ -44,7 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-
+        size = 0;
         Node<K, V>[] tempArray = array;
         array = (Node<K, V>[]) new Node[array.length * MULTIPLIER];
         threshold = (int) (array.length * LOAD_FACTOR);
@@ -52,18 +47,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             while (tempNode != null) {
                 put(tempNode.key, tempNode.value);
                 tempNode = tempNode.next;
-                size--;
+
             }
         }
     }
 
-    private int hashIndex(int hash) {
-        return Math.abs(hash % array.length);
-    }
-
-    private int hash(K key) {
-        int h;
-        return key == null ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+    private int hashIndex(K key) {
+        return Math.abs(key == null ? 0 : key.hashCode() % array.length);
     }
 
     @Override
@@ -71,18 +61,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (mapIsEmpty()) {
             return null;
         }
-        int hashKey = hash(key);
-        int index = hashIndex(hashKey);
+        int index = hashIndex(key);
         Node<K, V> tempNode = array[index];
-        if (tempNode == null) {
-            return null;
-        }
-        if (isEqual(tempNode.key, key)) {
-            return tempNode.value;
-        }
-        while (tempNode.next != null) {
-            if (isEqual(tempNode.next.key, key)) {
-                return tempNode.next.value;
+        while (tempNode != null) {
+            if (isEqual(tempNode.key, key)) {
+                return tempNode.value;
             }
             tempNode = tempNode.next;
         }
