@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75F;
@@ -8,14 +10,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int hash;
     private Node<K, V>[] nodesArray;
 
+
     @Override
     public void put(K key, V value) {
         initializeArr();
-        Node<K, V> newNode = new Node<>(hash, key, value, null);
         hash = setHash(key);
+        Node<K, V> newNode = new Node<>(hash, key, value, null);
         if (nodesArray[hash] != null) {
             Node<K, V> iterrarion = nodesArray[hash];
+            if(Objects.equals(iterrarion.key, key)){
+                iterrarion.value = newNode.value;
+                return;
+            }
             while (iterrarion.next != null){
+                if(Objects.equals(iterrarion.key,key)) {
+                    iterrarion.value = value;
+                    return;
+                }
                 iterrarion = iterrarion.next;
             }
             iterrarion.next = newNode;
@@ -35,14 +46,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if(nodesArray == null|| nodesArray[hash] == null) {
             return null;
         }
-        if(nodesArray[hash].next != null) {
-        while (nodesArray[hash].next != null) {
-            if(nodesArray[hash].key == key){
-                return nodesArray[hash].value;}
-            nodesArray[hash] = nodesArray[hash].next;
+        Node<K, V> iterrarion = nodesArray[hash];
+        while (iterrarion.next != null) {
+            if(Objects.equals(iterrarion.key,key)) {
+                return iterrarion.value;
+            }
+            iterrarion = iterrarion.next;
         }
-        }
-        return nodesArray[setHash(key)].value;
+        return iterrarion.value;
     }
 
     @Override
