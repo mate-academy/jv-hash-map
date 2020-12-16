@@ -16,18 +16,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K, V>[] tab = table;
-        int elementIndex;
-        if (tab == null || tab.length == 0) {
-            resize();
-        }
-        elementIndex = Math.abs(hash(key) % tab.length);
-        if (tab[elementIndex] == null) {
-            tab[elementIndex] = new Node<>(key, value, null);
+        int elementIndex = hash(key) % table.length;
+        if (table[elementIndex] == null) {
+            table[elementIndex] = new Node<>(key, value, null);
             size++;
             return;
         }
-        Node<K, V> head = tab[elementIndex];
+        Node<K, V> head = table[elementIndex];
         while (head != null) {
             if (Objects.equals(head.key, key)) {
                 head.value = value;
@@ -47,18 +42,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> head;
-        Node<K, V> returnValue = null;
         Node<K, V>[] tab = table;
-        head = tab[Math.abs(hash(key) % tab.length)];
+        Node<K, V> head = tab[hash(key) % tab.length];
         while (head != null) {
             if (Objects.equals(key, head.key)) {
                 return head.value;
             }
             head = head.next;
-        }
-        if (returnValue != null) {
-            return returnValue.value;
         }
         return null;
     }
@@ -70,22 +60,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         final Node<K, V>[] oldTab = table;
+        table = (Node<K, V>[]) new Node[table.length * 2];
         threshold = threshold * 2;
-        Node<K, V>[] newTab = (Node<K, V>[]) new Node[table.length * 2];
         size = 0;
-        table = newTab;
-        if (oldTab != null) {
-            for (Node<K, V> node : oldTab) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
+        for (Node<K, V> node : oldTab) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
 
     private int hash(Object key) {
-        return key == null ? 0 : key.hashCode();
+        return key == null ? 0 : Math.abs(key.hashCode());
     }
 
     private static class Node<K, V> {
