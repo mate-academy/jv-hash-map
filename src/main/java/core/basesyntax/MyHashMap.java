@@ -15,6 +15,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
+    public int getSize() {
+        return size;
+    }
+
+    private int hash(K key) {
+        int h;
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >> 16);
+    }
+
+    @Override
     public void put(K key, V value) {
         int keyHash = hash(key);
         int index = keyHash % array.length;
@@ -31,7 +41,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        //int oldArrayIndex = newNode.hash % this.array.length;
         Node<K, V> node = toArray[index];
         while (!Objects.equals(node.key, newNode.key) && node.next != null) {
             node = node.next;
@@ -42,6 +51,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         node.next = newNode;
         size++;
+    }
+
+    private void resize() {
+        int newCapacity = array.length * 2;
+        int index;
+        size = 0;
+        threshhold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
+        Node<K, V>[] newArray = (Node<K,V>[]) new Node[newCapacity];
+        for (Node<K, V> node : array) {
+            while (node != null) {
+                index = node.hash % newArray.length;
+                put(newArray, new Node<>(node), index);
+                node = node.next;
+            }
+        }
+        array = newArray;
     }
 
     @Override
@@ -58,11 +83,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return node.value;
         }
         return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
     }
 
     private static class Node<K, V> {
@@ -84,26 +104,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             value = node.value;
             next = null;
         }
-    }
-
-    private int hash(K key) {
-        int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >> 16);
-    }
-
-    private void resize() {
-        int newCapacity = array.length * 2;
-        int index;
-        size = 0;
-        threshhold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
-        Node<K, V>[] newArray = (Node<K,V>[]) new Node[newCapacity];
-        for (Node<K, V> node : array) {
-            while (node != null) {
-                index = node.hash % newArray.length;
-                put(newArray, new Node<>(node), index);
-                node = node.next;
-            }
-        }
-        array = newArray;
     }
 }
