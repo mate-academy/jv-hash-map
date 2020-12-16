@@ -26,22 +26,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int keyHash = hash(key);
-        int index = keyHash % array.length;
-        Node<K, V> node = new Node<>(keyHash, key, value, null);
-        put(array, node, index);
+        Node<K, V> node = new Node<>(hash(key), key, value, null);
+        put(node, getIndex(node));
         if (size > threshhold) {
             resize();
         }
     }
 
-    private void put(Node<K, V>[] toArray, Node<K, V> newNode, int index) {
-        if (toArray[index] == null) {
-            toArray[index] = newNode;
+    private void put(Node<K, V> newNode, int index) {
+        if (array[index] == null) {
+            array[index] = newNode;
             size++;
             return;
         }
-        Node<K, V> node = toArray[index];
+        Node<K, V> node = array[index];
         while (!Objects.equals(node.key, newNode.key) && node.next != null) {
             node = node.next;
         }
@@ -55,24 +53,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         int newCapacity = array.length * 2;
-        int index;
         size = 0;
         threshhold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
-        Node<K, V>[] newArray = (Node<K,V>[]) new Node[newCapacity];
-        for (Node<K, V> node : array) {
+        Node<K, V>[] tempArray = array;
+        array = (Node<K,V>[]) new Node[newCapacity];
+        for (Node<K, V> node : tempArray) {
             while (node != null) {
-                index = node.hash % newArray.length;
-                put(newArray, new Node<>(node), index);
+                put(new Node<>(node), getIndex(node));
                 node = node.next;
             }
         }
-        array = newArray;
     }
 
     @Override
     public V getValue(K key) {
-        int index = hash(key) % array.length;
-        Node<K, V> node = array[index];
+        Node<K, V> node = array[getIndex(key)];
         if (node == null) {
             return null;
         }
@@ -83,6 +78,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return node.value;
         }
         return null;
+    }
+
+    public int getIndex(Node<K, V> node) {
+        return node == null ? 0 : node.hash % array.length;
+    }
+
+    public int getIndex(K key) {
+        return key == null ? 0 : hash(key) % array.length;
     }
 
     private static class Node<K, V> {
