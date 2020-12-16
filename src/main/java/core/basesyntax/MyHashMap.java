@@ -5,8 +5,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public static final float DEFAULT_LOAD_FACTOR = 0.75f;
     public static final int CAPACITY_INCREASER = 2;
 
-    Node<K, V>[] bucketArray = new Node[DEFAULT_INITIAL_CAPACITY];
-    private int size = 0;
+    Node<K, V>[] bucketArray;
+    private int size;
+
+    public MyHashMap() {
+        bucketArray = new Node[DEFAULT_INITIAL_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
@@ -18,29 +22,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (bucketArray[bucket] == null) { //empty bucket
             bucketArray[bucket] = new Node<>(key, value);
             size++;
-        } else {
-            Node<K, V> current = bucketArray[bucket];
-            for (int i = 0; i < size; i++) {
-                if (key == null ? key == current.key : key.equals(current.key)) {
-                    current.value = value; //if keys equals change old value to new
-                    return;
-                } else {
-                    if (current.next == null) { //if its end of a list put new Node
-                        current.next = new Node<>(key, value);
-                        size++;
-                        return;
-                    } else {
-                        current = current.next;
-                    }
-                }
+            return;
+        }
+
+        Node<K, V> current = bucketArray[bucket];
+        for (int i = 0; i < size; i++) {
+            if (key == null ? key == current.key : key.equals(current.key)) {
+                current.value = value; //if keys equals change old value to new
+                return;
             }
+
+            if (current.next == null) { //if its end of a list put new Node
+                current.next = new Node<>(key, value);
+                size++;
+                return;
+            }
+            current = current.next;
         }
     }
 
     @Override
     public V getValue(K key) {
-        int bucket = bucket(key);
-        Node<K, V> current = bucketArray[bucket];
+        Node<K, V> current = bucketArray[bucket(key)];
         for (int i = 0; i < size; i++) {
             if (current == null) {
                 return null;
@@ -59,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int bucket(K key) {
-        int result = key == null ? 0 : key.hashCode() % 16;
+        int result = key == null ? 0 : key.hashCode() % bucketArray.length;
         return Math.abs(result);
     }
 
