@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -8,7 +7,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75F;
     private static int capacity = 1;
     private int size = 0;
-    private int hash;
     private Node<K, V>[] nodesArray;
 
     public MyHashMap() {
@@ -18,22 +16,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= capacity*LOAD_FACTOR) {
+        if (size >= capacity * LOAD_FACTOR) {
             resize();
         }
-
-        hash = setHash(key);
+        int hash = setHash(key);
         Node<K, V> newNode = new Node<>(hash, key, value, null);
         if (nodesArray[hash] != null) {
             Node<K, V> iterrarion = nodesArray[hash];
-           while (iterrarion.next != null){
-                if(Objects.equals(iterrarion.key,key)) {
+            while (iterrarion.next != null) {
+                if (Objects.equals(iterrarion.key,key)) {
                     iterrarion.value = value;
                     return;
                 }
                 iterrarion = iterrarion.next;
             }
-            if(Objects.equals(iterrarion.key, key)){
+            if (Objects.equals(iterrarion.key, key)) {
                 iterrarion.value = newNode.value;
                 return;
             }
@@ -47,16 +44,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     }
 
-
     @Override
     public V getValue(K key) {
-        hash = setHash(key);
-        if(nodesArray == null|| nodesArray[hash] == null) {
+        int hash = setHash(key);
+        if (nodesArray == null || nodesArray[hash] == null) {
             return null;
         }
         Node<K, V> iterrarion = nodesArray[hash];
         while (iterrarion.next != null) {
-            if(Objects.equals(iterrarion.key,key)) {
+            if (Objects.equals(iterrarion.key,key)) {
                 return iterrarion.value;
             }
             iterrarion = iterrarion.next;
@@ -70,34 +66,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int setHash(K key) {
-        return (key == null) ? 0 :  Math.abs(key.hashCode() % capacity);
-    }
-
-    private void initializeArr() {
-        if (nodesArray == null) {
-            nodesArray = new Node[INITIAL_CAPACITY];
-            capacity = INITIAL_CAPACITY;
-            return;
-        }
-            if(size > capacity*LOAD_FACTOR) {
-            resize();
-        }
+        return (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
     private void resize() {
+        size = 0;
         Node<K, V>[] oldTable = nodesArray;
         nodesArray = (Node<K, V>[]) new Node[capacity * 2];
         capacity = nodesArray.length;
-        size = 0;
-            for(Node<K, V> node : oldTable) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
+    }
 
-    private class Node<K, V> {
+    private static class Node<K, V> {
         int hash;
         K key;
         V value;
@@ -109,6 +94,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-
     }
 }
