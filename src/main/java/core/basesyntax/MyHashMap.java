@@ -44,6 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
+        V targetNodeValue = null;
         if (size == 0) {
             return null;
         }
@@ -51,11 +52,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> currentNode = table[nodeIndex];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
-                return currentNode.value;
+                targetNodeValue = currentNode.value;
             }
             currentNode = currentNode.next;
         }
-        return null;
+        return targetNodeValue;
     }
 
     @Override
