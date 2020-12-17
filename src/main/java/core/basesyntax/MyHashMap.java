@@ -54,7 +54,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public int getSize() {
-        return this.size;
+        return size;
     }
 
     public int getIndex(K key) {
