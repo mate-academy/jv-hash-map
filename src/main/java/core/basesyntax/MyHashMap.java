@@ -5,14 +5,14 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD = 0.75f;
-    private static final int COEF = 2;
+    private static final int COEFFICIENT = 2;
 
-    private Node<K, V>[] defaultTable;
+    private Node<K, V>[] table;
     private int size;
     private int threshold;
 
     public MyHashMap() {
-        this.defaultTable = new Node[DEFAULT_INITIAL_CAPACITY];
+        this.table = new Node[DEFAULT_INITIAL_CAPACITY];
         this.threshold = (int)(DEFAULT_LOAD * DEFAULT_INITIAL_CAPACITY);
     }
 
@@ -30,14 +30,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = hashcode(key) % defaultTable.length;
-        if (defaultTable[index] == null) {
-            defaultTable[index] = new Node<>(key, value, null);
+        int index = hashcode(key) % table.length;
+        if (table[index] == null) {
+            table[index] = new Node<>(key, value, null);
             size++;
             return;
         }
-        Node<K, V> currentNode = defaultTable[index];
-        while ((currentNode.next != null) || (Objects.equals(currentNode.key, key))) {
+        Node<K, V> currentNode = table[index];
+        while (currentNode.next != null || Objects.equals(currentNode.key, key)) {
             if (Objects.equals(currentNode.key, key)) {
                 currentNode.value = value;
                 return;
@@ -53,12 +53,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = hashcode(key) % defaultTable.length;
-        Node<K, V> currentNode = defaultTable[index];
-        if (currentNode == null) {
-            return null;
-        }
-        while ((currentNode.next != null) || (Objects.equals(currentNode.key, key))) {
+        int index = hashcode(key) % table.length;
+        Node<K, V> currentNode = table[index];
+        while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
             }
@@ -73,14 +70,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hashcode(K key) {
-        return (key == null) ? 0 : (Math.abs(key.hashCode() * 17));
+        return key == null ? 0 : Math.abs(key.hashCode() * 17);
     }
 
     private void resize() {
         size = 0;
-        Node<K, V> [] oldTable = defaultTable;
-        defaultTable = new Node[defaultTable.length * COEF];
-        threshold = (int) (defaultTable.length * DEFAULT_LOAD);
+        Node<K, V> [] oldTable = table;
+        table = new Node[table.length * COEFFICIENT];
+        threshold = (int) (table.length * DEFAULT_LOAD);
         for (Node<K, V> bucket : oldTable) {
             while (bucket != null) {
                 put(bucket.key, bucket.value);
