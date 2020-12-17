@@ -20,9 +20,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > threshold) {
             resize();
         }
-        int keyHashCode = key == null ? 0 : key.hashCode();
-        int index = keyHashCode % array.length;
-        index = Math.abs(index);
+        int keyHashCode = getKeyHashCode(key);
+        int index = getIndexByKey(key);
         Node<K, V> current;
         current = array[index];
         if (current != null) {
@@ -45,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = Math.abs(key == null ? 0 : (key.hashCode() % array.length));
+        int index = getIndexByKey(key);
         Node<K, V> current = array[index];
         while (current != null) {
             if (Objects.equals(current.key, key)) {
@@ -75,6 +74,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         threshold = (int) (newLength * LOAD_FACTOR);
+    }
+
+    private int getKeyHashCode(K key) {
+        return key == null ? 0 : key.hashCode();
+    }
+
+    private int getIndexByKey(K key) {
+        return Math.abs(getKeyHashCode(key) % array.length);
     }
 
     private static class Node<K, V> {
