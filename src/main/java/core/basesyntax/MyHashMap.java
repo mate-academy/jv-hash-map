@@ -82,7 +82,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K,V> [] oldTable = table;
         table = newTable;
         size = 0;
-        for (int i = 0; i < oldTable.length;i++) {
+        for (int i = 0; i < oldTable.length; i++) {
             if (oldTable[i] != null) {
                 while (oldTable[i].nextNode != null) {
                     put(oldTable[i].key, oldTable[i].value);
