@@ -9,17 +9,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        this.table = new Node[DEFAULT_INITIAL_CAPACITY];
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
-    static class Node<K, V> {
-        final int hash;
+    private static class Node<K, V> {
         final K key;
         V value;
         Node<K, V> next;
 
         Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
             this.key = key;
             this.value = value;
             this.next = next;
@@ -29,15 +27,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return "key = " + key + ", value = " + value;
         }
 
-        public final int hashCode() {
-            return Objects.hashCode(key) ^ Objects.hashCode(value);
-        }
-
     }
 
     @Override
     public void put(K key, V value) {
-        int hash = hash(key);
+        int hash = getIndex(key);
         Node<K, V> temp = table[hash];
         Node<K, V> current = temp;
         if (temp == null) {
@@ -59,15 +53,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key);
+        int hash = getIndex(key);
         Node<K, V> temp = table[hash];
-        if (temp != null) {
-            while (temp != null) {
-                if (Objects.equals(temp.key, key)) {
-                    return temp.value;
-                }
-                temp = temp.next;
+        while (temp != null) {
+            if (Objects.equals(temp.key, key)) {
+                return temp.value;
             }
+            temp = temp.next;
         }
         return null;
     }
@@ -78,7 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void transferValue(K key, V value, Node<K, V>[] table) {
-        int hash = hash(key);
+        int hash = getIndex(key);
         Node<K, V> temp = table[hash];
         if (temp == null) {
             table[hash] = new Node<K, V>(hash, key, value, null);
@@ -94,24 +86,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table.length * DEFAULT_LOAD_FACTOR <= size) {
             Node<K, V>[] temp = table;
             table = new Node[table.length * 2];
-            table = transfer(temp);
+            transfer(temp, table);
         }
     }
 
-    private int hash(K key) {
+    private int getIndex(K key) {
         return (key == null) ? 0 : (Math.abs(key.hashCode()) % table.length);
     }
 
-    private Node<K, V>[] transfer(Node<K, V>[] table) {
-        Node<K, V>[] transferedTable = new Node[table.length * 2];
+    private void transfer(Node<K, V>[] tableFrom, Node<K, V>[] tableTo) {
         Node<K, V> temp;
-        for (int i = 0; i < table.length; i++) {
-            temp = table[i];
+        for (int i = 0; i < tableFrom.length; i++) {
+            temp = tableFrom[i];
             while (temp != null) {
-                transferValue(temp.key, temp.value, transferedTable);
+                transferValue(temp.key, temp.value, tableTo);
                 temp = temp.next;
             }
         }
-        return transferedTable;
     }
 }
