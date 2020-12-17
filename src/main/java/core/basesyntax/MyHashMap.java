@@ -64,8 +64,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void checkSize(int size) {
         if (size > nodesArray.length * LOAD_FACTOR) {
             resize();
-        } else {
-            size++;
         }
     }
 
