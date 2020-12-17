@@ -19,7 +19,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-
         if (table[hashIndex(key)] == null) {
             table[hashIndex(key)] = new Node<>(key, value, null);
             size++;
