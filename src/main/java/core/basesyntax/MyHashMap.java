@@ -1,8 +1,11 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
     private static final int DEFAULT_CAPACITY = 16;
+    private static final int RESIZE_FACTOR = 2;
     private Node<K, V>[] array;
     private int treshold;
     private int size;
@@ -17,23 +20,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size + 1 > treshold) {
             resize();
         }
-        Node<K, V> currentNode = array[keyHash(key)];
-        if (currentNode == null) {
-            array[keyHash(key)] = new Node<>(key, value);
+        if (array[indexByKeyHash(key)] == null) {
+            array[indexByKeyHash(key)] = new Node<>(key, value);
             size++;
-            return;
-        }
-        while (currentNode != null) {
-            if (currentNode.key == key || currentNode.key != null && currentNode.key.equals(key)) {
-                currentNode.value = value;
-                return;
+        } else {
+            Node<K, V> currentNode = array[indexByKeyHash(key)];
+            while (currentNode != null) {
+                if (Objects.equals(currentNode.key, key)) {
+                    currentNode.value = value;
+                    return;
+                }
+                if (currentNode.next == null) {
+                    currentNode.next = new Node<>(key, value);
+                    size++;
+                }
+                currentNode = currentNode.next;
             }
-            if (currentNode.next == null) {
-                currentNode.next = new Node<>(key, value);
-                size++;
-                return;
-            }
-            currentNode = currentNode.next;
         }
     }
 
@@ -42,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == 0) {
             return null;
         }
-        Node<K, V> currentNode = array[keyHash(key)];
+        Node<K, V> currentNode = array[indexByKeyHash(key)];
         while (currentNode != null) {
             if (currentNode.key == key || currentNode.key != null && currentNode.key.equals(key)) {
                 return currentNode.value;
@@ -60,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         size = 0;
         Node<K, V>[] tmpArray = array;
-        array = (Node<K,V>[]) new Node[tmpArray.length * 2];
+        array = (Node<K,V>[]) new Node[tmpArray.length * RESIZE_FACTOR];
         treshold = (int) (array.length * LOAD_FACTOR);
         for (Node<K, V> tmpNode : tmpArray) {
             while (tmpNode != null) {
@@ -70,8 +72,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int keyHash(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % array.length);
+    private int indexByKeyHash(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % array.length);
     }
 
     private static class Node<K, V> {
