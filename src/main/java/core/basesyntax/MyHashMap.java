@@ -8,6 +8,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V>[] table;
     private int size;
+    private int threshold;
 
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
@@ -16,6 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        getThreshold();
         Node<K, V> current = table[getIndex(key)];
         if (current == null) {
             table[getIndex(key)] = new Node<>(key, value, null);
@@ -35,7 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             current.next = new Node<>(key, value, null);
         }
         size++;
-        if (size > getThreshold()) {
+        if (size > threshold) {
             resize();
         }
     }
@@ -85,8 +87,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return hash % table.length;
     }
 
-    private int getThreshold() {
-        return (int) (table.length * DEFAULT_LOAD_FACTOR);
+    private void getThreshold() {
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
     }
 
     private static class Node<K, V> {
