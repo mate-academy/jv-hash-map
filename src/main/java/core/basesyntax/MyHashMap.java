@@ -18,23 +18,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         int index = hash(key);
         Node<K, V> newNode = new Node<>(key, value, null);
-        if (table[index] == null) {
-            table[index] = newNode;
-            size++;
-        } else {
-            Node<K, V> listNode = table[index];
-            while (true) {
-                if (Objects.equals(newNode.key, listNode.key)) {
-                    listNode.value = newNode.value;
-                    return;
-                }
-                if (listNode.next == null) {
-                    break;
-                }
-                listNode = listNode.next;
+        Node<K, V> listNode = table[index];
+        while (true) {
+            if (table[index] == null) {
+                table[index] = newNode;
+                size++;
+                break;
             }
-            listNode.next = newNode;
-            size++;
+            if (Objects.equals(newNode.key, listNode.key)) {
+                listNode.value = newNode.value;
+                return;
+            }
+            if (listNode.next == null) {
+                listNode.next = newNode;
+                size++;
+                break;
+            }
+            listNode = listNode.next;
         }
         if (size > threshold) {
             resize();
