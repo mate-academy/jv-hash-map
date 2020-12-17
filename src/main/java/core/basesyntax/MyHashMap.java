@@ -5,13 +5,11 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75F;
-    private static int capacity;
     private int size;
     private Node<K, V>[] nodesArray;
 
     public MyHashMap() {
         nodesArray = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
-        capacity = nodesArray.length;
         size = 0;
     }
 
@@ -64,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void checkSize(int size) {
-        if (size > capacity * LOAD_FACTOR) {
+        if (size > nodesArray.length * LOAD_FACTOR) {
             resize();
         } else {
             size++;
@@ -72,14 +70,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int setHash(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
+        return (key == null) ? 0 : Math.abs(key.hashCode() % nodesArray.length);
     }
 
     private void resize() {
         size = 0;
         Node<K, V>[] node = nodesArray;
-        nodesArray = (Node<K, V>[]) new Node[capacity * 2];
-        capacity = nodesArray.length;
+        nodesArray = (Node<K, V>[]) new Node[node.length * 2];
         for (Node<K, V> nodes : node) {
             while (nodes != null) {
                 put(nodes.key, nodes.value);
