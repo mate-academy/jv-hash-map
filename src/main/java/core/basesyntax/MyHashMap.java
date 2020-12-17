@@ -20,11 +20,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size + 1 > threshold) {
             resize();
         }
-        if (array[indexByKeyHash(key)] == null) {
-            array[indexByKeyHash(key)] = new Node<>(key, value);
+        if (array[getIndexByKey(key)] == null) {
+            array[getIndexByKey(key)] = new Node<>(key, value);
             size++;
+            return;
         } else {
-            Node<K, V> currentNode = array[indexByKeyHash(key)];
+            Node<K, V> currentNode = array[getIndexByKey(key)];
             while (currentNode != null) {
                 if (Objects.equals(currentNode.key, key)) {
                     currentNode.value = value;
@@ -44,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == 0) {
             return null;
         }
-        Node<K, V> currentNode = array[indexByKeyHash(key)];
+        Node<K, V> currentNode = array[getIndexByKey(key)];
         while (currentNode != null) {
             if (currentNode.key == key || currentNode.key != null && currentNode.key.equals(key)) {
                 return currentNode.value;
@@ -72,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int indexByKeyHash(K key) {
+    private int getIndexByKey(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % array.length);
     }
 
