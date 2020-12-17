@@ -71,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     eachNode = eachNode.next;
                 }
             }
-            threshold *= 2;
+            threshold *= CAPACITY_INCREASE;
         }
     }
 
