@@ -14,10 +14,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.threshold = (int)(table.length * LOAD_FACTOR);
     }
 
-    private int hashKey(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
-    }
-
     public static class Node<K, V> {
         private K key;
         private V value;
@@ -74,6 +70,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private int hashKey(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     public void resize() {
