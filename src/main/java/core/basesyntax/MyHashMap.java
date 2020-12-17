@@ -3,14 +3,17 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    //-----------------constants------------------------//
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int INITIAL_THRESHOLD = 12;
+    private static final int INITIAL_THRESHOLD = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
     private static final int INCREASE_MULTIPLIER = 2;
 
-    // ----------------Node class-----------------------//
-    static class Node<K, V> {
+    private Node<K, V>[] map;
+    private int size;
+    private int threshold;
+
+    private static class Node<K, V> {
+
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -20,27 +23,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-    }
-    //----------------------fields------------------------//
 
-    private Node<K, V>[] map;
-    private int size;
-    private int threshold;
-    //---------------------constructor--------------------//
+    }
 
     public MyHashMap() {
         map = new Node[INITIAL_CAPACITY];
-        size = 0;
         threshold = INITIAL_THRESHOLD;
     }
-    //-------------------public methods-------------------//
 
     @Override
     public void put(K key, V value) {
-        if (map[getIndex(key)] == null) {
-            map[getIndex(key)] = new Node<>(key, value, null);
+        int index = getIndex(key);
+        if (map[index] == null) {
+            map[index] = new Node<>(key, value, null);
         } else {
-            Node<K, V> finalNode = map[getIndex(key)];
+            Node<K, V> finalNode = map[index];
             while (finalNode.next != null || Objects.equals(finalNode.key, key)) {
                 if (Objects.equals(finalNode.key, key)) {
                     finalNode.value = value;
@@ -57,7 +54,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> searchNode = map[getIndex(key)];
+        int index = getIndex(key);
+        Node<K, V> searchNode = map[index];
         while (searchNode != null) {
             if (Objects.equals(searchNode.key, key)) {
                 return searchNode.value;
@@ -76,7 +74,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public boolean isEmpty() {
         return size == 0;
     }
-    //----------------------------internal utility-------------------------//
 
     private int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % map.length);
