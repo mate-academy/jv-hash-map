@@ -24,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == 0) {
             return null;
         }
-        Node<K, V> currentNode = table[hash(key)];
+        Node<K, V> currentNode = table[getIndex(key)];
         while (currentNode != null) {
             if (key == currentNode.key || (key != null && key.equals(currentNode.key))) {
                 return currentNode.value;
@@ -36,9 +36,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     
     @Override
     public void put(K key, V value) {
-        int hash = hash(key);
+        int hash = getIndex(key);
         Node<K, V> currentNode = table[hash];
-        Node<K, V> newNode = new Node<>(hash, key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, null);
         if (currentNode == null) {
             table[hash] = newNode;
         } else {
@@ -62,33 +62,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @SuppressWarnings("unchecked")
     private void resize() {
         size = 0;
-        int newCap = table.length * 2;
-        threshold = (int) (newCap * LOAD_FACTOR);
+        int newCapacity = table.length * 2;
+        threshold = (int) (newCapacity * LOAD_FACTOR);
         Node<K, V>[] oldTable = table;
-        table = (Node<K, V>[]) new Node[newCap];
-        for (Node<K, V> node : oldTable) {
-            if (node != null) {
-                Node<K, V> currentNode = node;
-                while (currentNode != null) {
-                    put(currentNode.key, currentNode.value);
-                    currentNode = currentNode.next;
-                }
+        table = (Node<K, V>[]) new Node[newCapacity];
+        for (Node<K, V> currentNode : oldTable) {
+            while (currentNode != null) {
+                put(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
             }
         }
     }
     
-    private int hash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % threshold);
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
     
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
         
-        Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
