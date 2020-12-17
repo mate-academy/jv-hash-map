@@ -150,7 +150,7 @@ public class MyHashMapTest {
         Integer secondActualValue = myHashMap.getValue(secondBus);
         Integer thirdActualValue = myHashMap.getValue(thirdBus);
         Integer fourthActualValue = myHashMap.getValue(null);
-        Assert.assertEquals("Test failed! HashMap expects to contain 3 values, but was "
+            Assert.assertEquals("Test failed! HashMap expects to contain 3 values, but was "
                 + firstActualValue, Integer.valueOf(3), firstActualValue);
         Assert.assertEquals("Test failed! HashMap expects to contain 5 values, but was "
                 + secondActualValue, Integer.valueOf(5), secondActualValue);
