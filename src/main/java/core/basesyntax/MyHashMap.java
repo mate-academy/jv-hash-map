@@ -64,11 +64,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int newLength = table.length * 2;
         threshold = threshold * 2;
         size = 0;
         Node<K, V>[] oldTable = table;
-        table = (Node<K, V>[]) new Node[newLength];
+        table = (Node<K, V>[]) new Node[table.length * 2];
         for (Node<K, V> oldNode : oldTable) {
             while (oldNode != null) {
                 put(oldNode.key, oldNode.value);
