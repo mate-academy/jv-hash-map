@@ -44,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> resultNode = table[getIndex(key)];
-        while (resultNode != null) {
+        while(resultNode != null) {
             if (Objects.equals(resultNode.key, key)) {
                 return resultNode.value;
             }
