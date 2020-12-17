@@ -229,6 +229,9 @@ public class MyHashMapTest {
         for (int i = 0; i < 1000; i++) {
             Plane plane = new Plane("model_" + i, "color_" + i);
             myHashMap.put(plane, i);
+            if (myHashMap.getSize() != i + 1) {
+                break;
+            }
         }
         Assert.assertEquals("Test failed! The size isn't correct. Expected 1000 but was "
                 + myHashMap.getSize(), 1000, myHashMap.getSize());
