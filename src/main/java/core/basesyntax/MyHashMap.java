@@ -26,8 +26,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> node = new Node<>(hash(key), key, value, null);
-        put(node, getIndex(node));
+        Node<K, V> node = new Node<>(key, value, null);
+        put(node, getIndex(node.key));
         if (size > threshhold) {
             resize();
         }
@@ -59,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         array = (Node<K,V>[]) new Node[newCapacity];
         for (Node<K, V> node : tempArray) {
             while (node != null) {
-                put(new Node<>(node), getIndex(node));
+                put(new Node<>(node), getIndex(node.key));
                 node = node.next;
             }
         }
@@ -67,21 +67,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = array[getIndex(key)];
-        if (node == null) {
-            return null;
-        }
-        while (!Objects.equals(node.key, key) && node.next != null) {
-            node = node.next;
-        }
-        if (Objects.equals(node.key, key)) {
-            return node.value;
+        Node<K, V> returnNode = array[getIndex(key)];
+        while (returnNode != null) {
+            if (Objects.equals(returnNode.key, key)) {
+                return returnNode.value;
+            }
+            returnNode = returnNode.next;
         }
         return null;
-    }
-
-    public int getIndex(Node<K, V> node) {
-        return node == null ? 0 : node.hash % array.length;
     }
 
     public int getIndex(K key) {
@@ -89,20 +82,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
         }
 
         public Node(Node<K, V> node) {
-            hash = node.hash;
             key = node.key;
             value = node.value;
             next = null;
