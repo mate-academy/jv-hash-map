@@ -61,10 +61,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         if (size > threshold) {
             int newCapacity = table.length * CAPACITY_INCREASE;
-            Node<K, V>[] newNodes = table;
+            Node<K, V>[] oldNodes = table;
             table = new Node[newCapacity];
             size = 0;
-            for (Node<K, V> eachNode : newNodes) {
+            for (Node<K, V> eachNode : oldNodes) {
                 while (eachNode != null) {
                     put(eachNode.key, eachNode.value);
                     eachNode = eachNode.next;
