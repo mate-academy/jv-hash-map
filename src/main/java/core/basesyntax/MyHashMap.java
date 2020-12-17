@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -20,25 +19,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > threshold) {
             resize();
         }
-        int keyHashCode = getKeyHashCode(key);
         int index = getIndexByKey(key);
-        Node<K, V> current;
-        current = array[index];
-        if (current != null) {
-            while (current != null) {
-                if (Objects.equals(current.key, key)) {
-                    current.value = value;
-                    return;
-                }
-                if (current.next == null) {
-                    current.next = new Node(keyHashCode, value, key, null);
-                    size++;
-                    return;
-                }
-                current = current.next;
+        Node<K, V> current = array[index];
+        while (current != null) {
+            if (Objects.equals(current.key, key)) {
+                current.value = value;
+                return;
             }
+            if (current.next == null) {
+                current.next = new Node(value, key, null);
+                size++;
+                return;
+            }
+            current = current.next;
         }
-        array[index] = new Node(keyHashCode, value, key, null);
+        array[index] = new Node(value, key, null);
         size++;
     }
 
@@ -62,7 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         int newLength = array.length * 2;
-        Node<K, V>[] oldArray = Arrays.copyOf(array, array.length);
+        Node<K, V>[] oldArray = array;
         array = new Node[newLength];
         size = 0;
         Node<K, V> current;
@@ -76,22 +71,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (newLength * LOAD_FACTOR);
     }
 
-    private int getKeyHashCode(K key) {
-        return key == null ? 0 : key.hashCode();
-    }
-
     private int getIndexByKey(K key) {
-        return Math.abs(getKeyHashCode(key) % array.length);
+        return Math.abs((key == null ? 0 : key.hashCode()) % array.length);
     }
 
     private static class Node<K, V> {
-        final int hashCode;
         final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hashCode, V value, K key, Node<K, V> next) {
-            this.hashCode = hashCode;
+        public Node(V value, K key, Node<K, V> next) {
             this.value = value;
             this.key = key;
             this.next = next;
