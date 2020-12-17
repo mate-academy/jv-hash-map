@@ -25,7 +25,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-
         Node<K, V> temp = table[hashIndex(key)];
         while (temp.next != null || Objects.equals(temp.key, key)) {
             if (Objects.equals(key, temp.key)) {
