@@ -15,12 +15,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        checkSize();
         int index = calculateIndex(key);
         Node<K, V> newNode = new Node<>(key, value, null);
         if (nodesArray[index] == null) {
             nodesArray[index] = newNode;
             size++;
-            checkSize();
             return;
         }
         if (nodesArray[index] != null) {
@@ -38,7 +38,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node.next = newNode;
             size++;
-            checkSize();
         }
     }
 
