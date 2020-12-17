@@ -27,13 +27,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             if (current.next == null) {
-                current.next = new Node(value, key, null);
+                current.next = new Node<>(value, key, null);
                 size++;
                 return;
             }
             current = current.next;
         }
-        array[index] = new Node(value, key, null);
+        array[index] = new Node<>(value, key, null);
         size++;
     }
 
@@ -72,7 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndexByKey(K key) {
-        return Math.abs((key == null ? 0 : key.hashCode()) % array.length);
+        return key == null ? 0 : Math.abs(key.hashCode()) % array.length;
     }
 
     private static class Node<K, V> {
