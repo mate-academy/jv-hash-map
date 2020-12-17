@@ -2,17 +2,19 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_INDEX = 0.75;
-    private int capacityArray = 16;
+    private static final int INITIAL_CAPACITY = 16;
+    private int currentArraySize;
     private MyNode<K,V> [] arrayBaskets;
     private int size;
 
     public MyHashMap() {
-        arrayBaskets = new MyNode [capacityArray];
+        currentArraySize = INITIAL_CAPACITY;
+        arrayBaskets = new MyNode[currentArraySize];
         size = 0;
     }
 
     private void put(MyNode<K,V> newNode) {
-        int indexBasket = Math.abs(newNode.getHashKey() % capacityArray);
+        int indexBasket = getIndex(newNode.getHashKey());
         if (arrayBaskets[indexBasket] != null) {
             addToList(newNode, indexBasket);
         } else {
@@ -24,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         MyNode<K, V> newNode = new MyNode<K, V>(key, value);
-        if (size > capacityArray * LOAD_INDEX) {
+        if (size > currentArraySize * LOAD_INDEX) {
             resize();
         }
         put(newNode);
@@ -36,12 +38,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             index = 0;
         } else {
-            index = Math.abs(key.hashCode() % capacityArray);
+            index = getIndex(key.hashCode());
         }
         MyNode<K,V> current = arrayBaskets[index];
         while (current != null) {
-            if (current.getKey() == null && key == null
-                    || current.getKey() != null && current.getKey().equals(key)) {
+            if (isKeyEqual(current.getKey(), key)) {
                 return current.getValue();
             }
             current = current.getNext();
@@ -54,28 +55,36 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private boolean isKeyEqual(K key1, K key2) {
+        return key1 == null && key2 == null || key1 != null && key1.equals(key2);
+    }
+
+    private int getIndex(int hashKye) {
+        return Math.abs(hashKye % currentArraySize);
+    }
+
     private void addToList(MyNode<K, V> newNode, int index) {
         MyNode<K, V> currentNode = arrayBaskets[index];
-        MyNode<K, V> memCurrentNode = currentNode;
         while (currentNode != null) {
-            if (currentNode.getKey() == null && newNode.getKey() == null
-                    || currentNode.getKey() != null
-                    && currentNode.getKey().equals(newNode.getKey())) {
+            if (isKeyEqual(currentNode.getKey(), newNode.getKey())) {
                 currentNode.setValue(newNode.getValue());
                 size--;
                 return;
             }
-            memCurrentNode = currentNode;
+            if (currentNode.getNext() == null) {
+                currentNode.setNext(newNode);
+                return;
+            }
             currentNode = currentNode.getNext();
         }
-        memCurrentNode.setNext(newNode);
+        currentNode.setNext(newNode);
     }
 
     private void resize() {
         size = 0;
-        capacityArray = capacityArray << 1;
+        currentArraySize = currentArraySize << 1;
         MyNode<K, V> [] memArrayBaskets = arrayBaskets;
-        arrayBaskets = new MyNode[capacityArray];
+        arrayBaskets = new MyNode[currentArraySize];
         for (int i = 0; i < memArrayBaskets.length; i++) {
             if (memArrayBaskets[i] != null) {
                 put(new MyNode<K,V>(memArrayBaskets[i].getKey(), memArrayBaskets[i].getValue()));
