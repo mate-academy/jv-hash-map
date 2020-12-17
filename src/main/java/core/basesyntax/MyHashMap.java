@@ -5,14 +5,12 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-
     private Node<K, V>[] table;
     private int size;
     private int threshold;
 
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
-        size = 0;
     }
 
     @Override
@@ -22,19 +20,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (current == null) {
             table[getIndex(key)] = new Node<>(key, value, null);
         } else {
-            boolean flag = true;
-            while (flag) {
+            while (current != null) {
                 if (Objects.equals(current.key, key)) {
                     current.value = value;
                     return;
                 }
                 if (current.next == null) {
-                    flag = false;
-                } else {
-                    current = current.next;
+                    current.next = new Node<>(key, value, null);
+                    break;
                 }
+                current = current.next;
             }
-            current.next = new Node<>(key, value, null);
         }
         size++;
         if (size > threshold) {
@@ -83,7 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        int hash = key == null ? 0 : key.hashCode() < 0 ? key.hashCode() * (-1) : key.hashCode();
+        int hash = key == null ? 0 : Math.abs(key.hashCode());
         return hash % table.length;
     }
 
@@ -103,5 +99,3 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 }
-
-
