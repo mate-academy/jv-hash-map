@@ -12,19 +12,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        this.size = 0;
         this.capacity = DEFAULT_CAPACITY;
         this.table = new Node[DEFAULT_CAPACITY];
     }
 
-    class Node<K, V> {
-        private final int hash;
+    private class Node<K, V> {
+
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node( K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -36,7 +34,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        Node<K, V> newNodeForPut = new Node(hashCode(), key, value, null);
+        Node<K, V> newNodeForPut = new Node(key, value, null);
         int index = getHash(key) % table.length;
         if (table[index] == null) {
             table[index] = newNodeForPut;
@@ -47,7 +45,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         while (currentNode.next != null || Objects.equals(currentNode.key, key)) {
             if (Objects.equals(currentNode.key, key)) {
                 currentNode.value = value;
-
                 return;
             }
             currentNode = currentNode.next;
@@ -60,14 +57,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int index = getHash(key) % table.length;
         Node<K, V> currentNode = table[index];
-        V value = null;
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
-                value = currentNode.value;
+                return currentNode.value;
             }
             currentNode = currentNode.next;
         }
-        return value;
+        return null;
     }
 
     @Override
@@ -75,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public void resize() {
+    private void resize() {
         size = 0;
         capacity = table.length * TABLE_MULTIPLIER;
         Node<K, V>[] oldTable = table;
