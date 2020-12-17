@@ -1,13 +1,19 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private static final int CAPACITY_MULTIPLIER = 2;
-    private int size = 0;
-    private Node<K, V>[] hashTable = new Node[INITIAL_CAPACITY];
-    private int threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
-    private int currentCapacity = INITIAL_CAPACITY;
+    private int size;
+    private Node<K, V>[] hashTable;
+    private int threshold;
+
+    public MyHashMap() {
+        this.hashTable = new Node[INITIAL_CAPACITY];
+        this.threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
+    }
 
     @Override
     public void put(K key, V value) {
@@ -47,8 +53,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hashFunction(Object key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % currentCapacity);
+    private int getIndex(Object key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode() % hashTable.length);
     }
 
     private Node<K, V> lastAddedNodeInBucket(Node<K, V> previousNode, K key, V value) {
@@ -66,7 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putWithoutCheckKeyContaince(K key, V value) {
-        int indexOfBucket = hashFunction(key);
+        int indexOfBucket = getIndex(key);
         Node<K, V> nodeInBucket = hashTable[indexOfBucket];
         Node<K, V> currentNodeInBucket = lastAddedNodeInBucket(nodeInBucket, key, value);
         hashTable[indexOfBucket] = currentNodeInBucket;
@@ -77,16 +83,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int newCapacity = currentCapacity * CAPACITY_MULTIPLIER;
+        int newCapacity = hashTable.length * CAPACITY_MULTIPLIER;
         final Node<K, V>[] oldHashTable = hashTable;
         hashTable = new Node[newCapacity];
         threshold = (int)(newCapacity * LOAD_FACTOR);
-        currentCapacity = newCapacity;
         size = 0;
         for (int i = 0; i < oldHashTable.length; i++) {
-            if (oldHashTable[i] == null) {
-                continue;
-            }
             Node<K, V> goalNode = oldHashTable[i];
             while (goalNode != null) {
                 putWithoutCheckKeyContaince(goalNode.key, goalNode.value);
@@ -96,10 +98,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> returnNodeOfKey(K key) {
-        int indexOfKeyBucket = hashFunction(key);
+        int indexOfKeyBucket = getIndex(key);
         Node<K, V> goalNode = hashTable[indexOfKeyBucket];
         while (goalNode != null) {
-            if (goalNode.key != null ? goalNode.key.equals(key) : goalNode.key == key) {
+            if (Objects.equals(key, goalNode.key)) {
                 return goalNode;
             }
             goalNode = goalNode.prev;
