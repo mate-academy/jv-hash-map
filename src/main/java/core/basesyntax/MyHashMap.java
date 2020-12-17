@@ -7,17 +7,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final int RESIZE_FACTOR = 2;
     private Node<K, V>[] array;
-    private int treshold;
+    private int threshold;
     private int size;
 
     public MyHashMap() {
         array = (Node<K,V>[]) new Node[DEFAULT_CAPACITY];
-        treshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size + 1 > treshold) {
+        if (size + 1 > threshold) {
             resize();
         }
         if (array[indexByKeyHash(key)] == null) {
@@ -63,7 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         Node<K, V>[] tmpArray = array;
         array = (Node<K,V>[]) new Node[tmpArray.length * RESIZE_FACTOR];
-        treshold = (int) (array.length * LOAD_FACTOR);
+        threshold = (int) (array.length * LOAD_FACTOR);
         for (Node<K, V> tmpNode : tmpArray) {
             while (tmpNode != null) {
                 put(tmpNode.key, tmpNode.value);
