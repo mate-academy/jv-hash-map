@@ -39,18 +39,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        while (node != null) {
+        while (node.next != null || Objects.equals(node.key, key)) {
             if (Objects.equals(key, node.key)) {
                 node.value = value;
                 return;
             }
-            if (node.next == null) {
-                node.next = new Node<>(key, value, null);
-                size++;
-                return;
-            }
             node = node.next;
         }
+        node.next = new Node<>(key, value, null);
+        size++;
     }
 
     private void resize() {
