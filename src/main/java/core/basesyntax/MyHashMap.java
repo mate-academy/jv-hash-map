@@ -6,12 +6,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final int TABLE_MULTIPLIER = 2;
     private static final float LOAD_FACTOR = 0.75f;
-    private int size = 0;
-    private int capacity = DEFAULT_CAPACITY;
+    private int size;
+    private int capacity;
     private int threshold;
     private Node<K, V>[] table;
 
     public MyHashMap() {
+        this.size = 0;
+        this.capacity = DEFAULT_CAPACITY;
         this.table = new Node[DEFAULT_CAPACITY];
     }
 
@@ -42,13 +44,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         } else {
             Node<K, V> currentNode = table[index];
-            if (Objects.equals(currentNode.key, key)) {
-                currentNode.value = value;
-                return;
-            }
-            while (currentNode.next != null) {
-                if (key == currentNode.key || currentNode.key != null
-                        && currentNode.key.equals(key)) {
+            while (currentNode.next != null || Objects.equals(currentNode.key, key)) {
+                if (Objects.equals(currentNode.key, key)) {
                     currentNode.value = value;
 
                     return;
