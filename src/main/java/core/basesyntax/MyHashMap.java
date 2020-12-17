@@ -11,7 +11,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
-        size = 0;
         threshold = (int) (LOAD_FACTOR * DEFAULT_CAPACITY);
     }
 
@@ -20,9 +19,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        Node<K, V> current = table[getHash(key)];
+        Node<K, V> current = table[getIndex(key)];
         if (current == null) {
-            table[getHash(key)] = new Node<>(key, value, null);
+            table[getIndex(key)] = new Node<>(key, value, null);
         } else {
             while (current.next != null || Objects.equals(current.key, key)) {
                 if (Objects.equals(current.key, key)) {
@@ -39,7 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> current;
-        current = table[getHash(key)];
+        current = table[getIndex(key)];
         while (current != null) {
             if (Objects.equals(current.key, key)) {
                 return current.value;
@@ -69,8 +68,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         Node<K, V>[] oldTable = table;
         int oldCap = table.length;
-        threshold = threshold * 2;
         int newCap = oldCap * 2;
+        threshold = newCap * 2;
         table = (Node<K, V>[]) new Node[newCap];
         for (Node<K, V> kvNode : oldTable) {
             Node<K, V> head = kvNode;
@@ -82,7 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getHash(K key) {
+    private int getIndex(K key) {
         return key != null ? Math.abs(key.hashCode()) % table.length : 0;
     }
 }
