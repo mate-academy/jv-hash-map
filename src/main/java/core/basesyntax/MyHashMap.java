@@ -29,16 +29,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> node = table[getIndexForBucket(key)];
-        if (node != null) {
+        while (node != null) {
             if (isEqual(key, node.key)) {
                 return node.value;
             }
-            while (node.next != null) {
-                node = node.next;
-                if (isEqual(key, node.key)) {
-                    return node.value;
-                }
-            }
+            node = node.next;
         }
         return null;
     }
@@ -49,8 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean isEqual(K firstKey, K secondKey) {
-        return (firstKey == null && secondKey == null)
-                || (firstKey != null && firstKey.equals(secondKey));
+        return firstKey == secondKey || (firstKey != null && firstKey.equals(secondKey));
     }
 
     private int getIndexForBucket(K key) {
@@ -76,8 +70,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size = 0;
             Node<K, V>[] oldTable = table;
             int oldCapacity = oldTable.length;
-            threshold = threshold << 1;
-            table = new Node[oldCapacity << 1];
+            threshold = threshold * 2;
+            table = new Node[oldCapacity * 2];
             for (Node<K, V> node : oldTable) {
                 while (node != null) {
                     put(node.key, node.value);
