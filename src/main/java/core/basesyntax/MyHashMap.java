@@ -15,11 +15,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = setIndex(key);
+        int index = calculateIndex(key);
         Node<K, V> newNode = new Node<>(key, value, null);
         if (nodesArray[index] == null) {
             nodesArray[index] = newNode;
-            checkSize(size++);
+            size++;
+            checkSize();
             return;
         }
         if (nodesArray[index] != null) {
@@ -36,22 +37,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             node.next = newNode;
-            checkSize(size++);
+            size++;
+            checkSize();
         }
     }
 
     @Override
     public V getValue(K key) {
-        int index = setIndex(key);
-        if (nodesArray != null && nodesArray[index] != null) {
-            Node<K, V> node = nodesArray[index];
-            while (node.next != null) {
-                if (Objects.equals(node.key, key)) {
-                    return node.value;
-                }
-                node = node.next;
+        int index = calculateIndex(key);
+        Node<K, V> node = nodesArray[index];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return node.value;
             }
-            return node.value;
+            node = node.next;
         }
         return null;
     }
@@ -61,14 +60,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void checkSize(int size) {
+    private int calculateIndex(K key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode() % nodesArray.length);
+    }
+
+    private void checkSize() {
         if (size > nodesArray.length * LOAD_FACTOR) {
             resize();
         }
-    }
-
-    private int setIndex(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % nodesArray.length);
     }
 
     private void resize() {
