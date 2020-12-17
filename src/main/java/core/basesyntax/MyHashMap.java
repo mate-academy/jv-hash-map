@@ -24,19 +24,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             array[getIndexByKey(key)] = new Node<>(key, value);
             size++;
             return;
-        } else {
-            Node<K, V> currentNode = array[getIndexByKey(key)];
-            while (currentNode != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    currentNode.value = value;
-                    return;
-                }
-                if (currentNode.next == null) {
-                    currentNode.next = new Node<>(key, value);
-                    size++;
-                }
-                currentNode = currentNode.next;
+        }
+        Node<K, V> currentNode = array[getIndexByKey(key)];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                currentNode.value = value;
+                return;
             }
+            if (currentNode.next == null) {
+                currentNode.next = new Node<>(key, value);
+                size++;
+            }
+            currentNode = currentNode.next;
         }
     }
 
