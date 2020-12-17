@@ -15,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        getThreshold();
+        getThreshold();;
         Node<K, V> current = table[getIndex(key)];
         if (current == null) {
             table[getIndex(key)] = new Node<>(key, value, null);
