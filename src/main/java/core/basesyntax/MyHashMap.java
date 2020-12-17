@@ -6,7 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     //-----------------constants------------------------//
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int INITIAL_THRESHOLD = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
+    private static final int INITIAL_THRESHOLD = 12;
     private static final int INCREASE_MULTIPLIER = 2;
 
     // ----------------Node class-----------------------//
@@ -24,14 +24,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     //----------------------fields------------------------//
 
     private Node<K, V>[] map;
-    private int capacity;
     private int size;
     private int threshold;
     //---------------------constructor--------------------//
 
     public MyHashMap() {
-        capacity = INITIAL_CAPACITY;
-        map = new Node[capacity];
+        map = new Node[INITIAL_CAPACITY];
         size = 0;
         threshold = INITIAL_THRESHOLD;
     }
@@ -39,11 +37,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = getIndex(key);
-        if (map[index] == null) {
-            map[index] = new Node<>(key, value, null);
+        if (map[getIndex(key)] == null) {
+            map[getIndex(key)] = new Node<>(key, value, null);
         } else {
-            Node<K, V> finalNode = map[index];
+            Node<K, V> finalNode = map[getIndex(key)];
             while (finalNode.next != null || Objects.equals(finalNode.key, key)) {
                 if (Objects.equals(finalNode.key, key)) {
                     finalNode.value = value;
@@ -60,8 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = getIndex(key);
-        Node<K, V> searchNode = map[index];
+        Node<K, V> searchNode = map[getIndex(key)];
         while (searchNode != null) {
             if (Objects.equals(searchNode.key, key)) {
                 return searchNode.value;
@@ -83,18 +79,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     //----------------------------internal utility-------------------------//
 
     private int getIndex(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode() % capacity);
+        return key == null ? 0 : Math.abs(key.hashCode() % map.length);
     }
 
     private void resize() {
         size = 0;
-        capacity *= INCREASE_MULTIPLIER;
         Node<K, V>[] oldMap = map;
-        map = new Node[capacity];
-        threshold = (int) (capacity * LOAD_FACTOR);
+        map = new Node[oldMap.length * INCREASE_MULTIPLIER];
+        threshold = (int) (map.length * LOAD_FACTOR);
         transit(oldMap);
     }
 
