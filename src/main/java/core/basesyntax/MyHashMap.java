@@ -42,23 +42,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = newNodeForPut;
             size++;
             return;
-        } else {
-            Node<K, V> currentNode = table[index];
-            while (currentNode.next != null || Objects.equals(currentNode.key, key)) {
-                if (Objects.equals(currentNode.key, key)) {
-                    currentNode.value = value;
-
-                    return;
-                }
-                currentNode = currentNode.next;
-            }
-            currentNode.next = newNodeForPut;
         }
-        size++;
-    }
+        Node<K, V> currentNode = table[index];
+        while (currentNode.next != null || Objects.equals(currentNode.key, key)) {
+            if (Objects.equals(currentNode.key, key)) {
+                currentNode.value = value;
 
-    private int getHash(K key) {
-        return Math.abs(key == null ? 0 : key.hashCode());
+                return;
+            }
+            currentNode = currentNode.next;
+        }
+        currentNode.next = newNodeForPut;
+        size++;
     }
 
     @Override
@@ -67,8 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> currentNode = table[index];
         V value = null;
         while (currentNode != null) {
-            if (key == currentNode.key || currentNode.key != null
-                    && currentNode.key.equals(key)) {
+            if (Objects.equals(currentNode.key, key)) {
                 value = currentNode.value;
             }
             currentNode = currentNode.next;
@@ -93,6 +87,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 oldTable[i] = oldTable[i].next;
             }
         }
+    }
+
+    private int getHash(K key) {
+        return Math.abs(key == null ? 0 : key.hashCode());
     }
 }
 
