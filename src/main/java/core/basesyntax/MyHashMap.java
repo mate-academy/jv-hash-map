@@ -47,7 +47,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         table[index] = new Node<>(key,value,null);
         size++;
-        return;
     }
 
     @Override
@@ -78,12 +77,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[table.length * INCREASE_ARRAY_SIZE_INDEX];;
         threshold = (int) (table.length * LOAD_FACTOR);
         for (int i = 0; i < oldTable.length; i++) {
-            if (oldTable[i] != null) {
-                Node<K,V> currentNode = oldTable[i];
-                while (currentNode != null) {
-                    put(currentNode.key, currentNode.value);
-                    currentNode = currentNode.nextNode;
-                }
+            Node<K,V> currentNode = oldTable[i];
+            while (currentNode != null) {
+                put(currentNode.key, currentNode.value);
+                currentNode = currentNode.nextNode;
             }
         }
     }
