@@ -22,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndexOfBucket(key);
         Node<K, V> node = nodes[index];
         if (node == null) {
-            nodes[index] = new Node<>(null, key, value, index);
+            nodes[index] = new Node<>(null, key, value);
             size++;
             return;
         }
@@ -33,7 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node = node.next;
         }
-        node.next = new Node<>(null, key, value, index);
+        node.next = new Node<>(null, key, value);
         size++;
     }
 
@@ -78,13 +78,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private Node<K, V> next;
         private K key;
         private V value;
-        private int hash;
 
-        private Node(Node<K, V> next, K key, V value, int hash) {
+        private Node(Node<K, V> next, K key, V value) {
             this.next = next;
             this.key = key;
             this.value = value;
-            this.hash = hash;
         }
     }
 }
