@@ -11,45 +11,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
     }
 
-    private void addToList(MyNode<K, V> newNode, int index) {
-        MyNode<K, V> currentNode = arrayBaskets[index];
-        MyNode<K, V> memCurrentNode = currentNode;
-        while (currentNode != null) {
-            if (currentNode.getKey() == null && newNode.getKey() == null
-                    || currentNode.getKey() != null
-                    && currentNode.getKey().equals(newNode.getKey())) {
-                currentNode.setValue(newNode.getValue());
-                size--;
-                return;
-            }
-            memCurrentNode = currentNode;
-            currentNode = currentNode.getNext();
-        }
-        memCurrentNode.setNext(newNode);
-    }
-
-    private void resize() {
-        size = 0;
-        capacityArray = capacityArray << 1;
-        MyNode<K, V> [] memArrayBaskets = arrayBaskets;
-        arrayBaskets = new MyNode[capacityArray];
-        for (int i = 0; i < memArrayBaskets.length; i++) {
-            if (memArrayBaskets[i] != null) {
-                put(new MyNode<K,V>(memArrayBaskets[i].getKey(), memArrayBaskets[i].getValue()));
-                MyNode<K,V> current = memArrayBaskets[i].getNext();
-                while (current != null) {
-                    put(new MyNode<K,V>(current.getKey(), current.getValue()));
-                    current = current.getNext();
-                }
-            }
-        }
-    }
-
     private void put(MyNode<K,V> newNode) {
         int indexBasket = Math.abs(newNode.getHashKey() % capacityArray);
-        if (newNode.getKey() == null) {
-            indexBasket = 0;
-        }
         if (arrayBaskets[indexBasket] != null) {
             addToList(newNode, indexBasket);
         } else {
@@ -90,4 +53,39 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public int getSize() {
         return size;
     }
+
+    private void addToList(MyNode<K, V> newNode, int index) {
+        MyNode<K, V> currentNode = arrayBaskets[index];
+        MyNode<K, V> memCurrentNode = currentNode;
+        while (currentNode != null) {
+            if (currentNode.getKey() == null && newNode.getKey() == null
+                    || currentNode.getKey() != null
+                    && currentNode.getKey().equals(newNode.getKey())) {
+                currentNode.setValue(newNode.getValue());
+                size--;
+                return;
+            }
+            memCurrentNode = currentNode;
+            currentNode = currentNode.getNext();
+        }
+        memCurrentNode.setNext(newNode);
+    }
+
+    private void resize() {
+        size = 0;
+        capacityArray = capacityArray << 1;
+        MyNode<K, V> [] memArrayBaskets = arrayBaskets;
+        arrayBaskets = new MyNode[capacityArray];
+        for (int i = 0; i < memArrayBaskets.length; i++) {
+            if (memArrayBaskets[i] != null) {
+                put(new MyNode<K,V>(memArrayBaskets[i].getKey(), memArrayBaskets[i].getValue()));
+                MyNode<K,V> current = memArrayBaskets[i].getNext();
+                while (current != null) {
+                    put(new MyNode<K,V>(current.getKey(), current.getValue()));
+                    current = current.getNext();
+                }
+            }
+        }
+    }
 }
+
