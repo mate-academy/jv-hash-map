@@ -20,12 +20,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size + 1 > threshold) {
             resize();
         }
-        if (array[getIndexByKey(key)] == null) {
-            array[getIndexByKey(key)] = new Node<>(key, value);
+        int index = getIndexByKey(key);
+        if (array[index] == null) {
+            array[index] = new Node<>(key, value);
             size++;
             return;
         }
-        Node<K, V> currentNode = array[getIndexByKey(key)];
+        Node<K, V> currentNode = array[index];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 currentNode.value = value;
