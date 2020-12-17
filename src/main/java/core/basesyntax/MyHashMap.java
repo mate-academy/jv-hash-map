@@ -7,34 +7,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int CAPACITY_INCREASER = 2;
 
-    private Node<K, V>[] bucketArray;
+    private Node<K, V>[] map;
     private int size;
 
     public MyHashMap() {
-        bucketArray = new Node[DEFAULT_INITIAL_CAPACITY];
+        map = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size + 1 > bucketArray.length * DEFAULT_LOAD_FACTOR) {
+        if (size + 1 > map.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
-
-        int bucket = bucket(key);
-        if (bucketArray[bucket] == null) { //empty bucket
-            bucketArray[bucket] = new Node<>(key, value);
+        int bucket = getIndex(key);
+        if (map[bucket] == null) {
+            map[bucket] = new Node<>(key, value);
             size++;
             return;
         }
-
-        Node<K, V> current = bucketArray[bucket];
+        Node<K, V> current = map[bucket];
         while (current != null) {
             if (Objects.equals(key, current.key)) {
-                current.value = value; //if keys equals change old value to new
+                current.value = value;
                 return;
             }
-
-            if (current.next == null) { //if its end of a list put new Node
+            if (current.next == null) {
                 current.next = new Node<>(key, value);
                 size++;
                 return;
@@ -45,10 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> current = bucketArray[bucket(key)];
-        if (current == null) {
-            return null;
-        }
+        Node<K, V> current = map[getIndex(key)];
         while (current != null) {
             if (Objects.equals(key, current.key)) {
                 return current.value;
@@ -63,22 +57,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int bucket(K key) {
-        int result = key == null ? 0 : key.hashCode() % bucketArray.length;
+    private int getIndex(K key) {
+        int result = key == null ? 0 : key.hashCode() % map.length;
         return Math.abs(result);
     }
 
     private void resize() {
-        Node<K, V>[] oldArray = bucketArray;
-        bucketArray = new Node[oldArray.length * CAPACITY_INCREASER];
+        Node<K, V>[] oldArray = map;
+        map = new Node[oldArray.length * CAPACITY_INCREASER];
         int iterations = size;
         size = 0;
         for (Node<K, V> node : oldArray) {
-            for (int i = 0; i < iterations; i++) {
-                if (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
