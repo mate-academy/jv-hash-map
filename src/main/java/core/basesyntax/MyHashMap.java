@@ -43,23 +43,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (tab[index] == null) {
             tab[index] = new Node<>(hash, key, value, null);
             size++;
-        } else {
-            Node<K, V> temp = tab[index];
+            return;
+        }
+        Node<K, V> temp = tab[index];
+        while (temp.next != null
+                || (key == temp.key || (key != null && key.equals(temp.key)))) {
             if (key == temp.key || (key != null && key.equals(temp.key))) {
                 temp.value = value;
-            } else {
-                while (temp.next != null) {
-                    temp = temp.next;
-                    if (key == temp.key || (key != null && key.equals(temp.key))) {
-                        temp.value = value;
-                        return;
-                    }
-                }
-                Node<K, V> newNode = new Node<>(hash, key, value, null);
-                temp.next = newNode;
-                size++;
+                return;
             }
+            temp = temp.next;
         }
+        Node<K, V> newNode = new Node<>(hash, key, value, null);
+        temp.next = newNode;
+        size++;
     }
 
     private void resize() {
