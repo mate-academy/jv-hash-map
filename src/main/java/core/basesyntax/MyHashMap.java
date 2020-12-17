@@ -24,21 +24,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (nodes[index] == null) {
             nodes[index] = new Node<>(key, value);
             size++;
-        } else if (!Objects.equals(key, nodes[index].key)) {
-            Node<K, V> current = nodes[index];
-            while (current.next != null
-                    || Objects.equals(current.key, key)) {
-                if (Objects.equals(current.key, key)) {
-                    current.value = value;
-                    return;
-                }
-                current = current.next;
-            }
-            current.next = new Node<>(key, value);
-            size++;
-        } else {
-            nodes[index].value = value;
+            return;
         }
+        Node<K, V> current = nodes[index];
+        while (current.next != null
+                || Objects.equals(current.key, key)) {
+            if (Objects.equals(current.key, key)) {
+                current.value = value;
+                return;
+            }
+            current = current.next;
+        }
+        current.next = new Node<>(key, value);
+        size++;
     }
 
     @Override
