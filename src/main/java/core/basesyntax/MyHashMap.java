@@ -15,15 +15,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int hash = setHash(key);
-        Node<K, V> newNode = new Node<>(hash, key, value, null);
-        if (nodesArray[hash] == null) {
-            nodesArray[hash] = newNode;
+        int index = setIndex(key);
+        Node<K, V> newNode = new Node<>(key, value, null);
+        if (nodesArray[index] == null) {
+            nodesArray[index] = newNode;
             checkSize(size++);
             return;
         }
-        if (nodesArray[hash] != null) {
-            Node<K, V> node = nodesArray[hash];
+        if (nodesArray[index] != null) {
+            Node<K, V> node = nodesArray[index];
             while (node.next != null) {
                 if (Objects.equals(node.key,key)) {
                     node.value = value;
@@ -42,9 +42,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = setHash(key);
-        if (nodesArray != null && nodesArray[hash] != null) {
-            Node<K, V> node = nodesArray[hash];
+        int index = setIndex(key);
+        if (nodesArray != null && nodesArray[index] != null) {
+            Node<K, V> node = nodesArray[index];
             while (node.next != null) {
                 if (Objects.equals(node.key, key)) {
                     return node.value;
@@ -69,7 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int setHash(K key) {
+    private int setIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % nodesArray.length);
     }
 
@@ -86,13 +86,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        int hash;
         K key;
         V value;
         Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
