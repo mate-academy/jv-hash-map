@@ -33,7 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (currentNode == null) {
             table[index] = nextNode;
         } else {
-            while (nextNode.next == null) {
+            while (true) {
                 if (key == currentNode.key || (key != null && key.equals(currentNode.key))) {
                     currentNode.value = value;
                     return;
