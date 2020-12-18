@@ -14,7 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void put(MyNode<K,V> newNode) {
-        int indexBasket = getIndex(newNode.getHashKey());
+        int indexBasket = getIndex(newNode.getKey());
         if (arrayBaskets[indexBasket] != null) {
             addToList(newNode, indexBasket);
         } else {
@@ -34,12 +34,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index;
-        if (key == null) {
-            index = 0;
-        } else {
-            index = getIndex(key.hashCode());
-        }
+        int index = getIndex(key);
         MyNode<K,V> current = arrayBaskets[index];
         while (current != null) {
             if (isKeyEqual(current.getKey(), key)) {
@@ -59,8 +54,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key1 == null && key2 == null || key1 != null && key1.equals(key2);
     }
 
-    private int getIndex(int hashKye) {
-        return Math.abs(hashKye % currentArraySize);
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % currentArraySize);
     }
 
     private void addToList(MyNode<K, V> newNode, int index) {
@@ -97,4 +92,3 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 }
-
