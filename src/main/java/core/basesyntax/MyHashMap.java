@@ -9,10 +9,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int size;
     private int threshold;
-
     private Node<K, V>[] table;
 
-    public static class Node<K, V> {
+    static class Node<K, V> {
         K key;
         V value;
         Node<K, V> next;
@@ -31,14 +30,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = hash(key);
+        int index = getIndex(key);
         Node<K, V> newNode = new Node<>(key, value, null);
         if (table[index] == null) {
             table[index] = newNode;
             size++;
             return;
         }
-        checkKey(newNode);
+        insertValue(newNode);
         if (size > threshold) {
             resize();
         }
@@ -46,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = hash(key);
+        int index = getIndex(key);
         Node<K, V> getNode = table[index];
         while (getNode != null) {
             if (Objects.equals(getNode.key, key)) {
@@ -77,23 +76,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hash(K key) {
+    private int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
-    private void checkKey(Node<K, V> current) {
-        int index = hash(current.key);
+    private void insertValue(Node<K, V> current) {
+        int index = getIndex(current.key);
         Node<K, V> checkNode = table[index];
-        while (checkNode.next != null) {
+        while (checkNode.next != null || Objects.equals(current.key, checkNode.key)) {
             if (Objects.equals(current.key, checkNode.key)) {
                 checkNode.value = current.value;
                 return;
             }
             checkNode = checkNode.next;
-        }
-        if (Objects.equals(current.key, checkNode.key)) {
-            checkNode.value = current.value;
-            return;
         }
         checkNode.next = current;
         size++;
