@@ -2,6 +2,8 @@ package core.basesyntax;
 
 import org.junit.Assert;
 import org.junit.Test;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 
 public class MyHashMapTest {
     private static final Car firstCar = new Car("Audi", "black");
@@ -23,7 +25,7 @@ public class MyHashMapTest {
     @Test
     public void getByNonExistedKey() {
         MyMap<Car, Integer> myHashMap = new MyHashMap();
-        Assert.assertNull("Test failed! If key doesn't exist, we shoud return null.",
+        Assert.assertNull("Test failed! If key doesn't exist, we should return null.",
                 myHashMap.getValue(firstCar));
     }
 
@@ -58,8 +60,8 @@ public class MyHashMapTest {
         myHashMap.put(sameSecondCar, 5);
         myHashMap.put(sameThirdCar, 1);
 
-        Assert.assertEquals("Test failed! We should add checking if the same element " +
-                "exist in the map", 3, myHashMap.getSize());
+        Assert.assertEquals("Test failed! We should add checking if the same element "
+                + "exists in the map", 3, myHashMap.getSize());
 
         Integer firstActualValue = myHashMap.getValue(firstCar);
         Integer secondActualValue = myHashMap.getValue(secondCar);
@@ -104,6 +106,28 @@ public class MyHashMapTest {
         Integer thirdActualValue = myHashMap.getValue(thirdPlane);
         Assert.assertEquals("Test failed! HashMap expects to contain 3 values, but was "
                 + firstActualValue, Integer.valueOf(3), firstActualValue);
+        Assert.assertEquals("Test failed! HashMap expects to contain 5 values, but was "
+                + secondActualValue, Integer.valueOf(5), secondActualValue);
+        Assert.assertEquals("Test failed! HashMap expects to contain 1 values, but was "
+                + thirdActualValue, Integer.valueOf(1), thirdActualValue);
+    }
+
+    @Test
+    public void putAndGetWithCollisionAndReplaceValue() {
+        MyMap<Plane, Integer> myHashMap = new MyHashMap();
+        myHashMap.put(firstPlane, 3);
+        myHashMap.put(secondPlane, 5);
+        myHashMap.put(thirdPlane, 1);
+        myHashMap.put(firstPlane, 4);
+
+        Assert.assertEquals("Test failed! The size isn't correct. Expected 3 but was "
+                + myHashMap.getSize(), 3, myHashMap.getSize());
+
+        Integer firstActualValue = myHashMap.getValue(firstPlane);
+        Integer secondActualValue = myHashMap.getValue(secondPlane);
+        Integer thirdActualValue = myHashMap.getValue(thirdPlane);
+        Assert.assertEquals("Test failed! HashMap expects to contain 3 values, but was "
+                + firstActualValue, Integer.valueOf(4), firstActualValue);
         Assert.assertEquals("Test failed! HashMap expects to contain 5 values, but was "
                 + secondActualValue, Integer.valueOf(5), secondActualValue);
         Assert.assertEquals("Test failed! HashMap expects to contain 1 values, but was "
@@ -196,6 +220,57 @@ public class MyHashMapTest {
         for (int i = 0; i < 1000; i++) {
             Assert.assertEquals(Integer.valueOf(i),
                     myHashMap.getValue(new Bus("model_" + i, "color_" + i)));
+        }
+    }
+
+    @Test
+    public void getSizeWithCollisionAtFirstPosition() {
+        MyMap<Plane, Integer> myHashMap = new MyHashMap();
+        for (int i = 0; i < 1000; i++) {
+            Plane plane = new Plane("model_" + i, "color_" + i);
+            myHashMap.put(plane, i);
+        }
+        Assert.assertEquals("Test failed! The size isn't correct. Expected 1000 but was "
+                + myHashMap.getSize(), 1000, myHashMap.getSize());
+        for (int i = 0; i < 1000; i++) {
+            Assert.assertEquals(Integer.valueOf(i),
+                    myHashMap.getValue(new Plane("model_" + i, "color_" + i)));
+        }
+    }
+
+    @Test
+    public void existOnlyOneArrayFieldTest() {
+        MyHashMap hashMap = new MyHashMap();
+        Field[] declaredFields = hashMap.getClass().getDeclaredFields();
+        int count = 0;
+        for (Field field : declaredFields) {
+            if (field.getType().isArray()) {
+                count++;
+            }
+        }
+        Assert.assertEquals("Class MyHashMap shouldn't consist more then one array as a field",
+                1, count);
+    }
+
+    @Test
+    public void checkArrayLengthAfterResizingTest() throws IllegalAccessException {
+        MyMap<Car, Integer> myHashMap = new MyHashMap();
+        for (int i = 0; i < 14; i++) {
+            Car car = new Car("model_" + i, "color_" + i);
+            myHashMap.put(car, i);
+        }
+        for (int i = 0; i < 14; i++) {
+            Assert.assertEquals(Integer.valueOf(i),
+                    myHashMap.getValue(new Car("model_" + i, "color_" + i)));
+        }
+        Field[] declaredFields = myHashMap.getClass().getDeclaredFields();
+        for (Field field : declaredFields) {
+            if (field.getType().isArray()) {
+                field.setAccessible(true);
+                int length = Array.getLength(field.get(myHashMap));
+                Assert.assertEquals("After first resizing, length of array should be " + 32,
+                        32, length);
+            }
         }
     }
 }
