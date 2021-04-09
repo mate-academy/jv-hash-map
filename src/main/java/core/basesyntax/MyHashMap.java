@@ -1,19 +1,88 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    static final int DEFAULT_INITIAL_CAPACITY = 16;
+    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    static final int DEFAULT_TABLE_INCREASING = 2;
+    private int threshold;
+    private int capacity;
+    private int size;
+    private Node<K,V>[] table;
+
+    public MyHashMap() {
+        capacity = DEFAULT_INITIAL_CAPACITY;
+        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
-
+        resize();
+        Node<K,V> newNode = table[calculateIndex(key)];
+        if (newNode == null) {
+            table[calculateIndex(key)] = new Node<>(key, value);
+            size++;
+            return;
+        }
+        while (newNode.next != null || Objects.equals(newNode.key, key)) {
+            if (Objects.equals(newNode.key, key)) {
+                newNode.value = value;
+                return;
+            }
+            newNode = newNode.next;
+        }
+        newNode.next = new Node<>(key, value);
+        size++;
     }
 
     @Override
     public V getValue(K key) {
-        return null;
+        Node<K, V> nodeToSearch = table[calculateIndex(key)];
+        if (nodeToSearch == null) {
+            return null;
+        }
+        while (!Objects.equals(nodeToSearch.key, key)) {
+            nodeToSearch = nodeToSearch.next;
+        }
+        return nodeToSearch.value;
     }
 
     @Override
     public int getSize() {
-        return 0;
+        return size;
+    }
+
+    private void resize() {
+        if (size >= threshold) {
+            capacity *= DEFAULT_TABLE_INCREASING;
+            threshold *= DEFAULT_TABLE_INCREASING;
+            Node<K, V>[] oldTable = table;
+            table = new Node[capacity];
+            size = 0;
+            for (Node<K, V> oldNode : oldTable) {
+                while (oldNode != null) {
+                    put(oldNode.key, oldNode.value);
+                    oldNode = oldNode.next;
+                }
+            }
+        }
+    }
+
+    private int calculateIndex(Object key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode()) % capacity;
+    }
+
+    private class Node<K,V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+            this.next = null;
+        }
     }
 }
