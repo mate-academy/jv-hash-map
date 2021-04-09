@@ -20,20 +20,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        Node<K,V> newNode = table[calculateIndex(key)];
-        if (newNode == null) {
+        Node<K,V> possibleNode = table[calculateIndex(key)];
+        if (possibleNode == null) {
             table[calculateIndex(key)] = new Node<>(key, value);
             size++;
             return;
         }
-        while (newNode.next != null || Objects.equals(newNode.key, key)) {
-            if (Objects.equals(newNode.key, key)) {
-                newNode.value = value;
+        while (possibleNode.next != null || Objects.equals(possibleNode.key, key)) {
+            if (Objects.equals(possibleNode.key, key)) {
+                possibleNode.value = value;
                 return;
             }
-            newNode = newNode.next;
+            possibleNode = possibleNode.next;
         }
-        newNode.next = new Node<>(key, value);
+        possibleNode.next = new Node<>(key, value);
         size++;
     }
 
