@@ -44,6 +44,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         while (!Objects.equals(nodeToSearch.key, key)) {
+            if (nodeToSearch.next == null) {
+                throw new RuntimeException("There is no value with this key");
+            }
             nodeToSearch = nodeToSearch.next;
         }
         return nodeToSearch.value;
