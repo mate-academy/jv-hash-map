@@ -20,6 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(final K key, V value) {
         Node<K, V> node = new Node<>(key, value, Objects.hashCode(key));
         int indexFor = hash(key);
+        int currentSize = size;
         if (table[indexFor] == null) {
             initBucket(indexFor);
             add(indexFor, node);
@@ -35,7 +36,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[indexFor].add(node);
             size++;
         }
-        if ((size + 1) > threshold) {
+        if (++currentSize > threshold) {
             resize();
         }
     }
@@ -75,10 +76,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new List[newCapacity()];
         threshold = (int) (table.length * LOAD_FACTOR);
         size = 0;
-        transfer(oldTab, table);
+        transfer(oldTab);
     }
 
-    private void transfer(List<Node<K, V>>[] old, List<Node<K, V>>[] newTab) {
+    private void transfer(List<Node<K, V>>[] old) {
         for (List<Node<K, V>> bucket : old) {
             if (bucket != null) {
                 for (Node<K, V> n : bucket) {
