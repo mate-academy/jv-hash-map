@@ -1,6 +1,6 @@
 package core.basesyntax;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -104,7 +104,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void initBucket(int index) {
-        table[index] = new LinkedList<>();
+        table[index] = new ArrayList<>();
     }
 
     private int hash(final K key) {
