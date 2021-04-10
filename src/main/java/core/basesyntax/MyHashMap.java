@@ -17,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
-    public void put(K key, V value) {
+    public void put(final K key, V value) {
         Node<K, V> node = new Node<>(key, value, Objects.hashCode(key));
         int indexFor = hash(key);
         if (table[indexFor] == null) {
@@ -41,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
-    public V getValue(K key) {
+    public V getValue(final K key) {
         int indexFor = hash(key);
         if (table[indexFor] != null) {
             for (Node<K, V> n : table[indexFor]) {
@@ -60,10 +60,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static class Node<K, V> {
         private final int hash;
-        private K key;
+        private final K key;
         private V value;
 
-        Node(K key, V value, int hash) {
+        Node(final K key, V value, int hash) {
             this.key = key;
             this.value = value;
             this.hash = hash;
@@ -107,7 +107,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table[index] = new LinkedList<>();
     }
 
-    private int hash(K key) {
+    private int hash(final K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 }
