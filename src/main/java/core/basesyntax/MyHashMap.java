@@ -100,13 +100,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (nodes[hash] == null) {
             nodes[hash] = newNode;
             increasingSize = true;
-        } else if (key == nodes[hash].key) {
+        } else if (equalsKeys(key, nodes[hash].key)) {
             nodes[hash].value = value;
         } else {
             Node<K, V> nodeInTable = nodes[hash];
             increasingSize = putNodeWithExistedHash(newNode, nodeInTable);
         }
         return increasingSize;
+    }
+
+    private boolean equalsKeys(K key1, K key2) {
+        return key1 == key2 || key1 != null && key1.equals(key2);
     }
 
     public static class Node<K, V> {
