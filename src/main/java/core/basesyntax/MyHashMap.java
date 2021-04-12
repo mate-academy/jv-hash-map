@@ -19,10 +19,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        resize();
-        Node<K,V> possibleNode = table[calculateIndex(key)];
+        resizeIfNeeded();
+        int index = calculateIndex(key);
+        Node<K,V> possibleNode = table[index];
         if (possibleNode == null) {
-            table[calculateIndex(key)] = new Node<>(key, value);
+            table[index] = new Node<>(key, value);
             size++;
             return;
         }
@@ -45,7 +46,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         while (!Objects.equals(nodeToSearch.key, key)) {
             if (nodeToSearch.next == null) {
-                throw new RuntimeException("There is no value with this key");
+                return null;
             }
             nodeToSearch = nodeToSearch.next;
         }
@@ -57,7 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resize() {
+    private void resizeIfNeeded() {
         if (size >= threshold) {
             capacity *= DEFAULT_TABLE_INCREASING;
             threshold *= DEFAULT_TABLE_INCREASING;
@@ -73,7 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int calculateIndex(Object key) {
+    private int calculateIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 
