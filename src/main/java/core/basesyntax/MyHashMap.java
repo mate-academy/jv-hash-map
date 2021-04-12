@@ -3,6 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
+    private static final int INCREASE_SIZE = 2;
     private int capacity;
     private int size;
     private int threshold;
@@ -32,7 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             increaseSize();
         }
 
-        Node<K, V> newNode = new Node<>(key == null ? 0 : key.hashCode(), key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, null);
         if (container[index] == null) {
             container[index] = newNode;
         } else {
@@ -59,13 +60,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private int hashCode;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hashCode, K key, V value, Node<K, V> next) {
-            this.hashCode = hashCode;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -73,8 +72,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void increaseSize() {
-        capacity *= 2;
-        threshold *= 2;
+        capacity *= INCREASE_SIZE;
+        threshold *= INCREASE_SIZE;
         size = 0;
         Node<K, V>[] oldContainer = container;
         container = (Node<K, V>[]) new Node[capacity];
@@ -91,5 +90,4 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int getIndexUsingHashcode(K key) {
         return Math.abs(key.hashCode()) % capacity;
     }
-
 }
