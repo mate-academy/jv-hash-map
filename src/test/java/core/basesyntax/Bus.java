@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 public class Bus {
@@ -37,7 +35,6 @@ public class Bus {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Bus plane = (Bus) o;
-        Map<String, Integer> map = new HashMap<>();
         return Objects.equals(model, plane.model) &&
                 Objects.equals(color, plane.color);
     }

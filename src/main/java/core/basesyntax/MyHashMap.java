@@ -7,13 +7,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int capacity;
     private int size;
     private int threshold;
-
     private Node<K, V>[] container;
 
     public MyHashMap() {
         capacity = DEFAULT_CAPACITY;
-        this.container = (Node<K, V>[]) new Node[capacity];
-        this.threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
+        container = (Node<K, V>[]) new Node[capacity];
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
