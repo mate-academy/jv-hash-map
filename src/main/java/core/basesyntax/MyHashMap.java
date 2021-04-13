@@ -6,36 +6,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private int size;
-    private int capacity;
     private int threshold;
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        capacity = INITIAL_CAPACITY;
-        threshold = (int) (capacity * LOAD_FACTOR);
-        this.table = (Node<K, V>[]) new Node[capacity];
+        threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
+        table = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         checkSize();
-        int hashValue = hash(key);
-        int index = findIndex(hashValue);
+        Node<K, V> newNode = new Node<>(key, value, null);
+        int index = findIndex(hash(key));
         if (table[index] == null) {
-            table[index] = new Node<>(hashValue, key, value, null);
+            table[index] = newNode;
         } else {
             Node<K, V> iterator = table[index];
-            while (true) {
+            while (iterator.next != null || Objects.equals(iterator.key, key)) {
                 if (iterator.key == key || Objects.equals(iterator.key, key)) {
-                    iterator.value = value;
+                    iterator.value = newNode.value;
                     return;
-                }
-                if (iterator.next == null) {
-                    break;
                 }
                 iterator = iterator.next;
             }
-            iterator.next = new Node<>(hashValue, key, value, null);
+            iterator.next = newNode;
         }
         size++;
     }
@@ -43,9 +38,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = findIndex(hash(key));
-        if (table[index] == null) {
-            return null;
-        }
         Node<K, V> iterator = table[index];
         while (iterator != null) {
             if (Objects.equals(iterator.key, key)) {
@@ -68,8 +60,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        capacity = capacity << 1;
-        threshold = threshold << 1;
+        int capacity = table.length << 1;
+        threshold = (int) (capacity * LOAD_FACTOR);
         Node<K, V>[] temporaryTable = table;
         table = (Node<K, V>[]) new Node[capacity];
         size = 0;
@@ -86,7 +78,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int findIndex(int hashValue) {
-        return Math.abs(hashValue & capacity - 1);
+        return Math.abs(hashValue & table.length - 1);
     }
 
     private int hash(Object key) {
@@ -94,13 +86,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        private final int hash;
         private final K key;
         private Node<K, V> next;
         private V value;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
