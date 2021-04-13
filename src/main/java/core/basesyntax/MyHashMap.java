@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -8,13 +10,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        private Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -23,29 +23,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> newNode = new Node<>(hash(key), key, value, null);
         if (table == null || table.length == 0) {
             resize();
         }
-        int binNumber = getBinNumber(key, table.length);
-        Node<K, V> bin = table[binNumber];
-        if (bin == null) {
-            table[binNumber] = newNode;
-        } else {
-            for (int count = 0;; ++count) {
-                if (bin.hash == hash(key) && (bin.key == key
-                        || (key != null && key.equals(bin.key)))) {
-                    bin.value = value;
-                    return;
-                }
-                if (bin.next == null) {
-                    bin.next = newNode;
-                    break;
-                }
-                bin = bin.next;
-            }
-        }
-        if (++size > threshold) {
+        Node<K, V> newNode = new Node<>(key, value, null);
+        putNodeInTable(newNode, table);
+        if (size > threshold) {
             resize();
         }
     }
@@ -54,13 +37,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         if (table != null && table.length > 0) {
             int binNumber = getBinNumber(key, table.length);
-            Node<K, V> bin = table[binNumber];
-            while (bin != null) {
-                if (bin.hash == hash(key) && (bin.key == key
-                        || (key != null && key.equals(bin.key)))) {
-                    return bin.value;
+            Node<K, V> currentBin = table[binNumber];
+            while (currentBin != null) {
+                if (Objects.equals(key, currentBin.key)) {
+                    return currentBin.value;
                 }
-                bin = bin.next;
+                currentBin = currentBin.next;
             }
         }
         return null;
@@ -73,6 +55,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int hash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
+    }
+
+    private void putNodeInTable(Node<K, V> node, Node<K, V>[] inputTable) {
+        int binNumber = getBinNumber(node.key, inputTable.length);
+        if (inputTable[binNumber] == null) {
+            inputTable[binNumber] = node;
+        } else {
+            Node<K, V> currentBin = inputTable[binNumber];
+            Node<K, V> prevBin = null;
+            while (currentBin != null) {
+                if (Objects.equals(node.key, currentBin.key)) {
+                    currentBin.value = node.value;
+                    return;
+                }
+                prevBin = currentBin;
+                currentBin = currentBin.next;
+            }
+            if (prevBin != null) {
+                prevBin.next = node;
+            }
+        }
+        ++size;
     }
 
     private void resize() {
@@ -91,7 +95,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = newThreshold;
         table = new Node[newCapacity];
         if (oldTable != null) {
-            table = rearrangeBin(oldTable, newCapacity);
+            rearrangeBins(oldTable, newCapacity);
         }
     }
 
@@ -99,27 +103,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return hash(key) % tableCapacity;
     }
 
-    private Node<K, V>[] rearrangeBin(Node<K, V>[] oldTable, int newCapacity) {
+    private void rearrangeBins(Node<K, V>[] oldTable, int newCapacity) {
         Node<K, V>[] newTable = new Node[newCapacity];
-        for (int i = 0; i < oldTable.length; ++i) {
-            Node<K, V> node = oldTable[i];
-            if (node != null) {
-                oldTable[i] = null;
-                do {
-                    int binNumber = getBinNumber(node.key, newCapacity);
-                    if (newTable[binNumber] == null) {
-                        newTable[binNumber] = node;
-                    } else {
-                        Node<K, V> linkedNode = newTable[binNumber];
-                        while (linkedNode.next != null) {
-                            linkedNode = linkedNode.next;
-                        }
-                        linkedNode.next = node;
-                    }
-                    node = node.next;
-                } while (node != null);
+        for (Node<K, V> currentNode : oldTable) {
+            if (currentNode != null) {
+                putNodeInTable(currentNode, newTable);
             }
         }
-        return newTable;
+        table = newTable;
     }
 }
