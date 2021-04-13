@@ -4,7 +4,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.net.Socket;
 
 public class MyHashMapTest {
     private static final Car firstCar = new Car("Audi", "black");
@@ -230,7 +229,6 @@ public class MyHashMapTest {
         for (int i = 0; i < 1000; i++) {
             Plane plane = new Plane("model_" + i, "color_" + i);
             myHashMap.put(plane, i);
-
         }
         Assert.assertEquals("Test failed! The size isn't correct. Expected 1000 but was "
                 + myHashMap.getSize(), 1000, myHashMap.getSize());
@@ -261,7 +259,6 @@ public class MyHashMapTest {
             Car car = new Car("model_" + i, "color_" + i);
             myHashMap.put(car, i);
         }
-
         for (int i = 0; i < 14; i++) {
             Assert.assertEquals(Integer.valueOf(i),
                     myHashMap.getValue(new Car("model_" + i, "color_" + i)));
