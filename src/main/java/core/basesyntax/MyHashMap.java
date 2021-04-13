@@ -22,14 +22,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public MyHashMap() {
+        table = new Node[DEFAULT_CAPACITY];
+        threshold = (int) (DEFAULT_LOAD_FACTOR * DEFAULT_CAPACITY);
     }
 
     @Override
     public void put(K key, V value) {
         resizeIfNeed();
-        Node<K, V> currentNode = table[hash(key)];
+        Node<K, V> currentNode = table[getIndex(key)];
         if (currentNode == null) {
-            table[hash(key)] = new Node<>(key, value);
+            table[getIndex(key)] = new Node<>(key, value);
             size++;
             return;
         }
@@ -50,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table == null) {
             return null;
         }
-        Node<K, V> currentNode = table[hash(key)];
+        Node<K, V> currentNode = table[getIndex(key)];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
@@ -65,28 +67,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(Object key) {
+    private int getIndex(Object key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void resizeIfNeed() {
         Node<K, V>[] oldTable = table;
         int newCapacity;
-        if (table == null || table.length == 0) {
-            table = new Node[DEFAULT_CAPACITY];
-            threshold = (int) (DEFAULT_LOAD_FACTOR * DEFAULT_CAPACITY);
-        }
         if (size >= threshold) {
             newCapacity = table.length << 1;
             threshold = threshold << 1;
             table = new Node[newCapacity];
             size = 0;
-            if (oldTable != null) {
-                for (Node<K, V> node : oldTable) {
-                    while (node != null) {
-                        put(node.key, node.value);
-                        node = node.next;
-                    }
+            for (Node<K, V> node : oldTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
                 }
             }
         }
