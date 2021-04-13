@@ -26,23 +26,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table == null || table.length == 0) {
             resize();
         }
-        Node<K, V> newNode = new Node<>(key, value, null);
-        putNodeInTable(newNode, table);
-        if (size > threshold) {
+        if (putNodeInTable(new Node<>(key, value, null))) {
+            size++;
+        }
+        if (size >= threshold) {
             resize();
         }
     }
 
     @Override
     public V getValue(K key) {
-        if (table != null && table.length > 0) {
-            int binNumber = getBinNumber(key, table.length);
-            Node<K, V> currentBin = table[binNumber];
-            while (currentBin != null) {
-                if (Objects.equals(key, currentBin.key)) {
-                    return currentBin.value;
+        if (table != null) {
+            int binNumber = getBinNumber(key);
+            Node<K, V> currentNode = table[binNumber];
+            while (currentNode != null) {
+                if (Objects.equals(currentNode.key, key)) {
+                    return currentNode.value;
                 }
-                currentBin = currentBin.next;
+                currentNode = currentNode.next;
             }
         }
         return null;
@@ -57,37 +58,34 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
-    private void putNodeInTable(Node<K, V> node, Node<K, V>[] inputTable) {
-        int binNumber = getBinNumber(node.key, inputTable.length);
-        if (inputTable[binNumber] == null) {
-            inputTable[binNumber] = node;
+    private boolean putNodeInTable(Node<K, V> node) {
+        int binNumber = getBinNumber(node.key);
+        Node<K, V> currentNode = table[binNumber];
+        if (currentNode == null) {
+            table[binNumber] = node;
         } else {
-            Node<K, V> currentBin = inputTable[binNumber];
-            Node<K, V> prevBin = null;
-            while (currentBin != null) {
-                if (Objects.equals(node.key, currentBin.key)) {
-                    currentBin.value = node.value;
-                    return;
+            Node<K, V> prevNode = null;
+            while (currentNode != null) {
+                if (Objects.equals(node.key, currentNode.key)) {
+                    currentNode.value = node.value;
+                    return false;
                 }
-                prevBin = currentBin;
-                currentBin = currentBin.next;
+                prevNode = currentNode;
+                currentNode = currentNode.next;
             }
-            if (prevBin != null) {
-                prevBin.next = node;
-            }
+            prevNode.next = node;
         }
-        ++size;
+        return true;
     }
 
     private void resize() {
         Node<K, V>[] oldTable = table;
         int oldCapacity = (oldTable == null) ? 0 : oldTable.length;
-        int oldThreshold = threshold;
         int newCapacity;
         int newThreshold;
         if (oldCapacity > 0) {
             newCapacity = oldCapacity * 2;
-            newThreshold = oldThreshold * 2;
+            newThreshold = threshold * 2;
         } else {
             newCapacity = DEFAULT_INITIAL_CAPACITY;
             newThreshold = (int) (DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
@@ -95,21 +93,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = newThreshold;
         table = new Node[newCapacity];
         if (oldTable != null) {
-            rearrangeBins(oldTable, newCapacity);
+            transferNodes(oldTable);
         }
     }
 
-    private int getBinNumber(K key, int tableCapacity) {
-        return hash(key) % tableCapacity;
+    private int getBinNumber(K key) {
+        return hash(key) % table.length;
     }
 
-    private void rearrangeBins(Node<K, V>[] oldTable, int newCapacity) {
-        Node<K, V>[] newTable = new Node[newCapacity];
+    private void transferNodes(Node<K, V>[] oldTable) {
         for (Node<K, V> currentNode : oldTable) {
             if (currentNode != null) {
-                putNodeInTable(currentNode, newTable);
+                while (currentNode != null) {
+                    putNodeInTable(new Node<>(currentNode.key, currentNode.value, null));
+                    currentNode = currentNode.next;
+                }
             }
         }
-        table = newTable;
     }
 }
