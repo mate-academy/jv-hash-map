@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
@@ -24,11 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> iterator = table[index];
             while (true) {
-                if (iterator.key == key) {
-                    iterator.value = value;
-                    return;
-                }
-                if (iterator.key != null && iterator.key.equals(key)) {
+                if (iterator.key == key || Objects.equals(iterator.key, key)) {
                     iterator.value = value;
                     return;
                 }
@@ -49,18 +47,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         Node<K, V> iterator = table[index];
-        while (true) {
-            if (iterator.key == key) {
+        while (iterator != null) {
+            if (Objects.equals(iterator.key, key)) {
                 return iterator.value;
-            }
-            if (iterator.key != null && iterator.key.equals(key)) {
-                return iterator.value;
-            }
-            if (iterator.next == null) {
-                return null;
             }
             iterator = iterator.next;
         }
+        return null;
     }
 
     @Override
@@ -85,14 +78,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void transfer(Node<K, V>[] temporaryTable) {
         for (Node<K, V> element : temporaryTable) {
-            if (element != null) {
-                while (true) {
-                    put(element.key, element.value);
-                    if (element.next == null) {
-                        break;
-                    }
-                    element = element.next;
-                }
+            while (element != null) {
+                put(element.key, element.value);
+                element = element.next;
             }
         }
     }
