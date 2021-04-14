@@ -11,7 +11,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private Node<K, V>[] table;
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
@@ -62,11 +62,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public void resize() {
+    private void resize() {
         size = 0;
-        int newThreshold = threshold * MULTIPLIER;
+        threshold *= MULTIPLIER;
         int newCapacity = table.length * MULTIPLIER;
-        threshold = newThreshold;
         Node<K, V>[] oldTable = table;
         table = (Node<K, V>[]) new Node[newCapacity];
         for (Node<K, V> node : oldTable) {
