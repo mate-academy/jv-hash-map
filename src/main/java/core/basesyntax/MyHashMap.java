@@ -11,7 +11,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static class Node<K, V> {
         private int hash;
-        final private K key;
+        private K key;
         private V value;
         private Node<K, V> next;
 
