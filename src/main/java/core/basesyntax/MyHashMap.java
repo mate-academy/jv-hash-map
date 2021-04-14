@@ -8,7 +8,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int threshold;
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -88,14 +88,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = table;
         table = new Node[tableSize];
         size = 0;
-        for (int i = 0; i < oldTable.length; i++) {
-            if (oldTable[i] == null) {
-                continue;
-            }
-            put(oldTable[i].key, oldTable[i].value);
-            while (oldTable[i].next != null) {
-                oldTable[i] = oldTable[i].next;
-                put(oldTable[i].key, oldTable[i].value);
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
