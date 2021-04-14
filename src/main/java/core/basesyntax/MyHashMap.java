@@ -15,7 +15,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private Node<K, V> next;
 
         public Node(K key, V value, Node<K, V> next) {
-            ;
             this.key = key;
             this.value = value;
             this.next = next;
@@ -33,7 +32,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (current == null) {
             return null;
         }
-        if (key == null && key == current.key || current.key.equals(key)) {
+        if (key == current.key || current.key.equals(key)) {
             return current;
         }
         while (current.next != null) {
