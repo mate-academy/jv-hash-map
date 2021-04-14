@@ -33,13 +33,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> current = table[hash(key) % table.length];
         if (current == null) {
             table[hash(key) % table.length] = newNode;
-        } else if (Objects.equals(current.value, value) || Objects.equals(current.key, key)) {
+        } else if (Objects.equals(current.key, key)) {
             current.value = value;
             return;
         } else {
             while (current.next != null) {
-                if (Objects.equals(current.next.value, value)
-                        || Objects.equals(current.next.key, key)) {
+                if (Objects.equals(current.next.key, key)) {
                     current.next.value = value;
                     return;
                 }
