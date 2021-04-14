@@ -11,7 +11,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static class Node<K, V> {
         private int hash;
-        private K key;
+        final private K key;
         private V value;
         private Node<K, V> next;
 
@@ -79,8 +79,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void transferOfNodes(Node<K, V>[] oldTable) {
-        for (int i = 0; i < oldTable.length; i++) {
-            Node<K, V> currentNode = oldTable[i];
+        for (Node<K, V> node : oldTable) {
+            Node<K, V> currentNode = node;
             while (currentNode != null) {
                 put(currentNode.key, currentNode.value);
                 currentNode = currentNode.next;
