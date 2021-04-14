@@ -22,10 +22,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    public MyHashMap() {
+        table = new Node[DEFAULT_CAPACITY];
+        threshold = (int)(DEFAULT_CAPACITY * LOAD_FACTOR);
+    }
+
     @Override
     public void put(K key, V value) {
-        reSize();
-        int index = hash(key);
+        resize();
+        int index = calculateIndexByHashcode(key);
         if (table[index] != null) {
             addPair(key, value, index);
         } else {
@@ -34,12 +39,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void reSize() {
-        if (table == null || table.length == 0) {
-            table = new Node[DEFAULT_CAPACITY];
-            threshold = (int)(DEFAULT_CAPACITY * LOAD_FACTOR);
-        }
-        if (size + 1 > threshold) {
+    private void resize() {
+        if (size >= threshold) {
             copyFromOldToNew();
         }
     }
@@ -58,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private int hash(Object key) {
+    private int calculateIndexByHashcode(K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
@@ -80,10 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (table == null) {
-            return null;
-        }
-        int index = hash(key);
+        int index = calculateIndexByHashcode(key);
         Node<K, V> node = table[index];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
