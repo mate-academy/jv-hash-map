@@ -11,27 +11,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
-        table = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
+        table = new Node[INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        checkSize();
+        if (size == threshold) {
+            resize();
+        }
         Node<K, V> newNode = new Node<>(key, value, null);
         int index = findIndex(hash(key));
-        if (table[index] == null) {
-            table[index] = newNode;
-        } else {
-            Node<K, V> iterator = table[index];
-            while (iterator.next != null || Objects.equals(iterator.key, key)) {
-                if (Objects.equals(iterator.key, key)) {
-                    iterator.value = newNode.value;
-                    return;
-                }
-                iterator = iterator.next;
+        Node<K, V> iterator = table[index];
+        while (iterator != null) {
+            if (Objects.equals(iterator.key, key)) {
+                iterator.value = newNode.value;
+                return;
             }
-            iterator.next = newNode;
+            if (iterator.next == null) {
+                iterator.next = newNode;
+                size++;
+                return;
+            }
+            iterator = iterator.next;
         }
+        table[index] = newNode;
         size++;
     }
 
@@ -53,17 +56,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void checkSize() {
-        if (size == threshold) {
-            resize();
-        }
-    }
-
     private void resize() {
         int capacity = table.length << 1;
         threshold = (int) (capacity * LOAD_FACTOR);
         Node<K, V>[] temporaryTable = table;
-        table = (Node<K, V>[]) new Node[capacity];
+        table = new Node[capacity];
         size = 0;
         transfer(temporaryTable);
     }
