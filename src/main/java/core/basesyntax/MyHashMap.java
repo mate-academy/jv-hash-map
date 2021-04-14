@@ -29,26 +29,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         final Node<K, V> newNode = new Node<>(null, value, key);
         Node<K, V> existingNode = searchNodeByKey(key);
-        if (existingNode == null) {
-            int index = getPosition(key);
-            Node<K, V> temp = data[index];
-            if (temp != null) {
-                while (temp.next != null) {
-                    temp = temp.next;
-                }
-                temp.next = newNode;
-            } else {
-                data[index] = newNode;
-            }
-            size++;
+        if (existingNode != null) {
+            existingNode.value = value;
             return;
         }
-        existingNode.value = value;
+        int index = getPosition(key);
+        Node<K, V> temp = data[index];
+        if (temp != null) {
+            while (temp.next != null) {
+                temp = temp.next;
+            }
+            temp.next = newNode;
+        } else {
+            data[index] = newNode;
+        }
+        size++;
     }
 
     @Override
     public V getValue(K key) {
-        return size == 0 ? null : Objects.requireNonNull(searchNodeByKey(key)).value;
+        Node<K, V> node = searchNodeByKey(key);
+        return node == null ? null : node.value;
     }
 
     @Override
@@ -76,6 +77,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> searchNodeByKey(K key) {
+        if (size == 0) {
+            return null;
+        }
         int index = getPosition(key);
         Node<K, V> temp = data[index];
         while (temp != null) {
