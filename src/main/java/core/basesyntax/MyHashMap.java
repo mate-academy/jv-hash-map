@@ -3,8 +3,8 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static int DEFAULT_CAPACITY = 16;
-    private static float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
     private Node<K, V>[] data;
     private int size;
@@ -14,13 +14,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private Node<K, V> next;
         private V value;
         private final K key;
-        private final int hash;
 
-        public Node(Node<K, V> next, V value, K key, int hash) {
+        public Node(Node<K, V> next, V value, K key) {
             this.next = next;
             this.value = value;
             this.key = key;
-            this.hash = hash;
         }
     }
 
@@ -29,11 +27,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (data == null || size == threshold) {
             resize();
         }
-        final Node<K, V> newNode = new Node<>(null, value, key,
-                (key == null) ? 0 : key.hashCode());
-        Node<K, V> existenceNode = searchNodeByKey(key);
-        if (existenceNode == null) {
-            int index = Math.abs((key == null ? 0 : key.hashCode()) % data.length);
+        final Node<K, V> newNode = new Node<>(null, value, key);
+        Node<K, V> existingNode = searchNodeByKey(key);
+        if (existingNode == null) {
+            int index = getPosition(key);
             Node<K, V> temp = data[index];
             if (temp != null) {
                 while (temp.next != null) {
@@ -46,15 +43,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        existenceNode.value = value;
+        existingNode.value = value;
     }
 
     @Override
     public V getValue(K key) {
-        if (size != 0) {
-            return Objects.requireNonNull(searchNodeByKey(key)).value;
-        }
-        return null;
+        return size == 0 ? null : Objects.requireNonNull(searchNodeByKey(key)).value;
     }
 
     @Override
@@ -69,23 +63,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         int newCapacity = data.length * 2;
-        Node<K, V>[] oldData = data;
+        final Node<K, V>[] oldData = data;
         data = (Node<K, V>[])new Node[newCapacity];
-        final int currentSize = size;
+        size = 0;
         threshold *= 2;
         for (Node<K, V> element : oldData) {
-            if (element != null) {
-                while (element != null) {
-                    put(element.key, element.value);
-                    element = element.next;
-                }
+            while (element != null) {
+                put(element.key, element.value);
+                element = element.next;
             }
         }
-        size = currentSize;
     }
 
     private Node<K, V> searchNodeByKey(K key) {
-        int index = Math.abs((key == null ? 0 : key.hashCode()) % data.length);
+        int index = getPosition(key);
         Node<K, V> temp = data[index];
         while (temp != null) {
             if (Objects.equals(temp.key, key)) {
@@ -94,5 +85,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             temp = temp.next;
         }
         return null;
+    }
+
+    private int getPosition(K key) {
+        return Math.abs((key == null ? 0 : key.hashCode()) % data.length);
     }
 }
