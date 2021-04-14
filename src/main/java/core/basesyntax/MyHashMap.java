@@ -21,7 +21,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = null;
         }
     }
 
@@ -51,23 +50,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void resize() {
-        int newCapacity;
-        newCapacity = table.length * CAPACITY_MULTIPLIER;
-        threshold = threshold * CAPACITY_MULTIPLIER;
-        Node<K, V>[] oldTable = table;
-        table = new Node[newCapacity];
-        size = 0;
-
-        for (int i = 0; i < oldTable.length; i++) {
-            Node<K, V> node = oldTable[i];
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
-            }
-        }
-    }
-
     @Override
     public V getValue(K key) {
         Node<K, V> currentNode = table[hash(key)];
@@ -88,5 +70,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int hash(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
+    }
+
+    private void resize() {
+        int newCapacity;
+        newCapacity = table.length * CAPACITY_MULTIPLIER;
+        threshold = threshold * CAPACITY_MULTIPLIER;
+        Node<K, V>[] oldTable = table;
+        table = new Node[newCapacity];
+        size = 0;
+
+        for (int i = 0; i < oldTable.length; i++) {
+            Node<K, V> node = oldTable[i];
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
+        }
     }
 }
