@@ -60,11 +60,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         final Node<K,V>[] oldTab = table;
-        Node<K, V> current;
+
         table = new Node[table.length * 2];
         threshold = (int)(table.length * DEFAULT_LOAD_FACTOR);
         size = 0;
-        for (Node<K, V> kvNode : oldTab) {
+        moveBuckets(oldTab);
+    }
+
+    private void moveBuckets(Node<K, V>[] oldTable) {
+        Node<K, V> current;
+        for (Node<K, V> kvNode : oldTable) {
             current = kvNode;
             while (current != null) {
                 put(current.key, current.value);
