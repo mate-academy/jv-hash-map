@@ -16,8 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -34,7 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        int index = hash(key);
+        int index = calculateIndexByHashcode(key);
         if (table[index] == null) {
             addNewNode(key, value, index);
         } else {
@@ -42,12 +41,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hash(K key) {
+    private int calculateIndexByHashcode(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void addNewNode(K key, V value, int index) {
-        Node<K, V> newNode = new Node<>(index, key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, null);
         table[index] = newNode;
         size++;
     }
@@ -60,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             if (currentNode.next == null) {
-                Node<K, V> newNode = new Node<>(index, key, value, null);
+                Node<K, V> newNode = new Node<>(key, value, null);
                 currentNode.next = newNode;
                 size++;
                 return;
@@ -91,12 +90,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = hash(key);
+        int index = calculateIndexByHashcode(key);
         Node<K, V> currentNode = table[index];
-        return searchNode(currentNode, key);
+        return searchNodeValue(currentNode, key);
     }
 
-    private V searchNode(Node<K, V> currentNode, K key) {
+    private V searchNodeValue(Node<K, V> currentNode, K key) {
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
