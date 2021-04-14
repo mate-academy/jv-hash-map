@@ -26,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             current = current.next;
         }
         if (size++ > threshold) {
-            reSize();
+            resize();
         }
         Node<K, V> newNode = new Node<>(key, value, null);
         if (table[index] == null) {
