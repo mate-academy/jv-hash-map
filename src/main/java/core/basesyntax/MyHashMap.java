@@ -21,7 +21,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
         threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
@@ -72,7 +71,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int newCapacity = table.length * 2;
         threshold *= 2;
         size = 0;
-        @SuppressWarnings("unchecked")
         Node<K, V>[] newTable = new Node[newCapacity];
         Node<K, V>[] oldTable = table;
         table = newTable;
