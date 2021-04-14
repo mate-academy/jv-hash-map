@@ -3,16 +3,19 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int INCREASE_IN_TWO_TIMES = 2;
     private Node<K, V>[] table;
     private int size;
+    private int threshold;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
+        threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= table.length * DEFAULT_LOAD_FACTOR) {
+        if (size >= threshold) {
             resize();
         }
 
@@ -28,7 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         if (key == null) {
-            return table[0].value;
+            return table[0] != null ? table[0].value : null;
         }
 
         int index = hash(key);
@@ -60,7 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public int hash(K key) {
-        int index = key.hashCode() & (table.length - 1);
+        int index = Math.abs(key.hashCode()) % table.length;
         return (index == 0) ? 1 : index;
     }
 
@@ -68,7 +71,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[0] == null) {
             table[0] = new Node<>(null, value, null);
             size++;
-
         } else {
             table[0].value = value;
         }
@@ -90,7 +92,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             if (nodeInBucket.nextNode == null) {
-                nodeInBucket.nextNode = new Node<>(key, value, null);;
+                nodeInBucket.nextNode = new Node<>(key, value, null);
                 size++;
                 return;
             }
@@ -101,7 +103,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void resize() {
         size = 0;
         Node<K, V>[] copyTable = table;
-        table = new Node[table.length * 2];
+        table = new Node[table.length * INCREASE_IN_TWO_TIMES];
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
         for (Node<K, V> nodeInBucket : copyTable) {
             while (nodeInBucket != null) {
                 put(nodeInBucket.key, nodeInBucket.value);
