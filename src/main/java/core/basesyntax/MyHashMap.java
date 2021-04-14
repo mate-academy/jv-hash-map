@@ -29,7 +29,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        resize();
+        if (size >= threshold) {
+            resize();
+        }
         int index = calculateIndexByHashcode(key);
         if (table[index] != null) {
             addPair(key, value, index);
@@ -40,9 +42,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (size >= threshold) {
-            copyFromOldToNew();
+        Node<K, V>[] oldTable = table;
+        table = new Node[table.length * MULTIPLIER];
+        size = 0;
+        for (int i = 0; i < oldTable.length; i++) {
+            if (oldTable[i] != null) {
+                Node<K,V> node = oldTable[i];
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
+            }
         }
+        threshold = (int)(table.length * LOAD_FACTOR);
     }
 
     private void addPair(K key, V value, int index) {
@@ -61,22 +73,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int calculateIndexByHashcode(K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
-    }
-
-    private void copyFromOldToNew() {
-        Node<K, V>[] oldTable = table;
-        table = new Node[table.length * MULTIPLIER];
-        size = 0;
-        for (int i = 0; i < oldTable.length; i++) {
-            if (oldTable[i] != null) {
-                Node<K,V> node = oldTable[i];
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
-            }
-        }
-        threshold = (int)(table.length * LOAD_FACTOR);
     }
 
     @Override
