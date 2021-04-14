@@ -17,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K, V> node = new Node(Objects.hash(key), key, value, null);
-        int bucketIndex = hash(node.key);
+        int bucketIndex = calculateIndexByHashcode(node.key);
         if (table[bucketIndex] == null) {
             add(bucketIndex, node);
         } else {
@@ -30,7 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int bucketIndex = hash(key);
+        int bucketIndex = calculateIndexByHashcode(key);
         Node<K, V> currentBucket = table[bucketIndex];
         while (currentBucket != null) {
             if (Objects.equals(currentBucket.key, key)) {
@@ -61,7 +61,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putValue(Node<K, V> node) {
-        int bucketIndex = hash(node.key);
+        int bucketIndex = calculateIndexByHashcode(node.key);
         Node<K, V> currentBucket = table[bucketIndex];
         while (currentBucket != null) {
             if (Objects.equals(node.key, currentBucket.key)) {
@@ -102,7 +102,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private int hash(K key) {
+    private int calculateIndexByHashcode(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 }
