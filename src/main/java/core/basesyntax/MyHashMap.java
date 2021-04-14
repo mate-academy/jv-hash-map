@@ -47,7 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void addPair(K key, V value, int index) {
         Node<K, V> node = table[index];
         while (node != null) {
-            if (key == node.key || Objects.equals(key, node.key)) {
+            if (Objects.equals(key, node.key)) {
                 node.value = value;
                 return;
             }
@@ -86,7 +86,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = hash(key);
         Node<K, V> node = table[index];
         while (node != null) {
-            if (key == node.key || Objects.equals(key, node.key)) {
+            if (Objects.equals(key, node.key)) {
                 return node.value;
             }
             node = node.next;
