@@ -14,7 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -48,26 +48,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         int position = getPositionByKey(key);
         Node<K, V> newNode = new Node<>(key, value, null);
-        Node<K, V> current = table[position];
-        if (table[position] == null) {
-            table[position] = newNode;
-        } else if (current.key == key || key != null && key.equals(current.key)) {
+        Node<K, V> current = getNode(key);
+        if (size > threshold) {
+            resize();
+        }
+        if (current != null) {
             current.value = value;
             return;
+        }
+        if (table[position] == null) {
+            table[position] = newNode;
         } else {
+            current = table[position];
             while (current.next != null) {
                 current = current.next;
-                if (current.key == key || key != null && key.equals(current.key)) {
-                    current.value = value;
-                    return;
-                }
             }
             current.next = newNode;
         }
         size++;
-        if (size > threshold) {
-            resize();
-        }
     }
 
     @Override
