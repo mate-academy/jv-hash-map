@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -18,26 +20,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-
-        if (key == null) {
-            putForNullKey(value);
-        } else if (table[hash(key)] == null) {
-            putOnEmptyBucket(key, value);
+        int index = calculateIndexByHashcode(key);
+        if (table[index] == null) {
+            putOnEmptyBucket(key, value, index);
         } else {
-            putWithCollision(key, value);
+            putWithCollision(key, value, index);
         }
     }
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
-            return table[0] != null ? table[0].value : null;
-        }
-
-        int index = hash(key);
+        int index = calculateIndexByHashcode(key);
         Node<K, V> nodeInBucket = table[index];
         while (nodeInBucket != null) {
-            if (key.equals(nodeInBucket.key)) {
+            if (Objects.equals(key, nodeInBucket.key)) {
                 return nodeInBucket.value;
             }
             nodeInBucket = nodeInBucket.nextNode;
@@ -62,32 +58,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public int hash(K key) {
-        int index = Math.abs(key.hashCode()) % table.length;
-        return (index == 0) ? 1 : index;
+    public int calculateIndexByHashcode(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
-    public void putForNullKey(V value) {
-        if (table[0] == null) {
-            table[0] = new Node<>(null, value, null);
-            size++;
-        } else {
-            table[0].value = value;
-        }
-    }
-
-    public void putOnEmptyBucket(K key, V value) {
+    public void putOnEmptyBucket(K key, V value, int index) {
         Node<K,V> newNode = new Node<>(key, value, null);
-        table[hash(key)] = newNode;
+        table[index] = newNode;
         size++;
     }
 
-    public void putWithCollision(K key, V value) {
-        int index = hash(key);
+    public void putWithCollision(K key, V value, int index) {
         Node<K,V> nodeInBucket = table[index];
 
         while (nodeInBucket != null) {
-            if (key.equals(nodeInBucket.key)) {
+            if (key == nodeInBucket.key || key != null && key.equals(nodeInBucket.key)) {
                 nodeInBucket.value = value;
                 return;
             }
