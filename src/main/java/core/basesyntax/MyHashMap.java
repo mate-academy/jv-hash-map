@@ -14,7 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int)(INITIAL_CAPACITY * LOAD_FACTOR);
     }
 
-    private static class Node <K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K,V> next;
@@ -26,10 +26,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-
     @Override
     public void put(K key, V value) {
-        Node <K, V> existingNode = getNode(key);
+        Node<K, V> existingNode = getNode(key);
         if (existingNode != null) {
             existingNode.value = value;
             return;
