@@ -9,24 +9,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private Node<K, V>[] table;
 
+    public MyHashMap() {
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
+        threshold = (int) (DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
+    }
+
     private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        private Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
+            this.next = null;
         }
     }
 
     @Override
     public void put(K key, V value) {
-        if (table == null || table.length == 0) {
-            resize();
-        }
-        if (putNodeInTable(new Node<>(key, value, null))) {
+        if (putNodeInTable(new Node<>(key, value))) {
             size++;
         }
         if (size >= threshold) {
@@ -37,8 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         if (table != null) {
-            int binNumber = getBinNumber(key);
-            Node<K, V> currentNode = table[binNumber];
+            Node<K, V> currentNode = table[getBinNumber(key)];
             while (currentNode != null) {
                 if (Objects.equals(currentNode.key, key)) {
                     return currentNode.value;
@@ -80,21 +81,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldTable = table;
-        int oldCapacity = (oldTable == null) ? 0 : oldTable.length;
-        int newCapacity;
-        int newThreshold;
-        if (oldCapacity > 0) {
-            newCapacity = oldCapacity * 2;
-            newThreshold = threshold * 2;
-        } else {
-            newCapacity = DEFAULT_INITIAL_CAPACITY;
-            newThreshold = (int) (DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
-        }
-        threshold = newThreshold;
-        table = new Node[newCapacity];
-        if (oldTable != null) {
-            transferNodes(oldTable);
-        }
+        threshold = threshold * 2;
+        table = new Node[oldTable.length * 2];
+        transferNodes(oldTable);
     }
 
     private int getBinNumber(K key) {
@@ -103,11 +92,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void transferNodes(Node<K, V>[] oldTable) {
         for (Node<K, V> currentNode : oldTable) {
-            if (currentNode != null) {
-                while (currentNode != null) {
-                    putNodeInTable(new Node<>(currentNode.key, currentNode.value, null));
-                    currentNode = currentNode.next;
-                }
+            while (currentNode != null) {
+                putNodeInTable(new Node<>(currentNode.key, currentNode.value));
+                currentNode = currentNode.next;
             }
         }
     }
