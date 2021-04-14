@@ -52,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         size = 0;
         threshold *= DEFAULT_SIZE_INCREASE;
-        Node<K,V> [] previousTable = table;
+        Node<K, V>[] previousTable = table;
         table = new Node[table.length * DEFAULT_SIZE_INCREASE];
         for (Node<K, V> node : previousTable) {
             while (node != null) {
@@ -67,7 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private K key;
+        private final K key;
         private V value;
         private Node<K, V> next;
 
