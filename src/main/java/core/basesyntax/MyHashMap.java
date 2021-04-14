@@ -5,7 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private Node<K,V>[] table;
+    private Node<K, V>[] table;
     private int size;
     private int threshold;
 
@@ -19,26 +19,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        Node<K, V> currentNode = table[getKeyIndex(key)];
+        int index = getIndex(key);
+        Node<K, V> currentNode = table[index];
         if (currentNode == null) {
-            table[getKeyIndex(key)] = new Node<>(key, value, null);
+            table[index] = new Node<>(key, value, null);
+            size++;
+            return;
         } else {
-            while (currentNode.next != null
-                    || Objects.equals(key, currentNode.key)) {
+            while (currentNode != null) {
                 if (Objects.equals(key, currentNode.key)) {
                     currentNode.value = value;
+                    return;
+                } else if (currentNode.next == null) {
+                    currentNode.next = new Node<>(key, value, null);
+                    size++;
                     return;
                 }
                 currentNode = currentNode.next;
             }
-            currentNode.next = new Node<>(key, value, null);
         }
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = table[getKeyIndex(key)];
+        Node<K, V> currentNode = table[getIndex(key)];
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
                 return currentNode.value;
@@ -66,20 +71,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K,V>[] tmpTable = table;
+        Node<K, V>[] tmpTable;
+        tmpTable = table;
         int newCapacity = table.length * 2;
         threshold = newCapacity * 2;
         table = new Node[newCapacity];
+        size = 0;
         for (Node<K, V> node : tmpTable) {
             while (node != null) {
                 put(node.key, node.value);
-                size--;
                 node = node.next;
             }
         }
     }
 
-    private int getKeyIndex(K key) {
+    private int getIndex(K key) {
         return key != null ? Math.abs(key.hashCode()) % table.length : 0;
     }
 }
