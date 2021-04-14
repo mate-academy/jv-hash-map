@@ -20,19 +20,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         resizeIfNeeded();
         int index = calculateIndex(key);
         Node<K,V> possibleNode = table[index];
-        if (possibleNode == null) {
-            table[index] = new Node<>(key, value);
-            size++;
-            return;
-        }
-        while (possibleNode.next != null || Objects.equals(possibleNode.key, key)) {
+        while (possibleNode != null) {
             if (Objects.equals(possibleNode.key, key)) {
                 possibleNode.value = value;
                 return;
             }
+            if (possibleNode.next == null) {
+                possibleNode.next = new Node<>(key, value);
+                size++;
+                return;
+            }
             possibleNode = possibleNode.next;
         }
-        possibleNode.next = new Node<>(key, value);
+        table[index] = new Node<>(key, value);
         size++;
     }
 
