@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
@@ -17,28 +19,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = key == null ? 0 : getIndexUsingHashcode(key);
-
+        if (size >= threshold) {
+            increaseSize();
+        }
+        int index = getIndexUsingHashcode(key);
         Node<K, V> currentNode = container[index];
-        while (currentNode != null) {
-            if (currentNode.key == key || currentNode.key != null && currentNode.key.equals(key)) {
+
+        while (currentNode != null){
+            if (Objects.equals(key, currentNode.key)) {
                 currentNode.value = value;
+                return;
+            }
+            if (currentNode.next == null) {
+                currentNode.next = new Node<>(key, value, null);
+                size++;
                 return;
             }
             currentNode = currentNode.next;
         }
-
-        if (size++ > threshold) {
-            increaseSize();
-        }
-
-        Node<K, V> newNode = new Node<>(key, value, null);
-        if (container[index] == null) {
-            container[index] = newNode;
-        } else {
-            newNode.next = container[index].next;
-            container[index].next = newNode;
-        }
+        container[index] = new Node<>(key, value, null);
+        size++;
     }
 
     @Override
@@ -83,10 +83,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 temp = temp.next;
             }
         }
-        size++;
     }
 
     private int getIndexUsingHashcode(K key) {
-        return Math.abs(key.hashCode()) % capacity;
+        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 }
