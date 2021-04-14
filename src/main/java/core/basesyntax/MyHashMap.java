@@ -11,7 +11,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     private static class Node<K, V> {
-        private K key;
+        private final K key;
         private V value;
         private Node<K, V> next;
 
@@ -45,23 +45,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void addPair(K key, V value, int index) {
-        if (key == table[index].key || Objects.equals(key, table[index].key)) {
-            table[index].value = value;
-            return;
-        }
         Node<K, V> node = table[index];
-        while (node.next != null) {
-            if (Objects.equals(key, node.key)) {
+        while (node != null) {
+            if (key == node.key || Objects.equals(key, node.key)) {
                 node.value = value;
                 return;
             }
             node = node.next;
         }
-        if (Objects.equals(key, node.key)) {
-            node.value = value;
-            return;
-        }
-        node.next = new Node<>(key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, table[index]);
+        table[index] = newNode;
         size++;
     }
 
@@ -91,12 +84,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         int index = hash(key);
-        if (key == table[index].key || Objects.equals(key, table[index].key)) {
-            return table[index].value;
-        }
         Node<K, V> node = table[index];
         while (node != null) {
-            if (Objects.equals(key, node.key)) {
+            if (key == node.key || Objects.equals(key, node.key)) {
                 return node.value;
             }
             node = node.next;
