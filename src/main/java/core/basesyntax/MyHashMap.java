@@ -3,18 +3,16 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_INITIAL_CAPACITY = 16;
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    static final int DEFAULT_TABLE_INCREASING = 2;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_TABLE_INCREASING = 2;
     private int threshold;
-    private int capacity;
     private int size;
     private Node<K,V>[] table;
 
     public MyHashMap() {
-        capacity = DEFAULT_INITIAL_CAPACITY;
-        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
         table = new Node[DEFAULT_INITIAL_CAPACITY];
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
@@ -41,16 +39,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> nodeToSearch = table[calculateIndex(key)];
-        if (nodeToSearch == null) {
-            return null;
-        }
-        while (!Objects.equals(nodeToSearch.key, key)) {
-            if (nodeToSearch.next == null) {
-                return null;
+        while (nodeToSearch != null) {
+            if (Objects.equals(nodeToSearch.key, key)) {
+                return nodeToSearch.value;
             }
             nodeToSearch = nodeToSearch.next;
         }
-        return nodeToSearch.value;
+        return null;
     }
 
     @Override
@@ -60,10 +55,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resizeIfNeeded() {
         if (size >= threshold) {
-            capacity *= DEFAULT_TABLE_INCREASING;
             threshold *= DEFAULT_TABLE_INCREASING;
             Node<K, V>[] oldTable = table;
-            table = new Node[capacity];
+            table = new Node[table.length * DEFAULT_TABLE_INCREASING];
             size = 0;
             for (Node<K, V> oldNode : oldTable) {
                 while (oldNode != null) {
@@ -75,7 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int calculateIndex(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode()) % capacity;
+        return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private class Node<K,V> {
@@ -86,7 +80,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = null;
         }
     }
 }
