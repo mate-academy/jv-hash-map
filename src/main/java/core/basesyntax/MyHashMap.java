@@ -32,14 +32,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (current == null) {
             return null;
         }
-        if (key == current.key || current.key.equals(key)) {
-            return current;
-        }
-        while (current.next != null) {
-            current = current.next;
+        while (current != null) {
             if (current.key == key || key != null && key.equals(current.key)) {
                 return current;
             }
+            current = current.next;
         }
         return null;
     }
