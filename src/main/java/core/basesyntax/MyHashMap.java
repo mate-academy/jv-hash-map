@@ -3,8 +3,8 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_CAPACITY = 16;
-    static final float DEFAULT_LOAD_FACTOR = 0.75F;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75F;
     private int size;
     private int threshold;
     private Node<K,V>[] table;
@@ -41,16 +41,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int index = getIndex(key);
         Node<K, V> current = table[index];
-        if (current == null) {
-            return null;
-        }
-        while (current.next != null || Objects.equals(current.key, key)) {
+        while (current != null) {
             if (Objects.equals(current.key, key)) {
                 return current.value;
             }
             current = current.next;
         }
-        return current.value;
+        return null;
     }
 
     @Override
@@ -59,18 +56,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        final Node<K,V>[] oldTab = table;
-
+        size = 0;
+        Node<K,V>[] oldTable = table;
         table = new Node[table.length * 2];
         threshold = (int)(table.length * DEFAULT_LOAD_FACTOR);
-        size = 0;
-        moveBuckets(oldTab);
+        moveBuckets(oldTable);
     }
 
     private void moveBuckets(Node<K, V>[] oldTable) {
-        Node<K, V> current;
-        for (Node<K, V> kvNode : oldTable) {
-            current = kvNode;
+        for (Node<K, V> current : oldTable) {
             while (current != null) {
                 put(current.key, current.value);
                 current = current.next;
