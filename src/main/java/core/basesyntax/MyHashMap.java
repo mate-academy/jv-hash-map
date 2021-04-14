@@ -1,19 +1,90 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int TABLE_MAGNIFICATION_FACTOR = 2;
+    private int threshold;
+    private int size;
+    private Node<K,V>[] table;
+
+    public MyHashMap() {
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
+    }
 
     @Override
     public void put(K key, V value) {
-
+        resize();
+        int index = getIndex(key);
+        Node<K, V> intermediateNode = table[index];
+        if (intermediateNode == null) {
+            table[index] = new Node<>(key, value);
+            size++;
+            return;
+        }
+        while (intermediateNode != null) {
+            if (Objects.equals(intermediateNode.key, key)) {
+                intermediateNode.value = value;
+                return;
+            }
+            if (intermediateNode.next == null) {
+                intermediateNode.next = new Node<>(key, value);
+                size++;
+                return;
+            }
+            intermediateNode = intermediateNode.next;
+        }
+        intermediateNode.next = new Node<>(key, value);
+        size++;
     }
 
     @Override
     public V getValue(K key) {
+        Node<K, V> soughtNode = table[getIndex(key)];
+        while (soughtNode != null) {
+            if (Objects.equals(soughtNode.key, key)) {
+                return soughtNode.value;
+            }
+            soughtNode = soughtNode.next;
+        }
         return null;
     }
 
     @Override
     public int getSize() {
-        return 0;
+        return size;
+    }
+
+    private int getIndex(K key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
+    }
+
+    private void resize() {
+        if (size >= threshold) {
+            threshold *= TABLE_MAGNIFICATION_FACTOR;
+            Node<K, V>[] oldNodes = table;
+            table = new Node[table.length * TABLE_MAGNIFICATION_FACTOR];
+            size = 0;
+            for (Node<K, V> oldNode : oldNodes) {
+                while (oldNode != null) {
+                    put(oldNode.key, oldNode.value);
+                    oldNode = oldNode.next;
+                }
+            }
+        }
+    }
+
+    private class Node<K,V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 }
