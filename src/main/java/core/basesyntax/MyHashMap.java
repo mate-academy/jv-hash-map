@@ -15,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = key == null ? 0 : getIndex(key);
+        int index = getIndex(key);
         Node<K, V> current = table[index];
         while (current != null) {
             if (current.key == key
@@ -55,7 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void reSize() {
+    private void resize() {
         int capacity = table.length * RESIZE_MULTIPLIER;
         threshold *= RESIZE_MULTIPLIER;
         size = 0;
@@ -72,7 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return Math.abs(key.hashCode()) % table.length;
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private static class Node<K, V> {
