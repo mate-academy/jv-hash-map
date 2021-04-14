@@ -61,7 +61,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] newBucketList = (Node<K, V>[])new Node[capacity];
         for (Node<K, V> node : bucketList) {
             for (Node<K, V> element = node; element != null; element = element.next) {
-                insertNode(element, newBucketList);
+                Node<K, V> elementCopy = new Node<>(element.key, element.value, null);
+                insertNode(elementCopy, newBucketList);
             }
         }
         threshold = (int)(capacity * LOAD_FACTOR);
