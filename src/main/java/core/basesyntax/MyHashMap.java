@@ -21,23 +21,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int index = getIndex(key);
         Node<K, V> currentNode = table[index];
-        if (currentNode == null) {
-            table[index] = new Node<>(key, value, null);
-            size++;
-            return;
-        } else {
-            while (currentNode != null) {
-                if (Objects.equals(key, currentNode.key)) {
-                    currentNode.value = value;
-                    return;
-                } else if (currentNode.next == null) {
-                    currentNode.next = new Node<>(key, value, null);
-                    size++;
-                    return;
-                }
-                currentNode = currentNode.next;
+        while (currentNode != null) {
+            if (Objects.equals(key, currentNode.key)) {
+                currentNode.value = value;
+                return;
             }
+            if (currentNode.next == null) {
+                currentNode.next = new Node<>(key, value, null);
+                size++;
+                return;
+            }
+            currentNode = currentNode.next;
         }
+        table[index] = new Node<>(key, value, null);
         size++;
     }
 
@@ -71,12 +67,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] tmpTable;
-        tmpTable = table;
         int newCapacity = table.length * 2;
         threshold = newCapacity * 2;
-        table = new Node[newCapacity];
         size = 0;
+        Node<K, V>[] tmpTable = table;
+        table = new Node[newCapacity];
         for (Node<K, V> node : tmpTable) {
             while (node != null) {
                 put(node.key, node.value);
