@@ -22,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int index = getIndex(key);
         if (table[index] != null) {
-            addPair(key, value, index);
+            addPairByIndex(key, value, index);
         } else {
             table[index] = new Node<>(key, value, null);
             size++;
@@ -31,9 +31,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (table == null) {
-            return null;
-        }
         Node<K, V> currentNode = table[getIndex(key)];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
@@ -65,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (table.length * LOAD_FACTOR);
     }
 
-    private void addPair(K key, V value, int index) {
+    private void addPairByIndex(K key, V value, int index) {
         Node<K, V> node = table[index];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
