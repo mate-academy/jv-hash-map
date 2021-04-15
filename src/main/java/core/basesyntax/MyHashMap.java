@@ -6,24 +6,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULTL_CAPACITY = 16;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
     private int size;
+    private final int threshold;
     private Node<K, V>[] table;
 
     public MyHashMap() {
         table = new Node[DEFAULTL_CAPACITY];
+        threshold = (int) (DEFAULTL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= DEFAULTL_CAPACITY * DEFAULT_LOAD_FACTOR) {
+        if (size > threshold) {
             resize();
         }
         Node<K, V> currentNode = table[getIndex(key)];
-        if (currentNode == null) {
-            table[getIndex(key)] = new Node<>(key, value);
-            size++;
-            return;
-        }
-        while (currentNode.next != null || Objects.equals(currentNode.key, key)) {
+        while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 currentNode.value = value;
                 return;
@@ -31,10 +28,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (currentNode.next == null) {
                 currentNode.next = new Node<>(key, value);
                 size++;
+                return;
             }
             currentNode = currentNode.next;
         }
-        currentNode.next = new Node<>(key, value);
+        table[getIndex(key)] = new Node<>(key, value);
         size++;
     }
 
@@ -58,10 +56,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         if (size > table.length * DEFAULT_LOAD_FACTOR) {
             int newCapacity = table.length * 2;
-            Node<K, V>[] oldNodes = new Node[newCapacity];
-            Node<K, V>[] newNodes = table;
-            table = oldNodes;
             size = 0;
+            Node<K, V>[] newNodes = table;
+            table = new Node[newCapacity];
             for (Node<K, V> node: newNodes) {
                 while (node != null) {
                     put(node.key, node.value);
