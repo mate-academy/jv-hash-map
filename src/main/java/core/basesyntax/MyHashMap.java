@@ -60,9 +60,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        threshold = table.length << 1;
         Node<K, V>[] oldTable = table;
         table = new Node[table.length << 1];
+        threshold = (int) (table.length * LOAD_FACTOR);
         transfer(oldTable);
     }
 
