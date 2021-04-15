@@ -6,7 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
     private Node<K, V>[] bucketList;
-    private int size = 0;
+    private int size;
     private int threshold;
 
     public MyHashMap() {
@@ -29,14 +29,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K, V> existingNode = getNode(key);
+        if (existingNode == null) {
+            checkSize();
+            insertNode(new Node<>(key, value, null), bucketList);
+            size++;
+            return;
+        }
         if (existingNode != null) {
             existingNode.value = value;
             return;
         }
         Node<K, V> node = new Node<>(key, value, null);
-        if (size == threshold) {
-            resize();
-        }
+        checkSize();
         insertNode(node, bucketList);
         size++;
     }
@@ -55,8 +59,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private void checkSize() {
+        if (size == threshold) {
+            resize();
+        }
+    }
+
     private void resize() {
-        int capacity = bucketList.length + INITIAL_CAPACITY;
+        int capacity = bucketList.length * 2;
         Node<K, V>[] newBucketList = (Node<K, V>[])new Node[capacity];
         for (Node<K, V> node : bucketList) {
             for (Node<K, V> element = node; element != null; element = element.next) {
