@@ -16,20 +16,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
     }
 
-    private static class Node<K, V> {
-        private K key;
-        private V value;
-        private Node<K, V> next;
-        private int hash;
-
-        Node(K key, V value, int hash, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.hash = hash;
-            this.next = next;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value, hash(key), null);
@@ -101,6 +87,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 put(each.key, each.value);
                 each = each.next;
             }
+        }
+    }
+
+    private static class Node<K, V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
+        private int hash;
+
+        Node(K key, V value, int hash, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.hash = hash;
+            this.next = next;
         }
     }
 }
