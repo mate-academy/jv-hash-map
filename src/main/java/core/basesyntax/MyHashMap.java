@@ -29,7 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (elements == null || size == threshold) {
+        if (size == threshold) {
             resize();
         }
         Node<K, V> newNode = new Node<K, V>(key, value, null);
