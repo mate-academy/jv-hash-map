@@ -62,8 +62,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        final private int hash;
-        final private K key;
+        private int hash;
+        private K key;
         private V value;
         private Node<K, V> next;
 
