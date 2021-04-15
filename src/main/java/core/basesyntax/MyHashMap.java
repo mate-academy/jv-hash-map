@@ -16,12 +16,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (key == null) {
-            putForNullKey(value);
-        } else {
-            size = addEntry(Objects.hashCode(key), key, value, getIndex(key)) ? ++size : size;
+        size = addEntry(Objects.hashCode(key), key, value, getIndex(key)) ? ++size : size;
+        if (size >= threshold) {
+            resize();
         }
-        resize();
     }
 
     @Override
@@ -42,17 +40,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(Object key) {
-        return (key == null) ? 0 : Objects.hashCode(key) & table.length - 1;
+        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void resize() {
-        if (size >= threshold) {
-            size = 0;
-            threshold = table.length << 1;
-            Node<K, V>[] oldTable = table;
-            table = new Node[table.length << 1];
-            transfer(oldTable);
-        }
+        size = 0;
+        threshold = table.length << 1;
+        Node<K, V>[] oldTable = table;
+        table = new Node[table.length << 1];
+        transfer(oldTable);
     }
 
     private void transfer(Node<K, V>[] table) {
@@ -64,23 +60,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void putForNullKey(V value) {
-        Node<K, V> currentNode = table[0];
-        while (currentNode != null) {
-            if (currentNode.key == null) {
-                currentNode.value = value;
-                return;
-            }
-            currentNode = currentNode.next;
-        }
-        addEntry(0, null, value, 0);
-        size++;
-    }
-
     private boolean addEntry(int hash, K key, V value, int index) {
         Node<K, V> currentNode = table[index];
         if (currentNode == null) {
-            table[index] = new Node<>(hash, key, value);
+            table[index] = new Node<>(hash, key, value, null);
             return true;
         }
         while (true) {
@@ -88,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode.value = value;
                 return false;
             } else if (currentNode.next == null) {
-                currentNode.next = new Node<>(hash, key, value);
+                currentNode.next = new Node<>(hash, key, value, null);
                 return true;
             }
             currentNode = currentNode.next;
@@ -101,10 +84,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next = null;
 
-        public Node(int hash, K key, V value) {
+        public Node(int hash, K key, V value, Node<K,V> next) {
             this.hash = hash;
             this.key = key;
             this.value = value;
+            this.next = next;
         }
     }
 }
