@@ -21,26 +21,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
 
-        Node<K, V> inBucket = table[calculateHash(key)];
-        while (inBucket != null) {
-            if (Objects.equals(key, inBucket.key)) {
-                inBucket.value = value;
+        Node<K, V> indexedNode = table[calculateIndex(key)];
+        while (indexedNode != null) {
+            if (Objects.equals(key, indexedNode.key)) {
+                indexedNode.value = value;
                 return;
             }
-            if (inBucket.next == null) {
-                inBucket.next = new Node<>(key, value, null);
+            if (indexedNode.next == null) {
+                indexedNode.next = new Node<>(key, value, null);
                 size++;
                 return;
             }
-            inBucket = inBucket.next;
+            indexedNode = indexedNode.next;
         }
-        table[calculateHash(key)] = new Node<>(key, value, null);
+        table[calculateIndex(key)] = new Node<>(key, value, null);
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> requestNode = table[calculateHash(key)];
+        Node<K, V> requestNode = table[calculateIndex(key)];
         while (requestNode != null) {
             if (Objects.equals(key, requestNode.key)) {
                 return requestNode.value;
@@ -60,15 +60,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
         }
     }
 
-    private int calculateHash(K key) {
-        return key != null ? Math.abs(key.hashCode()) % table.length : 0;
+    private int calculateIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private void resize() {
