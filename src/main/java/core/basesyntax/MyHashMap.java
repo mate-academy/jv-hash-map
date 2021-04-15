@@ -5,6 +5,8 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFFAULT_CAPPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int TRESHOLD_RESIZE_MULTIPLIER = 2;
+    private static final int TABLE_RESIZE_MULTIPLIER = 2;
     private Node<K, V>[] table;
     private int size;
     private int treshold;
@@ -56,8 +58,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = table;
         int capacity;
         if (size >= treshold) {
-            capacity = table.length * 2;
-            treshold = treshold * 2;
+            capacity = table.length * TABLE_RESIZE_MULTIPLIER;
+            treshold = treshold * TRESHOLD_RESIZE_MULTIPLIER;
             table = new Node[capacity];
             size = 0;
             for (Node<K, V> node : oldTable) {
