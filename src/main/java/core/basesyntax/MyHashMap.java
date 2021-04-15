@@ -4,6 +4,7 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
+    private static final int COFFICIENT_GROW = 2;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
@@ -31,7 +32,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> putNode = new Node<>(key, value, null);
         int index = getIndexByKey(key);
         Node<K, V> currentNode = table[index];
-        if (size == 0 || table[index] == null) {
+        if (table[index] == null) {
             table[index] = putNode;
         } else {
             while (currentNode.next != null || Objects.equals(currentNode.key, key)) {
@@ -53,25 +54,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int index = getIndexByKey(key);
         Node<K, V> currentNode = table[index];
-        if (currentNode == null) {
-            return null;
-        }
-        if (Objects.equals(currentNode.key, key)) {
-            return currentNode.value;
-        } else {
-            while (currentNode.next != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    return currentNode.value;
-                }
-                if (currentNode.next.next == null) {
-                    if (Objects.equals(currentNode.next.key, key)) {
-                        return currentNode.next.value;
-                    }
-                }
-                currentNode = currentNode.next;
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
             }
-            return null;
+            currentNode = currentNode.next;
         }
+        return null;
     }
 
     @Override
@@ -81,8 +70,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V>[] resize() {
         Node<K, V>[] tableToResize = table;
-        int newCapacity = tableToResize.length * 2;
-        threshold *= 2;
+        int newCapacity = tableToResize.length * COFFICIENT_GROW;
+        threshold *= COFFICIENT_GROW;
         table = (Node<K, V>[]) new Node[newCapacity];
         size = 0;
         return transfer(tableToResize);
@@ -99,12 +88,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndexByKey(K key) {
-        if (table != null && table.length > 0) {
-            if (key == null) {
-                return 0;
-            }
-            return Math.abs(key.hashCode() % table.length);
+        if (key == null) {
+            return 0;
         }
-        return 0;
+        return Math.abs(key.hashCode() % table.length);
     }
 }
