@@ -46,7 +46,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             current.next = newNode;
         }
-        if (++size > threshold) {
+        if (++size >= threshold) {
             resize();
         }
     }
@@ -69,9 +69,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        final int newCapacity = table.length * GROW_VALUE;
-        final Node<K, V>[] oldTable = table;
+        int newCapacity = table.length * GROW_VALUE;
         threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
+        Node<K, V>[] oldTable = table;
         table = new Node[newCapacity];
         size = 0;
         for (Node<K, V> node : oldTable) {
