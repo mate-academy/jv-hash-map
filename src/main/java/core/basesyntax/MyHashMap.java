@@ -28,31 +28,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = hash(key);
-        Node<K, V> currentNode = table[index];
-        if (currentNode == null) {
-            table[index] = new Node<>(key, value);
-            size++;
-            return;
-        }
-        while (currentNode.next != null || Objects.equals(currentNode.key,key)) {
-            if (currentNode.key == key || currentNode.key != null
-                    && currentNode.key.equals(key)) {
-                currentNode.value = value;
-                return;
-            }
-            currentNode = currentNode.next;
-        }
-        currentNode.next = new Node<>(key, value);
-        size++;
         if (size >= threshold) {
             resize();
         }
+        int index = calculateIndexFromHashcode(key);
+        Node<K, V> currentNode = table[index];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                currentNode.value = value;
+                return;
+            }
+            if (currentNode.next == null) {
+                currentNode.next = new Node<>(key, value);
+                size++;
+            }
+            currentNode = currentNode.next;
+        }
+        table[index] = new Node<>(key, value);
+        size++;
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = table[hash(key)];
+        Node<K, V> currentNode = table[calculateIndexFromHashcode(key)];
         while (currentNode != null) {
             if (currentNode.key == key || currentNode.key != null
                     && currentNode.key.equals(key)) {
@@ -68,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(K key) {
+    private int calculateIndexFromHashcode(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
