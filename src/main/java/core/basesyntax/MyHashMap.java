@@ -17,8 +17,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K, V> currentNode = table[getIndex((key))];
-        if (table[getIndex(key)] == null) {
-            table[getIndex((key))] = new Node<>(Objects.hashCode(key), key, value, null);
+        Node<K, V> newNode = new Node<>(Objects.hashCode(key), key, value, null);
+        if (currentNode == null) {
+            table[getIndex((key))] = newNode;
             size++;
         }
         while (currentNode != null) {
@@ -26,7 +27,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode.value = value;
                 break;
             } else if (currentNode.next == null) {
-                currentNode.next = new Node<>(Objects.hashCode(key), key, value, null);
+                currentNode.next = newNode;
                 size++;
             }
             currentNode = currentNode.next;
