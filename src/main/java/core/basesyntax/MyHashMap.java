@@ -26,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
-    public Node<K, V> getNode(K key) {
+    private Node<K, V> getNode(K key) {
         int position = getPositionByKey(key);
         Node<K, V> current = table[position];
         if (current == null) {
