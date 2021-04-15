@@ -4,14 +4,14 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final float loadFactor = 0.75f;
+    private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
     private int threshold;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        threshold = (int) (DEFAULT_CAPACITY * loadFactor);
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         Node<K, V>[] nodeCopyTable = table;
         table = new Node[table.length << 1];
-        threshold = (int) (table.length * loadFactor);
+        threshold = (int) (table.length * LOAD_FACTOR);
         transfer(nodeCopyTable);
     }
 
