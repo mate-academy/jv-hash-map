@@ -9,7 +9,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private Node<K, V>[] table;
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -48,22 +48,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         int position = getPositionByKey(key);
-        Node<K, V> newNode = new Node<>(key, value, null);
         Node<K, V> current = getNode(key);
         if (current != null) {
             current.value = value;
             return;
         }
-
-        if (table[position] == null) {
-            table[position] = newNode;
-        } else {
-            current = table[position];
-            while (current.next != null) {
-                current = current.next;
-            }
-            current.next = newNode;
-        }
+        table[position] = new Node<>(key, value, table[position]);
         size++;
     }
 
