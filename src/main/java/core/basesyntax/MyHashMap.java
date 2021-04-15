@@ -6,7 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_CAPACITY = 0.75f;
     private Node<K, V>[] table;
-    private int size = 0;
+    private int size;
     private int threshold;
 
     public MyHashMap() {
@@ -62,14 +62,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
-    }
-
     public void resize() {
-        int newCapacity;
-        newCapacity = table.length * 2;
-        threshold = threshold * 2;
+        int newCapacity = table.length * 2;
+        threshold *= 2;
         Node<K, V>[] oldTable = table;
         table = new Node[newCapacity];
         size = 0;
@@ -79,6 +74,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 entry = entry.next;
             }
         }
+    }
+
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private static class Node<K, V> {
