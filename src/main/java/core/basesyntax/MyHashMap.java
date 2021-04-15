@@ -16,7 +16,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        size = addEntry(Objects.hashCode(key), key, value, getIndex(key)) ? ++size : size;
+        Node<K, V> currentNode = table[getIndex((key))];
+        if (table[getIndex(key)] == null) {
+            table[getIndex((key))] = new Node<>(Objects.hashCode(key), key, value, null);
+            size++;
+        }
+        while (currentNode != null) {
+            if (Objects.equals(key, currentNode.key)) {
+                currentNode.value = value;
+                break;
+            } else if (currentNode.next == null) {
+                currentNode.next = new Node<>(Objects.hashCode(key), key, value, null);
+                size++;
+            }
+            currentNode = currentNode.next;
+        }
         if (size >= threshold) {
             resize();
         }
@@ -57,24 +71,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 put(kvNode.key, kvNode.value);
                 kvNode = kvNode.next;
             }
-        }
-    }
-
-    private boolean addEntry(int hash, K key, V value, int index) {
-        Node<K, V> currentNode = table[index];
-        if (currentNode == null) {
-            table[index] = new Node<>(hash, key, value, null);
-            return true;
-        }
-        while (true) {
-            if (Objects.equals(key, currentNode.key)) {
-                currentNode.value = value;
-                return false;
-            } else if (currentNode.next == null) {
-                currentNode.next = new Node<>(hash, key, value, null);
-                return true;
-            }
-            currentNode = currentNode.next;
         }
     }
 
