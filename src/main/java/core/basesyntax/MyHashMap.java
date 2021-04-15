@@ -23,8 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             buckets[getIndex(key)] = newNode;
         } else {
             Node<K, V> lastNode = buckets[getIndex(key)];
-            while (lastNode.next != null || newNode.key == lastNode.key
-                    || Objects.equals(lastNode.key, newNode.key)) {
+            while (lastNode.next != null || Objects.equals(lastNode.key, newNode.key)) {
                 if (Objects.equals(lastNode.key, newNode.key)) {
                     lastNode.value = newNode.value;
                     return;
@@ -42,14 +41,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> checkElement = buckets[getIndex(key)];
-        if (buckets[getIndex(key)] != null) {
-            while (checkElement.next != null) {
-                if (Objects.equals(checkElement.key, key)) {
-                    return checkElement.value;
-                }
-                checkElement = checkElement.next;
+        while (checkElement != null) {
+            if (Objects.equals(checkElement.key, key)) {
+                return checkElement.value;
             }
-            return checkElement.value;
+            checkElement = checkElement.next;
         }
         return null;
     }
