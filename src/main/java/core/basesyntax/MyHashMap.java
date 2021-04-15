@@ -16,17 +16,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> currentNode = table[getIndex((key))];
-        Node<K, V> newNode = new Node<>(Objects.hashCode(key), key, value, null);
+        int bucketIndex = getIndex(key);
+        Node<K, V> currentNode = table[bucketIndex];
+        Node<K, V> newNode = new Node<>(key, value, null);
         if (currentNode == null) {
-            table[getIndex((key))] = newNode;
+            table[bucketIndex] = newNode;
             size++;
         }
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
                 currentNode.value = value;
                 break;
-            } else if (currentNode.next == null) {
+            }
+            if (currentNode.next == null) {
                 currentNode.next = newNode;
                 size++;
             }
@@ -67,22 +69,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void transfer(Node<K, V>[] table) {
-        for (Node<K, V> kvNode : table) {
-            while (kvNode != null) {
-                put(kvNode.key, kvNode.value);
-                kvNode = kvNode.next;
+        for (Node<K, V> currentBucket : table) {
+            while (currentBucket != null) {
+                put(currentBucket.key, currentBucket.value);
+                currentBucket = currentBucket.next;
             }
         }
     }
 
     private static class Node<K, V> {
-        private final int hash;
-        private final K key;
+        private K key;
         private V value;
-        private Node<K, V> next = null;
+        private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K,V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
