@@ -23,7 +23,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-
     }
 
     public MyHashMap() {
