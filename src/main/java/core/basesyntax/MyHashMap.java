@@ -19,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value, hash(key), null);
-        int bucketIndex = index(newNode.key);
+        int bucketIndex = calculateIndex(newNode.key);
         if (table[bucketIndex] == null) {
             add(newNode, bucketIndex);
         } else {
@@ -32,7 +32,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int bucketIndex = index(key);
+        int bucketIndex = calculateIndex(key);
         Node<K, V> thisNode = table[bucketIndex];
         while (thisNode != null) {
             if (Objects.equals(thisNode.key, key)) {
@@ -48,12 +48,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public void add(Node<K, V> node, int bucketIndex) {
+    private void add(Node<K, V> node, int bucketIndex) {
         table[bucketIndex] = node;
         size++;
     }
 
-    public void putNew(Node<K, V> node, int bucketIndex) {
+    private void putNew(Node<K, V> node, int bucketIndex) {
         Node<K, V> currentNode = table[bucketIndex];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, node.key)) {
@@ -68,11 +68,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public int index(K key) {
+    private int calculateIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
-    public void resize() {
+    private void resize() {
         final Node<K, V>[] oldTable = table;
         int newCapacity = table.length * 2;
         table = new Node[newCapacity];
@@ -81,7 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         transfer(oldTable);
     }
 
-    public void transfer(Node<K, V>[] table) {
+    private void transfer(Node<K, V>[] table) {
         for (Node<K, V> each : table) {
             while (each != null) {
                 put(each.key, each.value);
