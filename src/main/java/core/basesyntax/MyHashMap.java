@@ -3,8 +3,8 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    public static final int DEFFAULT_CAPPACITY = 16;
-    public static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFFAULT_CAPPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
     private int treshold;
@@ -17,9 +17,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        Node<K, V> thisNode = table[calculateHash(key)];
+        int indexBucket = getbacketIndex(key);
+        Node<K, V> thisNode = table[indexBucket];
         if (thisNode == null) {
-            table[calculateHash(key)] = new Node<>(key, value);
+            table[indexBucket] = new Node<>(key, value);
             size++;
             return;
         }
@@ -36,10 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (table == null) {
-            return null;
-        }
-        Node<K, V> thisNode = table[calculateHash(key)];
+        Node<K, V> thisNode = table[getbacketIndex(key)];
         while (thisNode != null) {
             if (Objects.equals(thisNode.key, key)) {
                 return thisNode.value;
@@ -71,8 +69,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int calculateHash(Object key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
+    private int getbacketIndex(Object k) {
+        return k == null ? 0 : Math.abs(k.hashCode() % table.length);
     }
 
     private static class Node<K, V> {
