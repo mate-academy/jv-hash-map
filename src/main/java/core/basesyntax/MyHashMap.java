@@ -5,7 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int MULTIPLAYER = 2;
+    private static final int MULTIPLIER = 2;
 
     private Node<K, V>[] buckets;
     private int threshold;
@@ -19,20 +19,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(getHash(key), key, value, null);
-        int index = Math.abs(newNode.hash % buckets.length);
-        if (buckets[index] == null) {
-            buckets[index] = newNode;
+        if (buckets[getIndex(key)] == null) {
+            buckets[getIndex(key)] = newNode;
         } else {
-            Node<K, V> lastElement = buckets[index];
-            while (lastElement.next != null || newNode.key == lastElement.key
-                    || Objects.equals(lastElement.key, newNode.key)) {
-                if (Objects.equals(lastElement.key, newNode.key)) {
-                    lastElement.value = newNode.value;
+            Node<K, V> lastNode = buckets[getIndex(key)];
+            while (lastNode.next != null || newNode.key == lastNode.key
+                    || Objects.equals(lastNode.key, newNode.key)) {
+                if (Objects.equals(lastNode.key, newNode.key)) {
+                    lastNode.value = newNode.value;
                     return;
                 }
-                lastElement = lastElement.next;
+                lastNode = lastNode.next;
             }
-            lastElement.next = newNode;
+            lastNode.next = newNode;
         }
         size++;
         if (size >= threshold) {
@@ -42,9 +41,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = Math.abs(getHash(key) % buckets.length);
-        Node<K, V> checkElement = buckets[index];
-        if (buckets[index] != null) {
+        Node<K, V> checkElement = buckets[getIndex(key)];
+        if (buckets[getIndex(key)] != null) {
             while (checkElement.next != null) {
                 if (Objects.equals(checkElement.key, key)) {
                     return checkElement.value;
@@ -79,11 +77,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : key.hashCode();
     }
 
+    private int getIndex(K key) {
+        return Math.abs(getHash(key) % buckets.length);
+    }
+
     private void resize() {
         size = 0;
-        threshold *= MULTIPLAYER;
+        threshold *= MULTIPLIER;
         Node<K, V>[] oldBuckets = buckets;
-        buckets = new Node[buckets.length * MULTIPLAYER];
+        buckets = new Node[buckets.length * MULTIPLIER];
         transfer(oldBuckets);
     }
 
