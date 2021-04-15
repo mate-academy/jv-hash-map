@@ -17,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR);
     }
 
-    public MyHashMap(int initialCapacity, float loadFactor) {
+    private MyHashMap(int initialCapacity, float loadFactor) {
         if (initialCapacity < 0) {
             throw new IllegalArgumentException("Wrong initial capacity: " + initialCapacity);
         }
@@ -45,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int numberOfBucket = getBucket(key);
         Node<K, V> element;
         if (size + 1 >= threshold) {
-            reSize(entryTable.length * VALUE_FOR_INCREASE);
+            changeSize(entryTable.length * VALUE_FOR_INCREASE);
         }
         for (element = entryTable[numberOfBucket]; element != null; element = element.next) {
             if (numberOfBucket == element.hash && Objects.equals(key, element.nodeKey)) {
@@ -85,7 +85,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void reSize(int newCapacity) {
+    private void changeSize(int newCapacity) {
         if (size >= threshold / VALUE_FOR_INCREASE) {
             threshold = (int) (newCapacity * loadFactor);
             makeTransfer();
@@ -108,7 +108,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return entryTable;
     }
 
-    final int getBucket(Object key) {
+    private int getBucket(Object key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % entryTable.length;
     }
 
@@ -129,14 +129,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.hash = hash;
         }
 
-        public K getKey() {
-            return nodeKey;
-        }
-
-        public V getValue() {
-            return nodeValue;
-        }
-
         @Override
         public boolean equals(Object o) {
             if (this == o) {
@@ -146,11 +138,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return false;
             }
             Node<K, V> e = (Node<K, V>) o;
-            K k1 = getKey();
-            Object k2 = e.getKey();
+            K k1 = nodeKey;
+            Object k2 = e.nodeValue;
             if (Objects.equals(k1, k2)) {
-                V v1 = getValue();
-                Object v2 = e.getValue();
+                V v1 = nodeValue;
+                Object v2 = e.nodeValue;
                 if (Objects.equals(v1, v2)) {
                     return true;
                 }
@@ -160,8 +152,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         @Override
         public int hashCode() {
-            K k = getKey();
-            V v = getValue();
+            K k = nodeKey;
+            V v = nodeValue;
 
             int result = 1;
             final int prime = 31;
@@ -173,7 +165,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         @Override
         public String toString() {
-            return getKey() + " - " + getValue();
+            return nodeKey + " - " + nodeValue;
         }
     }
 }
