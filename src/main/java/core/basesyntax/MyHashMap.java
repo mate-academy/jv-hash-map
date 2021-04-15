@@ -13,7 +13,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         capacity = DEFAULT_CAPACITY;
         threshold = (int) (LOAD_FACTOR * capacity);
-        table = (Node<K, V>[]) new Node[capacity];
+        table = new Node[capacity];
     }
 
     @Override
@@ -26,9 +26,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (size == 0) {
-            return null;
-        }
         Node<K, V> localNode = table[getHash(key) % capacity];
         while (localNode != null) {
             if (Objects.equals(localNode.key, key)) {
@@ -83,12 +80,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         capacity = capacity << 1;
         threshold = (int) (capacity * LOAD_FACTOR);
         Node<K, V>[] localTable = table;
-        table = (Node<K, V>[]) new Node[capacity];
+        table = new Node[capacity];
         size = 0;
-        for (int i = 0; i < localTable.length; i++) {
-            while (localTable[i] != null) {
-                put(localTable[i].key, localTable[i].value);
-                localTable[i] = localTable[i].next;
+
+        for (Node<K, V> localNode : localTable) {
+            while (localNode != null) {
+                put(localNode.key, localNode.value);
+                localNode = localNode.next;
             }
         }
     }
