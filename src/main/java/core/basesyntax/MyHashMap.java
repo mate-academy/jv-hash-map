@@ -34,7 +34,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode = currentNode.next;
             }
         }
-
     }
 
     @Override
@@ -64,7 +63,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[table.length << 1];
         threshold = (int) (table.length * loadFactor);
         transfer(nodeCopyTable);
-
     }
 
     private void transfer(Node<K, V>[] nodeCopyTable) {
