@@ -19,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         checkSize();
         Node<K, V> node = new Node<K, V>(key, value,null);
-        int index = getBucket(node.key);
+        int index = getBucketIndex(node.key);
         if (table[index] == null) {
             table[index] = node;
             size++;
@@ -30,7 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = getBucket(key);
+        int index = getBucketIndex(key);
         Node<K, V> current = table[index];
         while (current != null) {
             if (Objects.equals(current.key, key)) {
@@ -47,7 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void addNode(Node<K, V> node) {
-        int index = getBucket(node.key);
+        int index = getBucketIndex(node.key);
         Node<K, V> current = table[index];
         while (current.next != null || Objects.equals(current.key, node.key)) {
             if (Objects.equals(current.key, node.key)) {
@@ -64,7 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : key.hashCode();
     }
 
-    private int getBucket(K key) {
+    private int getBucketIndex(K key) {
         return Math.abs(getKeyHash(key)) % table.length;
     }
 
