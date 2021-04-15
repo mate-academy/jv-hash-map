@@ -50,13 +50,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = table;
         table = new Node[table.length * INCREASE_COEFFICIENT];
         size = 0;
-        for (Node n : oldTable) {
-            if (n != null) {
-                Node<K, V> node = n;
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
         threshold = (int) (table.length * LOAD_FACTOR);
@@ -71,8 +68,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node = node.next;
         }
-        Node<K, V> newNode = new Node<>(key, value, table[index]);
-        table[index] = newNode;
+        table[index] = new Node<>(key, value, table[index]);
         size++;
     }
 
