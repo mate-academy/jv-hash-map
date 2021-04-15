@@ -5,10 +5,16 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int CAPACITY_INCREMENT = 2;
 
     private Node<K, V>[] data;
     private int size;
     private int threshold;
+
+    public MyHashMap() {
+        data = (Node<K, V>[])new Node[DEFAULT_CAPACITY];
+        threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
+    }
 
     static class Node<K, V> {
         private Node<K, V> next;
@@ -24,26 +30,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (data == null || size == threshold) {
+        if (size == threshold) {
             resize();
         }
         final Node<K, V> newNode = new Node<>(null, value, key);
-        Node<K, V> existingNode = searchNodeByKey(key);
-        if (existingNode != null) {
-            existingNode.value = value;
-            return;
-        }
         int index = getPosition(key);
         Node<K, V> temp = data[index];
-        if (temp != null) {
-            while (temp.next != null) {
-                temp = temp.next;
-            }
-            temp.next = newNode;
-        } else {
+        if (temp == null) {
             data[index] = newNode;
+            size++;
+            return;
         }
-        size++;
+        while (true) {
+            if (Objects.equals(temp.key, key)) {
+                temp.value = value;
+                return;
+            }
+            if (temp.next == null) {
+                temp.next = newNode;
+                size++;
+                return;
+            }
+            temp = temp.next;
+        }
     }
 
     @Override
@@ -58,16 +67,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (data == null) {
-            data = (Node<K, V>[])new Node[DEFAULT_CAPACITY];
-            threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
-            return;
-        }
-        int newCapacity = data.length * 2;
+        int newCapacity = data.length * CAPACITY_INCREMENT;
         final Node<K, V>[] oldData = data;
         data = (Node<K, V>[])new Node[newCapacity];
         size = 0;
-        threshold *= 2;
+        threshold *= CAPACITY_INCREMENT;
         for (Node<K, V> element : oldData) {
             while (element != null) {
                 put(element.key, element.value);
@@ -77,9 +81,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> searchNodeByKey(K key) {
-        if (size == 0) {
-            return null;
-        }
         int index = getPosition(key);
         Node<K, V> temp = data[index];
         while (temp != null) {
