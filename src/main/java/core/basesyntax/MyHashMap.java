@@ -39,13 +39,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> currentNode = table[getIndex(key)];
-        if (currentNode == null) {
-            return null;
-        }
-        while (!Objects.equals(currentNode.key, key)) {
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
+            }
             currentNode = currentNode.next;
         }
-        return currentNode.value;
+        return null;
     }
 
     @Override
