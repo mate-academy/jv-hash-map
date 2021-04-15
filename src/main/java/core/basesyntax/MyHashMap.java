@@ -22,22 +22,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int index = hash(key);
         if (table[index] == null) {
-            Node<K, V> newNode = new Node<>(key, value, null);
-            table[index] = newNode;
-            size++;
-        } else {
-            Node<K, V> node = table[index];
-            while (node != null) {
-                if (Objects.equals(node.key, key)) {
-                    node.value = value;
-                    return;
-                }
-                node = node.next;
-            }
-            Node<K, V> lastNode = new Node<K, V>(key, value, table[index]);
-            table[index] = lastNode;
-            size++;
+            addNode(key, value, table[index]);
+            return;
         }
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
+                return;
+            }
+            node = node.next;
+        }
+        addNode(key, value, table[index]);
     }
 
     @Override
@@ -56,6 +52,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private void addNode(K key, V value, Node<K, V> node) {
+        if (table[hash(key)] == null) {
+            Node<K, V> newNode = new Node<>(key, value, null);
+            table[hash(key)] = newNode;
+            size++;
+        } else {
+            Node<K, V> lastNode = new Node<K, V>(key, value, table[hash(key)]);
+            table[hash(key)] = lastNode;
+            size++;
+        }
     }
 
     private int hash(K key) {
