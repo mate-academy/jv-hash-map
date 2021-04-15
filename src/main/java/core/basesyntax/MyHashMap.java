@@ -17,27 +17,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        resize();
+        if (size > threshold) {
+            resize();
+        }
+        Node<K, V> putNode = new Node<>(key, value);
         int index = getIndex(key);
-        Node<K, V> intermediateNode = table[index];
-        if (intermediateNode == null) {
-            table[index] = new Node<>(key, value);
-            size++;
-            return;
-        }
-        while (intermediateNode != null) {
-            if (Objects.equals(intermediateNode.key, key)) {
-                intermediateNode.value = value;
-                return;
+        Node<K, V> currentNode = table[index];
+        if (size == 0 || table[index] == null) {
+            table[index] = putNode;
+        } else {
+            while (currentNode.next != null || Objects.equals(currentNode.key, key)) {
+                if (Objects.equals(currentNode.key, key)) {
+                    currentNode.value = value;
+                    return;
+                }
+                currentNode = currentNode.next;
             }
-            if (intermediateNode.next == null) {
-                intermediateNode.next = new Node<>(key, value);
-                size++;
-                return;
-            }
-            intermediateNode = intermediateNode.next;
+            currentNode.next = putNode;
         }
-        intermediateNode.next = new Node<>(key, value);
         size++;
     }
 
