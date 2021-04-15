@@ -35,7 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             capacity++;
         }
 
-        entryTable = newBucketTable(capacity);
+        entryTable = new Node[capacity];
         this.loadFactor = loadFactor;
         threshold = (int) (capacity * loadFactor);
     }
@@ -44,16 +44,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         int numberOfBucket = getBucket(key);
         Node<K, V> element;
-        if (size + 1 >= threshold) {
+        if (size >= threshold) {
             changeSize(entryTable.length * VALUE_FOR_INCREASE);
         }
         for (element = entryTable[numberOfBucket]; element != null; element = element.next) {
             if (numberOfBucket == element.hash && Objects.equals(key, element.nodeKey)) {
-                V oldValue = element.nodeValue;
-                if (value != oldValue) {
-                    element.nodeValue = value;
-                    return;
-                }
+                element.nodeValue = value;
                 return;
             } else if (numberOfBucket == element.hash && element.next == null) {
                 element.next = new Node<>(numberOfBucket, key, value, null);
@@ -69,7 +65,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int numberOfBucket = getBucket(key);
-        Node<K, V>[] table = getTable();
+        Node<K, V>[] table = entryTable;
         Node<K, V> element = table[numberOfBucket];
         while (element != null) {
             if (element.hash == numberOfBucket && Objects.equals(key, element.nodeKey)) {
@@ -86,7 +82,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void changeSize(int newCapacity) {
-        if (size >= threshold / VALUE_FOR_INCREASE) {
+        if (size >= threshold) {
             threshold = (int) (newCapacity * loadFactor);
             makeTransfer();
         }
@@ -104,16 +100,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private Node<K, V>[] getTable() {
-        return entryTable;
-    }
-
     private int getBucket(Object key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % entryTable.length;
-    }
-
-    private Node<K, V>[] newBucketTable(int capacity) {
-        return (Node<K, V>[]) new Node<?, ?>[capacity];
     }
 
     static class Node<K, V> {
@@ -127,45 +115,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.nodeValue = v;
             this.next = next;
             this.hash = hash;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || this.getClass().getName() != o.getClass().getName()) {
-                return false;
-            }
-            Node<K, V> e = (Node<K, V>) o;
-            K k1 = nodeKey;
-            Object k2 = e.nodeValue;
-            if (Objects.equals(k1, k2)) {
-                V v1 = nodeValue;
-                Object v2 = e.nodeValue;
-                if (Objects.equals(v1, v2)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            K k = nodeKey;
-            V v = nodeValue;
-
-            int result = 1;
-            final int prime = 31;
-            result = prime * result + ((k == null) ? 0 : k.hashCode());
-            result = prime * result + ((v == null) ? 0 : v.hashCode());
-
-            return result;
-        }
-
-        @Override
-        public String toString() {
-            return nodeKey + " - " + nodeValue;
         }
     }
 }
