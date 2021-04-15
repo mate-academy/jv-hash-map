@@ -3,11 +3,11 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_MULTIPLICATION_FACTOR = 2;
 
     private int size;
     private int threshold;
     private Node<K, V>[] table;
-    private int tableCapacity = DEFAULT_CAPACITY;
 
     static class Node<K, V> {
         private final K key;
@@ -22,8 +22,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public MyHashMap() {
-        table = new Node[tableCapacity];
-        this.threshold = (int) (tableCapacity * DEFAULT_LOAD_FACTOR);
+        table = new Node[DEFAULT_CAPACITY];
+        this.threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
     public Node<K, V> getNode(K key) {
@@ -43,16 +43,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int position = getPositionByKey(key);
-        Node<K, V> newNode = new Node<>(key, value, null);
-        Node<K, V> current = getNode(key);
         if (size > threshold) {
             resize();
         }
+
+        int position = getPositionByKey(key);
+        Node<K, V> newNode = new Node<>(key, value, null);
+        Node<K, V> current = getNode(key);
         if (current != null) {
             current.value = value;
             return;
         }
+
         if (table[position] == null) {
             table[position] = newNode;
         } else {
@@ -67,8 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> utility = getNode(key);
-        return utility == null ? null : utility.value;
+        return getNode(key) == null ? null : getNode(key).value;
     }
 
     @Override
@@ -77,11 +78,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        tableCapacity = tableCapacity << 1;
-        threshold = (int) (tableCapacity * DEFAULT_LOAD_FACTOR);
+        final Node<K, V>[] oldArray = table;
+        table = new Node[table.length * DEFAULT_MULTIPLICATION_FACTOR];
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
         Node<K, V> current;
-        Node<K, V>[] oldArray = table;
-        table = new Node[tableCapacity];
         size = 0;
         for (Node<K, V> node : oldArray) {
             current = node;
@@ -93,6 +93,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getPositionByKey(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % tableCapacity);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 }
