@@ -4,7 +4,6 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int CAPACITY = 16;
-    private static final int MAX_CAPACITY = Integer.MAX_VALUE / 2;
     private static final float LOAD_FACTOR = 0.75f;
     private int size = 0;
     private Node<K, V>[] table;
@@ -25,10 +24,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             next = null;
         }
-
-        private Node<K, V> getNext() {
-            return next;
-        }
     }
 
     private int getIndex(K key) {
@@ -36,28 +31,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int capacity = table.length;
-        if (capacity << 1 >= MAX_CAPACITY) {
-            capacity = MAX_CAPACITY;
-        } else {
-            capacity = capacity << 1;
-        }
+        int capacity = table.length << 1;
+        threshold = (int) (capacity * LOAD_FACTOR);
         Node<K, V>[] oldHashTable = table;
         table = new Node[capacity];
         size = 0;
         for (Node<K, V> node : oldHashTable) {
-            if (node != null) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
 
     @Override
     public void put(K key, V value) {
-        threshold = (int) (table.length * LOAD_FACTOR);
         if (size >= threshold) {
             resize();
         }
