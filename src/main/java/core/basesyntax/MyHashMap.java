@@ -17,7 +17,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        resize();
+        Node<K, V>[] tempTable = table;
+        int newCapacity;
+        if (size >= threshold) {
+            newCapacity = table.length * GROW_COFFICIENT;
+            threshold *= GROW_COFFICIENT;
+            table = new Node[newCapacity];
+            size = 0;
+            for (Node<K, V> node : tempTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
+            }
+        }
         int index = getIndexByKey(key);
         Node<K,V> newNode = table[index];
         while (newNode != null) {
@@ -68,22 +81,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getIndexByKey(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
-    }
-
-    private void resize() {
-        Node<K, V>[] tempTable = table;
-        int newCapacity;
-        if (size >= threshold) {
-            newCapacity = table.length * GROW_COFFICIENT;
-            threshold *= GROW_COFFICIENT;
-            table = new Node[newCapacity];
-            size = 0;
-            for (Node<K, V> node : tempTable) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
-            }
-        }
     }
 }
