@@ -7,13 +7,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int MAX_CAPACITY = Integer.MAX_VALUE / 2;
     private static final float LOAD_FACTOR = 0.75f;
     private int size = 0;
-    private Node<K, V>[] hashtable;
+    private Node<K, V>[] table;
+    private int threshold;
 
     public MyHashMap() {
-        hashtable = new Node[CAPACITY];
+        table = new Node[CAPACITY];
+        threshold = (int) (CAPACITY * LOAD_FACTOR);
     }
 
-    private class Node<K, V> {
+    private static class Node<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
@@ -24,39 +26,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             next = null;
         }
 
-        private K getKey() {
-            return key;
-        }
-
-        private V getValue() {
-            return value;
-        }
-
         private Node<K, V> getNext() {
             return next;
-        }
-
-        private void setValue(V value) {
-            this.value = value;
         }
     }
 
     private int getIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % hashtable.length;
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
-    private void resizeMap() {
-        int capacity = hashtable.length;
-        if (capacity == MAX_CAPACITY) {
-            return;
-        }
+    private void resize() {
+        int capacity = table.length;
         if (capacity << 1 >= MAX_CAPACITY) {
             capacity = MAX_CAPACITY;
         } else {
             capacity = capacity << 1;
         }
-        Node<K, V>[] oldHashTable = hashtable;
-        hashtable = new Node[capacity];
+        Node<K, V>[] oldHashTable = table;
+        table = new Node[capacity];
         size = 0;
         for (Node<K, V> node : oldHashTable) {
             if (node != null) {
@@ -70,20 +57,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= hashtable.length * LOAD_FACTOR) {
-            resizeMap();
+        threshold = (int) (table.length * LOAD_FACTOR);
+        if (size >= threshold) {
+            resize();
         }
         Node<K, V> newNode = new Node(key, value);
         int index = getIndex(newNode.key);
-        if (hashtable[index] == null) {
-            hashtable[index] = newNode;
+        if (table[index] == null) {
+            table[index] = newNode;
             size++;
             return;
         }
-        Node<K, V> node = hashtable[index];
+        Node<K, V> node = table[index];
         while (node != null) {
-            if (Objects.equals(key, node.getKey())) {
-                node.setValue(value);
+            if (Objects.equals(key, node.key)) {
+                node.value = value;
                 return;
             }
             if (node.next == null) {
@@ -96,16 +84,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = getIndex(key);
-        if (index < hashtable.length && hashtable[index] != null) {
-            Node<K, V> node = hashtable[index];
-            while (node != null) {
-                if (Objects.equals(key, node.getKey())) {
-                    return node.getValue();
-                }
-                node = node.next;
+        Node<K, V> node = table[getIndex(key)];
+        while (node != null) {
+            if (Objects.equals(key, node.key)) {
+                return node.value;
             }
+            node = node.next;
         }
+
         return null;
     }
 
