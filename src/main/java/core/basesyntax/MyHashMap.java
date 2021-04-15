@@ -31,21 +31,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        if (putNodeInTable(new Node<>(key, value))) {
+        boolean addedNewNode = putNodeInTable(new Node<>(key, value));
+        if (addedNewNode) {
             size++;
         }
     }
 
     @Override
     public V getValue(K key) {
-        if (table != null) {
-            Node<K, V> currentNode = table[getBinNumber(key)];
-            while (currentNode != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    return currentNode.value;
-                }
-                currentNode = currentNode.next;
+        Node<K, V> currentNode = table[getIndex(key)];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
             }
+            currentNode = currentNode.next;
         }
         return null;
     }
@@ -60,10 +59,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean putNodeInTable(Node<K, V> node) {
-        int binNumber = getBinNumber(node.key);
-        Node<K, V> currentNode = table[binNumber];
+        int index = getIndex(node.key);
+        Node<K, V> currentNode = table[index];
         if (currentNode == null) {
-            table[binNumber] = node;
+            table[index] = node;
         } else {
             Node<K, V> prevNode = null;
             while (currentNode != null) {
@@ -86,7 +85,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         transferNodes(oldTable);
     }
 
-    private int getBinNumber(K key) {
+    private int getIndex(K key) {
         return hash(key) % table.length;
     }
 
