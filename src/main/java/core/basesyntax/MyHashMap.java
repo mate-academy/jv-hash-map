@@ -5,12 +5,12 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
-    private Node<K, V>[] bucketList;
+    private Node<K, V>[] table;
     private int size;
     private int threshold;
 
     public MyHashMap() {
-        bucketList = (Node<K, V>[])new Node[INITIAL_CAPACITY];
+        table = (Node<K, V>[])new Node[INITIAL_CAPACITY];
         threshold = (int)(INITIAL_CAPACITY * LOAD_FACTOR);
     }
 
@@ -29,19 +29,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K, V> existingNode = getNode(key);
-        if (existingNode == null) {
-            checkSize();
-            insertNode(new Node<>(key, value, null), bucketList);
-            size++;
-            return;
-        }
         if (existingNode != null) {
             existingNode.value = value;
             return;
         }
         Node<K, V> node = new Node<>(key, value, null);
         checkSize();
-        insertNode(node, bucketList);
+        insertNode(node, table);
         size++;
     }
 
@@ -66,16 +60,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int capacity = bucketList.length * 2;
-        Node<K, V>[] newBucketList = (Node<K, V>[])new Node[capacity];
-        for (Node<K, V> node : bucketList) {
+        int capacity = table.length * 2;
+        Node<K, V>[] newTable = (Node<K, V>[])new Node[capacity];
+        for (Node<K, V> node : table) {
             for (Node<K, V> element = node; element != null; element = element.next) {
                 Node<K, V> elementCopy = new Node<>(element.key, element.value, null);
-                insertNode(elementCopy, newBucketList);
+                insertNode(elementCopy, newTable);
             }
         }
         threshold = (int)(capacity * LOAD_FACTOR);
-        bucketList = newBucketList;
+        table = newTable;
     }
 
     private Node<K, V> getLastNode(Node<K, V> node) {
@@ -96,9 +90,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> getNode(K key) {
-        int i = getIndex(key, bucketList);
-        if (bucketList[i] != null) {
-            for (Node<K, V> element = bucketList[i]; element != null; element = element.next) {
+        int i = getIndex(key, table);
+        if (table[i] != null) {
+            for (Node<K, V> element = table[i]; element != null; element = element.next) {
                 if (Objects.equals(element.key, key)) {
                     return element;
                 }
