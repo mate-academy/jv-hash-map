@@ -17,13 +17,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size > threshold) {
+        if (size >= threshold) {
             resize();
         }
         Node<K, V> putNode = new Node<>(key, value);
         int index = getIndex(key);
         Node<K, V> currentNode = table[index];
-        if (size == 0 || table[index] == null) {
+        if (table[index] == null) {
             table[index] = putNode;
         } else {
             while (currentNode.next != null || Objects.equals(currentNode.key, key)) {
@@ -60,16 +60,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (size >= threshold) {
-            threshold *= TABLE_MAGNIFICATION_FACTOR;
-            Node<K, V>[] oldNodes = table;
-            table = new Node[table.length * TABLE_MAGNIFICATION_FACTOR];
-            size = 0;
-            for (Node<K, V> oldNode : oldNodes) {
-                while (oldNode != null) {
-                    put(oldNode.key, oldNode.value);
-                    oldNode = oldNode.next;
-                }
+        threshold *= TABLE_MAGNIFICATION_FACTOR;
+        Node<K, V>[] oldNodes = table;
+        table = new Node[table.length * TABLE_MAGNIFICATION_FACTOR];
+        size = 0;
+        for (Node<K, V> oldNode : oldNodes) {
+            while (oldNode != null) {
+                put(oldNode.key, oldNode.value);
+                oldNode = oldNode.next;
             }
         }
     }
