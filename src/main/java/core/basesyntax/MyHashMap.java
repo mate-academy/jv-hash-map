@@ -76,10 +76,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resizeIfNeeded() {
         if (size >= threshold) {
-            Node<K, V>[] oldTable = table;
             int newCapacity;
             newCapacity = table.length << 1;
             threshold = threshold << 1;
+            Node<K, V>[] oldTable = table;
             table = new Node[newCapacity];
             size = 0;
             for (Node<K, V> node : oldTable) {
