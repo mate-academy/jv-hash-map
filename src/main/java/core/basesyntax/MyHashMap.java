@@ -50,9 +50,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = table;
         table = new Node[table.length * INCREASE_COEFFICIENT];
         size = 0;
-        for (int i = 0; i < oldTable.length; i++) {
-            if (oldTable[i] != null) {
-                Node<K, V> node = oldTable[i];
+        for (Node n : oldTable) {
+            if (n != null) {
+                Node<K, V> node = n;
                 while (node != null) {
                     put(node.key, node.value);
                     node = node.next;
@@ -80,7 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
