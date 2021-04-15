@@ -5,9 +5,15 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
+    private static final int RESIZE_MULTIPLIER = 2;
     private int threshold;
     private int size;
     private Node<K, V>[] elements;
+
+    public MyHashMap() {
+        threshold = (int) (LOAD_FACTOR * INITIAL_CAPACITY);
+        elements = new Node[INITIAL_CAPACITY];
+    }
 
     private static class Node<K, V> {
         private final K key;
@@ -34,19 +40,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         Node<K, V> tempNode = elements[index];
-        if (Objects.equals(key, tempNode.key)) {
-            tempNode.value = value;
-            return;
-        }
-        while (tempNode.next != null) {
-            tempNode = tempNode.next;
+        while (tempNode != null) {
             if (Objects.equals(key, tempNode.key)) {
                 tempNode.value = value;
                 return;
             }
+            if (tempNode.next == null) {
+                tempNode.next = newNode;
+                size++;
+                return;
+            }
+            tempNode = tempNode.next;
         }
-        tempNode.next = newNode;
-        size++;
     }
 
     private int getIndex(K key) {
@@ -58,28 +63,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (elements == null) {
-            elements = new Node[INITIAL_CAPACITY];
-            threshold = (int) (LOAD_FACTOR * INITIAL_CAPACITY);
-        } else {
-            final Node<K, V>[] oldArray = elements;
-            elements = new Node[elements.length * 2];
-            threshold *= 2;
-            size = 0;
-            for (Node<K, V> element : oldArray) {
-                while (element != null) {
-                    put(element.key, element.value);
-                    element = element.next;
-                }
+        final Node<K, V>[] oldArray = elements;
+        elements = new Node[elements.length * RESIZE_MULTIPLIER];
+        threshold *= RESIZE_MULTIPLIER;
+        size = 0;
+        for (Node<K, V> element : oldArray) {
+            while (element != null) {
+                put(element.key, element.value);
+                element = element.next;
             }
         }
     }
 
     @Override
     public V getValue(K key) {
-        if (elements == null) {
-            return null;
-        }
         int index = getIndex(key);
         Node<K, V> tempNode = elements[index];
         while (tempNode != null) {
