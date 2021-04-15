@@ -21,9 +21,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int index = calculateIndexFromHashcode(Objects.hashCode(key));
         Node<K, V> currentNode = table[index];
-        Node<K, V> newNod = new Node<>(key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, null);
         if (table[index] == null) {
-            table[index] = newNod;
+            table[index] = newNode;
             size++;
         } else {
             while (currentNode != null) {
@@ -32,7 +32,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     return;
                 }
                 if (currentNode.next == null) {
-                    currentNode.next = newNod;
+                    currentNode.next = newNode;
                     size++;
                 }
                 currentNode = currentNode.next;
@@ -62,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
