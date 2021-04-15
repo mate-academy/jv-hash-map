@@ -87,12 +87,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V> getNode(K key) {
         int i = getIndex(key, bucketList);
-        if (bucketList[i] == null) {
-            return null;
-        }
-        for (Node<K, V> element = bucketList[i]; element != null; element = element.next) {
-            if (Objects.equals(element.key, key)) {
-                return element;
+        if (bucketList[i] != null) {
+            for (Node<K, V> element = bucketList[i]; element != null; element = element.next) {
+                if (Objects.equals(element.key, key)) {
+                    return element;
+                }
             }
         }
         return null;
