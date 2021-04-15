@@ -22,37 +22,35 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int index = getIndex(key);
         Node<K, V> currentNode = new Node<>(key, value, null);
-        Node<K, V> positionInTable = table[index];
-        if (table[index] == null) {
+        Node<K, V> nodeFromTable = table[index];
+        if (nodeFromTable == null) {
             table[index] = currentNode;
             size++;
-        } else {
-            while (positionInTable.next != null || Objects.equals(positionInTable.key, key)) {
-                if (Objects.equals(positionInTable.key, key)) {
-                    positionInTable.value = value;
-                    return;
-                }
-                positionInTable = positionInTable.next;
-            }
-            positionInTable.next = currentNode;
-            size++;
+            return;
         }
+        while (nodeFromTable.next != null || Objects.equals(nodeFromTable.key, key)) {
+            if (Objects.equals(nodeFromTable.key, key)) {
+                nodeFromTable.value = value;
+                return;
+            }
+            nodeFromTable = nodeFromTable.next;
+        }
+        nodeFromTable.next = currentNode;
+        size++;
+
     }
 
     @Override
     public V getValue(K key) {
         int index = getIndex(key);
         Node<K, V> currentNode = table[index];
-        if (currentNode == null) {
-            return null;
-        }
-        while (currentNode.next != null || Objects.equals(currentNode.key, key)) {
+        while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
         }
-        return currentNode.value;
+        return null;
     }
 
     @Override
