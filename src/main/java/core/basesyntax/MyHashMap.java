@@ -67,22 +67,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void addNode(Node<K, V> currentNode) {
         int index = getIndex(currentNode.key);
-        Node<K, V> prevNode = table[index];
-        while (prevNode.next != null || Objects.equals(currentNode.key, prevNode.key)) {
-            if (Objects.equals(currentNode.key, prevNode.key)) {
-                prevNode.value = currentNode.value;
+        Node<K, V> lastNode = table[index];
+        while (lastNode.next != null || Objects.equals(currentNode.key, lastNode.key)) {
+            if (Objects.equals(currentNode.key, lastNode.key)) {
+                lastNode.value = currentNode.value;
                 return;
             }
-            prevNode = prevNode.next;
+            lastNode = lastNode.next;
         }
-        prevNode.next = currentNode;
+        lastNode.next = currentNode;
         size++;
     }
 
     private void resize() {
         size = 0;
         int newCapacity = table.length * MULTIPLIER;
-        threshold = threshold * MULTIPLIER;
+        threshold *= MULTIPLIER;
         Node<K, V>[] oldTable = table;
         table = new Node[newCapacity];
         transfer(oldTable);
