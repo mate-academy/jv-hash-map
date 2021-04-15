@@ -18,11 +18,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> newNode = new Node<>(getHash(key), key, value, null);
-        if (buckets[getIndex(key)] == null) {
-            buckets[getIndex(key)] = newNode;
+        int index = getIndex(key);
+        Node<K, V> newNode = new Node<>(key, value, null);
+        if (buckets[index] == null) {
+            buckets[index] = newNode;
         } else {
-            Node<K, V> lastNode = buckets[getIndex(key)];
+            Node<K, V> lastNode = buckets[index];
             while (lastNode.next != null || Objects.equals(lastNode.key, newNode.key)) {
                 if (Objects.equals(lastNode.key, newNode.key)) {
                     lastNode.value = newNode.value;
@@ -40,7 +41,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> checkElement = buckets[getIndex(key)];
+        int index = getIndex(key);
+        Node<K, V> checkElement = buckets[index];
         while (checkElement != null) {
             if (Objects.equals(checkElement.key, key)) {
                 return checkElement.value;
@@ -56,25 +58,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
         }
     }
 
-    private int getHash(K key) {
-        return key == null ? 0 : key.hashCode();
-    }
-
     private int getIndex(K key) {
-        return Math.abs(getHash(key) % buckets.length);
+        return Math.abs(key == null ? 0 : key.hashCode() % buckets.length);
     }
 
     private void resize() {
@@ -87,14 +83,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void transfer(Node<K, V>[] oldBuckets) {
         for (Node<K, V> element : oldBuckets) {
-            if (element == null) {
-                continue;
-            }
-            while (element.next != null) {
+            while (element != null) {
                 put(element.key, element.value);
                 element = element.next;
             }
-            put(element.key, element.value);
         }
     }
 }
