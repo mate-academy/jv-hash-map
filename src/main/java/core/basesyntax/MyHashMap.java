@@ -23,7 +23,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int index = getIndex(newNode);
         if (table[index] == null) {
-            add(newNode, index);
+            table[index] = newNode;
+            size++;
         } else {
             attachNode(newNode, index);
         }
@@ -52,18 +53,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return node.key == null ? 0 : Math.abs(node.key.hashCode()) % table.length;
     }
 
-    private void add(Node<K, V> newNode, int index) {
-        table[index] = newNode;
-        size++;
-    }
-
     private void attachNode(Node<K, V> newNode, int index) {
         Node<K,V> currentNode = table[index];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, newNode.key)) {
                 currentNode.value = newNode.value;
                 return;
-            } else if (currentNode.next == null) {
+            }
+            if (currentNode.next == null) {
                 currentNode.next = newNode;
                 size++;
                 return;
