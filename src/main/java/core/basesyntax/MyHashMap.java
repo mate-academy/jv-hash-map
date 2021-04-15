@@ -57,7 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void reSize() {
-        threshold = threshold * RESIZE_COEFFICIENT;
+        threshold *=  RESIZE_COEFFICIENT;
         Node<K, V>[] oldTable = table;
         table = new Node[table.length * RESIZE_COEFFICIENT];
         for (Node<K, V> current : oldTable) {
