@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
 
-        Node<K, V> inBucket = table[hash(key)];
+        Node<K, V> inBucket = table[calculateHash(key)];
         while (inBucket != null) {
             if (Objects.equals(key, inBucket.key)) {
                 inBucket.value = value;
@@ -34,13 +34,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             inBucket = inBucket.next;
         }
-        table[hash(key)] = new Node<>(key, value, null);
+        table[calculateHash(key)] = new Node<>(key, value, null);
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> requestNode = table[hash(key)];
+        Node<K, V> requestNode = table[calculateHash(key)];
         while (requestNode != null) {
             if (Objects.equals(key, requestNode.key)) {
                 return requestNode.value;
@@ -67,7 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hash(K key) {
+    private int calculateHash(K key) {
         return key != null ? Math.abs(key.hashCode()) % table.length : 0;
     }
 
