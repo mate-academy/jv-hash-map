@@ -10,33 +10,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
     private int threshold;
-    private int capacity;
-
-    public static class Node<K,V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = 17;
-            result = 31 * result + (key == null ? 0 : key.hashCode());
-            return result;
-        }
-    }
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        threshold = (int) (capacity * LOAD_FACTOR);
-        capacity = DEFAULT_CAPACITY;
+        threshold = (int) (table.length * LOAD_FACTOR);
     }
 
     @Override
@@ -45,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size = 0;
             reSize();
         }
-        Node<K, V> newNode = new Node<>(hashKey(key), key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, null);
         Node<K, V> nodeInTable = table[getIndex(key)];
         if (nodeInTable != null) {
             while (nodeInTable.next != null || Objects.equals(key, nodeInTable.key)) {
@@ -80,11 +57,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V>[] reSize() {
-
         threshold = threshold * 2;
         final Node<K, V>[] oldTable = table;
-        table = new Node[capacity * RESIZE_COEFFICIENT];
-        capacity = capacity * 2;
+        table = new Node[table.length * RESIZE_COEFFICIENT];
+
         for (Node<K, V> current : oldTable) {
             Node<K, V> node = current;
             while (node != null) {
@@ -96,7 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
+        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private int hashKey(K key) {
@@ -106,5 +82,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int result = 17;
         result = 31 * result + key.hashCode();
         return result;
+    }
+
+    public static class Node<K, V> {
+
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+
+        @Override
+        public int hashCode() {
+            return key == null ? 0 : 31 * 17 + key.hashCode();
+        }
     }
 }
