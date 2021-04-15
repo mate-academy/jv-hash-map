@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_CAPACITY = 0.75f;
+    private static final int RESIZE_VALUE = 2;
     private Node<K, V>[] table;
     private int size;
     private int threshold;
@@ -22,20 +23,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         Node<K, V> entry = table[getIndex(key)];
 
-        if (entry == null) {
-            table[getIndex(key)] = new Node<K, V>(key, value);
-            size++;
-            return;
-        }
-
-        while (entry.next != null || Objects.equals(entry.key, key)) {
+        while (entry != null) {
             if (Objects.equals(entry.key, key)) {
                 entry.value = value;
                 return;
             }
+            if (entry.next == null) {
+                entry.next = new Node<K, V>(key, value);
+                size++;
+                return;
+            }
             entry = entry.next;
         }
-        entry.next = new Node<K, V>(key, value);
+        table[getIndex(key)] = new Node<>(key, value);
         size++;
     }
 
@@ -63,8 +63,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public void resize() {
-        int newCapacity = table.length * 2;
-        threshold *= 2;
+        int newCapacity = table.length * RESIZE_VALUE;
+        threshold *= RESIZE_VALUE;
         Node<K, V>[] oldTable = table;
         table = new Node[newCapacity];
         size = 0;
