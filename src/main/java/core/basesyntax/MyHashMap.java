@@ -17,23 +17,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold) {
+        if (size + 1 >= threshold) {
             resize();
         }
         int index = hash(key);
-        if (table[index] == null) {
-            addNode(key, value, table[index]);
+        if (table[index] != null) {
+            collisionHandling(key, value, index);
             return;
         }
-        Node<K, V> node = table[index];
-        while (node != null) {
-            if (Objects.equals(node.key, key)) {
-                node.value = value;
-                return;
-            }
-            node = node.next;
-        }
-        addNode(key, value, table[index]);
+        table[index] = new Node(key, value, null);
+        size++;
     }
 
     @Override
@@ -54,16 +47,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void addNode(K key, V value, Node<K, V> node) {
-        if (table[hash(key)] == null) {
-            Node<K, V> newNode = new Node<>(key, value, null);
-            table[hash(key)] = newNode;
-            size++;
-        } else {
-            Node<K, V> lastNode = new Node<K, V>(key, value, table[hash(key)]);
-            table[hash(key)] = lastNode;
-            size++;
+    private void collisionHandling(K key, V value, int index) {
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
+                return;
+            }
+            node = node.next;
         }
+        Node<K, V> lastNode = new Node<K, V>(key, value, table[index]);
+        table[index] = lastNode;
+        size++;
     }
 
     private int hash(K key) {
