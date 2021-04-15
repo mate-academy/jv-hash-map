@@ -3,17 +3,16 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    //Node<K, V> table;
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
-    private static final float DEFAULT_LOAD_FACTORY = 0.75f;
-    private static final int SIZE_REDUCTION_INDEX = 2;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int SIZE_INCREASE_INDEX = 2;
     private Node<K, V>[] table;
     private int threshold;
     private int size;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTORY);
+        threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
@@ -48,13 +47,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public void putNodeInEmptyBucket(K key, V value, int index) {
+    private void putNodeInEmptyBucket(K key, V value, int index) {
         Node<K, V> newNode = new Node<>(key, value, null);
         table[index] = newNode;
         size++;
     }
 
-    public void putNodeIfCollision(K key, V value, int index) {
+    private void putNodeIfCollision(K key, V value, int index) {
         Node<K, V> startNode = table[index];
         while (startNode != null) {
             if (Objects.equals(key, startNode.key)) {
@@ -68,14 +67,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    public void resize() {
+    private void resize() {
         Node<K, V>[] copyTable = table;
-        table = new Node[table.length * SIZE_REDUCTION_INDEX];
-        threshold = (int) (table.length * DEFAULT_LOAD_FACTORY);
-        for (Node<K, V> kvNode: copyTable) {
-            while (kvNode != null) {
-                put(kvNode.key, kvNode.value);
-                kvNode = kvNode.next;
+        table = new Node[table.length * SIZE_INCREASE_INDEX];
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
+        for (Node<K, V> node: copyTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
@@ -92,11 +91,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public int getIndex(K key) {
+    private int getIndex(K key) {
         if (key == null) {
             return 0;
         }
-        int index = Math.abs(key.hashCode()) % table.length;
-        return index;
+        return Math.abs(key.hashCode()) % table.length;
     }
 }
