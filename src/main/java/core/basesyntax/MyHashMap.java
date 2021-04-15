@@ -14,7 +14,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        resize();
+        if (size >= DEFAULTL_CAPACITY * DEFAULT_LOAD_FACTOR) {
+            resize();
+        }
         Node<K, V> currentNode = table[getIndex(key)];
         if (currentNode == null) {
             table[getIndex(key)] = new Node<>(key, value);
@@ -25,6 +27,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (Objects.equals(currentNode.key, key)) {
                 currentNode.value = value;
                 return;
+            }
+            if (currentNode.next == null) {
+                currentNode.next = new Node<>(key, value);
+                size++;
             }
             currentNode = currentNode.next;
         }
@@ -56,10 +62,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V>[] newNodes = table;
             table = oldNodes;
             size = 0;
-            for (Node<K, V> eachNode: newNodes) {
-                while (eachNode != null) {
-                    put(eachNode.key, eachNode.value);
-                    eachNode = eachNode.next;
+            for (Node<K, V> node: newNodes) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
                 }
             }
         }
