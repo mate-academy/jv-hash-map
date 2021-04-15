@@ -15,7 +15,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K,V> next;
@@ -28,7 +27,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         @Override
         public int hashCode() {
-            hash = 31;
+            int hash = 31;
             hash = hash * 17 + key.hashCode();
             return hash;
         }
@@ -39,10 +38,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        Node<K,V> newNode = new Node(key,value);
-        int index = putIndex(newNode);
+        int index = getIndex(new Node(key,value));
         if (table[index] == null) {
-            table[index] = newNode;
+            table[index] = new Node(key,value);
             size++;
             return;
         } else if (table[index].value != null) {
@@ -54,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 while (currentNode.next != null) {
                     currentNode = currentNode.next;
                 }
-                currentNode.next = newNode;
+                currentNode.next = new Node(key,value);
                 size++;
                 return;
             }
@@ -65,12 +63,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         for (Node<K, V> node : table) {
-            Node<K, V> currentNode = node;
-            while (currentNode != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    return currentNode.value;
+            while (node != null) {
+                if (Objects.equals(node.key, key)) {
+                    return node.value;
                 }
-                currentNode = currentNode.next;
+                node = node.next;
             }
         }
         return null;
@@ -81,28 +78,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(Node<K,V> node) {
-        if (node.key == null) {
-            return 0;
-        }
-        return node.hashCode() % table.length;
-    }
-
-    private int putIndex(Node<K,V> node) {
-        return Math.abs(hash(node));
+    private int getIndex(Node<K,V> node) {
+        return node.key == null ? 0 : Math.abs(node.hashCode() % table.length);
     }
 
     private void resize() {
         Node<K,V>[] oldTable = table;
         table = new Node[oldTable.length * 2];
-        size = 0;
         threshold = (int) table.length * DEFAULT_LOAD_FACTOR;
         size = 0;
         for (Node<K, V> node : oldTable) {
-            Node<K, V> currentNode = node;
-            while (currentNode != null) {
-                put(currentNode.key, currentNode.value);
-                currentNode = currentNode.next;
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
