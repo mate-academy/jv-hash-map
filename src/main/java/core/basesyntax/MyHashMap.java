@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final int COFFICIENT_GROW = 2;
+    private static final int GROW_COFFICIENT = 2;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
@@ -17,24 +17,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> newNode = new Node<>(key, value, null);
+        resize();
         int index = getIndexByKey(key);
-        Node<K, V> nodeByIndex = table[index];
-        if (table[index] == null) {
-            table[index] = newNode;
-        } else {
-            while (nodeByIndex.next != null || Objects.equals(nodeByIndex.key, key)) {
-                if (Objects.equals(nodeByIndex.key, key)) {
-                    nodeByIndex.value = value;
-                    return;
-                }
-                nodeByIndex = nodeByIndex.next;
+        Node<K,V> newNode = table[index];
+        while (newNode != null) {
+            if (Objects.equals(newNode.key, key)) {
+                newNode.value = value;
+                return;
             }
-            nodeByIndex.next = newNode;
+            if (newNode.next == null) {
+                newNode.next = new Node<>(key, value, null);
+                size++;
+                return;
+            }
+            newNode = newNode.next;
         }
-        if (++size > threshold) {
-            resize();
-        }
+        table[index] = new Node<>(key, value,null);
+        size++;
     }
 
     @Override
@@ -75,8 +74,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] tempTable = table;
         int newCapacity;
         if (size >= threshold) {
-            newCapacity = table.length * COFFICIENT_GROW;
-            threshold *= COFFICIENT_GROW;
+            newCapacity = table.length * GROW_COFFICIENT;
+            threshold *= GROW_COFFICIENT;
             table = new Node[newCapacity];
             size = 0;
             for (Node<K, V> node : tempTable) {
