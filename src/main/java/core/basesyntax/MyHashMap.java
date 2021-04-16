@@ -18,10 +18,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K, V> newElement = new Node<>(key, value);
-        if (keyIsNew(key)) {
-            size++;
-        }
-        if (size == threshold) {
+
+        if (size >= threshold) {
             resize();
         }
         addElement(newElement);
@@ -30,17 +28,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = getIndexByHashCode(key);
-        if (bucketsArray[index] != null) {
-            if (Objects.equals(bucketsArray[index].getKey(), key)) {
-                return bucketsArray[index].getValue();
+        Node<K, V> currentNode = bucketsArray[index];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
             }
-            Node<K, V> currentNode = bucketsArray[index];
-            while (currentNode != null) {
-                if (Objects.equals(currentNode.getKey(), key)) {
-                    return currentNode.getValue();
-                }
-                currentNode = currentNode.nextItemInBucket;
-            }
+            currentNode = currentNode.nextItemInBucket;
         }
         return null;
     }
@@ -54,36 +47,34 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return 0;
         }
-        int index = (key.hashCode() % bucketsArray.length);
-        return index >= 0 ? index : index * -1;
+        return Math.abs(key.hashCode() % bucketsArray.length);
     }
 
     private void resize() {
-        threshold = (int) (bucketsArray.length * LOADING_FACTOR);
-        Node<K, V>[] oldBucketsArray = bucketsArray;
+        final Node<K, V>[] oldBucketsArray = bucketsArray;
         bucketsArray = new Node[bucketsArray.length * RESIZE_MULTIPLIER];
+        threshold = (int) (bucketsArray.length * LOADING_FACTOR);
+        size = 0;
         for (Node<K, V> node : oldBucketsArray) {
-            if (node != null) {
-                Node<K, V> currentNode = node;
-                while (currentNode != null) {
-                    addElement(new Node<K, V>(currentNode.key, currentNode.value));
-                    currentNode = currentNode.nextItemInBucket;
-
-                }
+            Node<K, V> currentNode = node;
+            while (currentNode != null) {
+                addElement(new Node<K, V>(currentNode.key, currentNode.value));
+                currentNode = currentNode.nextItemInBucket;
             }
         }
     }
 
     private void addElement(Node<K, V> node) {
-        int index = node.getKey() == null ? 0 : getIndexByHashCode(node.getKey());
+        int index = getIndexByHashCode(node.key);
         if (bucketsArray[index] == null) {
             bucketsArray[index] = node;
+            size++;
             return;
         }
-        if (Objects.equals(bucketsArray[index].getKey(), node.getKey())) {
-            bucketsArray[index].setValue(node.getValue());
+        if (Objects.equals(bucketsArray[index].key, node.key)) {
+            bucketsArray[index].value = (node.value);
         } else {
-            Node<K, V> currentNode = getLastOrEqualNode(bucketsArray[index], node.getKey());
+            Node<K, V> currentNode = getLastOrEqualNode(bucketsArray[index], node.key);
             node.nextItemInBucket = currentNode.nextItemInBucket;
             currentNode.nextItemInBucket = node;
         }
@@ -91,11 +82,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V> getLastOrEqualNode(Node<K,V> currentNode, K key) {
         while (currentNode.nextItemInBucket != null) {
-            if (Objects.equals(currentNode.nextItemInBucket.getKey(), key)) {
+            if (Objects.equals(currentNode.nextItemInBucket.key, key)) {
                 return currentNode;
             }
             currentNode = currentNode.nextItemInBucket;
         }
+        size++;
         return currentNode;
     }
 
@@ -122,19 +114,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.nextItemInBucket = null;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
-        }
-
-        public V getValue() {
-            return value;
         }
     }
 }
