@@ -56,10 +56,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (bucketsArray.length * LOADING_FACTOR);
         size = 0;
         for (Node<K, V> node : oldBucketsArray) {
-            Node<K, V> currentNode = node;
-            while (currentNode != null) {
-                addElement(new Node<K, V>(currentNode.key, currentNode.value));
-                currentNode = currentNode.nextItemInBucket;
+            while (node != null) {
+                addElement(new Node<K, V>(node.key, node.value));
+                node = node.nextItemInBucket;
             }
         }
     }
@@ -73,37 +72,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         if (Objects.equals(bucketsArray[index].key, node.key)) {
             bucketsArray[index].value = (node.value);
-        } else {
-            Node<K, V> currentNode = getLastOrEqualNode(bucketsArray[index], node.key);
-            node.nextItemInBucket = currentNode.nextItemInBucket;
-            currentNode.nextItemInBucket = node;
+            return;
         }
-    }
-
-    private Node<K, V> getLastOrEqualNode(Node<K,V> currentNode, K key) {
+        Node<K, V> currentNode = bucketsArray[index];
         while (currentNode.nextItemInBucket != null) {
-            if (Objects.equals(currentNode.nextItemInBucket.key, key)) {
-                return currentNode;
+            if (Objects.equals(currentNode.nextItemInBucket.key, node.key)) {
+                currentNode.nextItemInBucket.value = node.value;
+                return;
             }
             currentNode = currentNode.nextItemInBucket;
         }
+        currentNode.nextItemInBucket = node;
         size++;
-        return currentNode;
-    }
-
-    private boolean keyIsNew(K key) {
-        if (bucketsArray[getIndexByHashCode(key)] == null) {
-            return true;
-        }
-        Node<K, V> current = bucketsArray[getIndexByHashCode(key)];
-        while (current != null) {
-            if (Objects.equals(key, current.key)) {
-                return false;
-            }
-            current = current.nextItemInBucket;
-        }
-        return true;
-
     }
 
     private static class Node<K, V> {
