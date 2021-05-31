@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -17,39 +19,40 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int hash = hash(key);
-        putVal(hash, key, value);
+        int index = getIndex(key);
+        putVal(index, key, value);
     }
 
     @Override
     public V getValue(K key) {
-        Node<K,V> e;
-        return (e = getNode(key)) == null ? null : e.value;
+        Node<K,V> result;
+        return (result = getNode(key)) == null ? null : result.value;
     }
 
     @Override
     public int getSize() {
         return size;
+
     }
 
-    private void putVal(int hash, K key, V value) {
-        Node<K, V> p = table[hash];
+    private void putVal(int index, K key, V value) {
+        Node<K, V> p = table[index];
         if (p == null) {
-            p = new Node<>(hash, key, value, null);
-            table[hash] = p;
+            p = new Node<>(key, value, null);
+            table[index] = p;
         } else {
-            if (((key == p.key) || (key != null && key.equals(p.key)))) {
+            if ((Objects.equals(key, p.key))) {
                 p.value = value;
                 return;
             }
             while (p.next != null) {
                 p = p.next;
-                if (((key == p.key) || (key != null && key.equals(p.key)))) {
+                if ((Objects.equals(key, p.key))) {
                     p.value = value;
                     return;
                 }
             }
-            p.next = new Node<>(hash, key, value, null);
+            p.next = new Node<>(key, value, null);
         }
         if (size++ > threshold) {
             resize();
@@ -79,38 +82,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K,V> getNode(Object key) {
-        Node<K,V> first;
-        Node<K,V> e;
-        if (table != null
-                    && (first = table[hash(key)]) != null) {
-            if (((key == first.key)
-                    || (key != null && key.equals(first.key)))) {
-                return first;
+        int index = getIndex(key);
+        Node<K,V> result = table[index];
+        while (result != null) {
+            if (Objects.equals(key, result.key)) {
+                return result;
             }
-            if ((e = first.next) != null) {
-                do {
-                    if (key == e.key
-                            || (key != null && key.equals(e.key))) {
-                        return e;
-                    }
-                } while ((e = e.next) != null);
-            }
+            result = result.next;
         }
         return null;
     }
 
-    private int hash(Object key) {
+    private int getIndex(Object key) {
         return (key == null) ? 0 : (Math.abs(key.hashCode())) % capacity;
     }
 
     private static class Node<K,V> {
-        private int hash;
-        private K key;
+        private final K key;
         private V value;
         private Node<K,V> next;
 
-        private Node(int hash, K key, V value, Node<K,V> next) {
-            this.hash = hash;
+        private Node(K key, V value, Node<K,V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
