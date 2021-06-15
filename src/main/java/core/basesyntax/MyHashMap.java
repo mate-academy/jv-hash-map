@@ -23,19 +23,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    static int hash(Object key) {
-        return (key == null) ? 0 : key.hashCode() & 1 << 16;
+    public MyHashMap() {
+        threshold = (int)(DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
+        table = (Node<K,V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (table == null) {
-            resize();
-        }
         Node<K,V> node = new Node<>(hash(key), key, value, null);
-
-        int index;
-        if (table[(index = hash(key) % table.length)] == null) {
+        int index = node.hash % table.length;
+        if (table[index] == null) {
             table[index] = node;
         } else {
             Node<K,V> pointer = table[index];
@@ -59,50 +56,37 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         Node<K,V>[] oldTable = table;
         Node<K,V>[] newTable;
-
-        if (table == null) {
-            threshold = (int)(DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
-            table = (Node<K,V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
-        } else {
-            newTable = (Node<K,V>[]) new Node[oldTable.length * 2];
-            threshold = (int)(newTable.length * DEFAULT_LOAD_FACTOR);
-            transfer(oldTable, newTable);
-            table = newTable;
-        }
+        newTable = (Node<K,V>[]) new Node[oldTable.length * 2];
+        threshold = (int)(newTable.length * DEFAULT_LOAD_FACTOR);
+        transfer(oldTable, newTable);
+        table = newTable;
     }
 
     private void transfer(Node<K,V>[] oldTable, Node<K,V>[] newTable) {
-        int index;
-
-        outerloop:
-        for (int i = 0; i < oldTable.length; i++) {
-            Node<K,V> node = table[i];
+        for (Node<K,V> node : oldTable) {
             if (node == null) {
                 continue;
             }
-            if (newTable[(index = node.hash % newTable.length)] == null) {
-                newTable[index] = node;
-            } else {
+            int index = node.hash % newTable.length;
+            if (newTable[index] != null) {
                 Node<K, V> pointer = newTable[index];
                 while (pointer.next != null) {
                     if (Objects.equals(pointer.key, node.key)) {
                         pointer.value = node.value;
-                        continue outerloop;
+                        break;
                     }
                     pointer = pointer.next;
                 }
-                newTable[node.hash % newTable.length] = node;
             }
+            newTable[index] = node;
         }
     }
 
     @Override
     public V getValue(K key) {
-        if (table == null) {
-            return null;
-        }
         V value = null;
-        Node<K,V> pointer = table[hash(key) % table.length];
+        int index = hash(key) % table.length;
+        Node<K,V> pointer = table[index];
         while (pointer != null) {
             if (Objects.equals(pointer.key,key)) {
                 value = pointer.value;
@@ -119,7 +103,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public boolean containsKey(Object key) {
-        Node<K,V> pointer = table[(hash(key) % table.length)];
+        int index = hash(key) % table.length;
+        Node<K,V> pointer = table[index];
         while (pointer.next != null) {
             if (Objects.equals(key, pointer.key)) {
                 return true;
@@ -127,5 +112,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             pointer = pointer.next;
         }
         return false;
+    }
+
+    private int hash(Object key) {
+        return (key == null) ? 0 : key.hashCode() & 1 << 16;
     }
 }
