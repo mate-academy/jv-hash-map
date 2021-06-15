@@ -5,15 +5,14 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75F;
-
-    private Node<K, V>[] nodes;
+    private Node<K, V>[] table;
     private int capacity;
     private int size;
     private int threshold;
 
     public MyHashMap() {
         capacity = DEFAULT_CAPACITY;
-        nodes = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
         threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
@@ -22,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        if (putVal(key, value, nodes, getHash(key))) {
+        if (putVal(key, value, table, getHash(key))) {
             size++;
         }
     }
@@ -32,7 +31,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             nodes[hash] = new Node<>(hash, key, value, null);
             return true;
         }
-
         Node<K, V> currentNode = nodes[hash];
         while (!Objects.equals(currentNode.key, key)) {
             if (isNullNode(currentNode.next)) {
@@ -51,15 +49,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = nodes[getHash(key)];
-
+        Node<K, V> currentNode = table[getHash(key)];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
         }
-
         return null;
     }
 
@@ -69,33 +65,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int newCapacity = nodes.length * 2;
-        int newThreshold = (int) (newCapacity * LOAD_FACTOR);
-
-        Node<K, V>[] newNodes = (Node<K, V>[]) new Node[newCapacity];
-        capacity = newCapacity;
-        threshold = newThreshold;
-
-        for (Node<K, V> node : nodes) {
-            if (node == null) {
-                continue;
-            }
-            Node<K, V> copy = node;
-            while (copy != null) {
-                int hash = getHash(copy.key);
-                putVal(copy.key, copy.value, newNodes, hash);
-                copy = copy.next;
+        capacity = table.length * 2;
+        threshold = (int) (capacity * LOAD_FACTOR);
+        Node<K, V>[] newNodes = (Node<K, V>[]) new Node[capacity];
+        for (Node<K, V> node : table) {
+            while (node != null) {
+                int hash = getHash(node.key);
+                putVal(node.key, node.value, newNodes, hash);
+                node = node.next;
             }
         }
-
-        nodes = newNodes;
+        table = newNodes;
     }
 
     private int getHash(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode() % capacity);
+        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
     private class Node<K, V> {
