@@ -30,6 +30,19 @@ public class MyHashMapTest {
     }
 
     @Test
+    public void checkIfContainsKey() {
+        MyHashMap<Car, Integer> myHashMap = new MyHashMap<>();
+        myHashMap.put(firstCar, 3);
+        myHashMap.put(secondCar, 5);
+        myHashMap.put(thirdCar, 1);
+
+        Assert.assertEquals("Test failed! The size isn't correct. Expected 3 but was "
+                + myHashMap.getSize(), true, myHashMap.containsKey(firstCar));
+        Assert.assertEquals("Test failed! The size isn't correct. Expected 3 but was "
+                + myHashMap.getSize(), false, myHashMap.containsKey(null));
+    }
+
+    @Test
     public void putAndGetOk() {
         MyMap<Car, Integer> myHashMap = new MyHashMap<>();
         myHashMap.put(firstCar, 3);
