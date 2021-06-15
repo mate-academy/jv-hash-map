@@ -116,4 +116,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public int getSize() {
         return size;
     }
+
+    public boolean containsKey(Object key) {
+        Node<K,V> pointer = table[(hash(key) % table.length)];
+        while (pointer.next != null) {
+            if (Objects.equals(key, pointer.key)) {
+                return true;
+            }
+            pointer = pointer.next;
+        }
+        return false;
+    }
 }
