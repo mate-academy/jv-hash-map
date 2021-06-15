@@ -12,6 +12,60 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = DEFAULT_CAPACITY * LOAD_FACTOR;
     }
 
+    @Override
+    public void put(K key, V value) {
+        if (size == threshold) {
+            resize();
+        }
+        int index = getHashIndex(key);
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (key == node.key || key != null && key.equals(node.key)) {
+                node.value = value;
+                return;
+            }
+            node = node.next;
+        }
+        node = new Node<K, V>(key, value, table[index]);
+        table[index] = node;
+        size++;
+    }
+
+    @Override
+    public V getValue(K key) {
+        int index = getHashIndex(key);
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (key == node.key || key != null && key.equals(node.key)) {
+                return node.value;
+            }
+            node = node.next;
+        }
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    private void resize() {
+        Node<K, V>[] newTable = new Node[table.length << 1];
+        threshold = table.length * LOAD_FACTOR;
+        Node<K, V>[] oldTable = table;
+        table = newTable;
+        size = 0;
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
+        }
+    }
+
+    private int getHashIndex(K key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
+    }
 
     private static class Node<K,V> {
         private K key;
