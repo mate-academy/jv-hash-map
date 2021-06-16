@@ -103,7 +103,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putNode(Node<K, V> node) {
-        int bucket = Math.abs(node.hash % myHashMap.length);
+        int bucket = node.hash % myHashMap.length;
         if (myHashMap[bucket] == null) {
             myHashMap[bucket] = node;
             return;
@@ -131,7 +131,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         public Node(K key, V value, Node<K, V> next) {
             this.key = key;
-            this.hash = key == null ? 0 : key.hashCode();
+            this.hash = key == null ? 0 : Math.abs(key.hashCode());
             this.value = value;
             this.next = next;
         }
