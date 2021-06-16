@@ -4,10 +4,9 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private int capacity = DEFAULT_CAPACITY;
     private static final float LOAD_FACTORY = 0.75f;
-    int size;
-
+    private int capacity = DEFAULT_CAPACITY;
+    private int size;
     private Node[] table;
 
     public MyHashMap() {
@@ -74,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         int newCapacity = capacity * 2;
         Node[] oldTable = table;
-        table = new Node[newCapacity]; // size 32
+        table = new Node[newCapacity];
         size = 0;
         for (int i = 0; i < oldTable.length; i++) {
             if (oldTable[i] != null) {
