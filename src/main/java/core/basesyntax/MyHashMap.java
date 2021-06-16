@@ -74,7 +74,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 noda = noda.next;
             }
         }
-
     }
 
     public int getIndex(K key) {
