@@ -3,18 +3,16 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private int threshold;
     private int size;
     private Node<K,V>[] table;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        threshold = (int) (DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold) {
+        if (size >= DEFAULT_LOAD_FACTOR * table.length) {
             resize();
         }
         int indexTable = getHashIndex(key);
@@ -73,7 +71,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] previousTable = table;
-        threshold = threshold << 1;
         table = new Node[previousTable.length << 1];
         size = 0;
         for (Node<K, V> newTableElements : previousTable) {
