@@ -18,8 +18,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == table.length * LOAD_FACTOR) {
             resize();
         }
-        Node<K, V> newNode = new Node(hashIndex(key), key, value, null);
-        int index = newNode.hash;
+        Node<K, V> newNode = new Node(key, value, null);
+        int index = getIndex(key);
         if (table[index] == null) {
             table[index] = newNode;
         } else {
@@ -41,16 +41,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentBucket = table[hashIndex(key)];
-        if (currentBucket != null && Objects.equals(key, currentBucket.key)) {
-            return currentBucket.value;
-        } else {
-            while (currentBucket != null) {
-                if (Objects.equals(key, currentBucket.key)) {
-                    return currentBucket.value;
-                }
-                currentBucket = currentBucket.next;
+        Node<K, V> currentBucket = table[getIndex(key)];
+        while (currentBucket != null) {
+            if (Objects.equals(key, currentBucket.key)) {
+                return currentBucket.value;
             }
+            currentBucket = currentBucket.next;
         }
         return null;
     }
@@ -61,13 +57,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        private Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -87,7 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hashIndex(K key) {
+    private int getIndex(K key) {
         int hash = 17;
         hash = 31 * hash + (key == null ? 0 : key.hashCode());
         return Math.abs(hash) % table.length;
