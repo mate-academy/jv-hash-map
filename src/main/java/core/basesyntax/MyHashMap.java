@@ -17,11 +17,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        Node<K, V> tableElements = table[transferKeyHashCodeToTableIndex(key)];
+        int indexTable = getHashIndex(key);
+        Node<K, V> tableElements = table[indexTable];
         if (tableElements == null) {
-            table[transferKeyHashCodeToTableIndex(key)] = new Node<>(key, value, null);
-            size++;
-            return;
+            table[indexTable] = new Node<>(key, value, null);
         }
         while (tableElements != null) {
             if (key == tableElements.key || key != null && key.equals(tableElements.key)) {
@@ -30,16 +29,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             if (tableElements.next == null) {
                 tableElements.next = new Node<>(key, value, null);
-                size++;
-                return;
+                break;
             }
             tableElements = tableElements.next;
         }
+        size++;
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> tableElementsByIndex = table[transferKeyHashCodeToTableIndex(key)];
+        Node<K, V> tableElementsByIndex = table[getHashIndex(key)];
         while (tableElementsByIndex != null) {
             if (key == tableElementsByIndex.key
                     || key != null
@@ -68,7 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int transferKeyHashCodeToTableIndex(K key) {
+    private int getHashIndex(K key) {
         return key != null ? Math.abs(key.hashCode()) % table.length : 0;
     }
 
