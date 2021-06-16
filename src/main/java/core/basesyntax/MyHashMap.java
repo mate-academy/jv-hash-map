@@ -18,21 +18,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int index = getIndex(key);
-        Node<K, V> newNode = new Node<>(Objects.hash(key), key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, null);
         if (table[index] == null) {
             table[index] = newNode;
         } else {
-            Node<K, V> currentBucket = table[index];
-            while (currentBucket != null) {
-                if (Objects.equals(currentBucket.key, key)) {
-                    currentBucket.value = value;
+            Node<K, V> currentNode = table[index];
+            while (currentNode != null) {
+                if (Objects.equals(currentNode.key, key)) {
+                    currentNode.value = value;
                     return;
                 }
-                if (currentBucket.next == null) {
-                    currentBucket.next = newNode;
+                if (currentNode.next == null) {
+                    currentNode.next = newNode;
                     break;
                 }
-                currentBucket = currentBucket.next;
+                currentNode = currentNode.next;
             }
         }
         size++;
@@ -78,13 +78,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
