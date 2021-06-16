@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         Node<K, V> newNode = new Node<>(key, value, null);
-        int index = newNode.hash % arrayOfNodes.length;
+        int index = getIndex(key);
         if (arrayOfNodes[index] == null) {
             arrayOfNodes[index] = newNode;
             size++;
@@ -45,20 +45,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         V value = null;
-        for (Node<K, V> node : arrayOfNodes) {
-            while (node != null) {
-                if (Objects.equals(key, node.key)) {
-                    value = node.value;
-                }
-                node = node.next;
+        int index = getIndex(key);
+        Node<K, V> node = arrayOfNodes[index];
+        while (node != null) {
+            if (Objects.equals(key, node.key)) {
+                value = node.value;
             }
+            node = node.next;
         }
+
         return value;
     }
 
     @Override
     public int getSize() {
         return size;
+    }
+
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % arrayOfNodes.length;
     }
 
     public boolean isEmpty() {
@@ -96,19 +101,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> node : oldHashMap) {
             while (node != null) {
                 putNode(node);
-                node = unlink(node);
+                Node<K, V> tempNode = node.next;
+                node.next = null;
+                node = tempNode;
             }
         }
     }
 
-    private Node<K, V> unlink(Node<K, V> node) {
-        Node<K, V> currentNode = node.next;
-        node.next = null;
-        return currentNode;
-    }
-
     private void putNode(Node<K, V> node) {
-        int index = node.hash % arrayOfNodes.length;
+        int index = getIndex(node.key);
         if (arrayOfNodes[index] == null) {
             arrayOfNodes[index] = node;
             return;
@@ -125,13 +126,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static class Node<K, V> {
         private final K key;
-        private final int hash;
         private V value;
         private Node<K, V> next;
 
         public Node(K key, V value, Node<K, V> next) {
             this.key = key;
-            this.hash = key == null ? 0 : Math.abs(key.hashCode());
             this.value = value;
             this.next = next;
         }
