@@ -6,9 +6,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final int DOUBLER = 2;
     private static final float LOAD_FACTOR = 0.75f;
-    private Node<K, V>[] table = new Node[DEFAULT_CAPACITY];
-    private int capacity = (int) (table.length * LOAD_FACTOR);
+    private Node<K, V>[] table;
+    private int capacity;
     private int size;
+
+    public MyHashMap() {
+        table = new Node[DEFAULT_CAPACITY];
+        capacity = (int) (table.length * LOAD_FACTOR);
+    }
 
     public static class Node<K, V> {
         private K key;
@@ -24,7 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size + 1 >= capacity) {
+        if (size == capacity * LOAD_FACTOR) {
             resize();
         }
         if (table[getIndex(key)] == null) {
@@ -66,7 +71,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void resize() {
         Node<K, V>[] oldTable = table;
         table = new Node[oldTable.length * DOUBLER];
-        capacity = capacity * DOUBLER;
         size = 0;
         for (Node<K, V> noda : oldTable) {
             while (noda != null) {
