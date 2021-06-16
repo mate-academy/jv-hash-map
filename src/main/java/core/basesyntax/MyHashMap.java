@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
+    private static final int COEFFICIENT_INCREASE = 2;
     private int size;
     private MyNode<K, V>[] table;
     private int threshold;
@@ -17,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (threshold >= size) {
-            int indexBucket = hashCode(key, table.length);
+            int indexBucket = indexForBucket(key);
             if (table[indexBucket] == null) {
                 table[indexBucket] = new MyNode<>(key, value, null);
             } else {
@@ -42,22 +43,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int indexBucket = hashCode(key, table.length);
-
-        if (table[indexBucket] == null) {
-            return null;
-        }
-
-        if (Objects.equals(key, table[indexBucket].key)) {
-            return table[indexBucket].value;
-        } else {
-            MyNode<K, V> oldBucket = table[indexBucket];
-            while (oldBucket != null) {
-                if (Objects.equals(key, oldBucket.key)) {
-                    return oldBucket.value;
-                }
-                oldBucket = oldBucket.next;
+        int indexBucket = indexForBucket(key);
+        MyNode<K, V> oldBucket = table[indexBucket];
+        while (oldBucket != null) {
+            if (Objects.equals(key, oldBucket.key)) {
+                return oldBucket.value;
             }
+            oldBucket = oldBucket.next;
         }
         return null;
     }
@@ -79,13 +71,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hashCode(Object key, int length) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % length);
+    private int indexForBucket(Object key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void resize() {
         size = 0;
-        int newTableLength = table.length * 2;
+        int newTableLength = table.length * COEFFICIENT_INCREASE;
         threshold = (int) (LOAD_FACTOR * newTableLength);
         MyNode<K, V>[] oldTable = table;
         table = new MyNode[newTableLength];
