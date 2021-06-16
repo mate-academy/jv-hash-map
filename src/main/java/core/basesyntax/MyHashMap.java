@@ -32,12 +32,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size + 1 >= threshold) {
             resize();
         }
-        int bucket = key == null ? 0 : Math.abs(key.hashCode()) % table.length;
+        int index = getIndex(key);
         Node<K, V> newNode = new Node<>(key, value, null);
-        if (table[bucket] == null) {
-            table[bucket] = newNode;
+        if (table[index] == null) {
+            table[index] = newNode;
         } else {
-            Node<K, V> currentNode = table[bucket];
+            Node<K, V> currentNode = table[index];
             while (currentNode != null) {
                 if (Objects.equals(currentNode.key, key)) {
                     currentNode.value = value;
@@ -55,8 +55,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int bucket = key == null ? 0 : Math.abs(key.hashCode()) % table.length;
-        Node<K, V> currentNode = table[bucket];
+        int index = getIndex(key);
+        Node<K, V> currentNode = table[index];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
@@ -82,5 +82,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node = node.next;
             }
         }
+    }
+
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 }
