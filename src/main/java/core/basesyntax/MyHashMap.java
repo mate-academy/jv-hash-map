@@ -1,9 +1,9 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_CAPACITY = 1 << 4;
-    static final float LOAD_FACTOR = 0.75f;
-    static final int GROW_INDEX = 2;
+    private static final int DEFAULT_CAPACITY = 1 << 4;
+    private static final float LOAD_FACTOR = 0.75f;
+    private static final int GROW_INDEX = 2;
     private Node<K,V>[] table;
     private int size;
     private int threshold;
