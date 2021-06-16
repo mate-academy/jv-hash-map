@@ -15,12 +15,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -73,10 +73,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         Node<K, V>[] oldTable = table;
         table = new Node[table.length * MAGNIFICATION_FACTOR];
-        for (Node<K, V> kvNode : oldTable) {
-            while (kvNode != null) {
-                put(kvNode.key, kvNode.value);
-                kvNode = kvNode.next;
+        for (Node<K, V> currentNode : oldTable) {
+            while (currentNode != null) {
+                put(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
             }
         }
     }
