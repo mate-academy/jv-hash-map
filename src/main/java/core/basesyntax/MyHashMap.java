@@ -6,7 +6,6 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private static final int NULL_POSITION = 0;
     private static final int SIZE_MULTIPLIER = 2;
     private int size;
     private Node<K,V>[] table;
@@ -73,7 +72,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void transfer(Node<K,V>[] oldTable) {
         size = 0;
-
         for (Node<K,V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
