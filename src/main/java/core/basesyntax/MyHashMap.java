@@ -5,7 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int MULTIPLIED_VALUE = 16 >> 3;
+    private static final int MULTIPLIED_VALUE = 2;
     private Node<K, V>[] table;
     private int threshold;
     private int size;
