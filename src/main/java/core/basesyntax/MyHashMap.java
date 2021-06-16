@@ -21,10 +21,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > threshold) {
             resize();
         }
-        if (table[getIndex(key)] == null) {
-            table[getIndex(key)] = new Node<>(key, value, null);
+        int index = getIndex(key);
+        if (table[index] == null) {
+            table[index] = new Node<>(key, value, null);
         } else {
-            Node<K,V> currentNode = table[getIndex(key)];
+            Node<K,V> currentNode = table[index];
             while (currentNode != null) {
                 if (Objects.equals(currentNode.key, key)) {
                     currentNode.value = value;
@@ -42,13 +43,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (Node<K,V> node : table) {
-            while (node != null) {
-                if (Objects.equals(node.key, key)) {
-                    return node.value;
-                }
-                node = node.next;
+        Node<K,V> currentNode = table[getIndex(key)];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
             }
+            currentNode = currentNode.next;
         }
         return null;
     }
@@ -80,12 +80,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    static class Node<K,V> implements Map.Entry<K,V> {
+    private static class Node<K,V> implements Map.Entry<K,V> {
         private final K key;
         private V value;
         private Node<K,V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
