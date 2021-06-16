@@ -6,13 +6,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75f;
     private static final int RESIZE_COEFFICIENT = 2;
-    private Node<K, V>[] myHashMap;
+    private Node<K, V>[] arrayOfNodes;
     private int threshold;
     private int size;
 
     public MyHashMap() {
-        myHashMap = new Node[INITIAL_CAPACITY];
-        threshold = (int) (myHashMap.length * LOAD_FACTOR);
+        arrayOfNodes = new Node[INITIAL_CAPACITY];
+        threshold = (int) (arrayOfNodes.length * LOAD_FACTOR);
     }
 
     @Override
@@ -21,17 +21,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         Node<K, V> newNode = new Node<>(key, value, null);
-        putNode(newNode);
-        size++;
+        int index = newNode.hash % arrayOfNodes.length;
+        if (arrayOfNodes[index] == null) {
+            arrayOfNodes[index] = newNode;
+            size++;
+            return;
+        }
+        Node<K, V> currentNode = arrayOfNodes[index];
+        while (currentNode != null) {
+            if (Objects.equals(key, currentNode.key)) {
+                currentNode.value = value;
+                return;
+            }
+            if (currentNode.next == null) {
+                currentNode.next = newNode;
+                size++;
+                return;
+            }
+            currentNode = currentNode.next;
+        }
     }
 
     @Override
     public V getValue(K key) {
         V value = null;
-        for (Node<K, V> node : myHashMap) {
-            if (node == null) {
-                continue;
-            }
+        for (Node<K, V> node : arrayOfNodes) {
             while (node != null) {
                 if (Objects.equals(key, node.key)) {
                     value = node.value;
@@ -52,10 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public boolean containsKey(K key) {
-        for (Node<K, V> node : myHashMap) {
-            if (node == null) {
-                continue;
-            }
+        for (Node<K, V> node : arrayOfNodes) {
             while (node != null) {
                 if (Objects.equals(key, node.key)) {
                     return true;
@@ -67,10 +78,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public boolean containsValue(V value) {
-        for (Node<K, V> node : myHashMap) {
-            if (node == null) {
-                continue;
-            }
+        for (Node<K, V> node : arrayOfNodes) {
             while (node != null) {
                 if (Objects.equals(value, node.value)) {
                     return true;
@@ -82,13 +90,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] oldHashMap = myHashMap;
-        myHashMap = new Node[oldHashMap.length * RESIZE_COEFFICIENT];
-        threshold = (int) (myHashMap.length * LOAD_FACTOR);
+        Node<K, V>[] oldHashMap = arrayOfNodes;
+        arrayOfNodes = new Node[oldHashMap.length * RESIZE_COEFFICIENT];
+        threshold = (int) (arrayOfNodes.length * LOAD_FACTOR);
         for (Node<K, V> node : oldHashMap) {
-            if (node == null) {
-                continue;
-            }
             while (node != null) {
                 putNode(node);
                 node = unlink(node);
@@ -103,18 +108,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putNode(Node<K, V> node) {
-        int bucket = node.hash % myHashMap.length;
-        if (myHashMap[bucket] == null) {
-            myHashMap[bucket] = node;
+        int index = node.hash % arrayOfNodes.length;
+        if (arrayOfNodes[index] == null) {
+            arrayOfNodes[index] = node;
             return;
         }
-        Node<K, V> currentNode = myHashMap[bucket];
+        Node<K, V> currentNode = arrayOfNodes[index];
         while (currentNode != null) {
-            if (Objects.equals(node.key, currentNode.key)) {
-                currentNode.value = node.value;
-                size--;
-                return;
-            }
             if (currentNode.next == null) {
                 currentNode.next = node;
                 return;
