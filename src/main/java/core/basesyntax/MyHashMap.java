@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-import java.util.HashMap;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -8,12 +7,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DOUBLER = 2;
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
-    private int capacity;
+    private int unacceptableCapacity;
     private int size;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        capacity = (int) (table.length * LOAD_FACTOR);
+        unacceptableCapacity = (int) (table.length * LOAD_FACTOR);
     }
 
     public static class Node<K, V> {
@@ -30,7 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size == capacity) {
+        if (size == unacceptableCapacity) {
             resize();
         }
         if (table[getIndex(key)] == null) {
@@ -73,6 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = table;
         table = new Node[oldTable.length * DOUBLER];
         size = 0;
+        unacceptableCapacity = unacceptableCapacity * DOUBLER;
         for (Node<K, V> noda : oldTable) {
             while (noda != null) {
                 put(noda.key, noda.value);
