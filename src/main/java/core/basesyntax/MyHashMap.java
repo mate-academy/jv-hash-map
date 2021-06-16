@@ -16,15 +16,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (threshold < size) {
-            resize();
-        }
-
         if (threshold >= size) {
             int indexBucket = hashCode(key, table.length);
             if (table[indexBucket] == null) {
-                MyNode<K, V> bucket = new MyNode<>(key, value, null);
-                table[indexBucket] = bucket;
+                table[indexBucket] = new MyNode<>(key, value, null);
             } else {
                 MyNode<K, V> oldBucket = table[indexBucket];
                 while (oldBucket != null) {
@@ -32,23 +27,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                         oldBucket.value = value;
                         return;
                     } else if (oldBucket.next == null) {
-                        MyNode<K, V> bucket = new MyNode<>(key, value, null);
-                        oldBucket.next = bucket;
+                        oldBucket.next = new MyNode<>(key, value, null);
                         break;
                     }
                     oldBucket = oldBucket.next;
                 }
             }
             size++;
+        } else {
+            resize();
+            put(key, value);
         }
     }
 
     @Override
     public V getValue(K key) {
         int indexBucket = hashCode(key, table.length);
+
         if (table[indexBucket] == null) {
             return null;
         }
+
         if (Objects.equals(key, table[indexBucket].key)) {
             return table[indexBucket].value;
         } else {
@@ -90,6 +89,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (LOAD_FACTOR * newTableLength);
         MyNode<K, V>[] oldTable = table;
         table = new MyNode[newTableLength];
+
         for (MyNode<K, V> bucket : oldTable) {
             while (bucket != null) {
                 put(bucket.key, bucket.value);
