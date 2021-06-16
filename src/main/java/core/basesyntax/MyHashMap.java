@@ -6,12 +6,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75F;
     private Node<K, V>[] table;
-    private int capacity;
     private int size;
     private int threshold;
 
     public MyHashMap() {
-        capacity = DEFAULT_CAPACITY;
         table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
         threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
@@ -21,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        if (putVal(key, value, table, getHash(key))) {
+        if (putVal(key, value, table, getIndex(key, table.length))) {
             size++;
         }
     }
@@ -49,7 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = table[getHash(key)];
+        Node<K, V> currentNode = table[getIndex(key, table.length)];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
@@ -65,12 +63,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        capacity = table.length * 2;
-        threshold = (int) (capacity * LOAD_FACTOR);
-        Node<K, V>[] newNodes = (Node<K, V>[]) new Node[capacity];
+        Node<K, V>[] newNodes = (Node<K, V>[]) new Node[table.length * 2];
+        threshold = (int) (newNodes.length * LOAD_FACTOR);
         for (Node<K, V> node : table) {
             while (node != null) {
-                int hash = getHash(node.key);
+                int hash = getIndex(node.key, newNodes.length);
                 putVal(node.key, node.value, newNodes, hash);
                 node = node.next;
             }
@@ -78,11 +75,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = newNodes;
     }
 
-    private int getHash(K key) {
+    private int getIndex(K key,int capacity) {
         return key == null ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
-    private class Node<K, V> {
+    private static class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
