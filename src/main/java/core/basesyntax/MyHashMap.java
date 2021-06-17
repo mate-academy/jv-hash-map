@@ -24,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
         if (table[indexToPut] != null) {
             Node<K, V> nodeRunner = table[indexToPut];
-            while (!(nodeRunner == null)) {
+            while (nodeRunner != null) {
                 if (rewriteNode(nodeRunner, key, value)) {
                     return;
                 }
