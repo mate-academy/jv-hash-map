@@ -11,12 +11,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         treshold = (int) (LOAD_FACTOR * INITIAL_CAPACITY);
-        table = new Node[16];
+        table = new Node[INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        resize();
+        if (treshold == size) {
+            resize();
+        }
         int indexToPut = indexFor(key);
         Node<K, V> node = new Node<>(key, value, null);
         size++;
@@ -56,16 +58,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (treshold == size) {
-            size = 0;
-            Node<K, V>[] oldTable = table;
-            treshold *= (int) (LOAD_FACTOR * table.length);
-            table = new Node[table.length << 1];
-            for (Node<K, V> node: oldTable) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
+        size = 0;
+        Node<K, V>[] oldTable = table;
+        treshold *= (int) (LOAD_FACTOR * table.length);
+        table = new Node[table.length << 1];
+        for (Node<K, V> node: oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
