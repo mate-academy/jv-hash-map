@@ -20,26 +20,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (threshold < size) {
             resize();
         }
-        if (threshold >= size) {
-            int indexBucket = indexForBucket(key);
-            if (table[indexBucket] == null) {
-                table[indexBucket] = new MyNode<>(key, value, null);
-            } else {
-                MyNode<K, V> oldBucket = table[indexBucket];
-                while (oldBucket != null) {
-                    if (Objects.equals(key, oldBucket.key)) {
-                        oldBucket.value = value;
-                        return;
-                    }
-                    if (oldBucket.next == null) {
-                        oldBucket.next = new MyNode<>(key, value, null);
-                        break;
-                    }
-                    oldBucket = oldBucket.next;
+        int indexBucket = indexForBucket(key);
+        if (table[indexBucket] == null) {
+            table[indexBucket] = new MyNode<>(key, value, null);
+        } else {
+            MyNode<K, V> oldBucket = table[indexBucket];
+            while (oldBucket != null) {
+                if (Objects.equals(key, oldBucket.key)) {
+                    oldBucket.value = value;
+                    return;
                 }
+                if (oldBucket.next == null) {
+                    oldBucket.next = new MyNode<>(key, value, null);
+                    break;
+                }
+                oldBucket = oldBucket.next;
             }
-            size++;
         }
+        size++;
     }
 
     @Override
