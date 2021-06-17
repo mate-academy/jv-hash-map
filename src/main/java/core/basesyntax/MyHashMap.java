@@ -16,20 +16,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int indexTable = getHashIndex(key);
-        Node<K, V> tableElements = table[indexTable];
-        if (tableElements == null) {
+        Node<K, V> currentNode = table[indexTable];
+        if (currentNode == null) {
             table[indexTable] = new Node<>(key, value, null);
         }
-        while (tableElements != null) {
-            if (key == tableElements.key || key != null && key.equals(tableElements.key)) {
-                tableElements.value = value;
+        while (currentNode != null) {
+            if (key == currentNode.key || key != null && key.equals(currentNode.key)) {
+                currentNode.value = value;
                 return;
             }
-            if (tableElements.next == null) {
-                tableElements.next = new Node<>(key, value, null);
+            if (currentNode.next == null) {
+                currentNode.next = new Node<>(key, value, null);
                 break;
             }
-            tableElements = tableElements.next;
+            currentNode = currentNode.next;
         }
         size++;
     }
@@ -53,7 +53,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K,V> next;
