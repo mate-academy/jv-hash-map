@@ -36,14 +36,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> tableElementsByIndex = table[getHashIndex(key)];
-        while (tableElementsByIndex != null) {
-            if (key == tableElementsByIndex.key
+        Node<K, V> currentNode = table[getHashIndex(key)];
+        while (currentNode != null) {
+            if (key == currentNode.key
                     || key != null
-                    && key.equals(tableElementsByIndex.key)) {
-                return tableElementsByIndex.value;
+                    && key.equals(currentNode.key)) {
+                return currentNode.value;
             }
-            tableElementsByIndex = tableElementsByIndex.next;
+            currentNode = currentNode.next;
         }
         return null;
     }
