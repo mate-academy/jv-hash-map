@@ -25,12 +25,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private boolean putValue(K key, V value, Node<K, V>[] nodes, int hash) {
-        if (nodes[hash] == null) {
-            nodes[hash] = new Node<>(key, value, null);
+    private boolean putValue(K key, V value, Node<K, V>[] nodes, int index) {
+        if (nodes[index] == null) {
+            nodes[index] = new Node<>(key, value, null);
             return true;
         }
-        Node<K, V> currentNode = nodes[hash];
+        Node<K, V> currentNode = nodes[index];
         while (!Objects.equals(currentNode.key, key)) {
             if (currentNode.next == null) {
                 currentNode.next = new Node<>(key, value, null);
