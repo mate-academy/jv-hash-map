@@ -25,7 +25,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[indexToPut] != null) {
             Node<K, V> nodeRunner = table[indexToPut];
             while (nodeRunner != null) {
-                if (rewriteNode(nodeRunner, key, value)) {
+                if (Objects.equals(nodeRunner.key, key)) {
+                    nodeRunner.value = value;
+                    size--;
                     return;
                 }
                 if (nodeRunner.next == null) {
@@ -72,15 +74,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int indexFor(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
-    }
-
-    private boolean rewriteNode(Node<K, V> node, K key, V value) {
-        if (Objects.equals(node.key, key)) {
-            node.value = value;
-            size--;
-            return true;
-        }
-        return false;
     }
 
     private class Node<K, V> {
