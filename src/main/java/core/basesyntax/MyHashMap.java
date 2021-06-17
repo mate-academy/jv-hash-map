@@ -17,6 +17,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if (threshold < size) {
+            resize();
+        }
         if (threshold >= size) {
             int indexBucket = indexForBucket(key);
             if (table[indexBucket] == null) {
@@ -27,7 +30,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     if (Objects.equals(key, oldBucket.key)) {
                         oldBucket.value = value;
                         return;
-                    } else if (oldBucket.next == null) {
+                    }
+                    if (oldBucket.next == null) {
                         oldBucket.next = new MyNode<>(key, value, null);
                         break;
                     }
@@ -35,9 +39,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
             size++;
-        } else {
-            resize();
-            put(key, value);
         }
     }
 
