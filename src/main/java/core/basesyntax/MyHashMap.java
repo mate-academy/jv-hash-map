@@ -13,7 +13,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
     }
 
-    public static class Node<K,V> {
+    private static class Node<K,V> {
         private final K key;
         private V value;
         private Node<K,V> next;
@@ -36,43 +36,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[keyIndex] = new Node<>(key, value, null);
             size++;
             return;
-        }
-        do {
-            if (key == currentNode.key || key != null && key.equals(currentNode.key)) {
-                currentNode.value = value;
-                return;
+        } else {
+            while (currentNode != null) {
+                if (key == currentNode.key || key != null && key.equals(currentNode.key)) {
+                    currentNode.value = value;
+                    return;
+                }
+                if (currentNode.next == null) {
+                    currentNode.next = new Node<>(key, value, null);
+                    size++;
+                    return;
+                }
+                currentNode = currentNode.next;
             }
-            currentNode = currentNode.next;
-        } while (currentNode != null);
-        currentNode = table[keyIndex]; // обнуление до ячейки
-        if (key == null) {
-            currentNode.next = new Node<>(key, value, null);
-            size++;
-            return;
         }
-        currentNode = table[keyIndex]; // обнуление до ячейки
-
-        do {
-            if (currentNode.next == null) {
-                currentNode.next = new Node<>(key, value, null);
-                size++;
-                return;
-            }
-            currentNode = currentNode.next;
-        } while (currentNode != null);
     }
 
     @Override
     public V getValue(K key) {
-        for (Node<K, V> bucket : table) {
-            Node<K, V> currentNode = bucket;
-            while (currentNode != null) {
-                if (key == currentNode.key || currentNode.key != null
-                        && currentNode.key.equals(key)) {
-                    return currentNode.value;
-                }
-                currentNode = currentNode.next;
+        int place = getPlace(key);
+        Node<K, V> currentNode = table[place];
+        while (currentNode != null) {
+            if (key == currentNode.key || currentNode.key != null
+                    && currentNode.key.equals(key)) {
+                return currentNode.value;
             }
+            currentNode = currentNode.next;
         }
         return null;
     }
