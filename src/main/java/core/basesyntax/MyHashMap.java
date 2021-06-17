@@ -5,20 +5,21 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTORY = 0.75f;
-    private int capacity = DEFAULT_CAPACITY;
+    private static final int RESIZE_COEFFICIENT = 2;
     private int size;
-    private Node[] table;
+    private Node<K, V>[] table;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
+
     }
 
     @Override
     public void put(K key, V value) {
-        if (size == capacity * LOAD_FACTORY) {
+        if (size == table.length * LOAD_FACTORY) {
             resize();
         }
-        int index = (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
+        int index = (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
         Node<K, V> newNode = new Node<>(key, value, null);
 
         if (table[index] == null) {
@@ -42,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
+        int index = (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
         Node<K, V> current = table[index];
         while (current != null) {
             if (Objects.equals(current.key, key)) {
@@ -71,14 +72,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int newCapacity = capacity * 2;
-        Node[] oldTable = table;
-        table = new Node[newCapacity];
+        Node<K, V>[] oldTable = table;
+        table = new Node[table.length * RESIZE_COEFFICIENT];
         size = 0;
         for (int i = 0; i < oldTable.length; i++) {
             if (oldTable[i] != null) {
                 while (oldTable[i] != null) {
-                    put((K) oldTable[i].key, (V) oldTable[i].value);
+                    put(oldTable[i].key, oldTable[i].value);
                     oldTable[i] = oldTable[i].nextNode;
                 }
             }
