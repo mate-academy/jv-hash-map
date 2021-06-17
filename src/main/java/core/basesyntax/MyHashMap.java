@@ -43,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int index = indexFor(key);
         Node<K, V> node = table[index];
-        while (!(node == null)) {
+        while (node != null) {
             if (Objects.equals(node.key, key)) {
                 return node.value;
             }
