@@ -83,8 +83,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private V value;
         private K key;
+        private V value;
         private MyHashMap.Node<K, V> next;
 
         Node(K key, V value, MyHashMap.Node<K, V> next) {
