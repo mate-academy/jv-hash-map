@@ -18,9 +18,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         int position = position(getIndex(key));
-        if (nodes[position] == null) {                          //якщо ячейка вільна то ставим у ячейку ноду.
+        if (nodes[position] == null) {
+            //якщо ячейка вільна то ставим у ячейку ноду.
             nodes[position] = new Node(key, value, null);
-        } else {                                                //якщо зайнята то ноду у ячейць вказуем як наступну.
+        } else {
+            //якщо зайнята то ноду у ячейць вказуем як наступну.
             nodes[position] = new Node(key, value, nodes[position]);
         }
         sizeMap++;
