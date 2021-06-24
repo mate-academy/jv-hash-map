@@ -3,55 +3,50 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_CAPACITY = 16;
-    private static final int DEFAULT_SIZE = 0;
-    private static final double CONDITION_RESIZE = 0.75;
-    private int sizeMap = DEFAULT_SIZE;
+    private static final double LOAD_FACTOR = 0.75;
+    private int sizeMap = 0;
     private int capacity = DEFAULT_CAPACITY;
     private Node[] nodes = new Node[DEFAULT_CAPACITY];
 
     @Override
     public void put(K key, V value) {
-        if (sizeMap >= (capacity * CONDITION_RESIZE)) {
-            reSize();
+        if (sizeMap >= (capacity * LOAD_FACTOR)) {
+            resize();
         }
         if (getValue(key) != null) {
             setValue(key, value);
             return;
         }
-        int position = position((key == null ? 0 : key).hashCode());
-        if (nodes[position] == null) {
+        int position = position(getIndex(key));
+        if (nodes[position] == null) {                          //якщо ячейка вільна то ставим у ячейку ноду.
             nodes[position] = new Node(key, value, null);
-            sizeMap++;
-        } else {
+        } else {                                                //якщо зайнята то ноду у ячейць вказуем як наступну.
             nodes[position] = new Node(key, value, nodes[position]);
-            sizeMap++;
         }
-
+        sizeMap++;
     }
 
     @Override
     public V getValue(K key) {
 
-        Node result = nodes[position((key == null ? 0 : key).hashCode())];
+        Node result = nodes[position(getIndex(key))];
         while (result != null) {
             if (key == result.key || result.key != null && result.key.equals(key)) {
                 return (V) result.value;
-            } else {
-                result = result.next;
             }
+            result = result.next;
         }
         return null;
     }
 
     private void setValue(K key, V value) {
-        Node result = nodes[position((key == null ? 0 : key).hashCode())];
+        Node result = nodes[position(getIndex(key))];
         while (result != null) {
             if (result.key == key || result.key.equals(key)) {
                 result.value = value;
                 return;
-            } else {
-                result = result.next;
             }
+            result = result.next;
         }
     }
 
@@ -59,13 +54,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.abs(hash) % capacity;
     }
 
-    private void reSize() {
+    private void resize() {
         int oldCapacity = capacity;
         capacity = oldCapacity * 2;
         Node[] newNodes = new Node[oldCapacity * 2];
         Node[] oldNodes = nodes;
         nodes = newNodes;
-        sizeMap = DEFAULT_SIZE;
+        sizeMap = 0;
         for (int i = 0; i < oldCapacity; i++) {
             if (oldNodes[i] != null) {
                 put((K) oldNodes[i].key, (V) oldNodes[i].value);
@@ -80,6 +75,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return sizeMap;
+    }
+
+    private int getIndex(K key) {
+        return (key == null ? 0 : key).hashCode();
     }
 
     private static class Node<K, V> {
