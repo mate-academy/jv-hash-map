@@ -1,12 +1,11 @@
 package core.basesyntax;
 
-import static java.lang.Math.abs;
-
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
-    private static final double LOAD_FACTOR = 0.75;
+    private static final float LOAD_FACTOR = 0.75f;
+    private static final int GROW_MULTIPLIER = 2;
     private int capacity = INITIAL_CAPACITY;
     private int size = 0;
     private Node<K, V>[] array = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
@@ -26,12 +25,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         putInto(array, key, value);
-        resize();
+        if (size > capacity * LOAD_FACTOR) {
+            resize();
+        }
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = array[getHash(key) % capacity];
+        Node<K, V> node = array[getIndex(key)];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
                 return node.value;
@@ -47,14 +48,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (size <= capacity * LOAD_FACTOR) {
-            return;
-        }
-        capacity *= 2;
+        capacity *= GROW_MULTIPLIER;
         size = 0;
         Node<K, V>[] newArray = (Node<K, V>[]) new Node[capacity];
-        for (int i = 0; i < capacity >> 1; i++) {
-            Node<K, V> node = array[i];
+        for (Node<K, V> node : array) {
             while (node != null) {
                 putInto(newArray, node.key, node.value);
                 node = node.next;
@@ -64,9 +61,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public void putInto(Node<K, V>[] destination, K key, V value) {
-        Node<K, V> node = destination[getHash(key) % destination.length];
+        Node<K, V> node = destination[getIndex(key)];
         if (node == null) {
-            destination[getHash(key) % destination.length] = new Node<>(key, value, null);
+            destination[getIndex(key)] = new Node<>(key, value, null);
             size++;
         } else {
             while (true) {
@@ -84,10 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getHash(K key) {
-        if (key != null) {
-            return abs(key.hashCode());
-        }
-        return 0;
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 }
