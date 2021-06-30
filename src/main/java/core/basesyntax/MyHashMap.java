@@ -60,7 +60,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         array = newArray;
     }
 
-    public void putInto(Node<K, V>[] destination, K key, V value) {
+    private void putInto(Node<K, V>[] destination, K key, V value) {
         Node<K, V> node = destination[getIndex(key)];
         if (node == null) {
             destination[getIndex(key)] = new Node<>(key, value, null);
