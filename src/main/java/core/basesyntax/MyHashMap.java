@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75F;
@@ -27,16 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (size == threshold) {
-            threshold *= 2;
-            size = 0;
-            Node<K, V>[] prevTable = table;
-            table = new Node[table.length * 2];
-            for (Node<K, V> node : prevTable) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
-            }
+            resize();
         }
 
         int index = getIndex(key);
@@ -52,7 +45,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 size++;
                 return;
             }
-
             node = node.next;
         }
         table[index] = new Node<>(key, value, null);
@@ -64,7 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Node<K, V> node = table[index];
         while (node != null) {
-            if (key == node.key || key != null && key.equals(node.key)) {
+            if (Objects.equals(key, node.key)) {
                 return node.value;
             }
             node = node.next;
@@ -78,6 +70,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K someKey) {
+
         return someKey == null ? 0 : Math.abs(someKey.hashCode() % table.length);
+    }
+
+    private void resize() {
+        threshold *= 2;
+        size = 0;
+        Node<K, V>[] prevTable = table;
+        table = new Node[table.length * 2];
+        for (Node<K, V> node : prevTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
+        }
     }
 }
