@@ -4,12 +4,15 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    static final int DEFAULT_CAPACITY = 16;
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int size = 0;
 
+    @SuppressWarnings("unchecked")
+    private Node<K, V>[] table = new Node[DEFAULT_CAPACITY];
+
     private static class Node<K, V> {
-        private K key;
+        private final K key;
         private V value;
         private Node<K, V> next;
 
@@ -20,13 +23,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private Node<K, V>[] table = new Node[DEFAULT_CAPACITY];
-
-    private int getIndex(Object key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
-    }
-
     @Override
     public void put(K key, V value) {
         addNode(key, value);
@@ -35,16 +31,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void resize() {
-        size = 0;
-        Node<K, V>[] oldTable = table;
-        table = new Node[table.length << 1];
-        for (Node<K, V> checkNode: oldTable) {
-            while (checkNode != null) {
-                addNode(checkNode.key, checkNode.value);
-                checkNode = checkNode.next;
+    @Override
+    public V getValue(K key) {
+        Node<K, V> getNode = table[getIndex(key)];
+        while (getNode != null) {
+            if (Objects.equals(getNode.key, key)) {
+                return getNode.value;
             }
+            getNode = getNode.next;
         }
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    private int getIndex(Object key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private void addNode(K key, V value) {
@@ -69,20 +74,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    @Override
-    public V getValue(K key) {
-        Node<K, V> getNode = table[getIndex(key)];
-        while (getNode != null) {
-            if (Objects.equals(getNode.key, key)) {
-                return getNode.value;
+    private void resize() {
+        size = 0;
+        Node<K, V>[] oldTable = table;
+        table = new Node[table.length << 1];
+        for (Node<K, V> checkNode: oldTable) {
+            while (checkNode != null) {
+                addNode(checkNode.key, checkNode.value);
+                checkNode = checkNode.next;
             }
-            getNode = getNode.next;
         }
-        return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
     }
 }
