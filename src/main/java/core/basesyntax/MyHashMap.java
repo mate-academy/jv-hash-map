@@ -11,10 +11,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K,V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K,V> next;
 
         public Node(K key, V value, Node<K, V> next) {
             this.key = key;
@@ -32,36 +32,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         Node<K, V> node = new Node<>(key, value, null);
         resize();
-        if (table[node.hash % table.length] != null) {
-            Node<K, V> currentNode = table[node.hash % table.length];
+        if (table[indexByHash(node.hash)] != null) {
+            Node<K, V> currentNode = table[indexByHash(node.hash)];
             Node<K, V> prevNode = currentNode;
-            if (key == currentNode.key || key!= null && key.equals(currentNode.key)) {
-                node.next = currentNode.next;
-                table[node.hash % table.length] = node;
+            if (checkFirstNode(currentNode, node)) {
                 return;
             }
             while (currentNode != null) {
-                if (key == currentNode.key || key!= null && key.equals(currentNode.key)) {
-                    node.next = currentNode.next;
-                    prevNode.next = node;
+                if (checkLinkedNode(currentNode, node, prevNode)) {
                     return;
                 }
                 prevNode = currentNode;
                 currentNode = currentNode.next;
-
             }
             prevNode.next = node;
         } else {
-            table[node.hash % table.length] = node;
+            table[indexByHash(node.hash)] = node;
         }
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = table[(key == null ? 0 : key.hashCode() < 0 ? -key.hashCode() : key.hashCode()) % table.length];
+        Node<K, V> node = new Node<>(null, null, null);
+        node = table[indexByHash(node.nodeHash(key))];
         while (node != null) {
-            if (key == node.key || key!= null && key.equals(node.key)) {
+            if (checkKeys(key, node.key)) {
                 return node.value;
             }
             node = node.next;
@@ -90,5 +86,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
+    }
+
+    private boolean checkKeys(K key, K keyToCompare) {
+        return key == keyToCompare || key != null && key.equals(keyToCompare);
+    }
+
+    private boolean checkFirstNode(Node<K, V> currentNode, Node<K, V> node) {
+        if (checkKeys(node.key, currentNode.key)) {
+            node.next = currentNode.next;
+            table[node.hash % table.length] = node;
+            return true;
+        }
+        return false;
+    }
+
+    private boolean checkLinkedNode(Node<K, V> currentNode, Node<K, V> node, Node<K, V> prevNode) {
+        if (checkKeys(node.key, currentNode.key)) {
+            node.next = currentNode.next;
+            prevNode.next = node;
+            return true;
+        }
+        return false;
+    }
+
+    private int indexByHash(int hash) {
+        return hash % table.length;
     }
 }
