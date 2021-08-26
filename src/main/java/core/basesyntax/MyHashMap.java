@@ -22,11 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-            this.hash = nodeHash(key);
-        }
-
-        private int nodeHash(K key) {
-            return key == null ? 0 : key.hashCode() < 0 ? -key.hashCode() : key.hashCode();
+            this.hash = key == null ? 0 : key.hashCode() < 0 ? -key.hashCode() : key.hashCode();
         }
     }
 
@@ -56,8 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = new Node<>(null, null, null);
-        node = table[indexByHash(node.nodeHash(key))];
+        Node<K, V> node = table[indexByHash(nodeHash(key))];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
                 return node.value;
@@ -92,5 +87,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int indexByHash(int hash) {
         return hash % table.length;
+    }
+
+    private int nodeHash(K key) {
+        return key == null ? 0 : key.hashCode() < 0 ? -key.hashCode() : key.hashCode();
     }
 }
