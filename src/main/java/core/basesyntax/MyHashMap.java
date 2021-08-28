@@ -34,15 +34,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (++size > threshold) {
             table = resize();
         }
-        if (key == null) {
-            addNullKey(value, table);
-            return;
-        }
-        Node<K, V> newItem = new Node<>(key, value);
-        int index = newItem.hash % table.length;
-        if (table[index] != null) {
-            addToLink(newItem, index, this.table);
-        }
+        putToNewTable(new Node<K, V>(key, value), table);
         threshold = (int)(table.length * LOAD_FACTOR);
     }
 
@@ -77,7 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key, int capacity) {
-        return key == null ? 0 : key.hashCode() % table.length;
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private void addNullKey(V value, Node<K, V>[] table) {
@@ -136,6 +128,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(node.key, table.length);
         if (table[index] != null) {
             addToLink(newItem, index, table);
+        } else {
+            table[index] = newItem;
         }
     }
 
