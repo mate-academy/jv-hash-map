@@ -57,32 +57,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int keyHash = (key == null) ? 0 : key.hashCode();
         int index = Math.abs(keyHash) % table.length;
-        Node<K, V> newNode = table[index];
-        while (newNode != null) {
-            if (Objects.equals(key, newNode.getKey())) {
-                newNode.setValue(value);
-                return;
-            } else if (newNode.next == null) {
-                newNode.next = new Node<>(key, value, null);
-                size++;
+        Node<K, V> endNode = table[index];
+        if (endNode == null) {
+            endNode = new Node<>(key, value, null);
+            size++;
+            return;
+        }
+        while (endNode.next != null) {
+            if (Objects.equals(endNode.getKey(), key)) {
+                endNode.setValue(value);
                 return;
             }
-            newNode = newNode.next;
+            endNode = endNode.next;
         }
-        table[index] = new Node<>(key, value, null);
-        size++;
+        endNode.next = new Node<>(key, value, null);
     }
 
     @Override
     public V getValue(K key) {
         int keyHash = (key == null) ? 0 : key.hashCode();
         int index = Math.abs(keyHash) % table.length;
-        Node<K, V> bufferNode = table[index];
-        while (bufferNode != null) {
-            if (Objects.equals(key, bufferNode.getKey())) {
-                return bufferNode.getValue();
+        Node<K, V> helpNode = table[index];
+        while (helpNode != null) {
+            if (Objects.equals(key, helpNode.getKey())) {
+                return helpNode.getValue();
             }
-            bufferNode = bufferNode.next;
+            helpNode = helpNode.next;
         }
         return null;
     }
@@ -95,14 +95,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void growAndTransfer() {
         size = 0;
-        threshold = threshold * MULTIPLICATION_INDEX;
-        int arraySize = table.length * MULTIPLICATION_INDEX;
-        Node<K, V>[] buffer = table;
-        table = new Node[arraySize];
-        for (Node<K, V> node: buffer) {
+        Node<K, V>[] bufferArray = table;
+        table = new Node[bufferArray.length * MULTIPLICATION_INDEX];
+        for (Node<K, V> node : bufferArray) {
             while (node != null) {
                 put(node.getKey(), node.getValue());
-                node = node.next;
             }
         }
     }
