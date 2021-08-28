@@ -69,7 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key, int capacity) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
+        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 
     private void addNullKey(V value, Node<K, V>[] table) {
@@ -106,20 +106,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void transfer(Node<K, V>[] table){
-        for (int i = 0; i < size; i++) {
-            if (this.table[i] != null && this.table[i].next != null) {
-                Node<K, V> current = this.table[i];
+        for (Node<K, V> kvNode : this.table) {
+            if (kvNode != null && kvNode.next != null) {
+                Node<K, V> current = kvNode;
                 while (current != null) {
                     putToNewTable(current, table);
                     current = current.next;
                 }
-
+                continue;
             }
-            putToNewTable(this.table[i], table);
+            putToNewTable(kvNode, table);
         }
     }
 
     private void putToNewTable(Node<K,V> node, Node<K,V>[] table) {
+        if (node == null) {
+            return;
+        }
         if (node.key == null) {
             addNullKey(node.value, table);
             return;
