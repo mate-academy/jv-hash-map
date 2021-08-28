@@ -93,6 +93,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
+    public boolean remove(K key) {
+        int keyHash = (key == null) ? 0 : key.hashCode();
+        int index = Math.abs(keyHash) % table.length;
+        Node<K, V> helpNode = table[index];
+        if (Objects.equals(helpNode.getKey(), key)) {
+            table[index] = helpNode.next;
+            return true;
+        }
+        while (!Objects.equals(helpNode.next.getKey(), key)) {
+            helpNode = helpNode.next;
+            if (Objects.equals(helpNode.next.getKey(), key)) {
+                helpNode.next = helpNode.next.next;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public int getSize() {
         return size;
     }
