@@ -7,14 +7,10 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     static final int DEFAULT_INITIAL_CAPACITY = 16;
+    static final int MULTIPLICATION_INDEX = 2;
     private int size;
-    private Node<K, V>[] table;
-    private int threshold;
-
-    public MyHashMap() {
-        table = new Node[DEFAULT_INITIAL_CAPACITY];
-        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
-    }
+    private Node<K, V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
+    private int threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
 
     class Node<K, V> {
         final K key;
@@ -73,9 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             newNode = newNode.next;
         }
-        if (newNode == null) {
-            table[index] = new Node<>(key, value, null);
-        }
+        table[index] = new Node<>(key, value, null);
         size++;
     }
 
@@ -88,6 +82,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (Objects.equals(key, bufferNode.getKey())) {
                 return bufferNode.getValue();
             }
+            bufferNode = bufferNode.next;
         }
         return null;
     }
@@ -99,7 +94,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
 
     private void growAndTransfer() {
-        int arraySize = table.length * 2;
+        size = 0;
+        threshold = threshold * MULTIPLICATION_INDEX;
+        int arraySize = table.length * MULTIPLICATION_INDEX;
         Node<K, V>[] buffer = table;
         table = new Node[arraySize];
         for (Node<K, V> node: buffer) {
