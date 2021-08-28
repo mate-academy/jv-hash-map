@@ -38,8 +38,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int)(table.length * LOAD_FACTOR);
     }
 
-
-
     @Override
     public V getValue(K key) {
         int index = getIndex(key, table.length);
@@ -105,7 +103,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return newTab;
     }
 
-    private void transfer(Node<K, V>[] table){
+    private void transfer(Node<K, V>[] table) {
         for (Node<K, V> kvNode : this.table) {
             if (kvNode != null && kvNode.next != null) {
                 Node<K, V> current = kvNode;
