@@ -59,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = Math.abs(keyHash) % table.length;
         Node<K, V> endNode = table[index];
         if (endNode == null) {
-            endNode = new Node<>(key, value, null);
+            table[index] = new Node<>(key, value, null);
             size++;
             return;
         }
@@ -71,6 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             endNode = endNode.next;
         }
         endNode.next = new Node<>(key, value, null);
+        size++;
     }
 
     @Override
@@ -97,9 +98,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         Node<K, V>[] bufferArray = table;
         table = new Node[bufferArray.length * MULTIPLICATION_INDEX];
+        threshold = threshold * MULTIPLICATION_INDEX;
         for (Node<K, V> node : bufferArray) {
             while (node != null) {
                 put(node.getKey(), node.getValue());
+                node = node.next;
             }
         }
     }
