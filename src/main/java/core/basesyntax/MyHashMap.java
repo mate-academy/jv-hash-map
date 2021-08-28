@@ -70,6 +70,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             endNode = endNode.next;
         }
+        if (Objects.equals(endNode.getKey(), key)) {
+            endNode.setValue(value);
+            return;
+        }
         endNode.next = new Node<>(key, value, null);
         size++;
     }
