@@ -63,15 +63,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 
-    private void addNullKey(V value, Node<K, V>[] table) {
-        if (table[0] != null) {
-            addToLink(new Node<K, V>(null, value), 0, table);
-        } else {
-            table[0] = new Node<K, V>(null, value);
-        }
-
-    }
-
     private void addToLink(Node<K,V> newItem, int index, Node<K, V>[] table) {
         Node<K, V> current = table[index];
         while (current != null) {
@@ -114,7 +105,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void putToNewTable(Node<K,V> node, Node<K,V>[] table) {
         if (node.key == null) {
-            addNullKey(node.value, table);
+            if (table[0] != null) {
+                addToLink(new Node<K, V>(null, node.value), 0, table);
+            } else {
+                table[0] = new Node<K, V>(null, node.value);
+            }
             return;
         }
         Node<K, V> newItem = new Node<>(node.key, node.value);
