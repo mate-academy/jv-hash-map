@@ -10,13 +10,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Node<K, V> {
         private K key;
         private V value;
-        private int hash;
         private Node<K, V> next;
 
         Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.hash = key != null ? key.hashCode() : 0;
         }
     }
 
