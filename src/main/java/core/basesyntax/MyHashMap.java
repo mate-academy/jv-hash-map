@@ -98,22 +98,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void transfer(Node<K, V>[] table) {
         for (Node<K, V> kvNode : this.table) {
-            if (kvNode != null && kvNode.next != null) {
-                Node<K, V> current = kvNode;
-                while (current != null) {
-                    putToNewTable(current, table);
-                    current = current.next;
+            if (kvNode != null) {
+                if (kvNode.next != null) {
+                    Node<K, V> current = kvNode;
+                    while (current != null) {
+                        putToNewTable(current, table);
+                        current = current.next;
+                    }
+                    continue;
                 }
-                continue;
+                putToNewTable(kvNode, table);
             }
-            putToNewTable(kvNode, table);
         }
     }
 
     private void putToNewTable(Node<K,V> node, Node<K,V>[] table) {
-        if (node == null) {
-            return;
-        }
         if (node.key == null) {
             addNullKey(node.value, table);
             return;
