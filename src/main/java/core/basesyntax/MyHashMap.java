@@ -37,7 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key, table.length);
         if (table[index] != null) {
             Node<K, V> foundNode = searchInBacket(key, index);
-            return foundNode != null ? foundNode.value : null;
+            return foundNode.value;
         }
         return null;
     }
