@@ -1,14 +1,12 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    // Fields
     private static float LOAD_FACTOR = 0.75f;
     private static int INITIAL_CAPACITY = 16;
     private Node<K, V>[] table;
     private int size;
     private int threshold;
 
-    // Static class
     private static class Node<K, V> {
         private K key;
         private V value;
@@ -22,13 +20,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    // Constructors
     public MyHashMap() {
         table = (Node<K, V>[])new Node[INITIAL_CAPACITY];
         threshold = (int)(table.length * LOAD_FACTOR);
     }
 
-    // Public methods
     @Override
     public void put(K key, V value) {
         if (++size > threshold) {
@@ -53,7 +49,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    // Private methods
     private Node<K,V> searchInBacket(K key, int index) {
         Node<K,V> current = table[index];
         while (current != null) {
