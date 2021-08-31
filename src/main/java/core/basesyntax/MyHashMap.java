@@ -11,7 +11,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         this.capacity = INSTALL_CAPACITY;
         this.threshold = (int) (INSTALL_CAPACITY * LOAD_FACTOR);
-        table = resize();
+        table = (Node<K, V>[]) new Node[capacity];
     }
 
     private static class Node<K, V> {
@@ -76,14 +76,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V>[] resize() {
         size = 0;
-        Node<K, V>[] newTable;
-        if (table == null) {
-            newTable = (Node<K, V>[]) new Node[capacity];
-            return newTable;
-        }
         capacity = capacity << 1;
         threshold = threshold << 1;
-        newTable = (Node<K, V>[]) new Node[capacity];
+        Node<K, V>[] newTable = (Node<K, V>[]) new Node[capacity];
         for (Node<K, V> headNode : table) {
             Node<K, V> currentNode = headNode;
             if (currentNode != null) {
