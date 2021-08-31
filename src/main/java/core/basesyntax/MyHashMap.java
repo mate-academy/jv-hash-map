@@ -4,65 +4,39 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final double DEFAULT_LOAD_FACTOR = 0.75;
+    private static final double DEFAULT_LOAD_FACTOR = 0.9;
     private static final int DEFAULT_THRESHOLD = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
     private static final int GROW_COEFFICIENT = 2;
 
     private Node<K,V>[] table;
     private int threshold;
-    private int size = 0;
+    private int size;
 
     public MyHashMap() {
-        this.threshold = DEFAULT_THRESHOLD;
-        this.table = new Node[DEFAULT_CAPACITY];
+        threshold = DEFAULT_THRESHOLD;
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        int bucketIndex = getBucketByKey(key);
         if (size >= threshold) {
             grow();
         }
+        int bucketIndex = getBucketByKey(key);
         Node<K, V> currentNode = table[bucketIndex];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
-                putValueInExistingNode(currentNode, key, value);
+                currentNode.value = value;
                 return;
             }
             if (currentNode.next == null) {
-                putFirstNodeInBucket(currentNode, key, value);
-                return;
+                currentNode.next = new Node<>(key, value, null);
+                size++;
             }
             currentNode = currentNode.next;
         }
-        putNodeInBucket(key, value, bucketIndex);
-    }
-
-    private void putNodeInBucket(K key, V value, int bucketIndex) {
         table[bucketIndex] = new Node<>(key, value, null);
         size++;
-    }
-
-    private void putFirstNodeInBucket(Node<K, V> node, K key, V value) {
-        node.next = new Node<>(key, value, null);
-        size++;
-    }
-
-    private void putValueInExistingNode(Node<K, V> node, K key, V value) {
-        node.value = value;
-    }
-
-    private void grow() {
-        size = 0;
-        Node<K, V>[] bufferTable = table;
-        table = new Node[table.length * GROW_COEFFICIENT];
-        for (Node<K, V> node : bufferTable) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
-            }
-        }
-        threshold *= GROW_COEFFICIENT;
     }
 
     @Override
@@ -83,8 +57,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    @Override
-    public boolean containsKey(K key) {
+    private void remove(K key) {
+        int bucketIndex = getBucketByKey(key);
+        Node<K, V> currentNode = table[bucketIndex];
+        Node<K, V> prevNode = null;
+        while (currentNode != null) {
+            if (Objects.equals(key, currentNode.key)) {
+                if (prevNode != null) {
+                    prevNode.next = currentNode.next;
+                } else {
+                    table[bucketIndex] = currentNode.next;
+                }
+                size--;
+                return;
+            }
+            prevNode = currentNode;
+            currentNode = currentNode.next;
+        }
+    }
+
+    private boolean containsKey(K key) {
         int bucketIndex = getBucketByKey(key);
         Node<K, V> currentNode = table[bucketIndex];
         while (currentNode != null) {
@@ -96,8 +88,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return false;
     }
 
-    @Override
-    public boolean containsValue(V value) {
+    private boolean containsValue(V value) {
         for (Node<K, V> node : table) {
             Node<K, V> currentNode = node;
             while (currentNode != null) {
@@ -110,18 +101,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return false;
     }
 
-    @Override
-    public void remove(K key) {
-        int bucketIndex = getBucketByKey(key);
-        Node<K, V> currentNode = table[bucketIndex];
-        while (currentNode != null) {
-            if (Objects.equals(key, currentNode.key)) {
-                table[bucketIndex] = null;
-                size--;
-                return;
+    private void grow() {
+        size = 0;
+        Node<K, V>[] bufferTable = table;
+        table = new Node[table.length * GROW_COEFFICIENT];
+        for (Node<K, V> node : bufferTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
-            currentNode = currentNode.next;
         }
+        threshold *= GROW_COEFFICIENT;
     }
 
     private int getBucketByKey(K key) {
@@ -139,4 +129,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
         }
     }
+
 }
