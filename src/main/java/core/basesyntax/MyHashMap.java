@@ -59,16 +59,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V> getNode(K key) {
         for (Node<K, V> headNode : table) {
             Node<K, V> searchingNode = headNode;
-            if (searchingNode != null) {
-                while (searchingNode != null) {
-                    if (searchingNode.hash == hash(key)
-                            && (searchingNode.key == key
-                            || (searchingNode.key != null
-                            && searchingNode.key.equals(key)))) {
-                        return searchingNode;
-                    }
-                    searchingNode = searchingNode.next;
+            while (searchingNode != null) {
+                if (searchingNode.hash == hash(key)
+                        && (searchingNode.key == key
+                        || (searchingNode.key != null
+                        && searchingNode.key.equals(key)))) {
+                    return searchingNode;
                 }
+                searchingNode = searchingNode.next;
             }
         }
         return null;
@@ -81,11 +79,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] newTable = (Node<K, V>[]) new Node[capacity];
         for (Node<K, V> headNode : table) {
             Node<K, V> currentNode = headNode;
-            if (currentNode != null) {
-                while (currentNode != null) {
-                    putValue(cleanNode(currentNode), newTable);
-                    currentNode = currentNode.next;
-                }
+            while (currentNode != null) {
+                putValue(cleanNode(currentNode), newTable);
+                currentNode = currentNode.next;
             }
         }
         return newTable;
