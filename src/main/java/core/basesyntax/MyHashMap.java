@@ -44,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K, V> tempNode = positionNode;
         while (positionNode != null) {
-            if (Objects.equals(positionNode.key, key)) {
+            if ((key == positionNode.key) || (key != null && key.equals(positionNode.key))) {
                 positionNode.value = value;
                 return;
             }
@@ -53,28 +53,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         tempNode.next = putNode;
         size++;
-    }
-
-    private int hash(K key) {
-        if (key == null) {
-            return 0;
-        }
-        int hash = key.hashCode() % capacity;
-        return hash > 0 ? hash : -hash;
-    }
-
-    private void increaseArray() {
-        size = 0;
-        threshold *= MULTIPLIER_CAPACITY_AND_THRESHOLD;
-        capacity *= MULTIPLIER_CAPACITY_AND_THRESHOLD;
-        Node<K, V>[] tempArray = nodes;
-        nodes = new Node[capacity];
-        for (Node<K, V> node : tempArray) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
-            }
-        }
     }
 
     @Override
@@ -92,5 +70,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private int hash(K key) {
+        if (key == null) {
+            return 0;
+        }
+        return Math.abs(key.hashCode() % capacity);
+    }
+
+    private void increaseArray() {
+        size = 0;
+        threshold *= MULTIPLIER_CAPACITY_AND_THRESHOLD;
+        capacity *= MULTIPLIER_CAPACITY_AND_THRESHOLD;
+        Node<K, V>[] tempArray = nodes;
+        nodes = new Node[capacity];
+        for (Node<K, V> node : tempArray) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
+        }
     }
 }
