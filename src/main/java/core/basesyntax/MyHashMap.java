@@ -9,8 +9,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
 
     public MyHashMap() {
-        this.capacity = INSTALL_CAPACITY;
-        this.threshold = (int) (INSTALL_CAPACITY * LOAD_FACTOR);
+        capacity = INSTALL_CAPACITY;
+        threshold = (int) (INSTALL_CAPACITY * LOAD_FACTOR);
         table = (Node<K, V>[]) new Node[capacity];
     }
 
