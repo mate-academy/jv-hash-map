@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final double DEFAULT_LOAD_FACTOR = 0.9;
+    private static final double DEFAULT_LOAD_FACTOR = 0.75;
     private static final int DEFAULT_THRESHOLD = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
     private static final int GROW_COEFFICIENT = 2;
 
