@@ -18,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        mapIsFull(getIndex(key, table.length));
+        resize();
         Node<K, V> current = table[getIndex(key, table.length)];
         Node<K, V> node = null;
         if (current != null) {
@@ -40,13 +40,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> current = table[getIndex(key, table.length)];
-        if (current != null) {
-            do {
-                if (Objects.equals(current.key, key)) {
-                    return current.value;
-                }
-                current = current.next;
-            } while (current != null);
+        while (current != null) {
+            if (Objects.equals(current.key, key)) {
+                return current.value;
+            }
+            current = current.next;
         }
         return null;
     }
@@ -56,30 +54,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private boolean mapIsFull(int index) {
+    @SuppressWarnings({"unchecked"})
+    private boolean resize() {
         if (size + 1 > threshhold) {
-            resize();
+            Node<K, V>[] oldTable = table;
+            table = new Node[oldTable.length * RESIZE_MULTIPLY];
+            threshhold = (int) (table.length * LOAD_FACTOR);
+            size = 0;
+            for (Node<K, V> kvNode : oldTable) {
+                while (kvNode != null) {
+                    put(kvNode.key, kvNode.value);
+                    kvNode = kvNode.next;
+                }
+            }
             return true;
         }
         return false;
-    }
-
-    @SuppressWarnings({"unchecked"})
-    private boolean resize() {
-        Node<K, V>[] newTable = new Node[table.length * RESIZE_MULTIPLY];
-        Node<K, V>[] oldTable = new Node[table.length];
-        System.arraycopy(table, INITIAL_SRC_POS, oldTable, INITIAL_SRC_POS, table.length);
-        table = newTable;
-        threshhold = (int) (newTable.length * LOAD_FACTOR);
-        int length = newTable.length;
-        size = 0;
-        for (Node<K, V> kvNode : oldTable) {
-            while (kvNode != null) {
-                put(kvNode.key, kvNode.value);
-                kvNode = kvNode.next;
-            }
-        }
-        return true;
     }
 
     private int getIndex(K key, int length) {
