@@ -6,7 +6,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private static final int RESIZE_MULTIPLY = 2;
-    private static final int INITIAL_SRC_POS = 0;
     private int size;
     private Node<K, V>[] table;
     private int threshhold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
