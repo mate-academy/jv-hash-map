@@ -73,22 +73,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshhold = (int) (newTable.length * LOAD_FACTOR);
         int length = newTable.length;
         size = 0;
-        Node<K, V> prev = null;
         for (Node<K, V> kvNode : oldTable) {
-            if (kvNode != null) {
-                do {
-                    put(kvNode.key, kvNode.value);
-                    prev = kvNode;
-                    kvNode = kvNode.next;
-                    unlink(prev);
-                } while (kvNode != null);
+            while (kvNode != null) {
+                put(kvNode.key, kvNode.value);
+                kvNode = kvNode.next;
             }
         }
-        return true;
-    }
-
-    private boolean unlink(Node<K, V> node) {
-        node.next = null;
         return true;
     }
 
