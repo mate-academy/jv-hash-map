@@ -9,7 +9,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_SRC_POS = 0;
     private int size;
     private Node<K, V>[] table;
-
     private int threshhold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
 
     @SuppressWarnings({"unchecked"})
@@ -111,18 +110,3 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 }
-
-/*
-       for (Node<K, V> kvNode : table) {
-            if (kvNode != null) {
-                while (kvNode != null) {
-                    Node<K, V> newNode = newTable[getIndex(kvNode.key, length)];
-                        while (newNode != null) {
-                            prev = newNode;
-                            newNode = newNode.next;
-                        }
-                        prev.next = kvNode;
-                }
-            }
-        }
- */
