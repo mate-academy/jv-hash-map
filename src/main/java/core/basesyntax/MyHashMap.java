@@ -7,34 +7,53 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 16;
     static final int MULTIPLICATION_INDEX = 2;
     private int size;
-    private Node<K, V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
-    private int threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
+    private Node<K, V>[] table;
+    private int threshold;
+
+    public MyHashMap() {
+        table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
+    }
 
     class Node<K, V> {
         private final K key;
         private V value;
         private Node<K,V> next;
 
-        Node(K key, V value, Node<K,V> next) {
+        private Node(K key, V value, Node<K,V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
         }
 
-        public final String toString() {
+        @Override
+        public String toString() {
             return key + "=" + value;
         }
 
-        public final int hashCode() {
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
+            if (o.getClass().equals(Node.class)) {
+                Node current = (Node)o;
+                return Objects.equals(this.key, current.key)
+                        && Objects.equals(this.value, current.value)
+                        && Objects.equals(this.next, current.next);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
             return Objects.hashCode(key) ^ Objects.hashCode(value);
         }
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold) {
-            growAndTransfer();
-        }
+        growAndTransfer();
         int index = getIndex(getKeyHash(key));
         Node<K, V> endNode = table[index];
         if (endNode == null) {
@@ -72,6 +91,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public boolean remove(K key) {
         Node<K, V> helpNode = table[getIndex(getKeyHash(key))];
+        if (helpNode == null) {
+            return false;
+        }
         if (Objects.equals(helpNode.key, key)) {
             helpNode = helpNode.next;
             return true;
@@ -92,6 +114,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void growAndTransfer() {
+        if (size < threshold) {
+            return;
+        }
         size = 0;
         Node<K, V>[] bufferArray = table;
         table = new Node[bufferArray.length * MULTIPLICATION_INDEX];
@@ -104,11 +129,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public int getKeyHash(K key) {
+    private int getKeyHash(K key) {
         return (key == null) ? 0 : key.hashCode();
     }
 
-    public int getIndex(int hash) {
+    private int getIndex(int hash) {
         return Math.abs(hash) % table.length;
     }
 }
