@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -22,40 +21,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
         }
 
-        public final K getKey() {
-            return key;
-        }
-
-        public final V getValue() {
-            return value;
-        }
-
         public final String toString() {
             return key + "=" + value;
         }
 
         public final int hashCode() {
             return Objects.hashCode(key) ^ Objects.hashCode(value);
-        }
-
-        public final V setValue(V newValue) {
-            V oldValue = value;
-            value = newValue;
-            return oldValue;
-        }
-
-        public final boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            }
-            if (o instanceof Map.Entry) {
-                Map.Entry<?,?> e = (Map.Entry<?,?>)o;
-                if (Objects.equals(key, e.getKey())
-                        && Objects.equals(value, e.getValue())) {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 
@@ -64,8 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             growAndTransfer();
         }
-        int keyHash = (key == null) ? 0 : key.hashCode();
-        int index = Math.abs(keyHash) % table.length;
+        int index = getIndex(getKeyHash(key));
         Node<K, V> endNode = table[index];
         if (endNode == null) {
             table[index] = new Node<>(key, value, null);
@@ -73,14 +43,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         while (endNode.next != null) {
-            if (Objects.equals(endNode.getKey(), key)) {
-                endNode.setValue(value);
+            if (Objects.equals(endNode.key, key)) {
+                endNode.value = value;
                 return;
             }
             endNode = endNode.next;
         }
-        if (Objects.equals(endNode.getKey(), key)) {
-            endNode.setValue(value);
+        if (Objects.equals(endNode.key, key)) {
+            endNode.value = value;
             return;
         }
         endNode.next = new Node<>(key, value, null);
@@ -89,12 +59,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int keyHash = (key == null) ? 0 : key.hashCode();
-        int index = Math.abs(keyHash) % table.length;
-        Node<K, V> helpNode = table[index];
+        Node<K, V> helpNode = table[getIndex(getKeyHash(key))];
         while (helpNode != null) {
-            if (Objects.equals(key, helpNode.getKey())) {
-                return helpNode.getValue();
+            if (Objects.equals(key, helpNode.key)) {
+                return helpNode.value;
             }
             helpNode = helpNode.next;
         }
@@ -103,16 +71,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public boolean remove(K key) {
-        int keyHash = (key == null) ? 0 : key.hashCode();
-        int index = Math.abs(keyHash) % table.length;
-        Node<K, V> helpNode = table[index];
-        if (Objects.equals(helpNode.getKey(), key)) {
-            table[index] = helpNode.next;
+        Node<K, V> helpNode = table[getIndex(getKeyHash(key))];
+        if (Objects.equals(helpNode.key, key)) {
+            helpNode = helpNode.next;
             return true;
         }
-        while (!Objects.equals(helpNode.next.getKey(), key)) {
+        while (!Objects.equals(helpNode.next.key, key)) {
             helpNode = helpNode.next;
-            if (Objects.equals(helpNode.next.getKey(), key)) {
+            if (Objects.equals(helpNode.next.key, key)) {
                 helpNode.next = helpNode.next.next;
                 return true;
             }
@@ -132,10 +98,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = threshold * MULTIPLICATION_INDEX;
         for (Node<K, V> node : bufferArray) {
             while (node != null) {
-                put(node.getKey(), node.getValue());
+                put(node.key, node.value);
                 node = node.next;
             }
         }
+    }
+
+    public int getKeyHash(K key) {
+        return (key == null) ? 0 : key.hashCode();
+    }
+
+    public int getIndex(int hash) {
+        return Math.abs(hash) % table.length;
     }
 }
 
