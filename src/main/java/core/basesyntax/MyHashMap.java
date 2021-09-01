@@ -5,40 +5,39 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private float treshold;
+    private float threshold;
     private int size;
     private Node<K, V>[] table;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        treshold = (int) (LOAD_FACTOR * table.length);
+        threshold = (int) (LOAD_FACTOR * table.length);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size + 1 > (int) treshold) {
+        if (size >= threshold) {
             resize();
         }
+        Node<K, V> newNode = new Node(key, value, null);
         int index = setHash(key);
-        Node<K, V> newNode = new Node<>(key, value, null);
-        size++;
-        Node<K, V> currentNode = table[index];
-        if (table[index] != null) {
-            while (currentNode != null) {
-                if (isKeysIdentical(currentNode.key, key)) {
-                    currentNode.value = value;
-                    size--;
-                    return;
-                }
-                if (currentNode.nextNode == null) {
-                    currentNode.nextNode = newNode;
-                    return;
-                }
-                currentNode = currentNode.nextNode;
-            }
+        if (table[index] == null) {
+            table[index] = newNode;
+            size++;
             return;
         }
-        table[index] = newNode;
+        Node<K, V> currentNode = table[index];
+        while (currentNode != null) {
+            if (isKeysIdentical(currentNode.key, key)) {
+                currentNode.value = value;
+                return;
+            }
+            if (currentNode.nextNode == null) {
+                currentNode.nextNode = newNode;
+                size++;
+            }
+            currentNode = currentNode.nextNode;
+        }
     }
 
     @Override
@@ -65,7 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        treshold *= (int) (LOAD_FACTOR * table.length);
+        threshold *= (int) (LOAD_FACTOR * table.length);
         Node<K, V>[] oldNode = table;
         table = new Node[table.length * 2];
         for (Node<K, V> node : oldNode) {
