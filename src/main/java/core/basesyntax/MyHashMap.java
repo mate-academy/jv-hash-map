@@ -30,20 +30,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (++size > currentThreshold) {
-            resize();
-        }
+        resize();
         Node<K,V> newNode = new Node(hash(key), key, value, null);
         if (table[hash(key)] == null) {
             table[hash(key)] = newNode;
+            size++;
             return;
         }
         Node<K,V> currentNode = findNode(key);
         if (checkEquals(currentNode, key)) {
             currentNode.value = newNode.value;
-            size--;
             return;
         }
+        size++;
         currentNode.next = newNode;
     }
 
@@ -58,10 +57,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        currentThreshold *= 2;
-        Node<K,V>[] resizedTable = (Node<K,V>[]) new Node[(int) (currentCapacity * 2)];
-        System.arraycopy(table, 0, resizedTable, 0, table.length - 1);
-        table = resizedTable;
+        if (size == currentThreshold) {
+            size = 0;
+            currentThreshold *= 2;
+            currentCapacity *= 2;
+            Node<K, V>[] oldTable = table;
+            table = (Node<K, V>[]) new Node[currentCapacity];
+            for (Node<K, V> node : oldTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
+            }
+        }
     }
 
     private int hash(K key) {
