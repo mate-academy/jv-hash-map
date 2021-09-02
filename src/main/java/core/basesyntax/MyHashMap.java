@@ -9,6 +9,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private Node<K, V>[] table;
 
+    private static class Node<K, V> {
+        private int hash;
+        private K key;
+        private V value;
+        private Node<K, V> nextNode;
+
+        Node(int hash, K key, V value, Node<K, V> nextNode) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.nextNode = nextNode;
+        }
+    }
+
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
         threshold = (int) (LOAD_FACTOR * table.length);
@@ -16,10 +30,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold) {
-            resize();
-        }
-        Node<K, V> newNode = new Node(key, value, null);
+        resize();
+        Node<K, V> newNode = new Node(setHash(key), key, value, null);
         int index = setHash(key);
         if (table[index] == null) {
             table[index] = newNode;
@@ -44,10 +56,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int index = setHash(key);
         Node<K, V> newNode = table[index];
-
-        if (index < 0 || index > table.length) {
-            throw new IndexOutOfBoundsException("Index " + index + " out of bounds");
-        }
         while (newNode != null) {
             if (isKeysIdentical(newNode.key, key)) {
                 return newNode.value;
@@ -63,38 +71,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        size = 0;
-        threshold *= (int) (LOAD_FACTOR * table.length);
-        Node<K, V>[] oldNode = table;
-        table = new Node[table.length * 2];
-        for (Node<K, V> node : oldNode) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.nextNode;
+        if (size > threshold) {
+            size = 0;
+            threshold *= 2;
+            Node<K, V>[] oldTable = table;
+            table = new Node[table.length * 2];
+            for (Node<K, V> node : oldTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.nextNode;
+                }
             }
         }
     }
 
     private boolean isKeysIdentical(K currentNodeKey, K key) {
-        if (Objects.equals(currentNodeKey, key)) {
-            return true;
-        }
-        return false;
+        return Objects.equals(currentNodeKey, key);
     }
 
     private int setHash(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
-    }
-
-    private static class Node<K, V> {
-        private K key;
-        private V value;
-        private Node<K, V> nextNode;
-
-        Node(K key, V value, Node<K, V> nextNode) {
-            this.key = key;
-            this.value = value;
-            this.nextNode = nextNode;
-        }
     }
 }
