@@ -28,7 +28,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         private int hashCode(K key) {
-            return key == null ? 0 : (31 * 17 + key.hashCode());
+            return key == null ? 0 : (31 * 17 + Math.abs(key.hashCode()));
         }
     }
 
