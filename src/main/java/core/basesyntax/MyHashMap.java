@@ -35,7 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value, null);
-        int index = newNode.hash % capacity;
+        int index = newNode.hash % table.length;
         if (table[index] != null) {
             findLastNext(index, key, newNode);
         } else {
@@ -46,6 +46,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
+        for (Node<K, V> bucket: table) {
+            if (bucket != null && Objects.equals(bucket.key, key)) {
+                return bucket.value;
+            } else if (bucket != null && bucket.next != null) {
+                Node<K, V> prev;
+                while (bucket.next != null) {
+                    prev = bucket;
+                    bucket = bucket.next;
+                    if (Objects.equals(bucket.key, key)) {
+                        return bucket.value;
+                    }
+                }
+            }
+        }
         return null;
     }
 
@@ -59,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> prev;
         while (current.next != null || Objects.equals(current.key, key)) {
             if (Objects.equals(current.key, key)) {
-                current = node;
+                table[index] = node;
                 return;
             }
             prev = current;
@@ -69,30 +83,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    /*private Node<K, V>[] resize() {///
+    /*private Node<K, V>[] resize() {
         return null;
     }
 
-    private void transfer() {///
+    private void transfer() {
 
     }*/
-
-    /*private boolean findKey(K key) {///
-        boolean result = false;
-        for (Node<K, V> node: table) {
-            if (node.key.equals(key)) {
-                return true;
-            } else if (node.next != null) {
-                Node<K, V> current = node;
-                Node<K, V> prev;
-                while (current.next != null || current.key.equals(key)) {
-                    prev = current;
-                    current = current.next;
-                }
-                //return current;
-            }
-        }
-        return
-    }*/
-
 }
