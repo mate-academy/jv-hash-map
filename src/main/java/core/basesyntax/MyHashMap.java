@@ -65,14 +65,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        if (key == null) {
-            return 0;
-        }
-        int hashOfKey = Math.abs(key.hashCode());
-        while (hashOfKey > currentCapacity) {
-            hashOfKey %= currentCapacity;
-        }
-        return hashOfKey;
+        return key == null ? 0 : Math.abs(key.hashCode()) % currentCapacity;
     }
 
     private boolean checkEquals(Node<K,V> currentNode, K key) {
