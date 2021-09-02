@@ -73,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> prev;
         while (current.next != null || Objects.equals(current.key, key)) {
             if (Objects.equals(current.key, key)) {
-                table[index] = node;
+                current.value = node.value;
                 return;
             }
             prev = current;
