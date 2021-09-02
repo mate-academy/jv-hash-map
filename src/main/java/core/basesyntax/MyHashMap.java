@@ -38,9 +38,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (size == threshold) {
-            table = resize();
+            resize();
         }
-        putValue(new Node<>(hash(key), key, value), table);
+        putValue(new Node<>(hash(key), key, value));
     }
 
     @Override
@@ -74,26 +74,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private Node<K, V>[] resize() {
+    private void resize() {
         size = 0;
         capacity = capacity << 1;
         threshold = threshold << 1;
-        Node<K, V>[] newTable = (Node<K, V>[]) new Node[capacity];
-        for (Node<K, V> headNode : table) {
+        Node<K, V>[] oldTable = table;
+        table = (Node<K, V>[]) new Node[capacity];
+        for (Node<K, V> headNode : oldTable) {
             Node<K, V> currentNode = headNode;
             while (currentNode != null) {
-                putValue(cleanNode(currentNode), newTable);
+                putValue(cleanNode(currentNode));
                 currentNode = currentNode.next;
             }
         }
-        return newTable;
     }
 
-    private void putValue(Node<K, V> node, Node<K, V>[] table) {
-        int length = table.length;
-        Node<K, V> headNode = table[getIndex(node, length)];
+    private void putValue(Node<K, V> node) {
+        Node<K, V> headNode = table[getIndex(node)];
         if (headNode == null) {
-            table[getIndex(node, length)] = node;
+            table[getIndex(node)] = node;
             size++;
             return;
         }
@@ -112,8 +111,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getIndex(Node<K, V> node, int length) {
-        return node.hash % length;
+    private int getIndex(Node<K, V> node) {
+        return node.hash % table.length;
     }
 
     private Node<K, V> cleanNode(Node<K, V> node) {
