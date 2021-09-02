@@ -71,13 +71,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void findLastNext(int index, K key, Node<K, V> node) {
         Node<K, V> current = table[index];
-        Node<K, V> prev;
         while (current.next != null || Objects.equals(current.key, key)) {
             if (Objects.equals(current.key, key)) {
                 current.value = node.value;
                 return;
             }
-            prev = current;
             current = current.next;
         }
         current.next = node;
