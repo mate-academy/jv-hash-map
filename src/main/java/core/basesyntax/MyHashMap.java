@@ -8,17 +8,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int threshold;
     private int size;
-    private int capacity = DEFAULT_INITIAL_CAPACITY;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
     }
 
     private static class Node<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         Node(K key, V value, Node<K, V> next) {
             hash = hashCode(key);
@@ -34,6 +34,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        resize();
         Node<K, V> newNode = new Node<>(key, value, null);
         int index = newNode.hash % table.length;
         if (table[index] != null) {
@@ -83,11 +84,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    /*private Node<K, V>[] resize() {
-        return null;
+    private void resize() {
+        if (size >= threshold) {
+            Node<K, V>[] newTable = new Node[table.length * 2];
+            for (Node<K, V> bucket: table) {
+                if (bucket != null) {
+                    int index = bucket.hash % newTable.length;
+                    newTable[index] = bucket;
+                }
+            }
+            table = newTable;
+            threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
+        }
     }
-
-    private void transfer() {
-
-    }*/
 }
