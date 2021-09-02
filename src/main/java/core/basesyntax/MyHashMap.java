@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INSTALL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
@@ -88,27 +90,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putValue(Node<K, V> node, Node<K, V>[] table) {
-        Node<K, V> prevNode = table[node.hash % table.length];
-        if (prevNode == null) {
-            table[node.hash % table.length] = node;
+        int length = table.length;
+        Node<K, V> headNode = table[getIndex(node, length)];
+        if (headNode == null) {
+            table[getIndex(node, length)] = node;
             size++;
             return;
         }
         while (true) {
-            if (prevNode.hash == node.hash
-                    && (prevNode.key == node.key
-                    || (prevNode.key != null
-                    && prevNode.key.equals(node.key)))) {
-                prevNode.value = node.value;
+            if (headNode.hash == node.hash
+                    && Objects.equals(headNode.key, node.key)) {
+                headNode.value = node.value;
                 return;
             }
-            if (prevNode.next == null) {
-                prevNode.next = node;
+            if (headNode.next == null) {
+                headNode.next = node;
                 size++;
                 return;
             }
-            prevNode = prevNode.next;
+            headNode = headNode.next;
         }
+    }
+
+    private int getIndex(Node<K, V> node, int length) {
+        return node.hash % length;
     }
 
     private Node<K, V> cleanNode(Node<K, V> node) {
