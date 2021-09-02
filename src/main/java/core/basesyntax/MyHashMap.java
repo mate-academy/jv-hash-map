@@ -33,10 +33,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private static int hash(Object key) {
-        return key == null ? 0 : Math.abs(key.hashCode());
-    }
-
     @Override
     public void put(K key, V value) {
         if (size == threshold) {
@@ -54,6 +50,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private static int hash(Object key) {
+        return key == null ? 0 : Math.abs(key.hashCode());
     }
 
     private Node<K, V> getNode(K key) {
