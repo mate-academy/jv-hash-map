@@ -40,9 +40,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
+        int hash = getHash(key);
         Node<K, V> current = table[getIndex(key, table.length)];
         while (current != null) {
-            if (Objects.equals(current.key, key)) {
+            if (current.hash == hash &&
+                    Objects.equals(current.key, key)) {
                 return current.value;
             }
             current = current.next;
