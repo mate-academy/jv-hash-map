@@ -79,19 +79,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (node == null) {
             return null;
         }
-        if ((key == null && node.key == null) || (key != null && key.equals(node.key))) {
+        if ((key == node.key) || (key != null && key.equals(node.key))) {
             return node.value;
         }
         return findingValues(key, node.next);
     }
 
     private int getHash(K key) {
-        int hash = 0;
-        if (key != null) {
-            hash = key.hashCode();
-            hash = hash < 0 ? -hash : hash;
-        }
-        return hash;
+        return key == null ? 0 : Math.abs(key.hashCode());
     }
 
     private int getIndex(int hash) {
