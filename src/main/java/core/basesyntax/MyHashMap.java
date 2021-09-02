@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import java.util.Objects;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
@@ -31,7 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold) {
+        if (size == threshold) {
             increaseArray();
         }
         Node<K, V> putNode = new Node<>(key, value, null);
@@ -42,24 +40,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        Node<K, V> tempNode = positionNode;
         while (positionNode != null) {
             if ((key == positionNode.key) || (key != null && key.equals(positionNode.key))) {
                 positionNode.value = value;
                 return;
             }
-            tempNode = positionNode;
+            if (positionNode.next == null) {
+                positionNode.next = putNode;
+                size++;
+                return;
+            }
             positionNode = positionNode.next;
         }
-        tempNode.next = putNode;
-        size++;
     }
 
     @Override
     public V getValue(K key) {
         Node<K, V> getNode = nodes[hash(key)];
         while (getNode != null) {
-            if (Objects.equals(key, getNode.key)) {
+            if ((key == getNode.key) || (key != null && key.equals(getNode.key))) {
                 return getNode.value;
             }
             getNode = getNode.next;
