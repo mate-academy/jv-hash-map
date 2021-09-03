@@ -5,9 +5,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
+    private int threshold;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
+        threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
     private static class Node<K, V> {
@@ -49,7 +51,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> currentNode = getNode(hash(key), key);
-        return (currentNode == null) ? null : currentNode.value;
+        return currentNode == null ? null : currentNode.value;
     }
 
     @Override
@@ -58,10 +60,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void ensureCapacity() {
-        int threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
         if (size == threshold) {
             int newCapacity = table.length << 1;
             Node<K, V>[] newTable = new Node[newCapacity];
+            threshold = (int) (newTable.length * DEFAULT_LOAD_FACTOR);
             transferNodesToNewTable(newTable);
         }
     }
