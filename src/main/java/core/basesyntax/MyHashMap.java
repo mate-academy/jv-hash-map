@@ -43,8 +43,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = getHash(key);
         Node<K, V> current = table[getIndex(key, table.length)];
         while (current != null) {
-            if (current.hash == hash &&
-                    Objects.equals(current.key, key)) {
+            if (current.hash == hash
+                    && Objects.equals(current.key, key)) {
                 return current.value;
             }
             current = current.next;
