@@ -4,6 +4,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private static final int DOUBLE_CAPACITY = 2;
+    private static final int NEGATIVE_COEFFICIENT = -1;
     private int size;
     private final float threshold;
     private Node<K, V>[] hashTable;
@@ -82,7 +83,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return 0;
         }
-        return key.hashCode() < 0 ? -key.hashCode() : key.hashCode();
+        return key.hashCode() < 0 ? key.hashCode() * NEGATIVE_COEFFICIENT : key.hashCode();
     }
 
     private static class Node<K, V> {
@@ -97,4 +98,3 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 }
-
