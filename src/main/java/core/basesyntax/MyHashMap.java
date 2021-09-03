@@ -37,11 +37,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
+        findKey(newNode, key);
+    }
+
+    @Override
+    public V getValue(K key) {
+        Node<K, V> newNode = findKey(null, key);
+        return (newNode == null) ? null : newNode.value;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    private Node<K, V> findKey(Node<K, V> newNode, K key) {
         Node<K, V> currentNode = table[getIndex(key)];
         while (currentNode != null) {
             if (isKeysIdentical(currentNode.key, key)) {
-                currentNode.value = value;
-                return;
+                if (newNode != null) {
+                    currentNode.value = newNode.value;
+                }
+                return currentNode;
             }
             if (currentNode.nextNode == null) {
                 currentNode.nextNode = newNode;
@@ -49,23 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             currentNode = currentNode.nextNode;
         }
-    }
-
-    @Override
-    public V getValue(K key) {
-        Node<K, V> newNode = table[getIndex(key)];
-        while (newNode != null) {
-            if (isKeysIdentical(newNode.key, key)) {
-                return newNode.value;
-            }
-            newNode = newNode.nextNode;
-        }
         return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
     }
 
     private void resize() {
@@ -84,7 +85,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean isKeysIdentical(K currentNodeKey, K key) {
-        return Objects.equals(currentNodeKey, key);
+        return (currentNodeKey == key) || (key != null && Objects.equals(currentNodeKey, key));
     }
 
     private int getIndex(K key) {
