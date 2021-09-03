@@ -52,18 +52,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (size < currentThreshold) {
-            return;
-        }
-        size = 0;
-        currentThreshold *= 2;
-        currentCapacity *= 2;
-        Node<K, V>[] oldTable = table;
-        table = (Node<K, V>[]) new Node[currentCapacity];
-        for (Node<K, V> node : oldTable) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+        if (size == currentThreshold) {
+            size = 0;
+            currentThreshold *= 2;
+            currentCapacity *= 2;
+            Node<K, V>[] oldTable = table;
+            table = (Node<K, V>[]) new Node[currentCapacity];
+            for (Node<K, V> node : oldTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
             }
         }
     }
