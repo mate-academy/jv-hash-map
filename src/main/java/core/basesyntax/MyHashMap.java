@@ -51,7 +51,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> bucket = table[hash % table.length];
         if (bucket != null && Objects.equals(bucket.key, key)) {
             return bucket.value;
-        } else if (bucket != null && bucket.next != null) {;
+        } else if (bucket != null && bucket.next != null) {
             while (bucket.next != null) {
                 bucket = bucket.next;
                 if (Objects.equals(bucket.key, key)) {
@@ -99,8 +99,4 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
         }
     }
-
-
-
-
 }
