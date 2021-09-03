@@ -47,20 +47,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (Node<K, V> bucket: table) {
-            if (bucket != null && Objects.equals(bucket.key, key)) {
-                return bucket.value;
-            } else if (bucket != null && bucket.next != null) {
-                Node<K, V> prev;
-                while (bucket.next != null) {
-                    prev = bucket;
-                    bucket = bucket.next;
-                    if (Objects.equals(bucket.key, key)) {
-                        return bucket.value;
-                    }
+        int hash = key == null ? 0 : (31 * 17 + Math.abs(key.hashCode()));
+        Node<K, V> bucket = table[hash % table.length];
+        if (bucket != null && Objects.equals(bucket.key, key)) {
+            return bucket.value;
+        } else if (bucket != null && bucket.next != null) {;
+            while (bucket.next != null) {
+                bucket = bucket.next;
+                if (Objects.equals(bucket.key, key)) {
+                    return bucket.value;
                 }
             }
         }
+
         return null;
     }
 
@@ -84,15 +83,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         if (size >= threshold) {
-            Node<K, V>[] newTable = new Node[table.length * 2];
-            for (Node<K, V> bucket: table) {
-                if (bucket != null) {
-                    int index = bucket.hash % newTable.length;
-                    newTable[index] = bucket;
+            Node<K, V>[] oldTable = table;
+            table = new Node[table.length * 2];
+            size = 0;
+            for (Node<K, V> node : oldTable) {
+                if (node != null) {
+                    put(node.key, node.value);
+                    while (node.next != null) {
+                        put(node.next.key, node.next.value);
+                        node = node.next;
+                    }
                 }
+
             }
-            table = newTable;
             threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
         }
     }
+
+
+
+
 }
