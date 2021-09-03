@@ -32,12 +32,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         resize();
         Node<K, V> newNode = new Node(getIndex(key), key, value, null);
-        if (table[getIndex] == null) {
-            table[getIndex] = newNode;
+        if (table[getIndex(key)] == null) {
+            table[getIndex(key)] = newNode;
             size++;
             return;
         }
-        Node<K, V> currentNode = table[getIndex];
+        Node<K, V> currentNode = table[getIndex(key)];
         while (currentNode != null) {
             if (isKeysIdentical(currentNode.key, key)) {
                 currentNode.value = value;
@@ -53,7 +53,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> newNode = table[getIndex];
+        Node<K, V> newNode = table[getIndex(key)];
         while (newNode != null) {
             if (isKeysIdentical(newNode.key, key)) {
                 return newNode.value;
