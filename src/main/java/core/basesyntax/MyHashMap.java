@@ -5,10 +5,10 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int ZERO_POSITION = 0;
     private static final int MULTIPLIER = 2;
     private Entry<K, V>[] table = new Entry[INITIAL_CAPACITY];
     private int size;
+    private  int threshold;
 
     public MyHashMap() {
     }
@@ -30,16 +30,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        if (key == null) {
-            putNullKey(value);
-            return;
-        }
-        int hash = (key.hashCode());
+        int hash = ourHashCode(key);
         int index = indexOfPosition(hash, table.length);
-        for (Entry<K, V> bucket = table[index]; bucket != null; bucket = bucket.next) {
-            if (bucket.hash == hash && key.equals(bucket.key)) {
-                bucket.value = value;
-                return;
+        Entry<K, V> bucket = table[index];
+        if (bucket != null) {
+            while (bucket != null) {
+                if (bucket.hash == hash && Objects.equals(bucket.key, key)) {
+                    bucket.value = value;
+                    return;
+                }
+                bucket = bucket.next;
             }
         }
         addEntry(hash, key, value, index);
@@ -47,13 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index;
-        if (key == null) {
-            index = 0;
-        } else {
-            int hash = key.hashCode();
-            index = indexOfPosition(hash, table.length);
-        }
+        int index = indexOfPosition(ourHashCode(key),table.length);
         Entry<K, V> bucket = table[index];
         while (bucket != null) {
             if (Objects.equals(key, bucket.key)) {
@@ -69,25 +63,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void putNullKey(V value) {
-        for (Entry<K, V> bucket = table[ZERO_POSITION]; bucket != null; bucket = bucket.next) {
-            if (bucket.key == null) {
-                bucket.value = value;
-                return;
-            }
-        }
-        addEntry(0, null, value, 0);
-    }
-
     private void addEntry(int hash, K key, V value, int index) {
         Entry<K, V> bucket = table[index];
-        table[index] = new Entry<K, V>(hash, key, value, bucket);
+        table[index] = new Entry<>(hash, key, value, bucket);
         size++;
     }
 
     private void resize() {
-        if (size >= table.length * LOAD_FACTOR) {
-            Entry[] newTable = table;
+        threshold = (int) (table.length * LOAD_FACTOR);
+        if (size == threshold) {
+            Entry<K, V>[] newTable = table;
             table = new Entry[table.length * MULTIPLIER];
             size = 0;
             for (Entry<K, V> bucket : newTable) {
@@ -99,7 +84,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private int ourHashCode(K key) {
+        return key == null ? 0 : key.hashCode();
+    }
+
     private int indexOfPosition(int hash, int length) {
-        return Math.abs(hash) % table.length;
+        return Math.abs(hash) % length;
     }
 }
