@@ -75,7 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean equalsKey(Node<K, V> pair, K key) {
-        return (key == null && pair.key == null) || (pair.key != null && pair.key.equals(key));
+        return (key == pair.key) || (key != null && key.equals(pair.key));
     }
 
     private static class Node<K, V> {
