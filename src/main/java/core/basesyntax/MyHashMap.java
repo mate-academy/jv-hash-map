@@ -18,19 +18,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         resize();
         Node<K, V> pair = new Node<>(key, value, null);
         int index = getIndex(key);
-        if (table[index] == null) {
-            table[index] = pair;
-        } else {
-            Node<K, V> savedNode = table[index];
-            while (savedNode.next != null || equalsKey(savedNode, key)) {
-                if (equalsKey(savedNode, key)) {
-                    savedNode.value = pair.value;
-                    return;
-                }
-                savedNode = savedNode.next;
+        Node<K, V> savedNode = table[index];
+        while (savedNode != null) {
+            if (equalsKey(savedNode, key)) {
+                savedNode.value = pair.value;
+                return;
             }
-            savedNode.next = pair;
+            if (savedNode.next == null) {
+                savedNode.next = pair;
+                size++;
+            }
+            savedNode = savedNode.next;
         }
+        table[index] = pair;
         size++;
     }
 
