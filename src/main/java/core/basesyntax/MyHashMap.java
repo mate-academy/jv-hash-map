@@ -14,7 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private Node<K, V> next;
         private V value;
 
-         private Node(V value, K key, Node<K, V> next) {
+        private Node(V value, K key, Node<K, V> next) {
             this.value = value;
             this.key = key;
             this.next = next;
