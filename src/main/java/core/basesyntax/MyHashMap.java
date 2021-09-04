@@ -17,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         resize();
         Node<K, V> pair = new Node<>(key, value, null);
-        int index = getHashCode(pair.key) % table.length;
+        int index = getIndex(key);
         if (table[index] == null) {
             table[index] = pair;
         } else {
@@ -36,7 +36,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = getHashCode(key) % table.length;
+        int index = getIndex(key);
         Node<K, V> pair = table[index];
         while (pair != null) {
             if (equalsKey(pair, key)) {
@@ -68,6 +68,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getHashCode(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
+    }
+
+    private int getIndex(K key) {
+        return getHashCode(key) % table.length;
     }
 
     private boolean equalsKey(Node<K, V> pair, K key) {
