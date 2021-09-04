@@ -23,18 +23,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
         }
 
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V newValue) {
-            value = newValue;
-        }
-
         public boolean equals(Object obj) {
             if (obj == this) {
                 return true;
@@ -65,11 +53,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (kvNode == null) {
                 continue;
             }
-            putNewTable(newTable, kvNode.getKey(), kvNode.getValue());
+            putNewTable(newTable, kvNode.key, kvNode.value);
             Node<K, V> temporaryNode = kvNode;
             while (temporaryNode.next != null) {
                 temporaryNode = temporaryNode.next;
-                putNewTable(newTable, temporaryNode.getKey(), temporaryNode.getValue());
+                putNewTable(newTable, temporaryNode.key, temporaryNode.value);
             }
         }
     }
@@ -78,26 +66,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> kvNode : table) {
             if (kvNode != null) {
                 if (key == null && key == kvNode.key) {
-                    kvNode.setValue(newValue);
+                    kvNode.value = newValue;
                     return;
                 }
                 if (kvNode.key == null) {
                     continue;
                 }
                 if (kvNode.key.equals(key)) {
-                    kvNode.setValue(newValue);
+                    kvNode.value = newValue;
                     return;
                 }
                 Node<K, V> temporaryNode = kvNode;
                 while (temporaryNode.next != null) {
                     if (temporaryNode.key.equals(key)) {
-                        temporaryNode.setValue(newValue);
+                        temporaryNode.value = newValue;
                         return;
                     }
                     temporaryNode = temporaryNode.next;
                 }
                 if (temporaryNode.key.equals(key)) {
-                    temporaryNode.setValue(newValue);
+                    temporaryNode.value = newValue;
                     return;
                 }
             }
@@ -127,13 +115,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> newNode = new Node<>(hash(key), key, value, null);
         if (key == null && table[0] != null) {
             if (newNode.key == table[0].key) {
-                table[0].setValue(value);
+                table[0].value = value;
                 return;
             }
             Node<K, V> temporaryNode = table[0];
             while (temporaryNode.next != null) {
                 if (temporaryNode.key == key) {
-                    temporaryNode.setValue(value);
+                    temporaryNode.value = value;
                     return;
                 }
                 temporaryNode = temporaryNode.next;
@@ -160,7 +148,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[index] != null) {
             Node<K, V> temporaryNode = table[index];
             if (temporaryNode.key != null && temporaryNode.key.equals(key)) {
-                temporaryNode.setValue(value);
+                temporaryNode.value = value;
                 size--;
                 return;
             }
@@ -168,7 +156,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 if (temporaryNode.key == key
                         || (temporaryNode.key != null
                         && temporaryNode.key.equals(key))) {
-                    temporaryNode.setValue(value);
+                    temporaryNode.value = value;
                     size--;
                     return;
                 }
@@ -185,30 +173,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> kvNode : table) {
             if (kvNode != null) {
                 if (key == null && key == kvNode.key) {
-                    return table[0].getValue();
+                    return table[0].value;
                 }
                 if (kvNode.key == null) {
                     continue;
                 }
                 if (kvNode.key.equals(key)) {
-                    return kvNode.getValue();
+                    return kvNode.value;
                 }
                 Node<K, V> temporaryNode = kvNode;
                 if (temporaryNode.key.equals(key)) {
-                    return temporaryNode.getValue();
+                    return temporaryNode.value;
                 }
                 while (temporaryNode.next != null) {
                     if (temporaryNode.key == key
                             || (temporaryNode.key != null
                             && temporaryNode.key.equals(key))) {
-                        return temporaryNode.getValue();
+                        return temporaryNode.value;
                     }
                     temporaryNode = temporaryNode.next;
                 }
                 if (temporaryNode.key == key
                         || (temporaryNode.key != null
                         && temporaryNode.key.equals(key))) {
-                    return temporaryNode.getValue();
+                    return temporaryNode.value;
                 }
             }
         }
