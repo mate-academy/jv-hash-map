@@ -21,9 +21,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    public MyHashMap() {
+        table = new Node[DEFAULT_CAPACITY];
+        threshold = (int)(DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
+    }
+
     @Override
     public void put(K key, V value) {
-        if (table == null || threshold == size) {
+        if (threshold == size) {
             resize();
         }
         Node<K, V> newNode = new Node<>(value, key, null);
@@ -63,15 +68,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (table == null) {
-            table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
-            threshold = (int)(DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
-        } else {
-            Node<K, V>[] oldArray = table;
-            table = (Node<K, V>[]) new Node[oldArray.length << 1];
-            threshold = (int)(table.length * DEFAULT_LOAD_FACTOR);
-            rePlaceNode(oldArray);
-        }
+        Node<K, V>[] oldArray = table;
+        table = new Node[oldArray.length << 1];
+        threshold = (int)(table.length * DEFAULT_LOAD_FACTOR);
+        rePlaceNode(oldArray);
     }
 
     private Node<K, V> findCurrentNode(K key) {
@@ -88,13 +88,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void rePlaceNode(Node<K, V>[] oldArray) {
         size = 0;
         for (Node<K, V> element : oldArray) {
-            if (element != null) {
-                put(element.key, element.value);
-                Node<K, V> currentNode = element;
-                while (currentNode.next != null) {
-                    currentNode = currentNode.next;
-                    put(currentNode.key, currentNode.value);
-                }
+            Node<K, V> currentNode = element;
+            while (currentNode != null) {
+                put(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
             }
         }
     }
