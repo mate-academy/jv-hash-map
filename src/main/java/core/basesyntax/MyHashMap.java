@@ -7,14 +7,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-       table = new Node[DEFAULT_INITIAL_CAPACITY];
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
     static class Node<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         public Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
@@ -39,10 +39,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (obj == this) {
                 return true;
             }
-            if (obj.getClass() != this.getClass() ) {
+            if (obj.getClass() != this.getClass()) {
                 return false;
             }
-            Node<K, V>  o = (Node<K, V>) new Object();
+            Node<K, V> o = (Node<K, V>) new Object();
             return ((o.key == this.key)
                     || (o.key != null
                     && o.key.equals(this.key)))
@@ -57,65 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     static int hash(Object key) {
-        return key == null ? 0 : (int) (Math.random() * 1001 + 31 * key.hashCode());
-    }
-
-    @Override
-    public void put(K key, V value) {
-
-        Node<K, V> newNode = new Node<>(hash(key), key, value, null);
-        if (key == null && table[0] != null) {
-            if (newNode.key == key) {
-                table[0].setValue(value);
-                return;
-            }
-            Node<K, V> temporaryNode = table[0];
-            while (temporaryNode.next != null) {
-                if (temporaryNode.key == key) {
-                    temporaryNode.setValue(value);
-                    return;
-                }
-                temporaryNode = temporaryNode.next;
-            }
-//            if (temporaryNode.key == key) {
-//                temporaryNode.setValue(value);
-//                return;
-//            }
-        }
-        if (size == table.length * DEFAULT_LOAD_FACTOR) {
-            Node<K, V>[] newTable = resizeNewTable();
-            transfer(newTable);
-            table = newTable;
-        }
-        if (getValue(key) != null) {
-            setNewValue(key, value);
-            return;
-        }
-        size++;
-        if (key == null) {
-            table[0] = newNode;
-            return;
-        }
-        int index = Math.abs(newNode.hash) % table.length;
-        if (table[index] != null) {
-            Node<K, V> temporaryNode = table[index];
-            if (temporaryNode.key.equals(key)) {
-                temporaryNode.setValue(value);
-                size--;
-                return;
-            }
-            while (temporaryNode.next != null) {
-                if (temporaryNode.key.equals(key)) {
-                    temporaryNode.setValue(value);
-                    size--;
-                    return;
-                }
-                temporaryNode = temporaryNode.next;
-            }
-            temporaryNode.next = newNode;
-            return;
-        }
-        table[index] = newNode;
+        return key == null ? 0 : 17 + 31 * key.hashCode();
     }
 
     private void transfer(Node<K, V>[] newTable) {
@@ -123,26 +65,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (kvNode == null) {
                 continue;
             }
-//            int index = kvNode.hash % newTable.length;
-//            newTable[index] = kvNode;
-//            newTable[index].next = null;
             putNewTable(newTable, kvNode.getKey(), kvNode.getValue());
             Node<K, V> temporaryNode = kvNode;
             while (temporaryNode.next != null) {
                 temporaryNode = temporaryNode.next;
                 putNewTable(newTable, temporaryNode.getKey(), temporaryNode.getValue());
             }
-//            Node<K, V> newNode = kvNode;
-//            int index = kvNode.hash % newTable.length;
-//            if (newTable[index] != null) {
-//                Node<K, V> temporaryNode = newTable[index];
-//                while (temporaryNode.next != null) {
-//                    temporaryNode = temporaryNode.next;
-//                }
-//                temporaryNode.next = newNode;
-//                continue;
-//            }
-//            table[index] = newNode;
         }
     }
 
@@ -179,11 +107,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void putNewTable(Node<K, V>[] newTable, K key, V value) {
         Node<K, V> newNode = new Node<>(hash(key), key, value, null);
         int index = Math.abs(newNode.hash) % newTable.length;
-//        if (size == table.length * DEFAULT_LOAD_FACTOR) {
-//            Node<K, V>[] newTable = resizeNewTable();
-//            transfer(newTable);
-//            table = newTable;
-//        }
         if (newTable[index] != null) {
             Node<K, V> temporaryNode = newTable[index];
             while (temporaryNode.next != null) {
@@ -200,6 +123,64 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
+    public void put(K key, V value) {
+        Node<K, V> newNode = new Node<>(hash(key), key, value, null);
+        if (key == null && table[0] != null) {
+            if (newNode.key == table[0].key) {
+                table[0].setValue(value);
+                return;
+            }
+            Node<K, V> temporaryNode = table[0];
+            while (temporaryNode.next != null) {
+                if (temporaryNode.key == key) {
+                    temporaryNode.setValue(value);
+                    return;
+                }
+                temporaryNode = temporaryNode.next;
+            }
+            temporaryNode.next = newNode;
+            size++;
+            return;
+        }
+        if (size == table.length * DEFAULT_LOAD_FACTOR) {
+            Node<K, V>[] newTable = resizeNewTable();
+            transfer(newTable);
+            table = newTable;
+        }
+        if (getValue(key) != null) {
+            setNewValue(key, value);
+            return;
+        }
+        size++;
+        if (key == null) {
+            table[0] = newNode;
+            return;
+        }
+        int index = Math.abs(newNode.hash) % table.length;
+        if (table[index] != null) {
+            Node<K, V> temporaryNode = table[index];
+            if (temporaryNode.key != null && temporaryNode.key.equals(key)) {
+                temporaryNode.setValue(value);
+                size--;
+                return;
+            }
+            while (temporaryNode.next != null) {
+                if (temporaryNode.key == key
+                        || (temporaryNode.key != null
+                        && temporaryNode.key.equals(key))) {
+                    temporaryNode.setValue(value);
+                    size--;
+                    return;
+                }
+                temporaryNode = temporaryNode.next;
+            }
+            temporaryNode.next = newNode;
+            return;
+        }
+        table[index] = newNode;
+    }
+
+    @Override
     public V getValue(K key) {
         for (Node<K, V> kvNode : table) {
             if (kvNode != null) {
@@ -213,13 +194,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     return kvNode.getValue();
                 }
                 Node<K, V> temporaryNode = kvNode;
+                if (temporaryNode.key.equals(key)) {
+                    return temporaryNode.getValue();
+                }
                 while (temporaryNode.next != null) {
-                    if (temporaryNode.key.equals(key)) {
+                    if (temporaryNode.key == key
+                            || (temporaryNode.key != null
+                            && temporaryNode.key.equals(key))) {
                         return temporaryNode.getValue();
                     }
                     temporaryNode = temporaryNode.next;
                 }
-                if (temporaryNode.key.equals(key)) {
+                if (temporaryNode.key == key
+                        || (temporaryNode.key != null
+                        && temporaryNode.key.equals(key))) {
                     return temporaryNode.getValue();
                 }
             }
