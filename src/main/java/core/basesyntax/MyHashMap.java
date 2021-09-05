@@ -21,11 +21,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         tableRebuild();
-        Node<K, V> newNode = new Node<>(key, value, null);
-        if (table[newNode.hash] == null) {
-            table[newNode.hash] = newNode;
+        Node<K, V> newNode = new Node<>(key, value, null, getHashCodeOfKey(key));
+        if (table[newNode.bucketIndex] == null) {
+            table[newNode.bucketIndex] = newNode;
         } else {
-            Node<K, V> workingNode = table[newNode.hash];
+            Node<K, V> workingNode = table[newNode.bucketIndex];
             do {
                 if (Objects.equals(key, workingNode.key)) {
                     workingNode.value = newNode.value;
@@ -76,41 +76,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
     }
 
-    private int getHashCodeOfKey(K key ){
+    private int getHashCodeOfKey(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
     private class Node<K, V> {
-        private int hash;
+        private int bucketIndex;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        Node(K key, V value, Node<K, V> next) {
+        Node(K key, V value, Node<K, V> next,int bucketIndex) {
             this.key = key;
             this.value = value;
             this.next = next;
-            this.hash = hashCode();
+            this.bucketIndex = bucketIndex;
         }
 
         public final String toString() {
             return key + "=" + value;
-        }
-
-        public final int hashCode() {
-            return key == null ? 0 : Math.abs(Objects.hashCode(key)) % capacity;
-        }
-
-        public final boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            }
-            if (o instanceof Map.Entry) {
-                Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
-                return Objects.equals(key, e.getKey())
-                        && Objects.equals(value, e.getValue());
-            }
-            return false;
         }
     }
 }
