@@ -88,7 +88,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int keyHash(K key) {
-        return key == null ? 0 : key.hashCode() < 0 ? Math.abs(key.hashCode()) : key.hashCode();
+        return key == null ? 0 : Math.abs(key.hashCode());
     }
 
     private int findIndex(K key) {
