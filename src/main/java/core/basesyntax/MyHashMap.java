@@ -1,7 +1,6 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int MAXIMUM_CAPACITY = 1 << 30;
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private static final int RESIZE_FACTOR = 2;
@@ -89,9 +88,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        size = 0;
         Node<K, V>[] oldTable = table;
         table = new Node[capacity * RESIZE_FACTOR];
-        size = 0;
         transfer(oldTable);
     }
 
