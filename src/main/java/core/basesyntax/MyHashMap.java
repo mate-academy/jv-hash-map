@@ -70,17 +70,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void addNode(K key, V value) {
         int keyHash = keyHash(key);
+        Node<K, V> newNode = new Node<>(keyHash, key, value, null);
         if (table[bucketIndex(keyHash)] == null) {
-            table[bucketIndex(keyHash)] = new Node<>(keyHash, key, value, null);
+            table[bucketIndex(keyHash)] = newNode;
             return;
         }
-        Node<K, V> node = getNode(key, bucketIndex(keyHash));
-        if (isEqual(node, key)) {
-            node.value = value;
+        Node<K, V> currentNode = getNode(key, bucketIndex(keyHash));
+        if (isEqual(currentNode, key)) {
+            currentNode.value = value;
             size--;
             return;
         }
-        node.next = new Node<>(keyHash, key, value, null);
+        currentNode.next = newNode;
     }
 
     private Node<K, V> getNode(K key, int bucketIndex) {
@@ -97,11 +98,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void moveNodes(Node<K,V>[] tempTable) {
         size = 0;
         for (Node<K, V> node: tempTable) {
-            if (node != null) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
