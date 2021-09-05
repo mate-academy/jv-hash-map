@@ -52,6 +52,37 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    public V remove(K key) {
+        int hash = getHash(key);
+        int index = hash % table.length;
+        Node<K, V> node = table[index];
+        if (node == null) {
+            return null;
+        }
+        if (node.hash == hash && (node.key == key
+                || (node.key != null && node.key.equals(key)))) {
+            V oldValue = node.value;
+            table[index] = null;
+            size--;
+            return oldValue;
+        }
+        Node<K, V> prevNode = node;
+        node = node.next;
+        while (node != null) {
+            if (node.hash == hash && (node.key == key
+                    || (node.key != null && node.key.equals(key)))) {
+                prevNode.next = node.next;
+                V oldValue = node.value;
+                node = null;
+                size--;
+                return oldValue;
+            }
+            prevNode = prevNode.next;
+            node = node.next;
+        }
+        return null;
+    }
+
     private int getHash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
