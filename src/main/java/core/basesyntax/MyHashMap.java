@@ -78,11 +78,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int oldSize = oldTable.length;
         table = new Node[(oldSize * RESIZE_FACTOR)];
         threshold = (int) (table.length * LOAD_FACTOR);
+        size = 0;
         transfer(oldTable);
     }
 
     private void transfer(Node<K, V>[] oldTable) {
-        size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
