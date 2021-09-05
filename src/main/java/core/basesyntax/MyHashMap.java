@@ -54,12 +54,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int bucketNumber = getHash(key);
-        Node<K, V> newNode = table[bucketNumber];
-        while (newNode != null) {
-            if (Objects.equals(newNode.key, key)) {
-                return newNode.value;
+        Node<K, V> neededNode = table[bucketNumber];
+        while (neededNode != null) {
+            if (Objects.equals(neededNode.key, key)) {
+                return neededNode.value;
             }
-            newNode = newNode.next;
+            neededNode = neededNode.next;
         }
         return null;
     }
@@ -75,9 +75,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             int newCapacity = table.length * 2;
             Node<K, V>[] oldTable = table;
             table = new Node[newCapacity];
-            for (Node<K, V> newNode : oldTable) {
-                if (newNode != null) {
-                    Node<K, V> currentNode = newNode;
+            for (Node<K, V> node : oldTable) {
+                if (node != null) {
+                    Node<K, V> currentNode = node;
                     while (currentNode != null) {
                         put(currentNode.key, currentNode.value);
                         currentNode = currentNode.next;
