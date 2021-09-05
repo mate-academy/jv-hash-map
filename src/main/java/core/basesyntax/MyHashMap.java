@@ -7,7 +7,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     static final int DEFAULT_INITIAL_CAPACITY = 16;
     static final int ARRAY_SIZE_MULTIPLIER = 2;
-    static final int INDEX_FOR_NULL_KEY = 0;
     private int size;
     private int threshold;
     private int capacity;
@@ -23,11 +22,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         tableRebuild();
         Node<K, V> newNode = new Node<>(key, value, null);
-        int index = newNode.hash % capacity;
-        if (table[index] == null) {
-            table[index] = newNode;
+        if (table[newNode.hash] == null) {
+            table[newNode.hash] = newNode;
         } else {
-            Node<K, V> workingNode = table[index];
+            Node<K, V> workingNode = table[newNode.hash];
             do {
                 if (Objects.equals(key, workingNode.key)) {
                     workingNode.value = newNode.value;
@@ -45,12 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int indexOfKey;
-        if (key == null) {
-            indexOfKey = INDEX_FOR_NULL_KEY;
-        } else {
-            indexOfKey = Math.abs(Objects.hashCode(key) % capacity);
-        }
+        int indexOfKey = getHashCodeOfKey(key);
         Node<K, V> currentNode = table[indexOfKey];
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
@@ -83,6 +76,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
     }
 
+    private int getHashCodeOfKey(K key ){
+        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
+    }
+
     private class Node<K, V> {
         private int hash;
         private final K key;
@@ -101,7 +98,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         public final int hashCode() {
-            return key == null ? 0 : Math.abs(Objects.hashCode(key));
+            return key == null ? 0 : Math.abs(Objects.hashCode(key)) % capacity;
         }
 
         public final boolean equals(Object o) {
