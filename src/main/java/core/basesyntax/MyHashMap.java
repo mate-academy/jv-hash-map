@@ -53,8 +53,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int bucketNumber = getHash(key);
-        Node<K, V> neededNode = table[bucketNumber];
+        int bucketIndex = getHash(key);
+        Node<K, V> neededNode = table[bucketIndex];
         while (neededNode != null) {
             if (Objects.equals(neededNode.key, key)) {
                 return neededNode.value;
