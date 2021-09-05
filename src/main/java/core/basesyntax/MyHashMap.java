@@ -1,8 +1,5 @@
 package core.basesyntax;
 
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -64,7 +61,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int retrievalIndex = getHash(key) % table.length;
         Node<K, V> node = table[retrievalIndex];
         while (node != null) {
-            if (Objects.equals(node.key, key)){
+            if (Objects.equals(node.key, key)) {
                 return node.value;
             }
             node = node.next;
@@ -83,7 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K,V>[] oldTable = table;
         table = new Node[newCapacity];
         size = 0;
-        for(Node<K,V> node : oldTable) {
+        for (Node<K,V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
