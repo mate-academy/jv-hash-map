@@ -28,9 +28,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size == table.length * LOAD_FACTOR) {
-            table = resize(table);
-        }
+        resize();
         if (table[hash(key)] == null) {
             Node currentNode = new Node(hash(key), key, value, null);
             table[hash(key)] = currentNode;
@@ -60,17 +58,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         Node<K, V> currentNode = table[hash(key)];
-        while (currentNode.key != key
-                || (currentNode.key != null && !currentNode.key.equals(key))) {
-            if (currentNode.key != null && currentNode.key.equals(key)) {
-                return (V) currentNode.value;
+        if (currentNode != null) {
+            while (!Objects.equals(currentNode.key, key)) {
+                if (currentNode.next == null) {
+                    return null;
+                }
+                currentNode = currentNode.next;
             }
-            if (currentNode.next == null) {
-                return null;
-            }
-            currentNode = currentNode.next;
+            return (V) currentNode.value;
         }
-        return (V) currentNode.value;
+        return null;
     }
 
     @Override
@@ -83,19 +80,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return result < 0 ? result * -1 : result;
     }
 
-    private int resizeHash(K key) {
-        int result = key == null ? 0 : key.hashCode() % (table.length * 2);
-        return result < 0 ? result * -1 : result;
-    }
-
-    private Node<K, V>[] resize(Node<K, V>[] table) {
-        Node<K, V>[] result = new Node[table.length * 2];
-        for (Node<K, V> node : table) {
-            if (node != null) {
-                result[resizeHash(node.key)] = node;
+    private void resize() {
+        if (size == table.length * LOAD_FACTOR) {
+            size = 0;
+            Node<K, V>[] oldTable = table;
+            table = new Node[oldTable.length * 2];
+            for (Node<K, V> node : oldTable) {
+                if (node != null) {
+                    Node<K, V> currentNode = node;
+                    while (currentNode != null) {
+                        put(currentNode.key, currentNode.value);
+                        currentNode = currentNode.next;
+                    }
+                }
             }
         }
-        return result;
     }
 
     private boolean isKeyEquals(Node<K, V> node, K key, V value) {
