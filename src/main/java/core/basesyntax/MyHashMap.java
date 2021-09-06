@@ -5,24 +5,24 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75F;
-    private static final int ARRAY_GROWTH = 2;
-    private Node<K, V>[] buckets;
+    private static final int INCREASE_COEFFICIENT = 2;
+    private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        buckets = new Node[DEFAULT_CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        checkLoadFactor();
+        resize();
         Node<K, V> newNode = new Node<>(hash(key), key, value, null);
         putValue(newNode);
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = buckets[hash(key)];
+        Node<K, V> node = table[hash(key)];
         while (node != null) {
             if (Objects.equals(node.kay, key)) {
                 return node.value;
@@ -37,10 +37,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void checkLoadFactor() {
-        if (size > buckets.length * LOAD_FACTOR) {
-            Node<K, V>[] oldBuckets = buckets;
-            buckets = new Node[oldBuckets.length * ARRAY_GROWTH];
+    private void resize() {
+        if (size > table.length * LOAD_FACTOR) {
+            Node<K, V>[] oldBuckets = table;
+            table = new Node[oldBuckets.length * INCREASE_COEFFICIENT];
             Node<K, V> node;
             for (int i = 0; i < oldBuckets.length; i++) {
                 node = oldBuckets[i];
@@ -59,11 +59,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K kay) {
-        return Math.abs(kay == null ? 0 : (kay.hashCode() % buckets.length));
+        return Math.abs(kay == null ? 0 : (kay.hashCode() % table.length));
     }
 
     private void putValue(Node<K, V> newNode) {
-        Node<K, V> node = buckets[newNode.hashCod];
+        Node<K, V> node = table[newNode.hashCod];
         while (node != null) {
             if (Objects.equals(node.kay, newNode.kay)) {
                 node.value = newNode.value;
@@ -76,7 +76,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node = node.next;
         }
-        buckets[newNode.hashCod] = newNode;
+        table[newNode.hashCod] = newNode;
         size++;
     }
 
