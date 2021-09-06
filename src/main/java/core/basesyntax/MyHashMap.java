@@ -27,7 +27,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (size == threshold) {
-            arrayDuplicate();
+            resize();
         }
 
         Node<K, V> addNode = new Node<>(key, value, null);
@@ -77,7 +77,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.abs(key.hashCode() % hashTable.length);
     }
 
-    private void arrayDuplicate() {
+    private void resize() {
         threshold *= 2;
         size = 0;
         Node<K, V>[] oldHashTable = hashTable;
