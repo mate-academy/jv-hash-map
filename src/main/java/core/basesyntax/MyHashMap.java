@@ -68,10 +68,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resizeArray() {
         if (size == threshold) {
             threshold *= INCREASE_COEFFICIENT;
-            Node<K, V>[] prevHashTable = nodeArray;
-            nodeArray = new Node[prevHashTable.length * INCREASE_COEFFICIENT];
+            Node<K, V>[] prevNodeArray = nodeArray;
+            nodeArray = new Node[prevNodeArray.length * INCREASE_COEFFICIENT];
             size = 0;
-            for (Node<K, V> node : prevHashTable) {
+            for (Node<K, V> node : prevNodeArray) {
                 while (node != null) {
                     put(node.key, node.value);
                     node = node.next;
