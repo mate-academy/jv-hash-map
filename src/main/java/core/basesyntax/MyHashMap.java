@@ -6,13 +6,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private static final int INITIAL_CAPACITY = 16;
     private int threshold;
-    private int capacity;
     private int size;
     private Node<K, V>[] hashMap;
 
     public MyHashMap() {
         threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
-        capacity = INITIAL_CAPACITY;
         hashMap = new Node[INITIAL_CAPACITY];
     }
 
@@ -21,25 +19,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        Node<K, V> newNode = new Node<>(key, value, null);
         int position = getPosition(key);
         if (hashMap[position] == null) {
-            hashMap[position] = newNode;
-        } else {
-            Node<K, V> current = hashMap[position];
-            while (current.next != null) {
-                if (Objects.equals(current.key, key)) {
-                    current.value = value;
-                    return;
-                }
-                current = current.next;
-            }
+            hashMap[position] = new Node<>(key, value, null);
+            size++;
+            return;
+        }
+        Node<K, V> current = hashMap[position];
+        while (current.next != null) {
             if (Objects.equals(current.key, key)) {
                 current.value = value;
                 return;
             }
-            current.next = newNode;
+            current = current.next;
         }
+        if (Objects.equals(current.key, key)) {
+            current.value = value;
+            return;
+        }
+        current.next = new Node<>(key, value, null);
         size++;
     }
 
@@ -62,15 +60,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        capacity *= 2;
-        threshold *= 2;
-        Node<K, V>[] newHashMap = new Node[capacity];
+        threshold = (int) (2 * hashMap.length * LOAD_FACTOR);
+        Node<K, V>[] newHashMap = new Node[hashMap.length * 2];
         Node<K, V>[] oldHashMap = hashMap;
         hashMap = newHashMap;
         Node<K, V> current;
         size = 0;
-        for (int i = 0; i < capacity / 2; i++) {
-            current = oldHashMap[i];
+        for (Node<K, V> node : oldHashMap) {
+            current = node;
             while (current != null) {
                 put(current.key, current.value);
                 current = current.next;
@@ -79,7 +76,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getPosition(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
+        return key == null ? 0 : Math.abs(key.hashCode() % hashMap.length);
     }
 
     private static class Node<K, V> {
