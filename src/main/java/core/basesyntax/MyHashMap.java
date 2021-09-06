@@ -68,10 +68,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHash(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return key.hashCode();
+        return key == null ? 0 : key.hashCode();
     }
 
     private void resize() {
