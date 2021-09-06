@@ -33,23 +33,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int index = hash(key);
-        Node<K, V> newNode = new Node<>(key, value, null);
         if (table[index] == null) {
-            table[index] = newNode;
+            table[index] = new Node<>(key, value, null);
             size++;
         } else {
-            Node<K, V> insideNode = table[index];
-            while (insideNode != null) {
-                if (Objects.equals(insideNode.key, key)) {
-                    insideNode.value = value;
+            Node<K, V> currentNode = table[index];
+            while (currentNode != null) {
+                if (Objects.equals(currentNode.key, key)) {
+                    currentNode.value = value;
                     return;
                 }
-                if (insideNode.next == null) {
-                    insideNode.next = newNode;
+                if (currentNode.next == null) {
+                    currentNode.next = new Node<>(key, value, null);
                     size++;
                     return;
                 } else {
-                    insideNode = insideNode.next;
+                    currentNode = currentNode.next;
                 }
             }
         }
@@ -58,12 +57,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = hash(key);
-        Node<K, V> insideNode = table[index];
-        while (insideNode != null) {
-            if (Objects.equals(insideNode.key, key)) {
-                return insideNode.value;
+        Node<K, V> currentNode = table[index];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
             }
-            insideNode = insideNode.next;
+            currentNode = currentNode.next;
         }
         return null;
     }
@@ -75,8 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldTable = table;
-        int oldSize = oldTable.length;
-        table = new Node[(oldSize * RESIZE_FACTOR)];
+        table = new Node[(oldTable.length * RESIZE_FACTOR)];
         threshold = (int) (table.length * LOAD_FACTOR);
         size = 0;
         transfer(oldTable);
