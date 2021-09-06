@@ -53,7 +53,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         @Override
         public int hashCode() {
             int result = 13;
-            return result * ((key == null) ? 0 : (key.hashCode() > 0) ? key.hashCode() : (key.hashCode() * -1));
+            return result * ((key == null) ? 0 : Math.abs(key.hashCode()));
         }
     }
 
@@ -80,6 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 } else if (oldBucketNode.next == null) {
                     oldBucketNode.next = inputNode;
                     size++;
+                    resize();
                     return;
                 }
                 oldBucketNode = oldBucketNode.next;
@@ -92,16 +93,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public Node<K, V>[] transfer(Node<K, V>[] oldTab, int oldCap) {
 
         for (int i = 0; i < oldCap; i++) {
-            if (oldTab[i] != null) {
+            while (oldTab[i] != null) {
+                put(oldTab[i].key, oldTab[i].value);
+                oldTab[i] = oldTab[i].next;
+            }
+          /*  if (oldTab[i] != null) {
                 if (oldTab[i].next == null) {
                     internalStorage[oldTab[i].hashCode() % internalStorage.length] = oldTab[i];
                 } else {
                     while (oldTab[i] != null) {
-                        internalStorage[oldTab[i].hashCode() % internalStorage.length] = oldTab[i];
+                        if (internalStorage[oldTab[i].hashCode() % internalStorage.length] == null) {
+                            internalStorage[oldTab[i].hashCode() % internalStorage.length] = oldTab[i];
+                        } else {
+                            internalStorage[oldTab[i].hashCode() % internalStorage.length].next = oldTab[i];
+                        }
                         oldTab[i] = oldTab[i].next;
                     }
                 }
-            }
+            }*/
         }
         return internalStorage;
     }
@@ -114,6 +123,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             int newThreshold = threshold * RESIZE_INDEX;
             threshold = newThreshold;
             internalStorage = (Node<K, V>[]) new Node[newCapacity];
+            size = 0;
             if (oldStorage != null) {
                 transfer(oldStorage, oldCapacity);
             }
