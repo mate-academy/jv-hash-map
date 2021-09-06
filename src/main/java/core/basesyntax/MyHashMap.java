@@ -31,9 +31,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        Node<K, V> newNode = new Node(hash(key), key, value, null);
-        if (table[hash(key)] == null) {
-            table[hash(key)] = newNode;
+        Node<K, V> newNode = new Node(calculateBucketIndex(key), key, value, null);
+        if (table[calculateBucketIndex(key)] == null) {
+            table[calculateBucketIndex(key)] = newNode;
             size++;
             return;
         }
@@ -67,13 +67,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hash(K key) {
+    private int calculateBucketIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private Node<K, V> findNode(K key) {
         Node<K, V> currentNode;
-        for (currentNode = table[hash(key)]; currentNode != null; currentNode = currentNode.next) {
+        for (currentNode = table[calculateBucketIndex(key)]; currentNode != null; currentNode = currentNode.next) {
             if (Objects.equals(key, currentNode.key)) {
                 return currentNode;
             }
@@ -92,6 +92,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (currentNode.next == null) {
                 currentNode.next = newNode;
                 size++;
+                return;
             }
         }
     }
