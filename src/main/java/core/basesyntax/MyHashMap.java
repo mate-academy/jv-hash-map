@@ -68,11 +68,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode());
+        return key == null ? 0 : key.hashCode();
     }
 
     private int calculateBucketIndex(K key) {
-        return hash(key) % table.length;
+        return Math.abs(hash(key)) % table.length;
     }
 
     private Node<K, V> findNode(K key) {
