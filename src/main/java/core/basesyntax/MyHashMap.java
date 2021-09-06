@@ -33,13 +33,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        Node<K, V> newNode = new Node(hash(key), key, value, null);
-        checkKey(newNode, key);
+        Node<K, V> newNode = new Node(getBucketIndex(key), key, value, null);
+        findNode(newNode, key);
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> requiredNode = checkKey(null, key);
+        Node<K, V> requiredNode = findNode(null, key);
         return (requiredNode == null) ? null : requiredNode.value;
     }
 
@@ -48,8 +48,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private Node<K, V> checkKey(Node<K, V> newNode, K key) {
-        Node<K, V> currentNode = table[hash(key)];
+    private Node<K, V> findNode(Node<K, V> newNode, K key) {
+        Node<K, V> currentNode = table[getBucketIndex(key)];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 if (newNode != null) {
@@ -64,7 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             currentNode = currentNode.nextNode;
         }
-        table[hash(key)] = newNode;
+        table[getBucketIndex(key)] = newNode;
         size++;
         return null;
     }
@@ -82,7 +82,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hash(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
+    private int getBucketIndex(K key) {
+        return Math.abs(hash(key)) % table.length;
     }
+
+    private int hash(K key) {
+        return (key == null) ? 0 : key.hashCode();
+    }
+
 }
