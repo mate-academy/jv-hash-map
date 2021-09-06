@@ -73,7 +73,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V> findNode(K key) {
         Node<K, V> currentNode;
-        for (currentNode = table[calculateBucketIndex(key)]; currentNode != null; currentNode = currentNode.next) {
+        for (currentNode = table[calculateBucketIndex(key)]; currentNode != null; 
+                                                currentNode = currentNode.next) {
             if (Objects.equals(key, currentNode.key)) {
                 return currentNode;
             }
