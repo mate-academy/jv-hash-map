@@ -5,7 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
-    private static final int MULTIPLIER_FOR_THRESHOLD_AND_CAPACITY = 2;
+    private static final int INCREASE_COEFFICIENT = 2;
     private int threshold;
     private int size;
     private Node<K, V>[] nodes;
@@ -29,7 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        increaseArray();
+        resize();
         Node<K, V> putNode = new Node<>(key, value, null);
         int position = index(key);
         Node<K, V> positionNode = nodes[position];
@@ -73,12 +73,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : Math.abs(key.hashCode() % nodes.length);
     }
 
-    private void increaseArray() {
+    private void resize() {
         if (size == threshold) {
             size = 0;
-            threshold *= MULTIPLIER_FOR_THRESHOLD_AND_CAPACITY;
+            threshold *= INCREASE_COEFFICIENT;
             Node<K, V>[] tempArray = nodes;
-            nodes = new Node[nodes.length * MULTIPLIER_FOR_THRESHOLD_AND_CAPACITY];
+            nodes = new Node[nodes.length * INCREASE_COEFFICIENT];
             for (Node<K, V> node : tempArray) {
                 while (node != null) {
                     put(node.key, node.value);
