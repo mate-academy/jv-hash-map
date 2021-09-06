@@ -33,11 +33,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = calculateIndex(key);
         Node<K, V> indexNode = hashTable[index];
         Node<K, V> addNode = new Node<>(key, value, null);
-        if (indexNode == null) {
-            hashTable[index] = addNode;
-            size++;
-            return;
-        }
         while (indexNode != null) {
             if (key == indexNode.key || (key != null && key.equals(indexNode.key))) {
                 indexNode.value = value;
