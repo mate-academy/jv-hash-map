@@ -27,6 +27,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (savedNode.next == null) {
                 savedNode.next = pair;
                 size++;
+                return;
             }
             savedNode = savedNode.next;
         }
