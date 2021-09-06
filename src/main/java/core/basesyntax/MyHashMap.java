@@ -36,20 +36,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int bucketIndex = getBucketIndex(key);
         Node<K, V> node = new Node<>(bucketIndex, key, value, null);
-        if (table[bucketIndex] != null) {
-            Node<K, V> currentNode = table[bucketIndex];
-            while (currentNode != null) {
-                if (isKeysEquals(bucketIndex, currentNode.hash, key, currentNode.key)) {
-                    currentNode.value = value;
-                    return;
-                }
-                if (currentNode.next == null) {
-                    currentNode.next = node;
-                    size++;
-                    return;
-                }
-                currentNode = currentNode.next;
+        Node<K, V> currentNode = table[bucketIndex];
+        while (currentNode != null) {
+            if (isKeysEquals(bucketIndex, currentNode.hash, key, currentNode.key)) {
+                currentNode.value = value;
+                return;
             }
+            if (currentNode.next == null) {
+                currentNode.next = node;
+                size++;
+                return;
+            }
+            currentNode = currentNode.next;
         }
         table[bucketIndex] = node;
         size++;
