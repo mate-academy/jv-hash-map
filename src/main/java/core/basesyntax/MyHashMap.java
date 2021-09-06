@@ -30,23 +30,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         int bucketIndex = getHash(key);
         resize();
-        Node<K, V> newNode = new Node<>(getHash(key), key, value, null);
         if (table[bucketIndex] == null) {
-            table[bucketIndex] = newNode;
-        } else {
-            Node<K, V> currentNode = table[bucketIndex];
-            while (currentNode != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    currentNode.value = value;
-                    return;
-                }
-                if (currentNode.next == null) {
-                    currentNode.next = newNode;
-                    size++;
-                    return;
-                }
-                currentNode = currentNode.next;
+            table[bucketIndex] = new Node<>(getHash(key), key, value, null);
+            size++;
+            return;
+        }
+
+        Node<K, V> currentNode = table[bucketIndex];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                currentNode.value = value;
+                return;
             }
+            if (currentNode.next == null) {
+                currentNode.next = new Node<>(getHash(key), key, value, null);
+                size++;
+                return;
+            }
+            currentNode = currentNode.next;
         }
         size++;
     }
@@ -76,13 +77,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V>[] oldTable = table;
             table = new Node[newCapacity];
             for (Node<K, V> node : oldTable) {
-                if (node != null) {
-                    Node<K, V> currentNode = node;
-                    while (currentNode != null) {
-                        put(currentNode.key, currentNode.value);
-                        currentNode = currentNode.next;
-                        size--;
-                    }
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                    size--;
                 }
             }
         }
