@@ -30,9 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size == threshold) {
-            resize();
-        }
+        resize();
         int index = Math.abs(getHash(key) % table.length);
         Node<K, V> node = new Node<>(key, value, null, getHash(key));
         Node<K, V> currentNode = table[index];
@@ -78,10 +76,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        size = 0;
-        Node<K, V>[] oldTable = table;
-        table = new Node[table.length * 2];
-        transfer(oldTable);
+        if (size == threshold) {
+            size = 0;
+            Node<K, V>[] oldTable = table;
+            table = new Node[table.length * 2];
+            transfer(oldTable);
+        }
+
     }
 
     private void transfer(Node<K, V>[] node) {
