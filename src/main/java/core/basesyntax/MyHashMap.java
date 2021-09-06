@@ -45,7 +45,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (currentNode.next == null) {
                 currentNode.next = new Node<>(Objects.hash(key), key, value, null);
                 size++;
-                checkResize();
                 return;
             }
             currentNode = currentNode.next;
@@ -70,7 +69,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void checkResize() {
-        if (size / DEFAULT_LOAD_FACTOR > hashMapTable.length) {
+        threshold = (int) DEFAULT_LOAD_FACTOR * hashMapTable.length;
+        if (threshold >= size) {
             Node<K, V>[] tempArray = hashMapTable;
             hashMapTable = (Node<K, V>[]) new Node[hashMapTable.length * INCREASE_COEFFICIENT];
             size = 0;
