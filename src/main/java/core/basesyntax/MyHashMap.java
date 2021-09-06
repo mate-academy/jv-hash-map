@@ -54,7 +54,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V> findKey(Node<K, V> newNode, K key) {
         Node<K, V> currentNode = table[getIndex(key)];
         while (currentNode != null) {
-            if (isKeysIdentical(currentNode.key, key)) {
+            if ((currentNode.key == key) || (key != null && Objects.equals(currentNode.key, key))) {
                 if (newNode != null) {
                     currentNode.value = newNode.value;
                 }
@@ -83,11 +83,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
     }
-
-    private boolean isKeysIdentical(K currentNodeKey, K key) {
-        return (currentNodeKey == key) || (key != null && Objects.equals(currentNodeKey, key));
-    }
-
     private int getIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
     }
