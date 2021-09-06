@@ -8,6 +8,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INCREASE_COEFFICIENT = 2;
     private Node<K,V>[] hashMapTable;
     private int size;
+    private int threshold;
 
     public MyHashMap() {
         hashMapTable = new Node[DEFAULT_CAPACITY];
@@ -29,13 +30,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> putNode = new Node<>(computeBucket(key), key, value, null);
-        Node<K, V> currentNode = hashMapTable[putNode.hash];
+        checkResize();
+        Node<K, V> currentNode = hashMapTable[getIndex(key)];
         do {
             if (currentNode == null) {
-                hashMapTable[putNode.hash] = putNode;
+                hashMapTable[getIndex(key)] = new Node<>(Objects.hash(key), key, value, null);
                 size++;
-                checkResize();
                 return;
             }
             if (Objects.equals(currentNode.key, key)) {
@@ -43,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             if (currentNode.next == null) {
-                currentNode.next = putNode;
+                currentNode.next = new Node<>(Objects.hash(key), key, value, null);
                 size++;
                 checkResize();
                 return;
@@ -54,7 +54,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = hashMapTable[computeBucket(key)];
+        Node<K, V> currentNode = hashMapTable[getIndex(key)];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
@@ -84,7 +84,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int computeBucket(K key) {
+    private int getIndex(K key) {
         return key == null ? 0 : Math.abs(Objects.hash(key) % hashMapTable.length);
     }
 }
