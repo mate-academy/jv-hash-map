@@ -32,7 +32,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         resize();
         int index = Math.abs(getHash(key) % table.length);
-        Node<K, V> node = new Node<>(key, value, null, getHash(key));
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
@@ -40,13 +39,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             if (currentNode.next == null) {
-                currentNode.next = node;
+                currentNode.next = new Node<>(key, value, null, getHash(key));
                 size++;
                 return;
             }
             currentNode = currentNode.next;
         }
-        table[index] = node;
+        table[index] = new Node<>(key, value, null, getHash(key));
         size++;
     }
 
