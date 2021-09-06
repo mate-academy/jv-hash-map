@@ -37,12 +37,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        findKey(newNode, key);
+        checkKey(newNode, key);
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> newNode = findKey(null, key);
+        Node<K, V> newNode = checkKey(null, key);
         return (newNode == null) ? null : newNode.value;
     }
 
@@ -51,7 +51,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private Node<K, V> findKey(Node<K, V> newNode, K key) {
+    private Node<K, V> checkKey(Node<K, V> newNode, K key) {
         Node<K, V> currentNode = table[getIndex(key)];
         while (currentNode != null) {
             if ((currentNode.key == key) || (key != null && Objects.equals(currentNode.key, key))) {
