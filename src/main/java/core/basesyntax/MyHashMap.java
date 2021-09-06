@@ -73,18 +73,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        MyHashMap<?, ?> myHashMap = (MyHashMap<?, ?>) o;
-        return size == myHashMap.size && Objects.equals(node, myHashMap.node);
-    }
-
     public int hashCode(K key) {
         return (key == null) ? 0 : key.hashCode();
     }
