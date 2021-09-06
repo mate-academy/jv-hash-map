@@ -11,7 +11,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
 
     private class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -20,7 +19,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-            hash = key == null ? 0 : key.hashCode();
         }
     }
 
@@ -82,11 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
     }
 
-    private int hash(K key) {
-        return key == null ? 0 : key.hashCode();
-    }
-
     private int index(K key) {
-        return Math.abs(hash(key)) % table.length;
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 }
