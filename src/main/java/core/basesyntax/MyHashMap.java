@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -34,30 +33,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public String toString() {
             return key + " = " + value;
         }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o.getClass().equals(Map.Entry.class)) {
-                return false;
-            }
-            Node<?, ?> node = (Node<?, ?>) o;
-            return hash == node.hash
-                    && Objects.equals(key, node.key)
-                    && Objects.equals(value, node.value);
-        }
-
-        @Override
-        public int hashCode() {
-            int result = 13;
-            return result * ((key == null) ? 0 : Math.abs(key.hashCode()));
-        }
     }
 
     public final int hash(Object key) {
-        int hash;
         return (key == null) ? 0 : Math.abs(key.hashCode());
     }
 
@@ -70,27 +48,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             internalStorage[bucketNumber] = inputNode;
             size++;
             return;
-        } else {
-            oldBucketNode = internalStorage[bucketNumber];
-            while (oldBucketNode != null) {
-                if (Objects.equals(oldBucketNode.key, key)) {
-                    oldBucketNode.value = value;
-                    return;
-                } else if (oldBucketNode.next == null) {
-                    oldBucketNode.next = inputNode;
-                    size++;
-                    resize();
-                    return;
-                }
-                oldBucketNode = oldBucketNode.next;
+        }
+        oldBucketNode = internalStorage[bucketNumber];
+        while (oldBucketNode != null) {
+            if (Objects.equals(oldBucketNode.key, key)) {
+                oldBucketNode.value = value;
+                return;
             }
-            internalStorage[bucketNumber] = inputNode;
+            if (oldBucketNode.next == null) {
+                oldBucketNode.next = inputNode;
+                size++;
+                resize();
+                return;
+            }
+            oldBucketNode = oldBucketNode.next;
         }
         resize();
     }
 
     public Node<K, V>[] transfer(Node<K, V>[] oldTab, int oldCap) {
-
         for (int i = 0; i < oldCap; i++) {
             while (oldTab[i] != null) {
                 put(oldTab[i].key, oldTab[i].value);
