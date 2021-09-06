@@ -15,30 +15,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        checkCapacity();
-        addNode(key, value, hash(key));
+        if (checkCapacity()) {
+            resize();
+        }
+        addNode(key, value);
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> suppNode;
-        for (int i = 0; i < table.length; i++) {
-            if (table[i] != null) {
-                if (checkKeys(table[i].key,key)) {
-                    return table[i].value;
-                }
-                if (table[i].next != null) {
-                    suppNode = table[i].next;
-                    while (suppNode != null) {
-                        if (checkKeys(suppNode.key,key)) {
-                            return suppNode.value;
-                        }
-                        suppNode = suppNode.next;
-                    }
-                }
-            }
+        Node<K, V> suppNode = table[getIndex(key)];
+        if (suppNode == null) {
+            return null;
         }
-        return null;
+        while (!checkKeys(suppNode.key, key)) {
+            suppNode = suppNode.next;
+        }
+        return suppNode.value;
     }
 
     @Override
@@ -49,21 +41,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Node<K, V> {
         private K key;
         private V value;
-        private int hash;
         private Node<K, V> next;
 
-        public Node(K key, V value, int hash, Node<K, V> next) {
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
-            this.hash = hash;
             this.next = next;
         }
     }
 
-    private void checkCapacity() {
-        if (size == threshold) {
-            resize();
-        }
+    private boolean checkCapacity() {
+        return size == threshold;
     }
 
     private Node<K, V>[] resize() {
@@ -71,47 +59,35 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold *= RESIZE_COEFFICIENT;
         Node<K, V>[] oldTable = table;
         table = new Node[table.length * RESIZE_COEFFICIENT];
-        Node<K, V> suppNode;
         for (int i = 0; i < oldTable.length; i++) {
-            if (oldTable[i] != null) {
-                addNode(oldTable[i].key, oldTable[i].value, hash(oldTable[i].key));
-                if (oldTable[i].next != null) {
-                    suppNode = oldTable[i].next;
-                    while (suppNode != null) {
-                        addNode(suppNode.key, suppNode.value, hash(suppNode.key));
-                        suppNode = suppNode.next;
-                    }
-                }
+            while (oldTable[i] != null) {
+                addNode(oldTable[i].key, oldTable[i].value);
+                oldTable[i] = oldTable[i].next;
             }
         }
         return table;
     }
 
-    private void addNode(K key, V value, int hash) {
-        Node<K, V> node;
-        if ((node = table[hash(key)]) == null) {
-            table[hash(key)] = new Node<>(key, value, hash,null);
-            size++;
-        } else {
-            Node<K, V> suppNode;
-            for (int i = 0; ; ++i) {
-                if (checkKeys(node.key,key)) {
-                    node.value = value;
-                    break;
-                }
-                if ((suppNode = node.next) == null) {
-                    node.next = new Node<>(key, value, hash, null);
-                    size++;
-                    break;
-                }
-                node = suppNode;
+    private void addNode(K key, V value) {
+        Node<K, V> node = table[getIndex(key)];
+        while (node != null) {
+            if (checkKeys(node.key, key)) {
+                node.value = value;
+                return;
             }
+            if (node.next == null) {
+                node.next = new Node<>(key, value, null);
+                size++;
+                return;
+            }
+            node = node.next;
         }
+        table[getIndex(key)] = new Node<>(key, value, null);
+        size++;
     }
 
-    private int hash(Object key) {
-        return key == null ? 0 : key.hashCode() < 0 ? -key.hashCode() % table.length
-                : key.hashCode() % table.length;
+    private int getIndex(Object key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private boolean checkKeys(K firstKey, K secondKey) {
