@@ -35,7 +35,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-
         Node<K, V> currentNode = table[bucketIndex];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
