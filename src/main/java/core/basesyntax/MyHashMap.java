@@ -81,7 +81,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(int keyHash) {
-
         return keyHash % nodeArray.length;
     }
 
