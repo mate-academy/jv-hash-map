@@ -91,8 +91,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hash(Object key) {
-        int h;
+    private int hash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 }
