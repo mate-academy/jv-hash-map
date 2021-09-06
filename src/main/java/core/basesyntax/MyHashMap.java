@@ -16,10 +16,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node currentNode = table[getIndex((key))];
-        Node<K, V> newNode = new Node<>(Objects.hashCode(key), key, value, null);
+        Node currentNode = table[getIndex(key)];
+        Node<K, V> newNode = new Node<>(key, value, null);
         if (currentNode == null) {
-            table[getIndex((key))] = newNode;
+            table[getIndex(key)] = newNode;
             size++;
         }
         while (currentNode != null) {
@@ -77,13 +77,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-
         private final K key;
         private V value;
 
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K,V> next) {
+        public Node(K key, V value, Node<K,V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
