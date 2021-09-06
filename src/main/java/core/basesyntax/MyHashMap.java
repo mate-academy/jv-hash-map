@@ -10,13 +10,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        private Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -31,7 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        Node<K, V> newNode = new Node(calculateBucketIndex(key), key, value, null);
+        Node<K, V> newNode = new Node(key, value, null);
         if (table[calculateBucketIndex(key)] == null) {
             table[calculateBucketIndex(key)] = newNode;
             size++;
@@ -84,7 +82,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     
     private void putNode(Node<K, V> newNode) {
         Node<K, V> currentNode;
-        for (currentNode = table[newNode.hash]; currentNode != null;
+        for (currentNode = table[calculateBucketIndex(newNode.key)]; currentNode != null;
                                     currentNode = currentNode.next) {
             if (Objects.equals(newNode.key, currentNode.key)) {
                 currentNode.value = newNode.value;
