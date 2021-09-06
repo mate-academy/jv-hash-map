@@ -44,16 +44,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> node;
             for (int i = 0; i < oldBuckets.length; i++) {
                 node = oldBuckets[i];
-                if (node == null) {
-                    continue;
-                }
-                while (node.next != null) {
+                while (node != null && node.next != null) {
                     putValue(new Node<>(hash(node.kay), node.kay, node.value, null));
                     size--;
                     node = node.next;
                 }
-                putValue(new Node<>(hash(node.kay), node.kay, node.value, null));
-                size--;
+                if (node != null) {
+                    putValue(new Node<>(hash(node.kay), node.kay, node.value, null));
+                    size--;
+                }
             }
         }
     }
