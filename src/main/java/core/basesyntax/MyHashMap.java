@@ -72,10 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int calculateIndex(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode() % hashTable.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % hashTable.length);
     }
 
     private void resize() {
