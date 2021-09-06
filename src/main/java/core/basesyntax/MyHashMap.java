@@ -9,6 +9,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
     private int threshold;
+    private int capacity;
 
     private class Node<K, V> {
         private final int hash;
@@ -16,24 +17,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        public Node(int hash, K key, V value, Node<K, V> next) {
+            this.hash = hash;
             this.key = key;
             this.value = value;
             this.next = next;
-            hash = key == null ? 0 : Math.abs(key.hashCode()) % table.length;
         }
     }
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
+        capacity = DEFAULT_INITIAL_CAPACITY;
+        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
 
     }
 
     @Override
     public void put(K key, V value) {
         checkForResize();
-        Node<K, V> newNode = new Node<>(key, value, null);
+        Node<K, V> newNode = new Node<>(getHashCodeFromKey(key), key, value, null);
         if (table[newNode.hash] == null) {
             table[newNode.hash] = newNode;
         } else {
@@ -73,7 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void checkForResize() {
         if (size == threshold) {
             Node<K, V>[] temporaryTable = table;
-            table = new Node[table.length * GROW_COEFFICIENT];
+            table = new Node[capacity * GROW_COEFFICIENT];
             size = 0;
             for (Node<K, V> node : temporaryTable) {
                 while (node != null) {
@@ -81,11 +83,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     node = node.next;
                 }
             }
-            threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
+            threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
         }
     }
 
     private int getHashCodeFromKey(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
+        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 }
