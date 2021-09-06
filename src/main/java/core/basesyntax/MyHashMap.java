@@ -1,15 +1,17 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private static final int INCREASE_COEFFICIENT = 2;
     private int size;
     private float threshold;
-    private Node<K, V>[] hashTable;
+    private Node<K, V>[] nodeArray;
 
     public MyHashMap() {
-        hashTable = new Node[DEFAULT_CAPACITY];
+        nodeArray = new Node[DEFAULT_CAPACITY];
         threshold = DEFAULT_CAPACITY * LOAD_FACTOR;
     }
 
@@ -17,9 +19,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         Node<K, V> currentNode = new Node<>(key, value, null);
         resizeArray();
-        Node<K, V> newNode = hashTable[findIndex(key)];
+        Node<K, V> newNode = nodeArray[calculateIndex(key)];
         while (newNode != null) {
-            if (checkKey(newNode, key)) {
+            if (Objects.equals(key, newNode.key)) {
                 newNode.value = value;
                 return;
             }
@@ -30,15 +32,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             newNode = newNode.next;
         }
-        hashTable[findIndex(key)] = currentNode;
+        nodeArray[calculateIndex(key)] = currentNode;
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> thisNode = hashTable[findIndex(key)];
+        Node<K, V> thisNode = nodeArray[calculateIndex(key)];
         while (thisNode != null) {
-            if (checkKey(thisNode, key)) {
+            if (Objects.equals(key, thisNode.key)) {
                 return thisNode.value;
             }
             thisNode = thisNode.next;
@@ -66,8 +68,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resizeArray() {
         if (size == threshold) {
             threshold *= INCREASE_COEFFICIENT;
-            Node<K, V>[] prevHashTable = hashTable;
-            hashTable = new Node[prevHashTable.length * INCREASE_COEFFICIENT];
+            Node<K, V>[] prevHashTable = nodeArray;
+            nodeArray = new Node[prevHashTable.length * INCREASE_COEFFICIENT];
             size = 0;
             for (Node<K, V> node : prevHashTable) {
                 while (node != null) {
@@ -78,20 +80,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private boolean checkKey(Node<K, V> node, K key) {
-        return (node.key == key)
-                || (key != null && key.equals(node.key));
+    private int getIndex(int keyHash) {
+
+        return keyHash % nodeArray.length;
     }
 
-    private int valueIndex(int keyHash) {
-        return keyHash % hashTable.length;
-    }
-
-    private int keyHash(K key) {
+    private int getHash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
-    private int findIndex(K key) {
-        return valueIndex(keyHash(key));
+    private int calculateIndex(K key) {
+        return getIndex(getHash(key));
     }
 }
