@@ -3,7 +3,7 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int INCREASE_VALUE_BY_2 = 2;
+    private static final int GROWTH_COEFFICIENT = 2;
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
@@ -67,10 +67,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        threshold *= INCREASE_VALUE_BY_2;
+        threshold *= GROWTH_COEFFICIENT;
         size = 0;
         Node<K, V>[] prev = table;
-        table = new Node[table.length * INCREASE_VALUE_BY_2];
+        table = new Node[table.length * GROWTH_COEFFICIENT];
         for (Node<K, V> node : prev) {
             while (node != null) {
                 put(node.key, node.value);
