@@ -22,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = table[hash(key)];
+        Node<K, V> node = table[getIndex(key)];
         while (node != null) {
             if (Objects.equals(node.kay, key)) {
                 return node.value;
@@ -42,27 +42,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V>[] oldBuckets = table;
             table = new Node[oldBuckets.length * INCREASE_COEFFICIENT];
             Node<K, V> node;
+            size = 0;
             for (int i = 0; i < oldBuckets.length; i++) {
                 node = oldBuckets[i];
-                while (node != null && node.next != null) {
+                while (node != null) {
                     putValue(new Node<>(node.kay, node.value, null));
-                    size--;
                     node = node.next;
-                }
-                if (node != null) {
-                    putValue(new Node<>(node.kay, node.value, null));
-                    size--;
                 }
             }
         }
     }
 
-    private int hash(K kay) {
+    private int getIndex(K kay) {
         return Math.abs(kay == null ? 0 : (kay.hashCode() % table.length));
     }
 
     private void putValue(Node<K, V> newNode) {
-        Node<K, V> node = table[hash(newNode.kay)];
+        Node<K, V> node = table[getIndex(newNode.kay)];
         while (node != null) {
             if (Objects.equals(node.kay, newNode.kay)) {
                 node.value = newNode.value;
@@ -75,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node = node.next;
         }
-        table[hash(newNode.kay)] = newNode;
+        table[getIndex(newNode.kay)] = newNode;
         size++;
     }
 
