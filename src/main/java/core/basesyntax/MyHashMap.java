@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int INCREASE_COEFFICIENT = 2;
     private Node<K,V>[] hashMapTable;
     private int size;
 
@@ -31,7 +32,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             result = 31 * result + (key == null ? 0 : key.hashCode());
             return result;
         }
-
     }
 
     @Override
@@ -42,25 +42,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (currentNode == null) {
                 hashMapTable[putNode.hash] = putNode;
                 size++;
-                extendCapacityIfNecessary();
+                checkResize();
                 return;
             }
             if ((Objects.equals(currentNode.key, key) || (currentNode.key == null && key == null))
                     && hashMapTable[putNode.hash].next == null) {
                 hashMapTable[putNode.hash] = putNode;
-                //size++;
                 return;
             }
             if (Objects.equals(currentNode.key, key)) {
                 currentNode.value = value;
-                //size++;
                 return;
             }
             if (currentNode.next == null) {
                 currentNode.next = putNode;
                 size++;
-                extendCapacityIfNecessary();
-
+                checkResize();
                 return;
             }
             currentNode = currentNode.next;
@@ -84,11 +81,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void extendCapacityIfNecessary() {
+    private void checkResize() {
         if (size / DEFAULT_LOAD_FACTOR > hashMapTable.length) {
             Node<K, V>[] tempArray = (Node<K, V>[]) new Node[hashMapTable.length];
             tempArray = hashMapTable;
-            hashMapTable = (Node<K, V>[]) new Node[hashMapTable.length * 2];
+            hashMapTable = (Node<K, V>[]) new Node[hashMapTable.length * INCREASE_COEFFICIENT];
             for (int i = 0; i < tempArray.length; i++) {
                 Node<K, V> tempNode = tempArray[i];
                 while (tempNode != null) {
