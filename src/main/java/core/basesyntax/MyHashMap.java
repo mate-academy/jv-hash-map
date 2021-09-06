@@ -16,22 +16,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        Node<K, V> pair = new Node<>(key, value, null);
         int index = getIndex(key);
         Node<K, V> savedNode = table[index];
         while (savedNode != null) {
             if (equalsKey(savedNode, key)) {
-                savedNode.value = pair.value;
+                savedNode.value = value;
                 return;
             }
             if (savedNode.next == null) {
-                savedNode.next = pair;
+                savedNode.next = new Node<>(key, value, null);;
                 size++;
                 return;
             }
             savedNode = savedNode.next;
         }
-        table[index] = pair;
+        table[index] = new Node<>(key, value, null);;
         size++;
     }
 
