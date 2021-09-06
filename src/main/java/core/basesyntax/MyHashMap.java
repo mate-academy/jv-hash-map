@@ -56,20 +56,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void addNode(K key, V value) {
         int index = getIndex(key);
         Node<K, V> node = new Node<>(hash(key), key, value, null);;
-        if (table[index] != null) {
-            Node<K,V> currentNode = table[index];
-            while (currentNode != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    currentNode.value = value;
-                    return;
-                }
-                if (currentNode.next == null) {
-                    currentNode.next = node;
-                    size++;
-                    return;
-                }
-                currentNode = currentNode.next;
+        Node<K,V> currentNode = table[index];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                currentNode.value = value;
+                return;
             }
+            if (currentNode.next == null) {
+                currentNode.next = node;
+                size++;
+                return;
+            }
+            currentNode = currentNode.next;
         }
         table[index] = node;
         size++;
