@@ -7,7 +7,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private int threshold;
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
@@ -21,10 +21,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    MyHashMap() {
+    public MyHashMap() {
         table = (Node<K,V>[])new Node[DEFAULT_INITIAL_CAPACITY];
         threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
-        size = 0;
     }
 
     @Override
