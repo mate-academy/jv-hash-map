@@ -59,10 +59,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold *= RESIZE_COEFFICIENT;
         Node<K, V>[] oldTable = table;
         table = new Node[table.length * RESIZE_COEFFICIENT];
-        for (Node<K, V> node: oldTable) {
-            while (node != null) {
-                addNode(node.key, node.value);
-                node = node.next;
+        for (Node<K, V> nodes: oldTable) {
+            while (nodes != null) {
+                addNode(nodes.key, nodes.value);
+                nodes = nodes.next;
             }
         }
         return table;
