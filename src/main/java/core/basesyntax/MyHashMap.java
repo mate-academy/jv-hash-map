@@ -10,7 +10,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        hashMapTable = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        hashMapTable = new Node[DEFAULT_CAPACITY];
     }
 
     private class Node<K,V> {
@@ -25,29 +25,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-
-        @Override
-        public int hashCode() {
-            int result = 17;
-            result = 31 * result + (key == null ? 0 : key.hashCode());
-            return result;
-        }
     }
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> putNode = new Node<>(computeHash(key), key, value, null);
+        Node<K, V> putNode = new Node<>(computeBucket(key), key, value, null);
         Node<K, V> currentNode = hashMapTable[putNode.hash];
         do {
             if (currentNode == null) {
                 hashMapTable[putNode.hash] = putNode;
                 size++;
                 checkResize();
-                return;
-            }
-            if ((Objects.equals(currentNode.key, key) || (currentNode.key == null && key == null))
-                    && hashMapTable[putNode.hash].next == null) {
-                hashMapTable[putNode.hash] = putNode;
                 return;
             }
             if (Objects.equals(currentNode.key, key)) {
@@ -66,9 +54,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = hashMapTable[computeHash(key)];
+        Node<K, V> currentNode = hashMapTable[computeBucket(key)];
         while (currentNode != null) {
-            if (Objects.equals(currentNode.key, key) || (currentNode.key == null && key == null)) {
+            if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
@@ -83,21 +71,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void checkResize() {
         if (size / DEFAULT_LOAD_FACTOR > hashMapTable.length) {
-            Node<K, V>[] tempArray = (Node<K, V>[]) new Node[hashMapTable.length];
-            tempArray = hashMapTable;
+            Node<K, V>[] tempArray = hashMapTable;
             hashMapTable = (Node<K, V>[]) new Node[hashMapTable.length * INCREASE_COEFFICIENT];
+            size = 0;
             for (int i = 0; i < tempArray.length; i++) {
                 Node<K, V> tempNode = tempArray[i];
                 while (tempNode != null) {
                     put(tempNode.key, tempNode.value);
-                    size--;
                     tempNode = tempNode.next;
                 }
             }
         }
     }
 
-    private int computeHash(K key) {
+    private int computeBucket(K key) {
         return key == null ? 0 : Math.abs(Objects.hash(key) % hashMapTable.length);
     }
 }
