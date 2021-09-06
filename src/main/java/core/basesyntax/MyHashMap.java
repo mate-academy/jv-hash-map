@@ -12,18 +12,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] internalStorage;
     private int size;
 
-    /*making constructor*/
     public MyHashMap() {
         this.threshold = (int) (DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
         internalStorage = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
-
     private class Node<K, V> {
         private int hash;
         private final K key;
         private V value;
-        Node<K, V> next;
+        private Node<K, V> next;
 
         public Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
@@ -37,16 +35,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return key + " = " + value;
         }
 
-
         @Override
-        public boolean equals(Object o) {                /*mb need to rewrite it somehow*/
+        public boolean equals(Object o) {
             if (this == o) {
                 return true;
             }
-            if (o.getClass().equals(Map.Entry.class)) return false;
+            if (o.getClass().equals(Map.Entry.class)) {
+                return false;
+            }
             Node<?, ?> node = (Node<?, ?>) o;
-            return hash == node.hash &&
-                    Objects.equals(key, node.key)
+            return hash == node.hash
+                    && Objects.equals(key, node.key)
                     && Objects.equals(value, node.value);
         }
 
@@ -97,20 +96,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 put(oldTab[i].key, oldTab[i].value);
                 oldTab[i] = oldTab[i].next;
             }
-          /*  if (oldTab[i] != null) {
-                if (oldTab[i].next == null) {
-                    internalStorage[oldTab[i].hashCode() % internalStorage.length] = oldTab[i];
-                } else {
-                    while (oldTab[i] != null) {
-                        if (internalStorage[oldTab[i].hashCode() % internalStorage.length] == null) {
-                            internalStorage[oldTab[i].hashCode() % internalStorage.length] = oldTab[i];
-                        } else {
-                            internalStorage[oldTab[i].hashCode() % internalStorage.length].next = oldTab[i];
-                        }
-                        oldTab[i] = oldTab[i].next;
-                    }
-                }
-            }*/
         }
         return internalStorage;
     }
