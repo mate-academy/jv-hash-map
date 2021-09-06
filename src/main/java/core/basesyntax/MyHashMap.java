@@ -54,12 +54,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> getNode = nodes[getNodeIndex(key)];
-        while (getNode != null) {
-            if (Objects.equals(key, getNode.key)) {
-                return getNode.value;
+        Node<K, V> node = nodes[getNodeIndex(key)];
+        while (node != null) {
+            if (Objects.equals(key, node.key)) {
+                return node.value;
             }
-            getNode = getNode.next;
+            node = node.next;
         }
         return null;
     }
@@ -74,8 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getNodeIndex(K key) {
-        int hash = hash(key) % INITIAL_CAPACITY;
-        return hash < 0 ? Math.abs(hash) : hash;
+        return Math.abs(hash(key)) % nodes.length;
     }
 
     private void checkSize() {
