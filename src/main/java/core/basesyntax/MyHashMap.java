@@ -27,21 +27,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        if (table[hash(key)] == null) {
+        if (table[bucketIndex(key)] == null) {
             Node currentNode = new Node(key, value, null);
-            table[hash(key)] = currentNode;
+            table[bucketIndex(key)] = currentNode;
         } else {
-            Node<K, V> lastNode = table[hash(key)];
-            if (isKeyEquals(lastNode, key, value)) {
-                return;
-            }
+            Node<K, V> lastNode = table[bucketIndex(key)];
             while (lastNode.next != null) {
-                if (isKeyEquals(lastNode, key, value)) {
+                if (isKeyEquals(lastNode.key, key)) {
+                    lastNode.value = value;
                     return;
                 }
                 lastNode = lastNode.next;
             }
-            if (isKeyEquals(lastNode, key, value)) {
+            if (isKeyEquals(lastNode.key, key)) {
+                lastNode.value = value;
                 return;
             }
             Node<K, V> currentNode = new Node<>(key, value, null);
@@ -55,7 +54,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == 0) {
             return null;
         }
-        Node<K, V> currentNode = table[hash(key)];
+        Node<K, V> currentNode = table[bucketIndex(key)];
         if (currentNode != null) {
             while (!Objects.equals(currentNode.key, key)) {
                 if (currentNode.next == null) {
@@ -73,9 +72,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(K key) {
-        int result = key == null ? 0 : key.hashCode() % table.length;
-        return result < 0 ? result * -1 : result;
+    private int bucketIndex(K key) {
+        int index = key == null ? 0 : key.hashCode() % table.length;
+        return Math.abs(index);
     }
 
     private void resize() {
@@ -95,11 +94,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private boolean isKeyEquals(Node<K, V> node, K key, V value) {
-        if (Objects.equals(node.key, key)) {
-            node.value = value;
-            return true;
-        }
-        return false;
+    private boolean isKeyEquals(K nodeKey, K key) {
+        return Objects.equals(nodeKey, key);
     }
 }
