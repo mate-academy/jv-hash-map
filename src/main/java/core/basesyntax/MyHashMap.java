@@ -69,14 +69,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             size = 0;
             Node<K, V>[] nodes = table;
-            table = new Node[table.length << 1];
+            table = new Node[table.length * 2];
             for (Node<K, V> node : nodes) {
                 while (node != null) {
                     put(node.key, node.value);
                     node = node.next;
                 }
             }
-            threshold <<= 1;
+            threshold *= 2;
         }
     }
 
