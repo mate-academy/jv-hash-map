@@ -14,13 +14,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        private Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -31,26 +29,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         checkSize();
         int bucketIndex = getHash(key);
-        int hash = bucketIndex;
         Node<K, V> node = table[bucketIndex];
-        Node<K, V> newNode = new Node<>(hash, key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, null);
         if (node == null) {
             table[bucketIndex] = newNode;
-        } else {
-            while (node != null) {
-                if (Objects.equals(node.key, key)) {
-                    node.value = value;
-                    return;
-                } else {
-                    if (node.next == null) {
-                        node.next = newNode;
-                        size++;
-                        return;
-                    } else {
-                        node = node.next;
-                    }
-                }
+            size++;
+            return;
+        }
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
+                return;
             }
+            if (node.next == null) {
+                node.next = newNode;
+                size++;
+                return;
+            }
+            node = node.next;
         }
         size++;
     }
@@ -74,10 +70,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void checkSize() {
+    private boolean checkSize() {
         if (size >= threshold) {
             resize();
         }
+        return false;
     }
 
     private int getHash(K key) {
