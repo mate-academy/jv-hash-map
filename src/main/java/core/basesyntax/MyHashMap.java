@@ -5,13 +5,14 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private static final int RESIZE_FACTOR = 2;
+    private static final int RESIZE_COEFFICIENT = 2;
     private Node<K, V>[] table;
     private float threshold;
     private int size;
 
     protected MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
+        threshold = table.length * DEFAULT_LOAD_FACTOR;
     }
 
     private class Node<K, V> {
@@ -28,25 +29,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> node = new Node<>(key, value, null);
+        int index = hashNode(key);
         resize();
-        int index = hashNode(node.key);
-        if (table[index] != null) {
-            Node<K, V> currentNode = table[index];
-            while (currentNode != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    currentNode.value = value;
-                    return;
-                }
-                if (currentNode.next == null) {
-                    currentNode.next = node;
-                    size++;
-                    return;
-                }
-                currentNode = currentNode.next;
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
+                return;
             }
+            if (node.next == null) {
+                node.next = new Node<>(key, value, null);
+                size++;
+                return;
+            }
+            node = node.next;
         }
-        table[index] = node;
+        table[index] = new Node<>(key, value, null);
         size++;
     }
 
@@ -68,10 +66,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        threshold = table.length * DEFAULT_LOAD_FACTOR;
         if (size == threshold) {
             Node<K, V>[] oldNode = table;
-            table = new Node[table.length * RESIZE_FACTOR];
+            table = new Node[table.length * RESIZE_COEFFICIENT];
             size = 0;
             for (Node<K, V> node : oldNode) {
                 if (node != null) {
