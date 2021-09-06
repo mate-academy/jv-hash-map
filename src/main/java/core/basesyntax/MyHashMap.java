@@ -4,15 +4,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private static final int RESIZE_FACTOR = 2;
-    private final int capacity;
     private final int threshold;
     private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        capacity = table.length;
-        threshold = (int) (capacity * LOAD_FACTOR);
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     private static class Node<K, V> {
@@ -34,11 +32,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        int bucketIndex = getBucketIndex(key);
-        Node<K, V> node = new Node<>(bucketIndex, key, value, null);
+        int bucketIndex = getBucketIndex(getHash(key));
+        Node<K, V> node = new Node<>(getHash(key), key, value, null);
         Node<K, V> currentNode = table[bucketIndex];
         while (currentNode != null) {
-            if (isKeysEquals(bucketIndex, currentNode.hash, key, currentNode.key)) {
+            if (isKeysEquals(key, currentNode.key)) {
                 currentNode.value = value;
                 return;
             }
@@ -55,10 +53,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int bucketIndex = getBucketIndex(key);
+        int bucketIndex = getBucketIndex(getHash(key));
         Node<K, V> node = table[bucketIndex];
         while (node != null) {
-            if (isKeysEquals(bucketIndex, node.hash, key, node.key)) {
+            if (isKeysEquals(key, node.key)) {
                 return node.value;
             }
             node = node.next;
@@ -71,24 +69,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private boolean isKeysEquals(int keyHash, int nodeKeyHash, K key, K nodeKey) {
-        return keyHash == nodeKeyHash
-                && (key == nodeKey || (key != null && key.equals(nodeKey)));
+    private boolean isKeysEquals(K key, K nodeKey) {
+        return key == nodeKey || (key != null && key.equals(nodeKey));
     }
 
-    private int supplementalHash(int hash) {
-        hash ^= (hash >>> 20) ^ (hash >>> 12);
-        return hash ^ (hash >>> 7) ^ (hash >>> 4);
+    private int getHash(K key) {
+        return key == null ? 0 : key.hashCode();
     }
 
-    private int getBucketIndex(K key) {
-        return key == null ? 0 : supplementalHash(key.hashCode()) & (capacity - 1);
+    private int getBucketIndex(int hash) {
+        return Math.abs(hash % table.length);
     }
 
     private void resize() {
         size = 0;
         Node<K, V>[] oldTable = table;
-        table = new Node[capacity * RESIZE_FACTOR];
+        table = new Node[table.length * RESIZE_FACTOR];
         transfer(oldTable);
     }
 
