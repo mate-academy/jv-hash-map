@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -13,13 +15,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private Node<K, V> next;
         private V value;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -29,30 +29,38 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
 
-        ensureCapacity();
-        Node<K, V> newNode = new Node<>(hash(key), key, value, null);
-        int indexOfBucket = Math.abs(newNode.hash) % table.length;
-        if (table[indexOfBucket] == null) {
-            table[indexOfBucket] = newNode;
-        } else {
-            Node<K, V> currentNode = table[indexOfBucket];
-            Node<K, V> prevNode;
-            do {
-                prevNode = currentNode;
-                if (isKeyExist(currentNode, newNode.hash, newNode.key)) {
-                    currentNode.value = newNode.value;
-                    return;
-                }
-            } while ((currentNode = currentNode.next) != null);
-            prevNode.next = newNode;
+        if (size >= threshold) {
+            resize();
         }
+        int index = getIndex(key);
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (Objects.equals(key, node.key)) {
+                node.value = value;
+                return;
+            }
+            if (node.next == null) {
+                node.next = new Node<>(key, value, null);
+                size++;
+                return;
+            }
+            node = node.next;
+        }
+        table[index] = new Node<>(key, value, null);
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = getNode(hash(key), key);
-        return currentNode == null ? null : currentNode.value;
+        int index = getIndex(key);
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (Objects.equals(key, node.key)) {
+                return node.value;
+            }
+            node = node.next;
+        }
+        return null;
     }
 
     @Override
@@ -60,46 +68,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void ensureCapacity() {
-        if (size == threshold) {
-            int newCapacity = table.length << 1;
-            Node<K, V>[] newTable = new Node[newCapacity];
-            threshold = (int) (newTable.length * DEFAULT_LOAD_FACTOR);
-            transferNodesToNewTable(newTable);
-        }
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
-    private void transferNodesToNewTable(Node<K, V>[] newTable) {
+    private void resize() {
+        size = 0;
+        threshold *= 2;
         Node<K, V>[] oldTable = table;
-        table = newTable;
-        for (Node<K, V> currentNode : oldTable) {
-            while (currentNode != null) {
-                put(currentNode.key, currentNode.value);
-                currentNode = currentNode.next;
-                size--;
+        table = new Node[table.length * 2];
+        for (Node<K, V> current : oldTable) {
+            while (current != null) {
+                put(current.key, current.value);
+                current = current.next;
             }
         }
-    }
-
-    private int hash(K key) {
-        return (key == null) ? 0 : key.hashCode();
-    }
-
-    private Node<K, V> getNode(int hash, K key) {
-        int indexOfBucket = Math.abs(hash) % table.length;
-        Node<K, V> currentNode = table[indexOfBucket];
-        while (currentNode != null) {
-            if (isKeyExist(currentNode, hash, key)) {
-                return currentNode;
-            }
-            currentNode = currentNode.next;
-        }
-        return null;
-    }
-
-    private boolean isKeyExist(Node<K, V> nodeToCheck, int hash, K key) {
-        return (hash == nodeToCheck.hash)
-                && (key == nodeToCheck.key
-                || (key != null && key.equals(nodeToCheck.key)));
     }
 }
