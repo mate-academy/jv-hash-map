@@ -8,13 +8,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int MULTIPLIER_FOR_THRESHOLD_AND_CAPACITY = 2;
     private int threshold;
     private int size;
-    private int capacity;
     private Node<K, V>[] nodes;
 
     public MyHashMap() {
-        capacity = DEFAULT_CAPACITY;
-        threshold = (int) (capacity * LOAD_FACTOR);
-        nodes = new Node[capacity];
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
+        nodes = new Node[DEFAULT_CAPACITY];
     }
 
     private static class Node<K, V> {
@@ -72,16 +70,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int index(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
+        return (key == null) ? 0 : Math.abs(key.hashCode() % nodes.length);
     }
 
     private void increaseArray() {
         if (size == threshold) {
             size = 0;
             threshold *= MULTIPLIER_FOR_THRESHOLD_AND_CAPACITY;
-            capacity *= MULTIPLIER_FOR_THRESHOLD_AND_CAPACITY;
             Node<K, V>[] tempArray = nodes;
-            nodes = new Node[capacity];
+            nodes = new Node[nodes.length * MULTIPLIER_FOR_THRESHOLD_AND_CAPACITY];
             for (Node<K, V> node : tempArray) {
                 while (node != null) {
                     put(node.key, node.value);
