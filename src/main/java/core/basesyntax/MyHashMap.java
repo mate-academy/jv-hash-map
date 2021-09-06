@@ -24,13 +24,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> suppNode = table[getIndex(key)];
-        if (suppNode == null) {
-            return null;
-        }
-        while (!checkKeys(suppNode.key, key)) {
+        while (suppNode != null) {
+            if (checkKeys(suppNode.key, key)) {
+                return suppNode.value;
+            }
             suppNode = suppNode.next;
         }
-        return suppNode.value;
+        return null;
     }
 
     @Override
@@ -59,10 +59,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold *= RESIZE_COEFFICIENT;
         Node<K, V>[] oldTable = table;
         table = new Node[table.length * RESIZE_COEFFICIENT];
-        for (int i = 0; i < oldTable.length; i++) {
-            while (oldTable[i] != null) {
-                addNode(oldTable[i].key, oldTable[i].value);
-                oldTable[i] = oldTable[i].next;
+        for (Node<K, V> node: oldTable) {
+            while (node != null) {
+                addNode(node.key, node.value);
+                node = node.next;
             }
         }
         return table;
