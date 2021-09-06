@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> newNode = new Node<>(key, value, null, getHashCode(key));
         int indexOfBucket = newNode.hashCode % table.length;
         Node<K, V> workingNode = table[indexOfBucket];
-        while (workingNode != null){
+        while (workingNode != null) {
             if (Objects.equals(key, workingNode.key)) {
                 workingNode.value = newNode.value;
                 return;
