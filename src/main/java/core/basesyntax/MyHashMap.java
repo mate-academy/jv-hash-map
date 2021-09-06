@@ -16,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        Node<K, V> newNode = new Node<>(hash(key), key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, null);
         putValue(newNode);
     }
 
@@ -45,12 +45,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             for (int i = 0; i < oldBuckets.length; i++) {
                 node = oldBuckets[i];
                 while (node != null && node.next != null) {
-                    putValue(new Node<>(hash(node.kay), node.kay, node.value, null));
+                    putValue(new Node<>(node.kay, node.value, null));
                     size--;
                     node = node.next;
                 }
                 if (node != null) {
-                    putValue(new Node<>(hash(node.kay), node.kay, node.value, null));
+                    putValue(new Node<>(node.kay, node.value, null));
                     size--;
                 }
             }
@@ -62,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putValue(Node<K, V> newNode) {
-        Node<K, V> node = table[newNode.hashCod];
+        Node<K, V> node = table[hash(newNode.kay)];
         while (node != null) {
             if (Objects.equals(node.kay, newNode.kay)) {
                 node.value = newNode.value;
@@ -75,18 +75,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node = node.next;
         }
-        table[newNode.hashCod] = newNode;
+        table[hash(newNode.kay)] = newNode;
         size++;
     }
 
     private class Node<K, V> {
-        private int hashCod;
         private K kay;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hashCod, K kay, V value, Node<K, V> next) {
-            this.hashCod = hashCod;
+        public Node(K kay, V value, Node<K, V> next) {
             this.kay = kay;
             this.value = value;
             this.next = next;
