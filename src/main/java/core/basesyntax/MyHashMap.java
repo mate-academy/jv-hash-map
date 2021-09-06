@@ -3,7 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private static final int RESIZE_FACTOR = 2;
+    private static final int RESIZE_COEFFICIENT = 2;
     private Node<K, V>[] table;
     private float threshold;
     private int size;
@@ -55,7 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         if (size == threshold) {
             Node<K, V>[] previousTable = table;
-            table = (Node<K, V>[]) new Node[table.length * RESIZE_FACTOR];
+            table = (Node<K, V>[]) new Node[table.length * RESIZE_COEFFICIENT];
             size = 0;
             for (Node<K, V> currentNode : previousTable) {
                 while (currentNode != null) {
