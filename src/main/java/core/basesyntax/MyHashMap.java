@@ -30,7 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        int index = nodeIndex(key);
+        int index = getNodeIndex(key);
         Node<K,V> currentNode = table[index];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
@@ -50,7 +50,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = nodeIndex(key);
+        int index = getNodeIndex(key);
         Node<K,V> node = table[index];
         while (node != null) {
             if (Objects.equals(node.key,key)) {
@@ -66,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int nodeIndex(K key) {
+    private int getNodeIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
