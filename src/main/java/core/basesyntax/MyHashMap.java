@@ -15,11 +15,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private class Node<K, V> {
         private K key;
         private V value;
-        private int hash;
         private Node<K, V> next;
 
-        private Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -30,7 +28,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         resize();
         if (table[hash(key)] == null) {
-            Node currentNode = new Node(hash(key), key, value, null);
+            Node currentNode = new Node(key, value, null);
             table[hash(key)] = currentNode;
         } else {
             Node<K, V> lastNode = table[hash(key)];
@@ -46,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (isKeyEquals(lastNode, key, value)) {
                 return;
             }
-            Node<K, V> currentNode = new Node<>(hash(key), key, value, null);
+            Node<K, V> currentNode = new Node<>(key, value, null);
             lastNode.next = currentNode;
         }
         size++;
