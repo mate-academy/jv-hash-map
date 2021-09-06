@@ -27,33 +27,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        checkSize();
-        int bucketIndex = getHash(key);
-        Node<K, V> node = table[bucketIndex];
-        Node<K, V> newNode = new Node<>(key, value, null);
-        if (node == null) {
-            table[bucketIndex] = newNode;
-            size++;
-            return;
+        if (checkSize()) {
+            resize();
         }
+        int bucketIndex = getIndex(key);
+        Node<K, V> node = table[bucketIndex];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
                 node.value = value;
                 return;
             }
             if (node.next == null) {
-                node.next = newNode;
+                node.next = new Node<>(key, value, null);
                 size++;
                 return;
             }
             node = node.next;
         }
+        table[bucketIndex] = new Node<>(key, value, null);
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        int bucketIndex = getHash(key);
+        int bucketIndex = getIndex(key);
         Node<K, V> neededNode = table[bucketIndex];
         while (neededNode != null) {
             if (Objects.equals(neededNode.key, key)) {
@@ -71,13 +68,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean checkSize() {
-        if (size >= threshold) {
-            resize();
-        }
-        return false;
+        return size >= threshold;
     }
 
-    private int getHash(K key) {
+    private int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
