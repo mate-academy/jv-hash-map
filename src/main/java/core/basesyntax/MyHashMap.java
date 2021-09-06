@@ -19,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Node<K, V> savedNode = table[index];
         while (savedNode != null) {
-            if (equalsKey(savedNode, key)) {
+            if (equalsKey(savedNode.key, key)) {
                 savedNode.value = value;
                 return;
             }
@@ -39,7 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Node<K, V> pair = table[index];
         while (pair != null) {
-            if (equalsKey(pair, key)) {
+            if (equalsKey(pair.key, key)) {
                 return pair.value;
             }
             pair = pair.next;
@@ -74,8 +74,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return getHashCode(key) % table.length;
     }
 
-    private boolean equalsKey(Node<K, V> pair, K key) {
-        return (key == pair.key) || (key != null && key.equals(pair.key));
+    private boolean equalsKey(K nodeKey, K key) {
+        return (key == nodeKey) || (key != null && key.equals(nodeKey));
     }
 
     private static class Node<K, V> {
