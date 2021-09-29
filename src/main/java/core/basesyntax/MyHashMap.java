@@ -9,7 +9,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private Node<K, V>[] array;
 
-
     public MyHashMap() {
         array = new Node[INITIAL_CAPACITY];
         capacity = INITIAL_CAPACITY;
@@ -18,10 +17,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        int hash;
-        K key;
-        V value;
-        Node<K, V> next;
+        private int hash;
+        private K key;
+        private V value;
+        private Node<K, V> next;
 
         private Node(K key, V value) {
             this.key = key;
@@ -67,12 +66,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-
-    private Node<K, V> getNodeByindex(int index) {
-        checkIndex(index);
-        return array[index];
-    }
-
     private void addNode(Node<K, V> node, int index) {
         if (array[index] == null) {
             array[index] = node;
@@ -95,7 +88,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return currentNode;
     }
 
-    Node<K, V> findNodeByKey(K key) {
+    private Node<K, V> findNodeByKey(K key) {
         Node<K, V> currentNode = array[getIndex(getHash(key))];
         while (currentNode != null) {
             if (currentNode.key == null ? key == null : currentNode.key.equals(key)) {
@@ -104,11 +97,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             currentNode = currentNode.next;
         }
         return null;
-    }
-
-    private void checkIndex(int index) {
-        if (index < 0 || index >= size) {
-            throw new ArrayIndexOutOfBoundsException("Wrong index" + index);
-        }
     }
 }
