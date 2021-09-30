@@ -10,10 +10,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] array;
 
     public MyHashMap() {
-        array = new Node[INITIAL_CAPACITY];
         capacity = INITIAL_CAPACITY;
+        array = new Node[capacity];
         size = INITIAL_SIZE;
-        threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
+        threshold = (int) (capacity * LOAD_FACTOR);
     }
 
     private class Node<K, V> {
@@ -33,7 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         checkCapacity();
         Node<K, V> node = new Node(key, value);
         node.hash = getHash(key);
-        int index = getIndex(getHash(key));
+        int index = getIndex(node.hash);
         addNode(node, index);
     }
 
@@ -47,6 +47,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private void checkCapacity() {
+        if (size == threshold) {
+            resize();
+        }
+    }
+
+    private void resize() {
+        capacity *= 2;
+        threshold = (int) (capacity * LOAD_FACTOR);
+        size = 0;
+        Node<K, V>[] tempArray = array;
+        array = new Node[capacity];
+        for (Node<K, V> currentNode : tempArray) {
+            while (currentNode != null) {
+                put(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
+            }
+        }
+    }
+
     private int getHash(K key) {
         if (key != null) {
             return key.hashCode() < 0 ? -key.hashCode() : key.hashCode();
@@ -58,30 +78,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return hash % capacity;
     }
 
-    private void checkCapacity() {
-        if (size == capacity * LOAD_FACTOR) {
-            Node<K, V>[] newArray = new Node[capacity * 2];
-            System.arraycopy(array, 0, newArray, 0, array.length);
-            array = newArray;
-        }
-    }
-
     private void addNode(Node<K, V> node, int index) {
         if (array[index] == null) {
             array[index] = node;
             size++;
             return;
         }
-        Node<K, V> similarKeyNode = findNodeByKey(node.key);
-        if (similarKeyNode != null) {
-            similarKeyNode.value = node.value;
+        Node<K, V> nodeByKey = findNodeByKey(node.key);
+        if (nodeByKey != null) {
+            nodeByKey.value = node.value;
             return;
         }
-        findlastNode(array[index]).next = node;
+        findLastNode(array[index]).next = node;
         size++;
     }
 
-    private Node<K, V> findlastNode(Node<K, V> currentNode) {
+    private Node<K, V> findLastNode(Node<K, V> currentNode) {
         while (currentNode.next != null) {
             currentNode = currentNode.next;
         }
