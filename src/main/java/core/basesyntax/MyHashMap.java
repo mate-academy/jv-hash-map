@@ -17,7 +17,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
@@ -32,8 +31,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         checkCapacity();
         Node<K, V> node = new Node(key, value);
-        node.hash = getHash(key);
-        int index = getIndex(node.hash);
+        int hash = getHash(key);
+        int index = getIndex(hash);
         addNode(node, index);
     }
 
@@ -68,10 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHash(K key) {
-        if (key != null) {
-            return key.hashCode() < 0 ? -key.hashCode() : key.hashCode();
-        }
-        return 0;
+        return key == null ? 0 : Math.abs(key.hashCode());
     }
 
     private int getIndex(int hash) {
