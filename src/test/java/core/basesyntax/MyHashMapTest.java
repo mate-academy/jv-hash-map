@@ -211,13 +211,13 @@ public class MyHashMapTest {
     @Test
     public void getSizeWithCollisionAtZeroPosition() {
         MyMap<Bus, Integer> myHashMap = new MyHashMap<>();
-        for (int i = 0; i < 13; i++) {
+        for (int i = 0; i < 1000; i++) {
             Bus bus = new Bus("model_" + i, "color_" + i);
             myHashMap.put(bus, i);
         }
         Assert.assertEquals("Test failed! The size isn't correct. Expected 1000 but was "
-                + myHashMap.getSize(), 13, myHashMap.getSize());
-        for (int i = 0; i < 13; i++) {
+                + myHashMap.getSize(), 1000, myHashMap.getSize());
+        for (int i = 0; i < 1000; i++) {
             Assert.assertEquals(Integer.valueOf(i),
                     myHashMap.getValue(new Bus("model_" + i, "color_" + i)));
         }
