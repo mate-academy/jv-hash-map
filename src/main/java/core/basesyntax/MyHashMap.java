@@ -23,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size + 1 > threshold) {
+        if (size == threshold) {
             resize();
         }
         int i = Math.abs(hash(key) % table.length);
@@ -31,22 +31,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[i] == null) {
             table[i] = newNode;
             size++;
-            //return;
-        } else {
-            Node<K, V> node = table[i];
-            while (node != null) {
-                newNode = new Node<>(hash(key), key, value, null);
-                if (node.key == key || (node.key != null && node.key.equals(key))) {
-                    node.value = value;
-                    return;
-                }
-                if (node.next == null) {
-                    node.next = newNode;
-                    size++;
-                    return;
-                }
-                node = node.next;
+            return;
+        }
+        Node<K, V> node = table[i];
+        while (node != null) {
+            newNode = new Node<>(hash(key), key, value, null);
+            if (node.key == key || (node.key != null && node.key.equals(key))) {
+                node.value = value;
+                return;
             }
+            if (node.next == null) {
+                node.next = newNode;
+                size++;
+                return;
+            }
+            node = node.next;
         }
     }
 
