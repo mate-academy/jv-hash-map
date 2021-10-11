@@ -1,36 +1,55 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private Node<K, V>[] table;
-    private int defCapacity = 16;
-    private int capacity;
+    private static final int defCapacity = 16;
+    private static final double loadFactor = 0.75;
+    private Node<K, V>[] table = new Node[defCapacity];
+    private int capacity = defCapacity;
     private int size = 0;
-    private double loadFactor = 0.75;
-    private int threshold = 0;
+    private int threshold = (int) (capacity * loadFactor);
 
-    private void resize() {
-        if (table == null || capacity == 0) {
-            capacity = defCapacity;
-            table = new Node[defCapacity];
-            threshold = (int) (capacity * loadFactor);
-        } else {
-            capacity = capacity * 2;
-            threshold = (int) (capacity * loadFactor);
-            size = 0;
-            Node<K, V>[] oldTable = table;
-            table = new Node[capacity];
-            for (Node<K, V> node : oldTable) {
-                while (node != null) {
-                    put(node.getKey(), node.getValue());
-                    node = node.getNext();
-                }
-            }
+    private static class Node<K, V> {
+        private int hash;
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        public int getHash() {
+            return hash;
+        }
+
+        public void setHash(int hash) {
+            this.hash = hash;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public void setKey(K key) {
+            this.key = key;
+        }
+
+        public V getValue() {
+            return value;
+        }
+
+        public void setValue(V value) {
+            this.value = value;
+        }
+
+        public Node<K, V> getNext() {
+            return next;
+        }
+
+        public void setNext(Node<K, V> next) {
+            this.next = next;
         }
     }
 
     @Override
     public void put(K key, V value) {
-        if (capacity == 0 || size + 1 > threshold) {
+        if (size >= threshold) {
             resize();
         }
         Node<K, V> node = new Node<>();
@@ -38,9 +57,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         node.setKey(key);
         node.setValue(value);
 
-        Node<K, V> curNode = table[getBucketIndex(node.getHash())];
+        Node<K, V> curNode = table[getBucketIndex(node.getKey())];
         if (curNode == null) {
-            table[Math.abs(node.getHash()) % capacity] = node;
+            table[getBucketIndex(node.getKey())] = node;
             size++;
         } else {
             while (curNode.getNext() != null && !keysAreEquals(curNode.getKey(), key)) {
@@ -55,20 +74,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getBucketIndex(int hash) {
-        return Math.abs(hash) % capacity;
-    }
-
-    private boolean keysAreEquals(K key1, K key2) {
-        return key1 == key2 || (key1 != null && key1.equals(key2));
-    }
-
     @Override
     public V getValue(K key) {
         if (capacity == 0 || size == 0) {
             return null;
         }
-        Node<K, V> curNode = table[key == null ? 0 : getBucketIndex(key.hashCode())];
+        Node<K, V> curNode = table[key == null ? 0 : getBucketIndex(key)];
         if (curNode == null) {
             return null;
         }
@@ -81,5 +92,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private int getBucketIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
+    }
+
+    private boolean keysAreEquals(K key1, K key2) {
+        return key1 == key2 || (key1 != null && key1.equals(key2));
+    }
+
+    private void resize() {
+        capacity = capacity * 2;
+        threshold = (int) (capacity * loadFactor);
+        size = 0;
+        Node<K, V>[] oldTable = table;
+        table = new Node[capacity];
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.getKey(), node.getValue());
+                node = node.getNext();
+            }
+        }
+
     }
 }
