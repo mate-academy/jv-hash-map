@@ -13,38 +13,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
-
-        public int getHash() {
-            return hash;
-        }
-
-        public void setHash(int hash) {
-            this.hash = hash;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public void setKey(K key) {
-            this.key = key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
-        }
-
-        public Node<K, V> getNext() {
-            return next;
-        }
-
-        public void setNext(Node<K, V> next) {
-            this.next = next;
-        }
     }
 
     @Override
@@ -53,22 +21,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         Node<K, V> node = new Node<>();
-        node.setHash(key == null ? 0 : key.hashCode());
-        node.setKey(key);
-        node.setValue(value);
+        node.hash = key == null ? 0 : key.hashCode();
+        node.key = key;
+        node.value = value;
 
-        Node<K, V> curNode = table[getBucketIndex(node.getKey())];
+        Node<K, V> curNode = table[getBucketIndex(node.key)];
         if (curNode == null) {
-            table[getBucketIndex(node.getKey())] = node;
+            table[getBucketIndex(node.key)] = node;
             size++;
         } else {
-            while (curNode.getNext() != null && !keysAreEquals(curNode.getKey(), key)) {
-                curNode = curNode.getNext();
+            while (curNode.next != null && !keysAreEquals(curNode.key, key)) {
+                curNode = curNode.next;
             }
-            if (keysAreEquals(curNode.getKey(), key)) {
-                curNode.setValue(value);
+            if (keysAreEquals(curNode.key, key)) {
+                curNode.value = value;
             } else {
-                curNode.setNext(node);
+                curNode.next = node;
                 size++;
             }
         }
@@ -79,14 +47,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (capacity == 0 || size == 0) {
             return null;
         }
-        Node<K, V> curNode = table[key == null ? 0 : getBucketIndex(key)];
-        if (curNode == null) {
-            return null;
+        Node<K, V> curNode = table[getBucketIndex(key)];
+        while (curNode != null) {
+            if (keysAreEquals(curNode.key, key)) {
+                return curNode.value;
+            }
+            curNode = curNode.next;
         }
-        while (curNode.getNext() != null && !keysAreEquals(curNode.getKey(), key)) {
-            curNode = curNode.getNext();
-        }
-        return curNode.getValue();
+        return null;
+
     }
 
     @Override
@@ -110,8 +79,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[capacity];
         for (Node<K, V> node : oldTable) {
             while (node != null) {
-                put(node.getKey(), node.getValue());
-                node = node.getNext();
+                put(node.key, node.value);
+                node = node.next;
             }
         }
 
