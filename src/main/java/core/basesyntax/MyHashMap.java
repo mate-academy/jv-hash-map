@@ -21,7 +21,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         Node<K, V> node = new Node<>();
-        node.hash = key == null ? 0 : key.hashCode();
         node.key = key;
         node.value = value;
 
