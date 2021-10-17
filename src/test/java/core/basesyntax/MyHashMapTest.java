@@ -51,7 +51,7 @@ public class MyHashMapTest {
     }
 
     @Test
-    public void putTheSameElement() {
+     public void putTheSameElement() {
         MyMap<Car, Integer> myHashMap = new MyHashMap<>();
         myHashMap.put(firstCar, 3);
         myHashMap.put(secondCar, 5);
