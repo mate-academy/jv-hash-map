@@ -29,8 +29,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[getIndex(key)] = node;
             size++;
         } else {
-            Node<K,V> indexNode = table[getIndex(key)];
-            for (; indexNode != null; indexNode = indexNode.next) {
+            for (Node<K,V> indexNode = table[getIndex(key)];
+                    indexNode != null; indexNode = indexNode.next) {
                 if (isEqual(key, indexNode.key)) {
                     indexNode.value = value;
                     return;
@@ -46,12 +46,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> indexNode = table[getIndex(key)];
-        if (indexNode != null) {
-            for (; indexNode != null; indexNode = indexNode.next) {
-                if (isEqual(key, indexNode.key)) {
-                    return indexNode.value;
-                }
+        for (Node<K, V> indexNode = table[getIndex(key)];
+                indexNode != null; indexNode = indexNode.next) {
+            if (isEqual(key, indexNode.key)) {
+                return indexNode.value;
             }
         }
         return null;
@@ -63,7 +61,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return key == null ? 0 : Math.abs((key.hashCode() + 17) % table.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private boolean isEqual(Object firstObject, Object secondObject) {
@@ -77,10 +75,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = table;
         table = (Node<K, V>[]) new Node[table.length << 1];
         for (Node<K, V> node : oldTable) {
-            if (node != null) {
-                for (; node != null; node = node.next) {
-                    put(node.key, node.value);
-                }
+            for (; node != null; node = node.next) {
+                put(node.key, node.value);
             }
         }
     }
