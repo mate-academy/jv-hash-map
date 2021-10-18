@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -25,13 +27,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         Node<K, V> node = new Node<>(key, value, null);
-        if (table[getIndex(key)] == null) {
-            table[getIndex(key)] = node;
+        int nodeIndex = getIndex(key);
+        if (table[nodeIndex] == null) {
+            table[nodeIndex] = node;
             size++;
         } else {
-            for (Node<K,V> indexNode = table[getIndex(key)];
+            for (Node<K,V> indexNode = table[nodeIndex];
                     indexNode != null; indexNode = indexNode.next) {
-                if (isEqual(key, indexNode.key)) {
+                if (Objects.equals(key, indexNode.key)) {
                     indexNode.value = value;
                     return;
                 }
@@ -48,7 +51,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         for (Node<K, V> indexNode = table[getIndex(key)];
                 indexNode != null; indexNode = indexNode.next) {
-            if (isEqual(key, indexNode.key)) {
+            if (Objects.equals(key, indexNode.key)) {
                 return indexNode.value;
             }
         }
@@ -62,11 +65,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
-    }
-
-    private boolean isEqual(Object firstObject, Object secondObject) {
-        return firstObject == secondObject
-                || firstObject != null && firstObject.equals(secondObject);
     }
 
     private void resize() {
