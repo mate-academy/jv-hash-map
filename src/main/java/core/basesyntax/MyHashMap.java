@@ -33,7 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
 
-        int position = hash(key);
+        int position = getIndex(key);
         Node<K, V> newNode = new Node<>(key, value, null);
         if (table[position] == null) {
             table[position] = newNode;
@@ -63,23 +63,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (table.length * LOAD_FACTOR);
         size = 0;
         transfer(oldTable);
-
     }
 
     private void transfer(Node<K, V>[] oldTable) {
-
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
             }
         }
-
     }
 
     @Override
     public V getValue(K key) {
-        int index = hash(key);
+        int index = getIndex(key);
         Node<K, V> node = table[index];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
@@ -95,7 +92,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(K key) {
+    private int getIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % DEFAULT_CAPACITY);
     }
 }
