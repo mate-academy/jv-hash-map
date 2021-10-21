@@ -33,7 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
 
-        int position = hash(key);
+        int position = getIndex(key);
         Node<K, V> newNode = new Node<>(key, value, null);
         if (table[position] == null) {
             table[position] = newNode;
