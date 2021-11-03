@@ -5,24 +5,22 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private int nodesSize;
+
     private Node<K, V>[] nodes;
     private int size;
 
     {
-        nodesSize = DEFAULT_CAPACITY;
-        nodes = new Node[nodesSize];
+        nodes = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size == nodesSize * LOAD_FACTOR) {
+        if (size == nodes.length * LOAD_FACTOR) {
             grow();
         }
         Node<K, V> newNode = nodes[getPosition(key)];
         if (newNode == null) {
-            newNode = new Node(key, value, null);
-            nodes[getPosition(key)] = newNode;
+            nodes[getPosition(key)] = new Node(key, value, null);
             size++;
         } else {
             while (newNode != null) {
@@ -59,13 +57,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getPosition(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % nodesSize);
+        return key == null ? 0 : Math.abs(key.hashCode() % nodes.length);
     }
 
     private void grow() {
         size = 0;
         Node<K, V>[] copyNodes = nodes;
-        nodes = new Node[nodesSize * 2];
+        nodes = new Node[nodes.length * 2];
         for (Node<K, V> copyNode : copyNodes) {
             while (copyNode != null) {
                 put(copyNode.key, copyNode.value);
