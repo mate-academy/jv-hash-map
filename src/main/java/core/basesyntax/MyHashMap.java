@@ -5,22 +5,12 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int MULTIPLIER = 2;
-    private int initialCapacity;
     private int size;
     private Node<K, V>[] array;
 
     public MyHashMap() {
-        initialCapacity = DEFAULT_CAPACITY;
-        array = new Node[initialCapacity];
+        array = new Node[DEFAULT_CAPACITY];
         size = 0;
-    }
-
-    private int getIndex(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode() % initialCapacity);
     }
 
     @Override
@@ -70,7 +60,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         size = 0;
         Node<K, V>[] newSize = array;
-        array = new Node[array.length * MULTIPLIER];
+        array = new Node[array.length * 2];
         for (Node<K, V> iterate : newSize) {
             Node<K, V> node = iterate;
             while (node != null) {
@@ -78,6 +68,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node = node.next;
             }
         }
+    }
+
+    private int getIndex(K key) {
+        if (key == null) {
+            return 0;
+        }
+        return Math.abs(key.hashCode() % DEFAULT_CAPACITY);
     }
 
     private static class Node<K, V> {
@@ -89,10 +86,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = values;
             this.next = next;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
         }
     }
 }
