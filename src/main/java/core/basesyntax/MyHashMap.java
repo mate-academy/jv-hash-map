@@ -5,24 +5,19 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private Node<K, V>[] buckets;
-    private int capacity;
+    private Node<K, V>[] buckets = new Node[DEFAULT_CAPACITY];
+    private int capacity = DEFAULT_CAPACITY;
     private int size;
-    private int threshold;
-
-    public MyHashMap() {
-        this.buckets = new Node[DEFAULT_CAPACITY];
-        this.capacity = DEFAULT_CAPACITY;
-        this.threshold = (int) (capacity * LOAD_FACTOR);
-    }
+    private int threshold = (int) (capacity * LOAD_FACTOR);
 
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value, null);
+        int index = getIndexByKey(key);
+
         if (size >= threshold) {
             grow();
         }
-        int index = getIndexByKey(key);
         if (buckets[index] == null) {
             fillEmptyBucket(newNode, index);
         } else {
@@ -34,15 +29,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int index = getIndexByKey(key);
         V value;
-        Node<K, V> node = buckets[index];
-        if (node == null) {
+        Node<K, V> currentNode = buckets[index];
+
+        if (currentNode == null) {
             return null;
         }
-        value = node.value;
-        while (node.next != null) {
-            node = node.next;
-            if (Objects.equals(node.key, key)) {
-                value = node.value;
+        value = currentNode.value;
+        while (currentNode.next != null) {
+            currentNode = currentNode.next;
+            if (Objects.equals(currentNode.key, key)) {
+                value = currentNode.value;
             }
         }
         return value;
@@ -53,36 +49,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getIndexByKey(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
-    }
-
     private void fillEmptyBucket(Node<K, V> node, int index) {
         buckets[index] = node;
         size++;
     }
 
     private void addNextToBucket(Node<K, V> node, int index) {
-        Node<K, V> prev = buckets[index];
-        if (isEquals(node, prev)) {
-            node.next = prev.next;
+        Node<K, V> currentNode = buckets[index];
+        if (isEquals(node, currentNode)) {
+            node.next = currentNode.next;
             buckets[index] = node;
         } else {
-            while (prev.next != null) {
-                if (isEquals(node, prev.next)) {
-                    node.next = prev.next.next;
-                    prev.next = node;
+            while (currentNode.next != null) {
+                if (isEquals(node, currentNode.next)) {
+                    node.next = currentNode.next.next;
+                    currentNode.next = node;
                     return;
                 }
-                prev = prev.next;
+                currentNode = currentNode.next;
             }
-            prev.next = node;
+            currentNode.next = node;
             size++;
         }
     }
 
-    private boolean isEquals(Node<K, V> firstNode, Node<K, V> secondNode) {
-        return firstNode.hash == secondNode.hash && Objects.equals(firstNode.key, secondNode.key);
+    private boolean isEquals(Node<K, V> nodeA, Node<K, V> nodeB) {
+        return nodeA.hash == nodeB.hash && Objects.equals(nodeA.key, nodeB.key);
     }
 
     private void grow() {
@@ -95,22 +87,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void transfer(Node<K, V>[] oldBuckets) {
         size = 0;
         threshold = (int) (capacity * LOAD_FACTOR);
-        for (Node<K, V> oldBucket : oldBuckets) {
-            if (oldBucket != null) {
-                Node<K, V> node = oldBucket;
-                put(node.key, node.value);
-                while (node.next != null) {
-                    node = node.next;
-                    put(node.key, node.value);
+        for (Node<K, V> currentNode : oldBuckets) {
+            if (currentNode != null) {
+                put(currentNode.key, currentNode.value);
+                while (currentNode.next != null) {
+                    currentNode = currentNode.next;
+                    put(currentNode.key, currentNode.value);
                 }
             }
         }
     }
 
+    private int getIndexByKey(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
+    }
+
     private static class Node<K, V> {
         private final int hash;
         private final K key;
-        private V value;
+        private final V value;
         private Node<K, V> next;
 
         private Node(K key, V value, Node<K, V> next) {
