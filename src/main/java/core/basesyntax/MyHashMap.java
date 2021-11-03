@@ -28,9 +28,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         Node<K, V> newNode = new Node(key, value, null);
         int i = getIndex(key);
-
         if (size == getLoadLimit()) {
-            resize(table);
+            resizeTable(table);
         }
         if (table[i] == null) {
             table[i] = newNode;
@@ -55,7 +54,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> node = table[getIndex(key)];
-
         while (node != null) {
             if (Objects.equals(node.key, key)) {
                 return node.value;
@@ -78,15 +76,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (int) (table.length * DEFAULT_LOAD_FACTOR);
     }
 
-    private void resize(Node<K, V>[] table) {
+    private void resizeTable(Node<K, V>[] oldTable) {
         size = 0;
-        int newLength = table.length * 2;
-        migrateTable(table, newLength);
-    }
-
-    private void migrateTable(Node<K, V>[] oldTable, int length) {
+        int length = table.length * 2;
         this.table = new Node[length];
-
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
