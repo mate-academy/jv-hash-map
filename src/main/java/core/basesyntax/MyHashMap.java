@@ -9,7 +9,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int GROW_COEFFICIENT = 2;
     private Node<K, V>[] table;
     private int size;
-    private int index;
     private int threshold;
 
     public MyHashMap() {
@@ -22,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        index = getNumberOfBucket(key);
+        int index = getNumberOfBucket(key);
         Node<K, V> node = table[index];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
@@ -42,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        index = getNumberOfBucket(key);
+        int index = getNumberOfBucket(key);
         Node<K, V> node = table[index];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
