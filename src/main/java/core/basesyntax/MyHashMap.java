@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -55,26 +54,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof MyHashMap)) {
-            return false;
-        }
-        MyHashMap<?, ?> myHashMap = (MyHashMap<?, ?>) o;
-        return size == myHashMap.size && threshold == myHashMap.threshold
-                && Arrays.equals(table, myHashMap.table);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Objects.hash(size, threshold);
-        result = 31 * result + Arrays.hashCode(table);
-        return result;
     }
 
     private void resize() {
