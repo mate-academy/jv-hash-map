@@ -61,10 +61,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold *= GROW_COEFFICIENT;
         Node<K, V>[] oldTable = table;
         table = new Node[table.length * GROW_COEFFICIENT];
-        for (Node<K, V> arr : oldTable) {
-            while (arr != null) {
-                put(arr.key, arr.value);
-                arr = arr.next;
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
