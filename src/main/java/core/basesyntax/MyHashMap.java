@@ -6,25 +6,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private int size;
-    private Node<K, V>[] array;
+    private Node<K, V>[] nodes;
 
     public MyHashMap() {
-        array = new Node[DEFAULT_CAPACITY];
+        nodes = new Node[DEFAULT_CAPACITY];
         size = 0;
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= array.length * LOAD_FACTOR) {
+        if (size >= nodes.length * LOAD_FACTOR) {
             resize();
         }
         int index = getIndex(key);
-        if (array[index] == null) {
-            array[index] = new Node<>(key, value, null);
+        if (nodes[index] == null) {
+            nodes[index] = new Node<>(key, value, null);
             size++;
             return;
         }
-        Node<K, V> current = array[index];
+        Node<K, V> current = nodes[index];
         while (current.next != null
                 || Objects.equals(current.key, key)) {
             if (Objects.equals(current.key, key)) {
@@ -39,17 +39,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        V value = null;
         int index = getIndex(key);
-        Node<K, V> entry = array[getIndex(key)];
+        Node<K, V> entry = nodes[getIndex(key)];
         while (entry != null) {
             if (Objects.equals(entry.key, key)) {
-                value = entry.value;
-                break;
+                return entry.value;
             }
             entry = entry.next;
         }
-        return value;
+        return null;
     }
 
     @Override
@@ -59,22 +57,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        Node<K, V>[] newSize = array;
-        array = new Node[array.length * 2];
-        for (Node<K, V> iterate : newSize) {
-            Node<K, V> node = iterate;
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+        Node<K, V>[] newNodes = nodes;
+        nodes = new Node[nodes.length * 2];
+        for (Node<K, V> node : newNodes) {
+            Node<K, V> kvNode = node;
+            while (kvNode != null) {
+                put(kvNode.key, kvNode.value);
+                kvNode = kvNode.next;
             }
         }
     }
 
     private int getIndex(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode() % DEFAULT_CAPACITY);
+        return key == null ? 0 : Math.abs(key.hashCode() % DEFAULT_CAPACITY);
     }
 
     private static class Node<K, V> {
@@ -82,9 +77,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        private Node(K key, V values, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
-            this.value = values;
+            this.value = value;
             this.next = next;
         }
     }
