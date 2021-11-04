@@ -59,10 +59,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] newNodes = nodes;
         nodes = new Node[nodes.length * 2];
         for (Node<K, V> node : newNodes) {
-            Node<K, V> kvNode = node;
-            while (kvNode != null) {
-                put(kvNode.key, kvNode.value);
-                kvNode = kvNode.next;
+            Node<K, V> currentNode = node;
+            while (currentNode != null) {
+                put(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
             }
         }
     }
