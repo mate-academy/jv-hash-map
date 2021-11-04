@@ -17,26 +17,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        resize();
+        resizeAndTransfer();
         int index = getIndexFor(key);
         Node<K, V> newNode = new Node<>(key, value, null);
         if (table[index] == null) {
             table[index] = newNode;
             size++;
-        } else {
-            Node<K, V> tempNode = table[index];
-            while (tempNode != null) {
-                if (Objects.equals(tempNode.key, key)) {
-                    tempNode.value = value;
-                    return;
-                }
-                if (tempNode.next == null) {
-                    tempNode.next = newNode;
-                    size++;
-                    return;
-                }
-                tempNode = tempNode.next;
+            return;
+        }
+        Node<K, V> tempNode = table[index];
+        while (tempNode != null) {
+            if (Objects.equals(tempNode.key, key)) {
+                tempNode.value = value;
+                return;
             }
+            if (tempNode.next == null) {
+                tempNode.next = newNode;
+                size++;
+                return;
+            }
+            tempNode = tempNode.next;
         }
     }
 
@@ -59,19 +59,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndexFor(Object key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
-    private void resize() {
-        if (threshold == size) {
-            size = 0;
-            int newSize = table.length * RESIZE_FACTOR;
-            threshold = (int) (newSize * LOAD_FACTOR);
-            transferToNewTable(newSize);
+    private void resizeAndTransfer() {
+        if (threshold != size) {
+            return;
         }
-    }
-
-    private void transferToNewTable(int newSize) {
+        size = 0;
+        int newSize = table.length * RESIZE_FACTOR;
+        threshold = (int) (newSize * LOAD_FACTOR);
         Node<K, V>[] oldTable = table;
         table = new Node[newSize];
         for (Node<K, V> currentNode : oldTable) {
@@ -82,7 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
