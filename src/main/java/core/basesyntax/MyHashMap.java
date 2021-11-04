@@ -4,37 +4,33 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private static final int RESIZE_FACTOR = 2;
-    private int currentCapacity;
     private int size;
     private int threshold;
     private Node<K, V>[] table;
 
     {
         table = new Node[INITIAL_CAPACITY];
-        currentCapacity = INITIAL_CAPACITY;
         threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        resize();
+        resizeIfNeeded();
         Node<K, V> newNode = new Node<>(key, value);
-        if (table[newNode.hashCode] == null) {
-            table[newNode.hashCode] = newNode;
-        } else if (table[newNode.hashCode].ifEqualsKey(key)) {
-            table[newNode.hashCode].value = value;
+        if (table[getBucket(newNode)] == null) {
+            table[getBucket(newNode)] = newNode;
+        } else if (ifEqualsKey(table[getBucket(newNode)], key)) {
+            table[getBucket(newNode)].value = value;
             return;
         } else {
-            Node<K, V> currentNode = table[newNode.hashCode];
-            do {
-                if (currentNode.next != null) {
-                    currentNode = currentNode.next;
-                }
-                if (currentNode.ifEqualsKey(key)) {
+            Node<K, V> currentNode = table[getBucket(newNode)];
+            while (currentNode.next != null) {
+                currentNode = currentNode.next;
+                if (ifEqualsKey(currentNode, key)) {
                     currentNode.value = value;
                     return;
                 }
-            } while (currentNode.next != null);
+            }
             currentNode.next = newNode;
         }
         size++;
@@ -43,15 +39,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         for (Node<K, V> currentNode : table) {
-            if (currentNode == null) {
-                continue;
-            }
-            do {
-                if (currentNode.ifEqualsKey(key)) {
-                    return (V) currentNode.value;
+            while (currentNode != null) {
+                if (ifEqualsKey(currentNode, key)) {
+                    return currentNode.value;
                 }
                 currentNode = currentNode.next;
-            } while (currentNode != null);
+            }
         }
         return null;
     }
@@ -61,49 +54,39 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resize() {
+    private void resizeIfNeeded() {
         if (size >= threshold) {
-            currentCapacity *= RESIZE_FACTOR;
-            migrate();
-            threshold = (int) (currentCapacity * LOAD_FACTOR);
+            Node<K, V>[] tempTable = table;
+            table = new Node[tempTable.length * RESIZE_FACTOR];
+            threshold = (int) (table.length * LOAD_FACTOR);
+            size = 0;
+            for (Node<K, V> currentNode : tempTable) {
+                while (currentNode != null) {
+                    put(currentNode.key, currentNode.value);
+                    currentNode = currentNode.next;
+                }
+            }
         }
     }
 
-    private void migrate() {
-        Node<K, V>[] tempTable = new Node[currentCapacity];
-        for (Node<K, V> currentNode : table) {
-            if (currentNode == null) {
-                continue;
-            }
-            Node<K, V> newNode = new Node<>(currentNode.key, currentNode.value);
-            tempTable[newNode.hashCode] = newNode;
-            if (currentNode.next != null) {
-                newNode.next = currentNode.next;
-            }
-        }
-        table = tempTable;
+    private int getBucket(Node<K, V> node) {
+        return node.key != null ? Math.abs(node.key.hashCode() % table.length) : 0;
+    }
+
+    private boolean ifEqualsKey(Node<K, V> node, K key) {
+        return (node.key == key
+                || node.key != null && node.key.equals(key));
     }
 
     private class Node<K, V> {
         private final K key;
         private V value;
-        private final int hashCode;
         private Node<K, V> next;
 
         private Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.hashCode = setHashCode();
             this.next = null;
-        }
-
-        private int setHashCode() {
-            return key != null ? Math.abs(key.hashCode() % currentCapacity) : 0;
-        }
-
-        private boolean ifEqualsKey(K key) {
-            return (this.key == key
-                    || this.key != null && this.key.equals(key));
         }
     }
 }
