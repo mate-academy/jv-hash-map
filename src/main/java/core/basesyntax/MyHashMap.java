@@ -27,27 +27,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node(key, value, null);
-        int i = getIndex(key);
+        int index = getIndex(key);
         if (size == getLoadLimit()) {
             resizeTable(table);
         }
-        if (table[i] == null) {
-            table[i] = newNode;
+        if (table[index] == null) {
+            table[index] = newNode;
             size++;
-        } else {
-            Node<K, V> node = table[i];
-            while (node != null) {
-                if (Objects.equals(node.key, key)) {
-                    node.value = value;
-                    return;
-                }
-                if (node.next == null) {
-                    node.next = newNode;
-                    size++;
-                    return;
-                }
-                node = node.next;
+            return;
+        }
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
+                return;
             }
+            if (node.next == null) {
+                node.next = newNode;
+                size++;
+                return;
+            }
+            node = node.next;
         }
     }
 
@@ -69,7 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private int getLoadLimit() {
@@ -79,7 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resizeTable(Node<K, V>[] oldTable) {
         size = 0;
         int length = table.length * 2;
-        this.table = new Node[length];
+        table = new Node[length];
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
