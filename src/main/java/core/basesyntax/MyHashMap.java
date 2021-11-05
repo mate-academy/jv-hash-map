@@ -40,12 +40,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> currentNode = table[getIndex(key)];
-            while (currentNode != null) {
-                if (ifEqualsKey(currentNode, key)) {
-                    return currentNode.value;
-                }
-                currentNode = currentNode.next;
+        while (currentNode != null) {
+            if (ifEqualsKey(currentNode, key)) {
+                return currentNode.value;
             }
+            currentNode = currentNode.next;
+        }
         return null;
     }
 
