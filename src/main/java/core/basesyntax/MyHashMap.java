@@ -6,7 +6,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int MAGNIFICATION_FACTOR = 2;
-
     private int size;
     private int threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     private Node<K, V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
@@ -57,7 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void toGrow() {
