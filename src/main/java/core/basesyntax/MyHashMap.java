@@ -8,7 +8,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private Node<K, V>[] table;
 
-    {
+    public MyHashMap() {
         table = new Node[INITIAL_CAPACITY];
         threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
     }
@@ -17,13 +17,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         resizeIfNeeded();
         Node<K, V> newNode = new Node<>(key, value);
-        if (table[getBucket(newNode)] == null) {
-            table[getBucket(newNode)] = newNode;
-        } else if (ifEqualsKey(table[getBucket(newNode)], key)) {
-            table[getBucket(newNode)].value = value;
+        int index = getIndex(newNode);
+        if (table[index] == null) {
+            table[index] = newNode;
+        } else if (ifEqualsKey(table[index], key)) {
+            table[index].value = value;
             return;
         } else {
-            Node<K, V> currentNode = table[getBucket(newNode)];
+            Node<K, V> currentNode = table[getIndex(newNode)];
             while (currentNode.next != null) {
                 currentNode = currentNode.next;
                 if (ifEqualsKey(currentNode, key)) {
@@ -69,7 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getBucket(Node<K, V> node) {
+    private int getIndex(Node<K, V> node) {
         return node.key != null ? Math.abs(node.key.hashCode() % table.length) : 0;
     }
 
