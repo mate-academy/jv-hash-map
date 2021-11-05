@@ -5,24 +5,30 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private Node<K, V>[] buckets = new Node[DEFAULT_CAPACITY];
-    private int capacity = DEFAULT_CAPACITY;
+    private Node<K, V>[] buckets;
+    private int capacity;
     private int size;
-    private int threshold = (int) (capacity * LOAD_FACTOR);
+    private int threshold;
+
+    {
+        buckets = new Node[DEFAULT_CAPACITY];
+        capacity = DEFAULT_CAPACITY;
+        threshold = (int) (capacity * LOAD_FACTOR);
+    }
 
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value, null);
         int index = getIndexByKey(key);
 
-        if (size >= threshold) {
+        if (size == threshold) {
             grow();
         }
         if (buckets[index] == null) {
             fillEmptyBucket(newNode, index);
-        } else {
-            addNextToBucket(newNode, index);
+            return;
         }
+        addNextToBucket(newNode, index);
     }
 
     @Override
@@ -56,25 +62,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void addNextToBucket(Node<K, V> node, int index) {
         Node<K, V> currentNode = buckets[index];
-        if (isEquals(node, currentNode)) {
+        if (Objects.equals(node.key, currentNode.key)) {
             node.next = currentNode.next;
             buckets[index] = node;
-        } else {
-            while (currentNode.next != null) {
-                if (isEquals(node, currentNode.next)) {
-                    node.next = currentNode.next.next;
-                    currentNode.next = node;
-                    return;
-                }
-                currentNode = currentNode.next;
-            }
-            currentNode.next = node;
-            size++;
+            return;
         }
-    }
+        while (currentNode.next != null) {
+            if (Objects.equals(node.key, currentNode.next.key)) {
+                node.next = currentNode.next.next;
+                currentNode.next = node;
+                return;
+            }
+            currentNode = currentNode.next;
+        }
+        currentNode.next = node;
+        size++;
 
-    private boolean isEquals(Node<K, V> nodeA, Node<K, V> nodeB) {
-        return nodeA.hash == nodeB.hash && Objects.equals(nodeA.key, nodeB.key);
     }
 
     private void grow() {
@@ -103,20 +106,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private final V value;
         private Node<K, V> next;
 
         private Node(K key, V value, Node<K, V> next) {
-            this.hash = hash(key);
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        private int hash(K key) {
-            return key == null ? 0 : key.hashCode();
         }
     }
 }
