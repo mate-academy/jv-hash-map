@@ -24,13 +24,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = key.hashCode();
-        int index = indexOfMapArray(hash);
+        int hash = hash(key);
+        int index = key == null ? 0 : indexOfMapArray(hash);
         Node<K, V> nodeSearch = table[index];
         while (nodeSearch != null) {
             if (Objects.equals(nodeSearch.key, key)) {
                 return nodeSearch.value;
             }
+            nodeSearch = nodeSearch.next;
         }
         return null;
     }
@@ -54,16 +55,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void addNode(K key, V value) {
-        int hash = key.hashCode();
-        int index = indexOfMapArray(hash);
+        int hash = hash(key);
+        int index = key == null ? 0 : indexOfMapArray(hash);
         Node<K, V> node = new Node<>(hash, key, value, null);
         if (table[index] == null) {
             table[index] = node;
-            node.next = null;
         } else {
             Node<K, V> nodeSearch = table[index];
-            while (nodeSearch.next != null) {
+            while (nodeSearch.next != null || Objects.equals(nodeSearch.key, key)) {
                 if (Objects.equals(nodeSearch.key, key)) {
+                    size--;
                     nodeSearch.value = value;
                     return;
                 }
@@ -78,6 +79,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return index;
     }
 
+    private int hash(K key) {
+        return Math.abs(31 * 17 + (key == null ? 0 : key.hashCode()));
+    }
+
     private static class Node<K, V> {
         private Node<K, V> next;
         private int hash;
@@ -89,10 +94,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        public int hashCode() {
-            return 31 * 17 + (key == null ? 0 : key.hashCode());
         }
     }
 }
