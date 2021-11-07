@@ -6,7 +6,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int MULTIPLICATION_FACTOR = 2;
-
     private Node<K, V> next;
     private Node<K, V>[] table;
     private int size;
@@ -25,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int hash = hash(key);
-        int index = key == null ? 0 : indexOfMapArray(hash);
+        int index = indexOfMapArray(hash);
         Node<K, V> nodeSearch = table[index];
         while (nodeSearch != null) {
             if (Objects.equals(nodeSearch.key, key)) {
@@ -80,7 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return Math.abs(31 * 17 + (key == null ? 0 : key.hashCode()));
+        return Math.abs(key == null ? 0 : key.hashCode());
     }
 
     private static class Node<K, V> {
