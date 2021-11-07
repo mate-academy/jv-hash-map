@@ -55,7 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void addNode(K key, V value) {
         int hash = hash(key);
-        int index = key == null ? 0 : indexOfMapArray(hash);
+        int index = indexOfMapArray(hash);
         Node<K, V> node = new Node<>(hash, key, value, null);
         if (table[index] == null) {
             table[index] = node;
