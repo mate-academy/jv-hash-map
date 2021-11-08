@@ -6,31 +6,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int MULTIPLICATION_FACTOR = 2;
-    private Node<K, V> next;
     private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        table = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
+        table = new Node[INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         checkSize();
         addNode(key, value);
-        size++;
     }
 
     @Override
     public V getValue(K key) {
         int hash = hash(key);
-        int index = indexOfMapArray(hash);
-        Node<K, V> nodeSearch = table[index];
-        while (nodeSearch != null) {
-            if (Objects.equals(nodeSearch.key, key)) {
-                return nodeSearch.value;
+        int index = getBucketIndex(hash);
+        Node<K, V> currentNode = table[index];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
             }
-            nodeSearch = nodeSearch.next;
+            currentNode = currentNode.next;
         }
         return null;
     }
@@ -43,11 +41,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void checkSize() {
         if (size >= (int) (table.length * DEFAULT_LOAD_FACTOR)) {
             Node<K, V>[] copiedTable = table;
-            table = (Node<K, V>[]) new Node[copiedTable.length * MULTIPLICATION_FACTOR];
-            for (int i = 0; i < copiedTable.length; i++) {
-                while (copiedTable[i] != null) {
-                    addNode(copiedTable[i].key, copiedTable[i].value);
-                    copiedTable[i] = copiedTable[i].next;
+            table = new Node[copiedTable.length * MULTIPLICATION_FACTOR];
+            for (Node<K, V> node : copiedTable) {
+                while (node != null) {
+                    addNode(node.key, node.value);
+                    size--;
+                    node = node.next;
                 }
             }
         }
@@ -55,7 +54,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void addNode(K key, V value) {
         int hash = hash(key);
-        int index = indexOfMapArray(hash);
+        int index = getBucketIndex(hash);
         Node<K, V> node = new Node<>(hash, key, value, null);
         if (table[index] == null) {
             table[index] = node;
@@ -63,7 +62,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> nodeSearch = table[index];
             while (nodeSearch.next != null || Objects.equals(nodeSearch.key, key)) {
                 if (Objects.equals(nodeSearch.key, key)) {
-                    size--;
                     nodeSearch.value = value;
                     return;
                 }
@@ -71,11 +69,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             nodeSearch.next = node;
         }
+        size++;
     }
 
-    private int indexOfMapArray(int hash) {
-        int index = hash % table.length;
-        return index;
+    private int getBucketIndex(int hash) {
+        return hash % table.length;
     }
 
     private int hash(K key) {
