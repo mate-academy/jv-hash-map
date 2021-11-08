@@ -24,13 +24,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             if (current.next == null) {
-                current.next = new Node<>(hash(key), key, value, null);
+                current.next = new Node<>(key, value, null);
                 size++;
                 return;
             }
             current = current.next;
         }
-        table[hash(key)] = new Node<>(hash(key), key, value, null);
+        table[hash(key)] = new Node<>(key, value, null);
         size++;
     }
 
@@ -65,21 +65,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        if (key == null) {
-            return 0;
-        } else {
-            return Math.abs(key.hashCode() % table.length);
-        }
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private static class Node<K,V> {
-        private int hash;
         private K key;
         private Node<K, V> next;
         private V value;
 
-        private Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
