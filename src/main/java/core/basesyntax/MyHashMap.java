@@ -28,20 +28,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int indexArrayNode = getHash(key);
-        Node<K, V> newNode = table[indexArrayNode];
-        if (newNode == null) {
+        Node<K, V> nodeByIndex = table[indexArrayNode];
+        if (nodeByIndex == null) {
             table[indexArrayNode] = new Node<>(key, value, null);
         } else {
-            while (true) {
-                if (Objects.equals(newNode.key, key)) {
-                    newNode.value = value;
+            while (nodeByIndex != null) {
+                if (Objects.equals(nodeByIndex.key, key)) {
+                    nodeByIndex.value = value;
                     return;
                 }
-                if (newNode.next == null) {
-                    newNode.next = new Node<>(key, value, null);
+                if (nodeByIndex.next == null) {
+                    nodeByIndex.next = new Node<>(key, value, null);
                     break;
                 }
-                newNode = newNode.next;
+                nodeByIndex = nodeByIndex.next;
             }
         }
         size++;
