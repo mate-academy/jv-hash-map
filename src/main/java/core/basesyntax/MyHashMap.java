@@ -17,35 +17,35 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == myTable.length * DEFAULT_LOAD_FACTOR) {
             grow();
         }
-        Node<K,V> newNode = myTable[getIndex(key)];
-        if (newNode == null) {
-            myTable[getIndex(key)] = new Node(key, value, null);
+        int index = getIndex(key);
+        Node<K,V> currentNode = myTable[index];
+        if (currentNode == null) {
+            myTable[index] = new Node(key, value, null);
             size++;
         } else {
-            while (newNode != null) {
-                if (Objects.equals(key, newNode.key)) {
-                    newNode.value = value;
+            while (currentNode != null) {
+                if (Objects.equals(key, currentNode.key)) {
+                    currentNode.value = value;
                     return;
                 }
-                if (newNode.next == null) {
-                    Node<K,V> temp = new Node<>(key, value, null);
-                    newNode.next = temp;
+                if (currentNode.next == null) {
+                    currentNode.next = new Node<>(key, value, null);
                     size++;
                     return;
                 }
-                newNode = newNode.next;
+                currentNode = currentNode.next;
             }
         }
     }
 
     @Override
     public V getValue(K key) {
-        Node<K,V> tempNode = myTable[getIndex(key)];
-        while (tempNode != null) {
-            if (Objects.equals(tempNode.key, key)) {
-                return tempNode.value;
+        Node<K,V> currentNode = myTable[getIndex(key)];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
             }
-            tempNode = tempNode.next;
+            currentNode = currentNode.next;
         }
         return null;
     }
@@ -68,20 +68,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode() % myTable.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % myTable.length);
     }
 
     private void grow() {
         size = 0;
-        Node<K,V>[] tempTable = myTable;
-        myTable = new Node[tempTable.length * 2];
-        for (Node<K,V> temp : tempTable) {
-            while (temp != null) {
-                put(temp.key, temp.value);
-                temp = temp.next;
+        Node<K,V>[] currentTable = myTable;
+        myTable = new Node[currentTable.length * 2];
+        for (Node<K,V> node : currentTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
