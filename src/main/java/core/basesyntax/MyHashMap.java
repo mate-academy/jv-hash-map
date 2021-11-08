@@ -95,18 +95,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return capacity * DEFAULT_LOAD_FACTOR;
     }
 
-    private static int hash(Object key) {
+    private int hash(Object key) {
         return (key == null ? 0 : key.hashCode());
     }
 
     private static class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
         public Node(K key, V value) {
-            hash = hash(key);
             this.key = key;
             this.value = value;
         }
