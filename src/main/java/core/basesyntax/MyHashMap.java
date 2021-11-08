@@ -59,15 +59,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[index] == null) {
             table[index] = node;
         } else {
-            Node<K, V> nodeSearch = table[index];
-            while (nodeSearch.next != null || Objects.equals(nodeSearch.key, key)) {
-                if (Objects.equals(nodeSearch.key, key)) {
-                    nodeSearch.value = value;
+            Node<K, V> currentNode = table[index];
+            while (currentNode.next != null || Objects.equals(currentNode.key, key)) {
+                if (Objects.equals(currentNode.key, key)) {
+                    currentNode.value = value;
                     return;
                 }
-                nodeSearch = nodeSearch.next;
+
+                currentNode = currentNode.next;
             }
-            nodeSearch.next = node;
+            currentNode.next = node;
         }
         size++;
     }
