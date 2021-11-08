@@ -12,6 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[CAPACITY];
         threshold = (int) (CAPACITY * LOAD_FACTOR);
     }
+
     @Override
     public void put(K key, V value) {
         checkCapacity();
@@ -24,13 +25,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             if (node.next == null) {
                 node.next = new Node<>(key, value, null);
-                    size++;
-                    return;
+                size++;
+                return;
             }
-                node = node.next;
+            node = node.next;
         }
-            table[index] = new Node<>(key, value, null);
-            size++;
+        table[index] = new Node<>(key, value, null);
+        size++;
     }
 
     @Override
