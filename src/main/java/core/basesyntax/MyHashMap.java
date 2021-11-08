@@ -20,7 +20,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> newNode = nodes[getKeyPosition(key)];
         if (newNode == null) {
             nodes[getKeyPosition(key)] = new Node<>(key, value, null);
-            size++;
         }
         while (newNode != null) {
             if (Objects.equals(newNode.key,key)) {
@@ -30,11 +29,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (newNode.next == null) {
                 Node<K, V> thisNode = new Node<>(key, value, null);
                 newNode.next = thisNode;
-                size++;
-                return;
+                break;
             }
             newNode = newNode.next;
         }
+        size++;
     }
 
     @Override
@@ -56,9 +55,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void grow() {
         size = 0;
-        Node<K,V>[] newNodes = nodes;
+        Node<K,V>[] oldNode = nodes;
         nodes = new Node[nodes.length * 2];
-        for (Node<K, V> newNode : newNodes) {
+        for (Node<K, V> newNode : oldNode) {
             while (newNode != null) {
                 put(newNode.key, newNode.value);
                 newNode = newNode.next;
