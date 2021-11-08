@@ -3,20 +3,13 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_INITIAL_CAPACITY;
-    private static final float DEFAULT_LOAD_FACTOR;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
-    private int capacity;
     private int size;
 
-    static {
-        DEFAULT_INITIAL_CAPACITY = 16;
-        DEFAULT_LOAD_FACTOR = 0.75f;
-    }
-
-    {
+    public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        capacity = DEFAULT_INITIAL_CAPACITY;
     }
 
     @Override
@@ -26,7 +19,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> newNode = new Node<>(key, value);
         if (firstNode == null) {
             table[index] = newNode;
-            resize();
+            size++;
+            resizeIfNeeded();
             return;
         }
         addOrReplace(firstNode, newNode);
@@ -60,17 +54,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         } while (node.next != null);
         node.next = newNode;
-        resize();
+        size++;
+        resizeIfNeeded();
     }
 
-    private void resize() {
-        if (++size > threshold()) {
+    private void resizeIfNeeded() {
+        if (size > threshold()) {
             grow();
         }
     }
 
     private void grow() {
-        capacity = capacity << 1;
+        int capacity = table.length << 1;
         Node<K, V>[] oldTable = table;
         size = 0;
         table = new Node[capacity];
@@ -79,24 +74,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void transfer(Node<K, V>[] oldTable) {
         for (Node<K, V> bucket : oldTable) {
-            if (bucket != null) {
-                for (Node<K, V> node = bucket; node != null; node = node.next) {
-                    put(node.key, node.value);
-                }
+            while (bucket != null) {
+                put(bucket.key, bucket.value);
+                bucket = bucket.next;
             }
         }
     }
 
     private int calculateIndex(K key) {
-        return hash(key) & (capacity - 1);
+        return (key == null ? 0 : key.hashCode()) & (table.length - 1);
     }
 
     private float threshold() {
-        return capacity * DEFAULT_LOAD_FACTOR;
-    }
-
-    private int hash(Object key) {
-        return (key == null ? 0 : key.hashCode());
+        return table.length * DEFAULT_LOAD_FACTOR;
     }
 
     private static class Node<K, V> {
