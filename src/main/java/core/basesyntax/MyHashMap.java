@@ -9,7 +9,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private Node<K, V>[] table;
 
-    {
+    public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
         threshold = (int) (LOAD_FACTOR * table.length);
     }
@@ -20,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         Node<K, V> newNode = new Node<>(key, value, null);
-        int index = Math.abs(getHashCode(key)) % table.length;
+        int index = getBucketIndex(key);
         if (table[index] == null) {
             table[index] = newNode;
             size++;
@@ -42,7 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = Math.abs(getHashCode(key)) % table.length;
+        int index = getBucketIndex(key);
         Node<K, V> item = table[index];
         while (item != null) {
             if (Objects.equals(key, item.key)) {
@@ -64,7 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] reserveTable = table;
         table = new Node[capacity];
         threshold = (int) (LOAD_FACTOR * capacity);
-        for (Node<K, V> item: reserveTable) {
+        for (Node<K, V> item : reserveTable) {
             while (item != null) {
                 put(item.key, item.value);
                 item = item.next;
@@ -72,8 +72,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getHashCode(K key) {
-        return 31 * ((key == null) ? 0 : key.hashCode());
+    private int getBucketIndex(K key) {
+        int hash = key == null ? 0 : key.hashCode();
+        return Math.abs(hash) % table.length;
     }
 
     private static class Node<K, V> {
