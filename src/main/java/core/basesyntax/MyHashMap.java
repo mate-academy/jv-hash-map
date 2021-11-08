@@ -2,6 +2,7 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
+    private static final int CAPACITY_MULTIPLIER = 2;
     private static final float LOAD_FACTOR = 0.75f;
     private int capacity;
     private int threshold;
@@ -10,14 +11,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (capacity == 0) {
-            array = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
-            capacity = INITIAL_CAPACITY;
-            threshold = (int) (capacity * LOAD_FACTOR);
-        }
-        if (size + 1 > threshold) {
-            resize();
-        }
+        checkSize();
         int hash = (key == null) ? 0 : Math.abs(key.hashCode());
         int bucketIndex = hash % capacity;
         Node<K, V> node = array[bucketIndex];
@@ -26,18 +20,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size = size + 1;
             return;
         }
-        if (key == node.key || (key != null && key.equals(node.key))) {
-            node.value = value;
-            return;
-        }
-        while (node.next != null) {
-            node = node.next;
+        Node<K, V> lastNode;
+        do {
             if (key == node.key || (key != null && key.equals(node.key))) {
                 node.value = value;
                 return;
             }
-        }
-        node.next = new Node<>(hash, key, value, null);
+            lastNode = node;
+            node = node.next;
+        } while (node != null);
+        lastNode.next = new Node<>(hash, key, value, null);
         size = size + 1;
     }
 
@@ -66,7 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        capacity = capacity * 2;
+        capacity = capacity * CAPACITY_MULTIPLIER;
         threshold = (int) (capacity * LOAD_FACTOR);
         Node<K, V>[] oldArray = array;
         size = 0;
@@ -76,6 +68,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 put(node.key, node.value);
                 node = node.next;
             }
+        }
+    }
+
+    private void checkSize() {
+        if (capacity == 0) {
+            array = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
+            capacity = INITIAL_CAPACITY;
+            threshold = (int) (capacity * LOAD_FACTOR);
+        } else if (size == threshold) {
+            resize();
         }
     }
 
