@@ -9,9 +9,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private int threshold;
 
-    {
-        buckets = new Node[DEFAULT_CAPACITY];
-        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
+    public MyHashMap() {
+        this.buckets = new Node[DEFAULT_CAPACITY];
+        this.threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
@@ -27,17 +27,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         Node<K, V> currentNode = buckets[index];
+        Node<K, V> prevNode = currentNode;
         while (currentNode != null) {
             if (Objects.equals(newNode.key, currentNode.key)) {
                 currentNode.value = newNode.value;
                 return;
             }
-            if (currentNode.next == null) {
-                break;
-            }
+            prevNode = currentNode;
             currentNode = currentNode.next;
         }
-        currentNode.next = newNode;
+        prevNode.next = newNode;
         size++;
     }
 
@@ -45,14 +44,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         V value = null;
         Node<K, V> currentNode = buckets[getIndexByKey(key)];
-        if (currentNode != null) {
-            value = currentNode.value;
-            while (currentNode.next != null) {
-                currentNode = currentNode.next;
-                if (Objects.equals(currentNode.key, key)) {
-                    value = currentNode.value;
-                }
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                value = currentNode.value;
+                return value;
             }
+            currentNode = currentNode.next;
         }
         return value;
     }
@@ -67,12 +64,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K,V>[] oldBuckets = buckets;
         buckets = new Node[oldBuckets.length * 2];
         for (Node<K, V> currentNode : oldBuckets) {
-            if (currentNode != null) {
+            while (currentNode != null) {
                 put(currentNode.key, currentNode.value);
-                while (currentNode.next != null) {
-                    currentNode = currentNode.next;
-                    put(currentNode.key, currentNode.value);
-                }
+                currentNode = currentNode.next;
             }
         }
         threshold = (int) (buckets.length * LOAD_FACTOR);
