@@ -61,11 +61,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void checkCapacity() {
         if (size == threshold) {
-            setCapacity();
+            changeCapacity();
         }
     }
 
-    private void setCapacity() {
+    private void changeCapacity() {
         Node<K, V>[] nodes = new Node[size];
         int index = 0;
         for (Node<K, V> node : table) {
