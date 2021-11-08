@@ -15,18 +15,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        private Node(V value, K key, Node<K, V> next) {
-            this.value = value;
-            this.key = key;
-            this.next = next;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         if (size == threshold) {
@@ -88,5 +76,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int hash(Object key) {
         int cell;
         return (key == null) ? 0 : (Math.abs(cell = key.hashCode() % table.length));
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        private Node(V value, K key, Node<K, V> next) {
+            this.value = value;
+            this.key = key;
+            this.next = next;
+        }
     }
 }
