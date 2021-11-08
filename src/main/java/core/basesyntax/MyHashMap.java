@@ -74,7 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node = node.next;
             }
         }
-        capacity = capacity * capacityGrowthMultiplier;
+        capacity *= capacityGrowthMultiplier;
         table = new Node[capacity];
         size = 0;
         threshold = (int) (capacity * loadFactor);;
