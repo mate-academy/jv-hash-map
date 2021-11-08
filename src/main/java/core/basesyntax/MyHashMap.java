@@ -26,10 +26,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size == DEFAULT_CAPACITY * LOAD_FACTOR) {
+        if (size == table.length * LOAD_FACTOR) {
             resize();
         }
-        int index = getBucket(key, table.length);
+        int index = getBucket(key);
         Node<K, V> node = findNode(key, index);
         if (node != null) {
             node.value = value;
@@ -42,7 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = findNode(key, getBucket(key, table.length));
+        Node<K, V> node = findNode(key, getBucket(key));
         return node != null ? node.value : null;
     }
 
@@ -62,8 +62,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private int getBucket(K key, int capacity) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
+    private int getBucket(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private void resize() {
