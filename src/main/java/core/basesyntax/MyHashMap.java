@@ -6,14 +6,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INNITIAL_CAPACITY = 16;
     private static final float DEFAULT_FACTORY_LOAD = 0.75f;
     private Node<K, V>[] table;
-    private int capacity;
-    private int maxSize;
+    private int threshold;
     private int size;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INNITIAL_CAPACITY];
-        capacity = DEFAULT_INNITIAL_CAPACITY;
-        maxSize = (int) (capacity * DEFAULT_FACTORY_LOAD);
+        threshold = (int) (table.length * DEFAULT_FACTORY_LOAD);
     }
 
     public MyHashMap(int initialCapacity) {
@@ -21,16 +19,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             throw new IllegalArgumentException("Initial capacity must be more than 0");
         }
         table = new Node[initialCapacity];
-        capacity = initialCapacity;
-        maxSize = (int) (capacity * DEFAULT_FACTORY_LOAD);
+        threshold = (int) (table.length * DEFAULT_FACTORY_LOAD);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= maxSize) {
+        if (size >= threshold) {
             resize();
         }
-        int index = getIndex(getHash(key), capacity);
+        int index = getHash(key);
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
         } else {
@@ -52,7 +49,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = getIndex(getHash(key), capacity);
+        int index = getHash(key);
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
@@ -80,25 +77,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getIndex(int hash, int capacity) {
-        return hash == 0 ? 0 : hash % capacity;
-    }
-
     private <K> int getHash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode());
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private void resize() {
         Node<K, V>[] oldTable = table;
-        table = new Node[capacity * 2];
+        table = new Node[table.length * 2];
+        size = 0;
         for (Node currentNode : oldTable) {
             while (currentNode != null) {
                 put((K) currentNode.key,(V) currentNode.value);
-                size--;
                 currentNode = currentNode.next;
             }
         }
-        capacity = table.length;
-        maxSize = (int) (capacity * DEFAULT_FACTORY_LOAD);
+        threshold = (int) (table.length * DEFAULT_FACTORY_LOAD);
     }
 }
