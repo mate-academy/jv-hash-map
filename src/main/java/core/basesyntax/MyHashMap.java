@@ -5,19 +5,29 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     static final int DEFAULT_INITIAL_CAPACITY = 16;
-    private MyHashMap.Node<K, V>[] table;
+    private Node<K, V>[] table;
     private int loadFactor;
     private int capacity;
     private int size;
+
+    static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+    }
 
     @Override
     public void put(K key, V value) {
         if (table == null || table.length == 0 || size + 1 > loadFactor) {
             resize();
         }
-        int indexArrayNode = (key == null) ? 0
-                : (key.hashCode() < 0) ? key.hashCode() % capacity * -1
-                : key.hashCode() % capacity;
+        int indexArrayNode = getHash(key);
         Node<K, V> newNode = table[indexArrayNode];
         if (newNode == null) {
             table[indexArrayNode] = new Node<>(key, value, null);
@@ -42,9 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == 0) {
             return null;
         }
-        int indexArrayNode = (key == null) ? 0
-                : (key.hashCode() < 0) ? key.hashCode() % capacity * -1
-                : key.hashCode() % capacity;
+        int indexArrayNode = getHash(key);
         Node<K, V> searchNode = table[indexArrayNode];
         while (searchNode != null) {
             if (Objects.equals(searchNode.key, key)) {
@@ -60,29 +68,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(K key, V value, MyHashMap.Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-
-    }
-
-    public void resize() {
+    private void resize() {
         if (table == null || table.length == 0) {
             loadFactor = (int) (DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
             capacity = DEFAULT_INITIAL_CAPACITY;
-            table = new MyHashMap.Node[capacity];
+            table = new Node[capacity];
         } else {
             capacity = capacity * 2;
             loadFactor = (int) (capacity * DEFAULT_LOAD_FACTOR);
             Node<K, V>[] oldTable = table;
-            table = new MyHashMap.Node[capacity];
+            table = new Node[capacity];
             size = 0;
             for (int i = 0; i < oldTable.length; i++) {
                 Node<K, V> newNode = oldTable[i];
@@ -92,5 +87,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
+    }
+
+    private int getHash(K key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 }
