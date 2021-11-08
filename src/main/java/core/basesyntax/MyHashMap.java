@@ -24,20 +24,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = new Node<>(key, value, null);
             size++;
             return;
-        } else if (key == node.key || (key != null && key.equals(node.key))) {  //если в table уже была нода
-            table[index].value = value;                            //и ее ключ равен введённому ключу, то просто
-            return;                                               // сеттим новое значение и также завершаем метод
+        } else if (key == node.key
+                || (key != null && key.equals(node.key))) { //если в table уже была нода
+            table[index].value = value; //и ее ключ равен введённому ключу, то просто
+            return; // сеттим новое значение и также завершаем метод
         }
-        while (node.next != null) {                       //проходимся по следущим нодам в связном списке;
-            if (key == node.next.key || (key != null && key.equals(node.next.key))) { //если у одной из них ключ
-                node.next.value = value;                                       //совпадает с введённым,
-                break;                                                   //сеттим новое значение и выходим из цикла
+        while (node.next != null) { //проходимся по следущим нодам в связном списке;
+            if (key == node.next.key
+                    || (key != null && key.equals(node.next.key))) { //если у одной из них ключ
+                node.next.value = value; //совпадает с введённым,
+                break; //сеттим новое значение и выходим из цикла
             }
             node = node.next;
         }
-        if (node.next == null) {  //если в цикле мы ни разу не зашли в блок if (т. е. в списке не оказалось
-            node.next = new Node<>(key, value, null);                   //совпадающих ключей),
-            size++;                                                     //кладём ноду в конец списка.
+        if (node.next == null) { //если в цикле мы ни разу не зашли в блок if (т. е. в списке
+            node.next = new Node<>(key, value, null); //не оказалось совпадающих ключей),
+            size++; //кладём ноду в конец списка.
         }
     }
 
@@ -63,8 +65,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int newCap = table.length << 1;
         table = new Node[newCap];
         size = 0;
-        threshold <<= 1;
         transfer(oldTab);
+        threshold <<= 1;
     }
 
     private void transfer(Node<K, V>[] oldTab) {
