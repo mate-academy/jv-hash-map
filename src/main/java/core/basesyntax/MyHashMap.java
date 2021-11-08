@@ -40,15 +40,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int bucketIndex = (key == null) ? 0 : Math.abs(key.hashCode()) % capacity;
         Node<K, V> node = array[bucketIndex];
-        if (node == null) {
-            return null;
-        }
-        do {
+        while (node != null) {
             if (key == node.key || (key != null && key.equals(node.key))) {
                 return node.value;
             }
             node = node.next;
-        } while (node != null);
+        }
         return null;
     }
 
