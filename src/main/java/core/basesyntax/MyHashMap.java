@@ -14,7 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size == nodes.length * LOAD_FACTOR) {
+        if (size >= nodes.length * LOAD_FACTOR) {
             grow();
         }
         Node<K, V> newNode = nodes[getKeyPosition(key)];
