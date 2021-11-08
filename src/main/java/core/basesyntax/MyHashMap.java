@@ -58,10 +58,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void changeCapacity() {
-        threshold = (int) (table.length * LOAD_FACTOR);
         size = 0;
         Node<K, V>[] tableCopy = table;
         table = new Node[table.length * CAPACITY_GROWTH_MULTIPLIER];
+        threshold = (int) (table.length * LOAD_FACTOR);
         for (Node<K, V> node : tableCopy) {
             while (node != null) {
                 put(node.key,node.value);
