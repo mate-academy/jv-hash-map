@@ -6,13 +6,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int RESIZE_FACTOR = 2;
-    private int capacity;
     private int size;
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        capacity = INITIAL_CAPACITY;
         table = new Node[INITIAL_CAPACITY];
     }
 
@@ -20,12 +17,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value, null);
         int index = getIndex(key);
-        if (size == (capacity * LOAD_FACTOR)) {
+        if (size >= (table.length * LOAD_FACTOR)) {
             resize();
         }
         if (table[index] == null) {
             table[index] = newNode;
-            size++;
         } else {
             Node<K, V> nodeByIndex = table[index];
             while (nodeByIndex != null) {
@@ -35,12 +31,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 if (nodeByIndex.next == null) {
                     nodeByIndex.next = newNode;
-                    size++;
-                    return;
+                   break;
                 }
                 nodeByIndex = nodeByIndex.next;
             }
         }
+        size++;
     }
 
     @Override
@@ -62,9 +58,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        capacity = capacity * RESIZE_FACTOR;
         Node<K, V>[] oldTable = table;
-        table = new Node[capacity];
+        table = new Node[table.length * 2];
         size = 0;
         for (int i = 0; i < oldTable.length; i++) {
             Node<K, V> node = oldTable[i];
@@ -76,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        int index = key != null ? Math.abs(key.hashCode() % capacity) : 0;
+        int index = key != null ? Math.abs(key.hashCode() % table.length) : 0;
         return index;
     }
 
