@@ -3,13 +3,13 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
-    private int trashHould;
+    private int trashould;
     private int size;
     private Node<K, V>[] table;
 
     {
         table = new Node[DEFAULT_CAPACITY];
-        trashHould = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
+        trashould = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     private class Node<K, V> {
@@ -26,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= trashHould) {
+        if (size == trashould) {
             resize();
         }
         Node<K, V> newNode = new Node(key, value, null);
@@ -73,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         Node<K, V>[] previousTable = table;
         table = new Node[previousTable.length * 2];
-        trashHould = (int) (table.length * LOAD_FACTOR);
+        trashould = (int) (table.length * LOAD_FACTOR);
         size = 0;
         for (Node<K, V> node: previousTable) {
             while (node != null) {
