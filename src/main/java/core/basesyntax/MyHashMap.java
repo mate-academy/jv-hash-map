@@ -5,24 +5,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private int size;
     private Node<K, V>[] map;
-    private int currentCapacity;
-    private int threshold;
+
+    public MyHashMap() {
+        map = new Node[INITIAL_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
-        updateThreshold();
-        if (size >= threshold) {
+        if (size >= LOAD_FACTOR * map.length) {
             resize();
         }
         int index = generateIndex(key);
         if (map[index] == null) {
-            map[index] = new Node<>(key, value);
+            map[index] = new Node<>(key, value, null);
             size++;
         }
         if (index != 0) {
             Node<K,V> tempNode = findInsertNode(map[index], key);
             if (tempNode.next == null && !tempNode.key.equals(key)) {
-                tempNode.next = new Node<>(key, value);
+                tempNode.next = new Node<>(key, value, null);
                 size++;
             } else {
                 tempNode.value = value;
@@ -42,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (index == 0) {
             return map[index].value;
         }
-        if (tempNode.next == null && map[index].key.equals(key)) {
+        if (tempNode != null && tempNode.next == null && map[index].key.equals(key)) {
             return map[index].value;
         } else {
             while (tempNode != null) {
@@ -65,18 +66,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private K key;
         private Node<K, V> next;
 
-        public Node(K key, V value) {
+        public Node(K key, V value, Node<K, V> next) {
             this.value = value;
             this.key = key;
         }
     }
 
     private int generateIndex(K key) {
-        if (key == null) {
-            return 0;
-        } else {
-            return Math.abs(key.hashCode()) % currentCapacity + 1;
-        }
+        return (key == null) ? 0 : Math.abs(key.hashCode()) % map.length + 1;
     }
 
     private Node<K,V> findInsertNode(Node<K,V> node, K key) {
@@ -91,24 +88,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return result;
     }
 
-    private void updateThreshold() {
-        this.threshold = (int) (LOAD_FACTOR * currentCapacity);
-    }
-
     private void resize() {
-        if (map == null) {
-            map = new Node[INITIAL_CAPACITY];
-            currentCapacity = map.length;
-        } else {
-            size = 0;
-            Node<K,V>[] oldMap = map;
-            map = new Node[currentCapacity << 1];
-            currentCapacity = map.length;
-            for (Node<K,V> node: oldMap) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
+        size = 0;
+        Node<K,V>[] oldMap = map;
+        map = new Node[map.length << 1];
+        for (Node<K,V> node: oldMap) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
