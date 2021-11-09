@@ -22,18 +22,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        Node<K, V> newNode = new Node<>(key, value);
         int bucket = getBucketNumber(key);
         if (table[bucket] == null) {
-            table[bucket] = newNode;
+            table[bucket] = new Node<>(key, value);
             size++;
             return;
         }
         Node<K, V> currentNode = getNodeFromCollision(table[bucket], key);
         if (Objects.equals(currentNode.key, key)) {
-            currentNode.value = newNode.value;
+            currentNode.value = value;
         } else {
-            currentNode.next = newNode;
+            currentNode.next = new Node<>(key, value);
             size++;
         }
     }
@@ -74,11 +73,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = table;
         table = new Node[realCapacity];
         for (Node<K, V> pair : oldTable) {
-            if (pair != null) {
-                while (pair != null) {
-                    put(pair.key, pair.value);
-                    pair = pair.next;
-                }
+            while (pair != null) {
+                put(pair.key, pair.value);
+                pair = pair.next;
             }
         }
     }
