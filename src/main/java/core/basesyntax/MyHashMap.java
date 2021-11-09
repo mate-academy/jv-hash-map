@@ -3,7 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private static final byte RESIZE_CAPACITY = 2;
+    private static final byte RESIZE_MULTIPLIER = 2;
     private int threshold;
     private int size;
     private Node<K, V>[] table;
@@ -15,9 +15,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        resizeTable();
-        Node<K, V> node = table[getIndex(key)];
+        resizeIfNeeded();
         int index = getIndex(key);
+        Node<K, V> node = table[index];
         while (node != null) {
             if (node.key == key || node.key != null && node.key.equals(key)) {
                 node.value = value;
@@ -30,7 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node = node.next;
         }
-        table[getIndex(key)] = new Node<K, V>(key,value);
+        table[index] = new Node<K, V>(key,value);
         size++;
     }
 
@@ -51,10 +51,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resizeTable() {
+    private void resizeIfNeeded() {
         if (size == threshold) {
             Node<K, V>[] temporaryTable = table;
-            table = new Node[temporaryTable.length * RESIZE_CAPACITY];
+            table = new Node[temporaryTable.length * RESIZE_MULTIPLIER];
             threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
             size = 0;
             for (Node<K, V> node : temporaryTable) {
