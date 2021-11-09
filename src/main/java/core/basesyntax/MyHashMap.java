@@ -6,22 +6,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double load_factor = 0.75;
     private Node<K, V>[] table = new Node[DEFAULT_CAPACITY];
-    private int size = 0;
+    private int size;
 
     @Override
     public void put(K key, V value) {
         if (size >= table.length * load_factor) {
             resize();
         }
-        int index = getHash(key);
+        int index = getIndex(key);
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
             size++;
             return;
         }
         Node<K, V> current = table[index];
-        while (current.next != null
-                || Objects.equals(current.key, key)) {
+        while (current.next != null || Objects.equals(current.key, key)) {
             if (Objects.equals(current.key, key)) {
                 current.value = value;
                 return;
@@ -34,7 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> oldNode = table[getHash(key)];
+        Node<K, V> oldNode = table[getIndex(key)];
         for (int i = 0; i < table.length; i++) {
             while (oldNode != null) {
                 if (Objects.equals(oldNode.key, key)) {
@@ -52,7 +51,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public int getHash(K key) {
+    public int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % DEFAULT_CAPACITY);
     }
 
