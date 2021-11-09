@@ -7,14 +7,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
 
     private Node<K, V>[] table;
-    private int realCapacity;
     private int threshold;
     private int size;
 
-    MyHashMap() {
-        realCapacity = DEFAULT_CAPACITY;
-        threshold = (int) (realCapacity * DEFAULT_LOAD_FACTOR);
-        table = new Node[realCapacity];
+    public MyHashMap() {
+        threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -28,12 +26,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        Node<K, V> currentNode = getNodeFromCollision(table[bucket], key);
-        if (Objects.equals(currentNode.key, key)) {
-            currentNode.value = value;
-        } else {
-            currentNode.next = new Node<>(key, value);
-            size++;
+        Node<K, V> node = table[bucket];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
+                return;
+            } else if (node.next == null) {
+                node.next = new Node<>(key, value);
+                size++;
+                return;
+            }
+            node = node.next;
         }
     }
 
@@ -43,8 +46,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[bucket] == null) {
             return null;
         }
-        Node<K, V> currentNode = getNodeFromCollision(table[bucket], key);
-        return Objects.equals(currentNode.key, key) ? currentNode.value : null;
+        Node<K, V> node = table[bucket];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return node.value;
+            }
+            node = node.next;
+        }
+        return null;
     }
 
     @Override
@@ -52,30 +61,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private Node<K, V> getNodeFromCollision(Node<K, V> node, K key) {
-        while (node.next != null) {
-            if (Objects.equals(node.key, key)) {
-                return node;
-            }
-            node = node.next;
-        }
-        return node;
-    }
-
     private int getBucketNumber(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % realCapacity);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void resize() {
+        int capacity = table.length << 1;
         size = 0;
-        realCapacity = realCapacity << 1;
-        threshold = (int) (realCapacity * DEFAULT_LOAD_FACTOR);
+        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
         Node<K, V>[] oldTable = table;
-        table = new Node[realCapacity];
-        for (Node<K, V> pair : oldTable) {
-            while (pair != null) {
-                put(pair.key, pair.value);
-                pair = pair.next;
+        table = new Node[capacity];
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
