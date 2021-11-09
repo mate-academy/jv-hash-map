@@ -7,22 +7,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75F;
     private Node<K, V>[] nodes;
     private int size;
-    private int threshold;
 
     public MyHashMap() {
         nodes = new Node[DEFAULT_CAPACITY];
-        threshold = (int) (nodes.length * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold) {
+        if (size >= nodes.length * LOAD_FACTOR) {
             grow();
         }
-        Node<K, V> newNode = new Node<>(key, value, null);
         int index = getIndexByKey(key);
+        Node<K, V> newNode = new Node<>(key, value, null);
         if (nodes[index] == null) {
             nodes[index] = newNode;
+            size++;
+            return;
         }
         Node<K, V> tempNode = nodes[index];
         while (tempNode != null) {
@@ -32,11 +32,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             if (tempNode.next == null) {
                 tempNode.next = newNode;
-                break;
+                size++;
+                return;
             }
             tempNode = tempNode.next;
         }
-        size++;
     }
 
     @Override
