@@ -26,18 +26,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        Node<K, V> node = table[index];
-        while (node != null) {
-            if (Objects.equals(key, node.key)) {
-                node.value = value;
+        Node<K, V> currentNode = table[index];
+        while (currentNode != null) {
+            if (Objects.equals(key, currentNode.key)) {
+                currentNode.value = value;
                 return;
             }
-            if (node.next == null) {
-                node.next = newNode;
+            if (currentNode.next == null) {
+                currentNode.next = newNode;
                 size++;
                 return;
             }
-            node = node.next;
+            currentNode = currentNode.next;
         }
 
     }
@@ -45,12 +45,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = getIndex(key);
-        Node<K, V> node = table[index];
-        while (node != null) {
-            if (Objects.equals(key, node.key)) {
-                return node.value;
+        Node<K, V> currentNode = table[index];
+        while (currentNode != null) {
+            if (Objects.equals(key, currentNode.key)) {
+                return currentNode.value;
             }
-            node = node.next;
+            currentNode = currentNode.next;
         }
         return null;
     }
