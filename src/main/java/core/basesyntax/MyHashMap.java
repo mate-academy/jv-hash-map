@@ -21,19 +21,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int indexBucket = getBucketIndex(key);
-        Node<K, V> checkNode = table[indexBucket];
+        Node<K, V> currentNode = table[indexBucket];
 
-        while (checkNode != null) {
-            if (Objects.equals(checkNode.key, key)) {
-                checkNode.value = value;
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                currentNode.value = value;
                 return;
             }
-            if (checkNode.next == null) {
-                checkNode.next = new Node<>(key, value, null);
+            if (currentNode.next == null) {
+                currentNode.next = new Node<>(key, value, null);
                 size++;
                 return;
             }
-            checkNode = checkNode.next;
+            currentNode = currentNode.next;
         }
         table[indexBucket] = new Node<>(key, value, null);
         size++;
@@ -69,7 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
         }
 
-        public final String toString() {
+        public String toString() {
             return key + "=" + value;
         }
 
