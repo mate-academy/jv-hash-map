@@ -3,8 +3,8 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static int DEFAULT_CAPACITY = 16;
-    private static float LOAD_FACTOR = 0.75F;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75F;
     private Node<K, V>[] nodes;
     private int size;
     private int threshold;
@@ -16,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold) {
+        if (size == threshold) {
             grow();
         }
         Node<K, V> newNode = nodes[getIndexByKey(key)];
