@@ -4,14 +4,14 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INNITIAL_CAPACITY = 16;
-    private static final float DEFAULT_FACTORY_LOAD = 0.75f;
+    private static final float DEFAULT_LOAD_FACTORY = 0.75f;
     private Node<K, V>[] table;
     private int threshold;
     private int size;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INNITIAL_CAPACITY];
-        threshold = (int) (table.length * DEFAULT_FACTORY_LOAD);
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTORY);
     }
 
     public MyHashMap(int initialCapacity) {
@@ -19,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             throw new IllegalArgumentException("Initial capacity must be more than 0");
         }
         table = new Node[initialCapacity];
-        threshold = (int) (table.length * DEFAULT_FACTORY_LOAD);
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTORY);
     }
 
     @Override
@@ -65,18 +65,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        private Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     private <K> int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
@@ -91,6 +79,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode = currentNode.next;
             }
         }
-        threshold = (int) (table.length * DEFAULT_FACTORY_LOAD);
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTORY);
+    }
+
+    private class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        private Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
