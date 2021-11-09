@@ -5,13 +5,11 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private int capacity;
     private int threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        capacity = DEFAULT_INITIAL_CAPACITY;
         table = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
@@ -67,10 +65,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        capacity = capacity * 2;
-        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
+        int newCapacity = table.length * 2;
+        threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
         Node<K, V>[] oldTable = table;
-        table = new Node[capacity];
+        table = new Node[newCapacity];
         for (Node<K, V> currentNode : oldTable) {
             if (currentNode != null) {
                 while (currentNode != null) {
@@ -82,7 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int calculateIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     static class Node<K, V> {
