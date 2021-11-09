@@ -11,9 +11,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] array;
 
     public MyHashMap() {
-        this.threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
-        this.size = 0;
-        this.array = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
+        threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
+        array = new Node[INITIAL_CAPACITY];
     }
 
     @Override
@@ -59,9 +58,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        threshold = (int) (array.length * LOAD_FACTOR);
         Node<K, V>[] oldArray = array;
-        array = (Node<K, V>[]) new Node[array.length * CAPACITY_MULTIPLIER];
+        array = new Node[array.length * CAPACITY_MULTIPLIER];
+        threshold = (int) (array.length * LOAD_FACTOR);
         for (Node<K, V> node : oldArray) {
             while (node != null) {
                 put(node.key, node.value);
