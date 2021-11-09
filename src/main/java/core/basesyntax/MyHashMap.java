@@ -59,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resizeIfNeeded() {
-        if (size > threshold()) {
+        if (size > getThreshold()) {
             grow();
         }
     }
@@ -73,19 +73,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void transfer(Node<K, V>[] oldTable) {
-        for (Node<K, V> bucket : oldTable) {
-            while (bucket != null) {
-                put(bucket.key, bucket.value);
-                bucket = bucket.next;
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
 
     private int calculateIndex(K key) {
-        return (key == null ? 0 : key.hashCode()) & (table.length - 1);
+        int hash = key == null ? 0 : key.hashCode();
+        return hash & (table.length - 1);
     }
 
-    private float threshold() {
+    private float getThreshold() {
         return table.length * DEFAULT_LOAD_FACTOR;
     }
 
