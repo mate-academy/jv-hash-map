@@ -60,10 +60,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         Node<K, V>[] tableCopy = table;
         table = new Node[table.length * 2];
-        for (Node<K, V> nodes : tableCopy) {
-            while (nodes != null) {
-                put(nodes.key, nodes.value);
-                nodes = nodes.next;
+        for (Node<K, V> node : tableCopy) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
