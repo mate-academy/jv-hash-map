@@ -7,31 +7,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static float LOAD_FACTOR = 0.75F;
     private Node<K, V>[] nodes;
     private int size;
-
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
+    private int threshold;
 
     public MyHashMap() {
         nodes = new Node[DEFAULT_CAPACITY];
+        threshold = (int) (nodes.length * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= nodes.length * LOAD_FACTOR) {
+        if (size >= threshold) {
             grow();
         }
-        Node<K, V> newNode = nodes[getKey(key)];
+        Node<K, V> newNode = nodes[getIndexByKey(key)];
         if (newNode == null) {
-            nodes[getKey(key)] = new Node<>(key, value, null);
+            nodes[getIndexByKey(key)] = new Node<>(key, value, null);
         }
         while (newNode != null) {
             if (Objects.equals(newNode.key,key)) {
@@ -49,7 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = nodes[getKey(key)];
+        Node<K, V> node = nodes[getIndexByKey(key)];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
                 return node.value;
@@ -76,10 +66,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getKey(K key) {
-        if (key == null) {
-            return 0;
+    private int getIndexByKey(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % nodes.length);
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
         }
-        return Math.abs(key.hashCode() % nodes.length);
     }
 }
