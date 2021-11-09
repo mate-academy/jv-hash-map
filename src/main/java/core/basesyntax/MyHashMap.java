@@ -75,13 +75,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void recize() {
         size = 0;
         int newCapacity = table.length * 2;
-        Node<K, V>[] newTable = table;
+        Node<K, V>[] oldTable = table;
         table = new Node[newCapacity];
         threshold = (int) (DEFAULT_LOAD_FACTOR * table.length);
-        for (Node<K, V> node : newTable) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+        for (Node<K, V> currentNode : oldTable) {
+            while (currentNode != null) {
+                put(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
             }
         }
     }
