@@ -23,8 +23,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> node = table[index];
         if (node == null) {
             table[index] = new Node<>(key, value, null);
-            size++;
-            return;
         } else {
             while (node != null) {
                 if (Objects.equals(node.key, key)) {
@@ -33,12 +31,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 if (node.next == null) {
                     node.next = new Node<>(key, value, null);
-                    size++;
                     break;
                 }
                 node = node.next;
             }
         }
+        size++;
     }
 
     @Override
