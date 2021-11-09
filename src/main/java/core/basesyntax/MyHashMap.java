@@ -10,7 +10,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
         threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
-        size = 0;
     }
 
     @Override
@@ -59,15 +58,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        threshold <<= 1;
         Node<K, V>[] oldTab = table;
         int newCap = table.length << 1;
         table = new Node[newCap];
         size = 0;
-        transfer(oldTab);
-        threshold <<= 1;
-    }
-
-    private void transfer(Node<K, V>[] oldTab) {
         for (Node<K, V> node : oldTab) {
             while (node != null) {
                 put(node.key, node.value);
