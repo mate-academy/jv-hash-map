@@ -17,21 +17,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= nodes.length * LOAD_FACTOR) {
             grow();
         }
-        Node<K, V> newNode = nodes[getKeyPosition(key)];
-        if (newNode == null) {
-            nodes[getKeyPosition(key)] = new Node<>(key, value, null);
+        int index = getKeyPosition(key);
+        Node<K, V> currentNode = nodes[index];
+        if (currentNode == null) {
+            nodes[index] = new Node<>(key, value, null);
         }
-        while (newNode != null) {
-            if (Objects.equals(newNode.key,key)) {
-                newNode.value = value;
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key,key)) {
+                currentNode.value = value;
                 return;
             }
-            if (newNode.next == null) {
-                Node<K, V> thisNode = new Node<>(key, value, null);
-                newNode.next = thisNode;
+            if (currentNode.next == null) {
+                currentNode.next = new Node<>(key, value, null);
                 break;
             }
-            newNode = newNode.next;
+            currentNode = currentNode.next;
         }
         size++;
     }
@@ -55,21 +55,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void grow() {
         size = 0;
-        Node<K,V>[] oldNode = nodes;
+        Node<K,V>[] oldNodes = nodes;
         nodes = new Node[nodes.length * 2];
-        for (Node<K, V> newNode : oldNode) {
-            while (newNode != null) {
-                put(newNode.key, newNode.value);
-                newNode = newNode.next;
+        for (Node<K, V> node : oldNodes) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
 
     private int getKeyPosition(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode() % nodes.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % nodes.length);
     }
 
     private static class Node<K, V> {
