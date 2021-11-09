@@ -31,7 +31,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (Objects.equals(node.key, key)) {
                 node.value = value;
                 return;
-            } else if (node.next == null) {
+            }
+            if (node.next == null) {
                 node.next = new Node<>(key, value);
                 size++;
                 return;
@@ -43,9 +44,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int bucket = getBucketNumber(key);
-        if (table[bucket] == null) {
-            return null;
-        }
         Node<K, V> node = table[bucket];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
