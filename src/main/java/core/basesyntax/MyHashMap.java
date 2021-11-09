@@ -31,7 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 if (nodeByIndex.next == null) {
                     nodeByIndex.next = newNode;
-                   break;
+                    break;
                 }
                 nodeByIndex = nodeByIndex.next;
             }
