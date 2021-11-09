@@ -32,8 +32,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 if (node.next == null) {
                     node.next = newNode;
-                    size++;
-                    return;
+                    break;
                 }
                 node = node.next;
             }
@@ -60,10 +59,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resizeAndTransform() {
         size = 0;
-        int newLen = table.length * 2;
-        threshold = (int) (newLen * DEFAULT_LOAD_FACTOR);
+        int newTableLength = table.length * 2;
+        threshold = (int) (newTableLength * DEFAULT_LOAD_FACTOR);
         Node<K, V>[] tempTable = table;
-        table = new Node[newLen];
+        table = new Node[newTableLength];
         for (Node<K, V> currentNode : tempTable) {
             while (currentNode != null) {
                 put(currentNode.key, currentNode.value);
