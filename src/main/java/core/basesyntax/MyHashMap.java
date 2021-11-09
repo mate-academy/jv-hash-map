@@ -21,6 +21,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> newNode = new Node<>(key, value, null);
         if (nodes[index] == null) {
             nodes[index] = newNode;
+            size++;
+            return;
         }
         Node<K, V> tempNode = nodes[index];
         while (tempNode != null) {
@@ -30,11 +32,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             if (tempNode.next == null) {
                 tempNode.next = newNode;
-                break;
+                size++;
+                return;
             }
             tempNode = tempNode.next;
         }
-        size++;
     }
 
     @Override
