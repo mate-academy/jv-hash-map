@@ -3,8 +3,8 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static int DEFAULT_CAPACITY = 16;
-    private static float LOAD_FACTOR = 0.75F;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75F;
     private Node<K, V>[] nodes;
     private int size;
     private int threshold;
@@ -16,25 +16,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold) {
+        if (size == threshold) {
             grow();
         }
-        Node<K, V> newNode = nodes[getIndexByKey(key)];
-        if (newNode == null) {
-            nodes[getIndexByKey(key)] = new Node<>(key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, null);
+        int index = getIndexByKey(key);
+        if (nodes[index] == null) {
+            nodes[index] = newNode;
+            size++;
+            return;
         }
-        while (newNode != null) {
-            if (Objects.equals(newNode.key,key)) {
-                newNode.value = value;
+        Node<K, V> tempNode = nodes[index];
+        while (tempNode != null) {
+            if (Objects.equals(tempNode.key, key)) {
+                tempNode.value = value;
                 return;
-            } else if (newNode.next == null) {
-                Node<K, V> thisNode = new Node<>(key, value, null);
-                newNode.next = thisNode;
-                break;
             }
-            newNode = newNode.next;
+            if (tempNode.next == null) {
+                tempNode.next = newNode;
+                size++;
+                return;
+            }
+            tempNode = tempNode.next;
         }
-        size++;
     }
 
     @Override
