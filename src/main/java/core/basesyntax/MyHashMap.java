@@ -27,7 +27,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        int index = getHash(key);
+        int index = getIndex(key);
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
         } else {
@@ -49,7 +49,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = getHash(key);
+        int index = getIndex(key);
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
@@ -77,7 +77,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private <K> int getHash(K key) {
+    private <K> int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
