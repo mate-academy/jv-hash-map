@@ -53,19 +53,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private void resize() {
-        Node<K, V>[] oldTable = table;
-        table = new Node[oldTable.length * 2];
-        size = 0;
-        for (int i = 0; i < oldTable.length; i++) {
-            Node<K, V> newNode = oldTable[i];
-            while (newNode != null) {
-                put(newNode.key, newNode.value);
-                newNode = newNode.next;
-            }
-        }
-    }
-
     @Override
     public int getSize() {
         return size;
@@ -84,6 +71,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
+        }
+    }
+
+    private void resize() {
+        Node<K, V>[] oldTable = table;
+        table = new Node[oldTable.length * 2];
+        size = 0;
+        for (int i = 0; i < oldTable.length; i++) {
+            Node<K, V> newNode = oldTable[i];
+            while (newNode != null) {
+                put(newNode.key, newNode.value);
+                newNode = newNode.next;
+            }
         }
     }
 }
