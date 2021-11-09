@@ -16,22 +16,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size == threshold) {
+        if (size >= threshold) {
             resize();
         }
+        Node<K, V> newNode = new Node<>(key, value, null);
         int index = getIndex(key);
-        for (Node<K, V> node = table[index]; node != null; node = node.next) {
-            if (Objects.equals(key, node.key)) {
-                node.value = value;
-                return;
-            }
-            if (node.next == null) {
-                node.next = new Node<>(key, value, null);
-                size++;
-                return;
+        if (table[index] == null) {
+            table[index] = newNode;
+        } else {
+            for (Node<K, V> node = table[index]; node != null; node = node.next) {
+                if (Objects.equals(key, node.key)) {
+                    node.value = value;
+                    return;
+                }
+                if (node.next == null) {
+                    node.next = newNode;
+                    break;
+                }
             }
         }
-        table[index] = new Node<>(key, value, null);
         size++;
     }
 
@@ -52,9 +55,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
-        Node<K, V>[] oldTable = table;
+        final Node<K, V>[] oldTable = table;
         table = new Node[table.length * 2];
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
         size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
