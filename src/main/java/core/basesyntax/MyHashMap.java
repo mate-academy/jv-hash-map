@@ -25,17 +25,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[index] == null) {
             table[index] = newNode;
         } else {
-            Node oldNode = table[index];
-            while (oldNode != null) {
-                if (Objects.equals(key, oldNode.key)) {
-                    oldNode.value = value;
+            Node currentNode = table[index];
+            while (currentNode != null) {
+                if (Objects.equals(key, currentNode.key)) {
+                    currentNode.value = value;
                     return;
                 }
-                if (oldNode.next == null) {
-                    oldNode.next = newNode;
+                if (currentNode.next == null) {
+                    currentNode.next = newNode;
                     size++;
                 } else {
-                    oldNode = oldNode.next;
+                    currentNode = currentNode.next;
                 }
             }
         }
@@ -78,12 +78,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
     
-    static class Node<K,V> {
+    private static class Node<K,V> {
         private final K key;
         private V value;
         private Node<K,V> next;
 
-        Node(K key, V value) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
             this.next = null;
