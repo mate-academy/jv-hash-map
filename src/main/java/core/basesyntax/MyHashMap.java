@@ -24,29 +24,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         Node<K,V> tempNode = findInsertNode(map[index], key);
-        if (tempNode.next == null && (!Objects.equals(key, tempNode.key))) {
+        if (!Objects.equals(key, tempNode.key)) {
             tempNode.next = new Node<>(key, value, null);
-        } else {
-            tempNode.value = value;
+            size++;
             return;
         }
-        size++;
+        tempNode.value = value;
     }
 
     @Override
     public V getValue(K key) {
         int index = generateIndex(key);
         Node<K,V> tempNode = map[index];
-        if (tempNode != null && tempNode.next == null
-                || tempNode == key && tempNode.key.equals(key)) {
-            return map[index].value;
-        } else {
-            while (tempNode != null) {
-                if (Objects.equals(tempNode.key, key)) {
-                    return tempNode.value;
-                }
-                tempNode = tempNode.next;
+        while (tempNode != null) {
+            if (Objects.equals(tempNode.key, key)) {
+                return tempNode.value;
             }
+            tempNode = tempNode.next;
         }
         return null;
     }
@@ -56,31 +50,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static class Node<K, V> {
-        private V value;
-        private K key;
-        private Node<K, V> next;
-
-        public Node(K key, V value, Node<K, V> next) {
-            this.value = value;
-            this.key = key;
-        }
-    }
-
     private int generateIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode()) % map.length;
     }
 
     private Node<K,V> findInsertNode(Node<K,V> node, K key) {
-        Node<K,V> result;
-        result = node;
-        while (result.next != null) {
-            if (Objects.equals(result.key, key)) {
-                return result;
+        while (node.next != null) {
+            if (Objects.equals(node.key, key)) {
+                return node;
             }
-            result = result.next;
+            node = node.next;
         }
-        return result;
+        return node;
     }
 
     private void resize() {
@@ -92,6 +73,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 put(node.key, node.value);
                 node = node.next;
             }
+        }
+    }
+
+    private static class Node<K, V> {
+        private V value;
+        private K key;
+        private Node<K, V> next;
+
+        public Node(K key, V value, Node<K, V> next) {
+            this.value = value;
+            this.key = key;
         }
     }
 }
