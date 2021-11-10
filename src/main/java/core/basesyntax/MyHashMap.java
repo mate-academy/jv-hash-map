@@ -15,19 +15,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         Node<K, V> newNode = new Node<>(key, value, null);
+        Node<K, V> oldNode = table[getIndex(key)];
         if (table[getIndex(key)] == null) {
             table[getIndex(key)] = newNode;
+            size++;
+        } else if (isEqual(key, oldNode.key)) {
+            oldNode.value = value;
         } else {
-            Node<K, V> oldNode;
             for (oldNode = table[getIndex(key)]; oldNode.next != null; oldNode = oldNode.next) {
                 if (isEqual(key, oldNode.key)) {
                     oldNode.value = value;
-                    break;
+                    return;
                 }
             }
             oldNode.next = newNode;
+            size++;
         }
-        size++;
     }
 
     @Override
@@ -80,7 +83,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[newCapacity];
 
         for (Node<K, V> node : oldTable) {
-            put(node.key, node.value);
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
         }
         threshold = (int) (newCapacity * LOAD_FACTOR);
     }
