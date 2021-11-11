@@ -19,17 +19,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[getIndex(key)] == null) {
             table[getIndex(key)] = newNode;
             size++;
-        } else if (isEqual(key, oldNode.key)) {
-            oldNode.value = value;
         } else {
-            for (oldNode = table[getIndex(key)]; oldNode.next != null; oldNode = oldNode.next) {
-                if (isEqual(key, oldNode.key)) {
+            while (oldNode != null) {
+                if (isEqual(oldNode.key, key)) {
                     oldNode.value = value;
                     return;
                 }
+                if (oldNode.next == null) {
+                    oldNode.next = newNode;
+                    size++;
+                    return;
+                }
+                oldNode = oldNode.next;
             }
-            oldNode.next = newNode;
-            size++;
         }
     }
 
