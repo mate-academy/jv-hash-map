@@ -24,13 +24,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    public int lookingOfBucket(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % currentMap.length;
+    }
+
+    public void resizeMap(Node<K, V>[] myOldMap) {
+        size = 0;
+        int length = currentMap.length * 2;
+        currentMap = new Node[length];
+        for (Node<K, V> node : myOldMap) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
+        }
+    }
+
     @Override
     public void put(K key, V value) {
 
         Node<K, V> newNode = new Node(key, value, null);
-        System.out.println(key + " " + value);
-        int index = key == null ? 0 : Math.abs(key.hashCode()) % currentMap.length;
-        System.out.println(index);
+        int index = lookingOfBucket(key);
+
         Node<K, V>[] myOldMap = currentMap;
         if (currentMap[index] == null) {
             currentMap[index] = newNode;
@@ -38,15 +53,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         if (size == currentMap.length * HASHMAP_LOAD_FACTOR) {
-            size = 0;
-            int length = currentMap.length * 2;
-            currentMap = new Node[length];
-            for (Node<K, V> node : myOldMap) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
-            }
+            resizeMap(myOldMap);
         }
         Node<K, V> node = currentMap[index];
         while (node != null) {
@@ -65,8 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = currentMap[key == null ? 0 : Math.abs(key.hashCode())
-                % currentMap.length];
+        Node<K, V> node = currentMap[lookingOfBucket(key)];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
                 return node.value;
