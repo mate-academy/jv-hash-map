@@ -24,12 +24,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public int lookingOfBucket(K key) {
+    public int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % currentMap.length;
     }
 
-    public void resizeMap(Node<K, V>[] myOldMap) {
+    public void resizeMap() {
         size = 0;
+        Node<K, V>[] myOldMap = currentMap;
         int length = currentMap.length * 2;
         currentMap = new Node[length];
         for (Node<K, V> node : myOldMap) {
@@ -44,16 +45,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
 
         Node<K, V> newNode = new Node(key, value, null);
-        int index = lookingOfBucket(key);
+        int index = getIndex(key);
 
-        Node<K, V>[] myOldMap = currentMap;
         if (currentMap[index] == null) {
             currentMap[index] = newNode;
             size++;
             return;
         }
         if (size == currentMap.length * HASHMAP_LOAD_FACTOR) {
-            resizeMap(myOldMap);
+            resizeMap();
         }
         Node<K, V> node = currentMap[index];
         while (node != null) {
@@ -72,7 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = currentMap[lookingOfBucket(key)];
+        Node<K, V> node = currentMap[getIndex(key)];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
                 return node.value;
