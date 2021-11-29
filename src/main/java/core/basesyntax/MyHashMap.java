@@ -5,7 +5,7 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;//00010000//2^4=16
+    static final int DEFAULT_INITIAL_CAPACITY = 16;
     static final int MAXIMUM_CAPACITY = 1 << 30;//0001000000000000000000000000000000//2^30
 
     /**
