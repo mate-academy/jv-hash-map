@@ -5,13 +5,13 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    static final int DEFAULT_INITIAL_CAPACITY = 16;
-    static final int MAXIMUM_CAPACITY = 1 << 30;//0001000000000000000000000000000000//2^30
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final int MAXIMUM_CAPACITY = 1 << 30;//0001000000000000000000000000000000//2^30
 
     /**
      * The load factor used when none specified in constructor.
      */
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
     private transient Node<K,V>[] table;
 
