@@ -60,21 +60,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        putVal(hash(key), key, value, true);
-    }
-
-    @Override
-    public V getValue(K key) {
-        Node<K,V> e = getNode(hash(key), key);
-        return e == null ? null : e.value;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
-    }
-
-    final V putVal(int hash, K key, V value, boolean rewriteExisting) {
+        int hash = hash(key);
+        boolean rewriteExisting = true;
         Node<K,V>[] tab = table;
         int l = 0;
         if (tab != null) {
@@ -121,14 +108,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     //только если rewriteExisting==true или oldValue==null
                     existing.value = value;//запишем в .value новое значение
                 }
-                return oldValue;
+                return;
             }
         }
         if (++size > threshold) { //если после увеличения на 1 size > threshold
             resize();
         }
+    }
 
-        return null;
+    @Override
+    public V getValue(K key) {
+        Node<K,V> e = getNode(hash(key), key);
+        return e == null ? null : e.value;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
     }
 
     static final int hash(Object key) {
