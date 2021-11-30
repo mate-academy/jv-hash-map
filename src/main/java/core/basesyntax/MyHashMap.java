@@ -12,12 +12,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
      */
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
-    private transient Node<K,V>[] table;
+    private Node<K,V>[] table;
 
     /**
      * The number of key-value mappings contained in this map.
      */
-    private transient int size;
+    private int size;
 
     /**
      * The load factor for the hash table.
