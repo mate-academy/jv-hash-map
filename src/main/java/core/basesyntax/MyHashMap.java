@@ -6,7 +6,6 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
-    private static final int MAXIMUM_CAPACITY = 1 << 30;//0001000000000000000000000000000000//2^30
 
     /**
      * The load factor used when none specified in constructor.
@@ -175,11 +174,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int newCap;
         int newThr = 0;
         if (oldCap > 0) {
-            if (oldCap >= MAXIMUM_CAPACITY) {
-                threshold = Integer.MAX_VALUE;
-                return oldTab;
-            } else if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY //double capacity
-                    && oldCap >= DEFAULT_INITIAL_CAPACITY) {
+            newCap = oldCap << 1; //double capacity
+            if (oldCap >= DEFAULT_INITIAL_CAPACITY) {
                 newThr = oldThr << 1; // double threshold
             } else if (oldThr > 0) { //oldCap=0,oldThr>0 (initial capacity was placed in threshold)
                 newCap = oldThr;
@@ -187,11 +183,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else { //oldCap=0,oldThr=0 (zero initial threshold signifies using defaults)
             newCap = DEFAULT_INITIAL_CAPACITY;
             newThr = (int)(DEFAULT_LOAD_FACTOR * newCap);
-        }
-        if (newThr == 0) {
-            float ft = (float)newCap * loadFactor;
-            newThr = (newCap < MAXIMUM_CAPACITY && ft < (float)MAXIMUM_CAPACITY
-                    ? (int)ft : Integer.MAX_VALUE);
         }
         threshold = newThr;
         @SuppressWarnings({"rawtypes","unchecked"})
