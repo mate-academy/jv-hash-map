@@ -63,18 +63,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = hash(key);
         boolean rewriteExisting = true;
         Node<K,V>[] tab = table;
-        int l = 0;
+        int tabLen = 0;
         if (tab != null) {
-            l = tab.length;
+            tabLen = tab.length;
         }
         Node<K,V> curr;
         int i;
-        if (tab == null || l == 0) {
+        if (tab == null || tabLen == 0) {
             tab = resize();
-            l = tab.length;
+            tabLen = tab.length;
         }
         //Bitwise AND (&) returns 1 if and only if both bits are 1, else returns 0
-        i = (l - 1) & hash;//index of bucket where to put value
+        i = (tabLen - 1) & hash;//index of bucket where to put value
         curr = tab[i];//посмотрим что там было в бакете до записи в него
         if (curr == null) { //если по данному индексу в table еще нет ноды
             tab[i] = newNode(hash, key, value, null);
