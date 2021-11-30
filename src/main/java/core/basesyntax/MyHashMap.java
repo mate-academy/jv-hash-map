@@ -5,10 +5,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double DEFAULT_LOAD_FACTOR = 0.75d;
 
     private static class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
+
+        private Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 
     private int threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
@@ -83,22 +88,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Node<K, V> temp = table[index];
         if (table[index] == null) {
-            table[index] = newNode(key, value);
+            table[index] = new Node<>(key, value, null);
         } else {
             while (temp.next != null) {
                 temp = temp.next;
             }
-            temp.next = newNode(key, value);
+            temp.next = new Node<>(key, value, null);
         }
         size++;
-    }
-
-    private Node<K, V> newNode(K key, V value) {
-        Node<K, V> newNode = new Node<>();
-        newNode.hash = (key == null) ? 0 : key.hashCode();
-        newNode.key = key;
-        newNode.value = value;
-        newNode.next = null;
-        return newNode;
     }
 }
