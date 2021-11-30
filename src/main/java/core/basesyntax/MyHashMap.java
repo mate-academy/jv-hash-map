@@ -7,32 +7,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
 
-    /**
-     * The load factor used when none specified in constructor.
-     */
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
     private Node<K,V>[] table;
 
-    /**
-     * The number of key-value mappings contained in this map.
-     */
     private int size;
 
-    /**
-     * The load factor for the hash table.
-     */
     private final float loadFactor;
 
-    /**
-     * The next size value at which to resize (capacity * load factor).
-     */
     private int threshold;
 
-    /**
-     * Constructs an empty MyHashMap with the default initial capacity
-     * (16) and the default load factor (0.75).
-     */
     public MyHashMap() {
         this.loadFactor = DEFAULT_LOAD_FACTOR; // all other fields defaulted
     }
