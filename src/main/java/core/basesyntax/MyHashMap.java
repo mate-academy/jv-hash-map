@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.loadFactor = DEFAULT_LOAD_FACTOR; // all other fields defaulted
     }
 
-    static class Node<K,V> implements Map.Entry<K,V> {
+    static class Node<K,V> {
         private final int hash;
         private final K key;
         private V value;
@@ -32,20 +32,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        public final K getKey() {
-            return key;
-        }
-
-        public final V getValue() {
-            return value;
-        }
-
-        public final V setValue(V newValue) {
-            V oldValue = value;
-            value = newValue;
-            return oldValue;
         }
 
         public final String toString() {
