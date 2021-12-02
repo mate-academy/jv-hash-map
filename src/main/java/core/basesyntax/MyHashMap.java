@@ -136,9 +136,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private final Node<K,V> getNode(int hash, Object key) {
-        Node<K,V>[] tab = table;
-        int tabLen = tab.length;
-        Node<K,V> first = tab[(tabLen - 1) & hash];
+        Node<K,V> first = table[(table.length - 1) & hash];
         if (first == null) {
             return null;
         }
