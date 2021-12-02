@@ -34,10 +34,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         int hash = hash(key);
         Node<K,V>[] tab = table;
-        int tabLen = 0;
-        if (tab != null) {
-            tabLen = tab.length;
-        }
+        int tabLen = tab.length;
         Node<K,V> curr;
         int i;
         if (tab == null || tabLen == 0) {
