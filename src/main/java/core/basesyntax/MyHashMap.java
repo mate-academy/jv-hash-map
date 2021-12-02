@@ -21,15 +21,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K,V> next;
 
-        Node(int hash, K key, V value, Node<K,V> next) {
+        private Node(int hash, K key, V value, Node<K,V> next) {
             this.hash = hash;
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        public final String toString() {
-            return key + "=" + value;
         }
 
     }
@@ -97,13 +93,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    static final int hash(Object key) {
+    private static final int hash(Object key) {
         int h;
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     } //^ Bitwise exclusive OR (returns 0 if both bits are the same, else returns 1)
     //>>> Unsigned Right Shift Operator (11110000 >>> 2 = 00111100)
 
-    final Node<K,V>[] resize() {
+    private final Node<K,V>[] resize() {
         Node<K,V>[] oldTab = table;
         int oldCap = (oldTab == null) ? 0 : oldTab.length;
         int oldThr = threshold;
@@ -140,11 +136,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return table;
     }
 
-    Node<K,V> newNode(int hash, K key, V value, Node<K,V> next) {
+    private Node<K,V> newNode(int hash, K key, V value, Node<K,V> next) {
         return new Node<>(hash, key, value, next);
     }
 
-    final Node<K,V> getNode(int hash, Object key) {
+    private final Node<K,V> getNode(int hash, Object key) {
         Node<K,V>[] tab;
         int tabLen;
         if ((tab = table) != null && (tabLen = tab.length) > 0) {
