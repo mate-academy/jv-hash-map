@@ -118,18 +118,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = newTab;
         size = 0;
         for (int j = 0; j < oldCap; ++j) { //нужно перенести все элементы из oldTab в newTab
-            Node<K,V> e = oldTab[j];
-            if (e != null) {
-                put(e.key, e.value);
-                if (e.next != null) { //то нужно перенести в newTab всю цепочку
+            Node<K,V> curNode = oldTab[j];
+            if (curNode != null) {
+                put(curNode.key, curNode.value);
+                if (curNode.next != null) { //то нужно перенести в newTab всю цепочку
                     Node<K,V> next;
                     do {
-                        next = e.next;
+                        next = curNode.next;
                         if (next != null) {
                             put(next.key, next.value);
                         }
-                        e = next;
-                    } while (e != null);
+                        curNode = next;
+                    } while (curNode != null);
                 }
             }
         }
