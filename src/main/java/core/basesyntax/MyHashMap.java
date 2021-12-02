@@ -18,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.table = (Node<K,V>[])new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
-    static class Node<K,V> {
+    private static class Node<K,V> {
         private final int hash;
         private final K key;
         private V value;
