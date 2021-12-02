@@ -141,26 +141,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private final Node<K,V> getNode(int hash, Object key) {
-        Node<K,V>[] tab;
-        int tabLen;
-        if ((tab = table) != null && (tabLen = tab.length) > 0) {
-            Node<K,V> first = tab[(tabLen - 1) & hash];
-            if (first == null) {
-                return null;
-            }
-            K k = first.key;
-            Node<K,V> next;
-            if (first.hash == hash && (k == key || (key != null && key.equals(k)))) {
-                return first;
-            }
-            if ((next = first.next) != null) {
-                do {
-                    if (next.hash == hash
-                            && ((k = next.key) == key || (key != null && key.equals(k)))) {
-                        return next;
-                    }
-                } while ((next = next.next) != null);
-            }
+        Node<K,V>[] tab = table;
+        int tabLen = tab.length;
+        Node<K,V> first = tab[(tabLen - 1) & hash];
+        if (first == null) {
+            return null;
+        }
+        K k = first.key;
+        Node<K,V> next;
+        if (first.hash == hash && (k == key || (key != null && key.equals(k)))) {
+            return first;
+        }
+        if ((next = first.next) != null) {
+            do {
+                if (next.hash == hash
+                        && ((k = next.key) == key || (key != null && key.equals(k)))) {
+                    return next;
+                }
+            } while ((next = next.next) != null);
         }
         return null;
     }
