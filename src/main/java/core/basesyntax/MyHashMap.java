@@ -61,7 +61,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int hash = hash(key);
-        boolean rewriteExisting = true;
         Node<K,V>[] tab = table;
         int tabLen = 0;
         if (tab != null) {
@@ -102,16 +101,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
             if (existing != null) { //если с таким key и hash уже была запись в списке
-                //то перезапишем value
-                V oldValue = existing.value;//скопируем старое значение в oldValue
-                if (rewriteExisting || oldValue == null) {
-                    //только если rewriteExisting==true или oldValue==null
-                    existing.value = value;//запишем в .value новое значение
-                }
+                existing.value = value;//запишем в .value новое значение
                 return;
             }
         }
-        if (++size > threshold) { //если после увеличения на 1 size > threshold
+        if (++size > threshold) { //увеличиваем на 1 size и после сравниваем с threshold
             resize();
         }
     }
@@ -140,12 +134,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int newCap;
         int newThr = 0;
         if (oldCap > 0) {
-            newCap = oldCap << 1; //double capacity
-            if (oldCap >= DEFAULT_INITIAL_CAPACITY) {
-                newThr = oldThr << 1; // double threshold
-            } else if (oldThr > 0) { //oldCap=0,oldThr>0 (initial capacity was placed in threshold)
-                newCap = oldThr;
-            }
+            newCap = oldCap << 1; // double capacity
+            newThr = oldThr << 1; // double threshold
         } else { //oldCap=0,oldThr=0 (zero initial threshold signifies using defaults)
             newCap = DEFAULT_INITIAL_CAPACITY;
             newThr = (int)(DEFAULT_LOAD_FACTOR * newCap);
@@ -154,58 +144,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         @SuppressWarnings({"rawtypes","unchecked"})
         Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap];
         table = newTab;
-        if (oldTab != null) { //нужно перенести все элементы из oldTab в newTab
-            for (int j = 0; j < oldCap; ++j) {
-                Node<K,V> oldTabNode = oldTab[j];
-                if (oldTabNode != null) {
-                    oldTab[j] = null;
-                    if (oldTabNode.next == null) { //если oldTabNode единственнный в бакете
-                        int i = (newCap - 1) & oldTabNode.hash; //индекс бакета в newTab
-                        newTab[i] = oldTabNode;
-                    } else { //oldTabNode не единственнный в бакете        preserve order
-                        Node<K,V> loHead = null;
-                        Node<K,V> loTail = null;
-                        Node<K,V> hiHead = null;
-                        Node<K,V> hiTail = null;
-                        Node<K,V> next;
-                        do {
-                            next = oldTabNode.next;
-                            if ((oldTabNode.hash & oldCap) == 0) {
-                                //hash=xXxxxx & oldCap=010000//2^4=16
-                                //X=0||1 result of & = 000000||010000
-                                //distribute them into "hi" and "lo" bin,
-                                // depending on the significant bit inside the hash
-                                if (loTail == null) { //first time loTail==null will be true
-                                    loHead = oldTabNode;
-                                } else { //loTail != null
-                                    loTail.next = oldTabNode;
-                                }
-                                loTail = oldTabNode;
-                            } else { //placing oldTabNode into "hi" bin
-                                if (hiTail == null) {
-                                    hiHead = oldTabNode;
-                                } else {
-                                    hiTail.next = oldTabNode;
-                                }
-                                hiTail = oldTabNode;
-                            }
-                            oldTabNode = next;
-                        } while (oldTabNode != null);
-                        //после того как мы переписали все ссылки .next от loHead до loTail
-                        //и от hiHead до hiTail
-                        if (loTail != null) {
-                            loTail.next = null;
-                            newTab[j] = loHead;
+        size = 0;
+        for (int j = 0; j < oldCap; ++j) { //нужно перенести все элементы из oldTab в newTab
+            Node<K,V> e = oldTab[j];
+            if (e != null) {
+                put(e.key, e.value);
+                if (e.next != null) { //то нужно перенести в newTab всю цепочку
+                    Node<K,V> next;
+                    do {
+                        next = e.next;
+                        if (next != null) {
+                            put(next.key, next.value);
                         }
-                        if (hiTail != null) {
-                            hiTail.next = null;
-                            newTab[j + oldCap] = hiHead;
-                        }
-                    }
+                        e = next;
+                    } while (e != null);
                 }
             }
         }
-        return newTab;
+        return table;
     }
 
     Node<K,V> newNode(int hash, K key, V value, Node<K,V> next) {
@@ -214,20 +170,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     final Node<K,V> getNode(int hash, Object key) {
         Node<K,V>[] tab;
-        int n;
-        if ((tab = table) != null && (n = tab.length) > 0) {
-            Node<K,V> first = tab[(n - 1) & hash];
+        int tabLen;
+        if ((tab = table) != null && (tabLen = tab.length) > 0) {
+            Node<K,V> first = tab[(tabLen - 1) & hash];
             K k = first.key;
-            Node<K,V> e;
+            Node<K,V> next;
             if (first.hash == hash && (k == key || (key != null && key.equals(k)))) {
                 return first;
             }
-            if ((e = first.next) != null) {
+            if ((next = first.next) != null) {
                 do {
-                    if (e.hash == hash && ((k = e.key) == key || (key != null && key.equals(k)))) {
-                        return e;
+                    if (next.hash == hash
+                            && ((k = next.key) == key || (key != null && key.equals(k)))) {
+                        return next;
                     }
-                } while ((e = e.next) != null);
+                } while ((next = next.next) != null);
             }
         }
         return null;
