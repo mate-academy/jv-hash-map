@@ -13,7 +13,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
 
     public MyHashMap() {
-        this.loadFactor = DEFAULT_LOAD_FACTOR; // all other fields defaulted
+        this.loadFactor = DEFAULT_LOAD_FACTOR;
+        this.threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
+        this.table = (Node<K,V>[])new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
     static class Node<K,V> {
@@ -168,6 +170,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int tabLen;
         if ((tab = table) != null && (tabLen = tab.length) > 0) {
             Node<K,V> first = tab[(tabLen - 1) & hash];
+            if (first == null) {
+                return null;
+            }
             K k = first.key;
             Node<K,V> next;
             if (first.hash == hash && (k == key || (key != null && key.equals(k)))) {
