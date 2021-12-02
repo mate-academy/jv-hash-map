@@ -44,7 +44,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             tab = resize();
             tabLen = tab.length;
         }
-        //Bitwise AND (&) returns 1 if and only if both bits are 1, else returns 0
         i = (tabLen - 1) & hash;//index of bucket where to put value
         curr = tab[i];//посмотрим что там было в бакете до записи в него
         if (curr == null) { //если по данному индексу в table еще нет ноды
@@ -96,8 +95,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int hash(Object key) {
         int h;
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
-    } //^ Bitwise exclusive OR (returns 0 if both bits are the same, else returns 1)
-    //>>> Unsigned Right Shift Operator (11110000 >>> 2 = 00111100)
+    }
 
     private final Node<K,V>[] resize() {
         Node<K,V>[] oldTab = table;
