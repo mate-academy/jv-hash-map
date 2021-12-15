@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -9,7 +8,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private Node<K, V>[] table = new Node[INITIAL_CAPACITY];
 
-    public int findPosition(K key) {
+    private int findPosition(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
@@ -24,10 +23,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> node = new Node<>(key, value, null);
             table[index] = node;
             size++;
-            return;
-        }
-        if (Objects.equals(key, currentNode.key)) {
-            currentNode.value = value;
             return;
         }
         while (currentNode.next != null || Objects.equals(key, currentNode.key)) {
@@ -71,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private class Node<K, V> implements Map.Entry<K, V> {
+    private class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -81,23 +76,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-
-        @Override
-        public K getKey() {
-            return key;
-        }
-
-        @Override
-        public V getValue() {
-            return value;
-        }
-
-        @Override
-        public V setValue(V value) {
-            return value;
-        }
     }
 }
-
-
-
