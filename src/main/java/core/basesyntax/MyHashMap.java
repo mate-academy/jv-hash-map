@@ -30,7 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             currentNode.value = value;
             return;
         }
-        while (currentNode.next != null) {
+        while (currentNode.next != null || Objects.equals(key, currentNode.key)) {
             if (Objects.equals(key, currentNode.key)) {
                 currentNode.value = value;
                 return;
@@ -63,14 +63,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         Node<K, V>[] tempTable = table;
         table = new Node[table.length * 2];
-
         for (Node<K, V> resizeTable : tempTable) {
             while (resizeTable != null) {
                 put(resizeTable.key, resizeTable.value);
                 resizeTable = resizeTable.next;
             }
         }
-
     }
 
     private class Node<K, V> implements Map.Entry<K, V> {
@@ -98,7 +96,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public V setValue(V value) {
             return value;
         }
-
     }
 }
 
