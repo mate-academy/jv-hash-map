@@ -1,19 +1,105 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private Node<K,V>[] table;
+    private int size;
+    private int threshold;
+
+    private static class Node<K,V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K,V> next;
+
+        public Node(int hash, K key, V value, Node<K,V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+    }
+
+    public MyHashMap() {
+        threshold = (int) (DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
+        Node<K,V> node = new Node<>(hash(key), key, value, null);
+        int index = hash(node.key) % table.length;
+        if (table[index] == null) {
+            table[index] = node;
+        } else {
+            Node<K,V> current = table[index];
+            while (current != null) {
+                if (Objects.equals(current.key,key)) {
+                    current.value = value;
+                    return;
+                }
+                if (current.next == null) {
+                    current.next = node;
+                    break;
+                }
+                current = current.next;
+            }
+        }
+        if (size++ > threshold) {
+            resize();
+        }
+    }
 
+    private void resize() {
+        Node<K,V>[] oldNodes = table;
+        Node<K,V>[] newNodes = new Node[oldNodes.length * 2];
+        threshold = (int) (newNodes.length * DEFAULT_LOAD_FACTOR);
+        transfer(oldNodes,newNodes);
+        table = newNodes;
+    }
+
+    private void transfer(Node<K,V>[] oldNodes, Node<K,V>[] newNodes) {
+        for (Node<K,V> node:oldNodes) {
+            if (node == null) {
+                continue;
+            }
+            int index = hash(node.key) % newNodes.length;
+            if (newNodes[index] != null) {
+                Node<K,V> current = newNodes[index];
+                while (current != null) {
+                    if (Objects.equals(current.key,node.key)) {
+                        current.value = node.value;
+                    }
+                    current = current.next;
+                }
+            }
+            newNodes[index] = node;
+        }
     }
 
     @Override
     public V getValue(K key) {
-        return null;
+        V value = null;
+        int index = hash(key) % table.length;
+        Node<K,V> current = table[index];
+        while (current != null) {
+            if (Objects.equals(current.key,key)) {
+                value = current.value;
+            }
+            current = current.next;
+        }
+        return value;
     }
 
     @Override
     public int getSize() {
-        return 0;
+        return size;
+    }
+
+    private int hash(Object key) {
+        return key == null ? 0 : key.hashCode() & 1 << 16;
     }
 }
