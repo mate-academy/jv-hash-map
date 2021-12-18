@@ -37,8 +37,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K,V> current = table[index];
             while (current != null) {
-                if (Objects.equals(current.key,key)) {
-                    current.value = value;
+                if (Objects.equals(current.key,node.key)) {
+                    current.value = node.value;
                     return;
                 }
                 if (current.next == null) {
