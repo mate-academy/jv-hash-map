@@ -12,9 +12,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        if (putNodeIntoTable(key, value, table)) {
-            size++;
-        }
+        if(getValue(key) == null) size++;
+        putNodeIntoTable(key, value, table);
     }
 
     @Override
@@ -45,15 +44,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
-    private boolean putNodeIntoTable(K key, V value, Node<K, V>[] table) {
+    private void putNodeIntoTable(K key, V value, Node<K, V>[] table) {
         int tablePosition = getTablePosition(key,table);
         Node<K, V> node = getNodeFromTableCell(table[tablePosition], key);
         if (node != null) {
             node.value = value;
-            return false;
+            return;
         }
         table[tablePosition] = new Node<>(key, value, table[tablePosition]);
-        return true;
     }
 
     private Node<K, V> getNodeFromTableCell(Node<K, V> cellFirstNode, K desiredKey) {
