@@ -12,9 +12,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        if (getValue(key) == null) {
-            size++;
-        }
         putNodeIntoTable(key, value, table);
     }
 
@@ -31,6 +28,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        size = 0;
         Node<K, V>[] newTable = (Node<K, V>[]) new Node[table.length << 1];
         for (int i = 0; i < table.length; i++) {
             Node<K, V> node = table[i];
@@ -54,6 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         table[tablePosition] = new Node<>(key, value, table[tablePosition]);
+        size++;
     }
 
     private Node<K, V> getNodeFromTableCell(Node<K, V> cellFirstNode, K desiredKey) {
