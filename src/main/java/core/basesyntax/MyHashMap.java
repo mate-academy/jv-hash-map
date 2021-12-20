@@ -12,7 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        if(getValue(key) == null) {
+        if (getValue(key) == null) {
             size++;
         }
         putNodeIntoTable(key, value, table);
