@@ -31,11 +31,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K,V> node = new Node<>(hash(key), key, value, null);
-        int index = hash(node.key) % table.length;
-        if (table[index] == null) {
-            table[index] = node;
+        //int index = hash(node.key) % table.length;
+        if (table[getIndex(key)] == null) {
+            table[getIndex(key)] = node;
         } else {
-            Node<K,V> current = table[index];
+            Node<K,V> current = table[getIndex(key)];
             while (current != null) {
                 if (Objects.equals(current.key,node.key)) {
                     current.value = node.value;
@@ -66,9 +66,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (node == null) {
                 continue;
             }
-            int index = hash(node.key) % newNodes.length;
-            if (newNodes[index] != null) {
-                Node<K,V> current = newNodes[index];
+            if (newNodes[getIndexNode(node)] != null) {
+                Node<K,V> current = newNodes[getIndexNode(node)];
                 while (current != null) {
                     if (Objects.equals(current.key,node.key)) {
                         current.value = node.value;
@@ -76,15 +75,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     current = current.next;
                 }
             }
-            newNodes[index] = node;
+            newNodes[getIndexNode(node)] = node;
         }
     }
 
     @Override
     public V getValue(K key) {
         V value = null;
-        int index = hash(key) % table.length;
-        Node<K,V> current = table[index];
+        Node<K,V> current = table[getIndex(key)];
         while (current != null) {
             if (Objects.equals(current.key,key)) {
                 value = current.value;
@@ -101,5 +99,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int hash(Object key) {
         return key == null ? 0 : key.hashCode() & 1 << 16;
+    }
+
+    public int getIndex(K key) {
+        return hash(key) % table.length;
+    }
+
+    public int getIndexNode(Node<K,V> node) {
+        return hash(node.key) % table.length;
     }
 }
