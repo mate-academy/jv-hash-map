@@ -10,13 +10,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
 
     private static class Node<K,V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K,V> next;
 
-        public Node(int hash, K key, V value, Node<K,V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K,V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -30,7 +28,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K,V> node = new Node<>(hash(key), key, value, null);
+        Node<K,V> node = new Node<>(key, value, null);
         //int index = hash(node.key) % table.length;
         if (table[getIndex(key)] == null) {
             table[getIndex(key)] = node;
@@ -97,15 +95,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(Object key) {
-        return key == null ? 0 : key.hashCode() & 1 << 16;
-    }
-
     public int getIndex(K key) {
         return hash(key) % table.length;
     }
 
     public int getIndexNode(Node<K,V> node) {
         return hash(node.key) % table.length;
+    }
+
+    private int hash(Object key) {
+        return key == null ? 0 : key.hashCode() & 1 << 16;
     }
 }
