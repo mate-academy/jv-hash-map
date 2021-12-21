@@ -30,7 +30,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K,V> node = new Node<>(key, value, null);
-        //int index = hash(node.key) % table.length;
         if (table[getIndex()] == null) {
             table[getIndex()] = node;
         } else {
@@ -92,6 +91,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 while (current != null) {
                     if (Objects.equals(current.key,node.key)) {
                         current.value = node.value;
+                        return;
+                    }
+                    if (current.next == null) {
+                        current.next = node;
+                        break;
                     }
                     current = current.next;
                 }
