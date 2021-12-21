@@ -105,6 +105,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(Object key) {
-        return key == null ? 0 : key.hashCode() & 1 << 16;
+        return key == null ? 0 : key.hashCode();
     }
 }
