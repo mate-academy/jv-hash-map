@@ -1,5 +1,6 @@
 package core.basesyntax;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -30,10 +31,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         Node<K,V> node = new Node<>(key, value, null);
         //int index = hash(node.key) % table.length;
-        if (table[getIndex(key)] == null) {
-            table[getIndex(key)] = node;
+        if (table[getIndex()] == null) {
+            table[getIndex()] = node;
         } else {
-            Node<K,V> current = table[getIndex(key)];
+            Node<K,V> current = table[getIndex()];
             while (current != null) {
                 if (Objects.equals(current.key,node.key)) {
                     current.value = node.value;
@@ -54,7 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         V value = null;
-        Node<K,V> current = table[getIndex(key)];
+        Node<K,V> current = table[getIndex()];
         while (current != null) {
             if (Objects.equals(current.key,key)) {
                 value = current.value;
@@ -69,12 +70,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public int getIndex(K key) {
-        return hash(key) % table.length;
-    }
-
-    public int getIndexNode(Node<K,V> node) {
-        return hash(node.key) % table.length;
+    public int getIndex() {
+        return hash(this.table) % table.length;
     }
 
     private void resize() {
@@ -90,8 +87,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (node == null) {
                 continue;
             }
-            if (newNodes[getIndexNode(node)] != null) {
-                Node<K,V> current = newNodes[getIndexNode(node)];
+            if (newNodes[getIndex()] != null) {
+                Node<K,V> current = newNodes[getIndex()];
                 while (current != null) {
                     if (Objects.equals(current.key,node.key)) {
                         current.value = node.value;
@@ -99,7 +96,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     current = current.next;
                 }
             }
-            newNodes[getIndexNode(node)] = node;
+            newNodes[getIndex()] = node;
         }
     }
 
