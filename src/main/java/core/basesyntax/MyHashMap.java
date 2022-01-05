@@ -40,7 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         MyNode<K, V>[] oldTable = myTable;
         myTable = new MyNode[newSize];
         for (MyNode<K, V> node : oldTable) {
-            while (node != null) { //transfer collision element
+            while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
             }
