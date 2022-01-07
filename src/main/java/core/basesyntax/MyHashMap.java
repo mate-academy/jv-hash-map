@@ -27,6 +27,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        Node<K,V> node = getNode(key);
+        if (node != null) {
+            node.value = value;
+            return;
+        }
         if (table == null) {
             table = new Object[DEFAULT_INITIAL_CAPACITY];
         } else {
@@ -35,6 +40,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 resize();
             }
         }
+        putHelper(new Node<K,V>(key, value), table);
+        size++;
     }
 
     @Override
@@ -48,14 +55,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public int getSize() {
-        return 0;
+        return size;
     }
 
     private Node<K,V> getNode(K key) {
-        if ((table == null | table.length == 0)) {
+        if (table == null) {
             return null;
         }
-        int bucketNo = key.hashCode() % table.length;
+        if (table.length == 0) {
+            return null;
+        }
+        int hash =  key == null ? 0 : key.hashCode();
+        int bucketNo = getBucketNo(hash, table);
         Node<K,V> node = (Node<K,V>) table[bucketNo];
         while (node != null) {
             if (node.isKey(key)) {
@@ -72,13 +83,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K,V> node = (Node<K,V>) table[i];
             while (node != null) {
                 putHelper(new Node(node.key, node.value), newTable);
+                node = node.next;
             }
         }
         table = newTable;
     }
 
     private void putHelper(Node<K,V> node, Object[] array) {
-        int bucketNo = node.hash % array.length;
+        int bucketNo = getBucketNo(node.hash, array);
         Node<K,V> listNode = (Node<K,V>) array[bucketNo];
         if (listNode == null) {
             array[bucketNo] = node;
@@ -88,5 +100,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             listNode = listNode.next;
         }
         listNode.next = node;
+    }
+
+    private int getBucketNo(int hash, Object[] buckets) {
+        int bucketNo = hash % buckets.length;
+        return bucketNo < 0 ? - bucketNo : bucketNo;
     }
 }
