@@ -91,15 +91,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void putHelper(Node<K,V> node, Object[] array) {
         int bucketNo = getBucketNo(node.hash, array);
-        Node<K,V> listNode = (Node<K,V>) array[bucketNo];
-        if (listNode == null) {
+        Node<K,V> bucketNode = (Node<K,V>) array[bucketNo];
+        if (bucketNode == null) {
             array[bucketNo] = node;
             return;
         }
-        while (listNode.next != null) {
-            listNode = listNode.next;
+        while (bucketNode.next != null) {
+            bucketNode = bucketNode.next;
         }
-        listNode.next = node;
+        bucketNode.next = node;
     }
 
     private int getBucketNo(int hash, Object[] buckets) {
