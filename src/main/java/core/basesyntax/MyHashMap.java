@@ -34,11 +34,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         if (table == null) {
             table = new Object[DEFAULT_INITIAL_CAPACITY];
-        } else {
-            int threshold = (int) (table.length * loadFactor);
-            if (size >= threshold) {
-                resize();
-            }
+        }
+        while (size >= threshold()) {
+            resize();
         }
         putHelper(new Node<K,V>(key, value), table);
         size++;
@@ -58,6 +56,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private int threshold() {
+        if (table == null) {
+            return 0;
+        }
+        return (int) (table.length * loadFactor);
+    }
+
     private Node<K,V> getNode(K key) {
         if (table == null) {
             return null;
@@ -65,7 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table.length == 0) {
             return null;
         }
-        int hash =  key == null ? 0 : key.hashCode();
+        int hash = key == null ? 0 : key.hashCode();
         int bucketNo = getBucketNo(hash, table);
         Node<K,V> node = (Node<K,V>) table[bucketNo];
         while (node != null) {
@@ -79,6 +84,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Object[] newTable = new Object[table.length * 2];
+        if (size == 0) {
+            table = newTable;
+            return;
+        }
         for (int i = 0; i < table.length; i++) {
             Node<K,V> node = (Node<K,V>) table[i];
             while (node != null) {
