@@ -1,28 +1,32 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final int INITIAL_CAPACITY = 16;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
     private double loadFactor = DEFAULT_LOAD_FACTOR;
     private int size;
 
     private Object[] table;
 
-    private static class Node<K1, V1> {
-        private final K1 key;
-        private V1 value;
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
         private final int hash;
-        private Node<K1,V1> next;
+        private Node<K, V> next;
 
-        private Node(K1 key, V1 value) {
+        private Node(K key, V value) {
             this.key = key;
             this.hash = key == null ? 0 : key.hashCode();
             this.value = value;
         }
 
-        private boolean isKey(K1 key) {
+        private boolean compareKey(K key) {
             return this.key == null ? key == null : this.key.equals(key);
         }
+    }
+
+    public MyHashMap() {
+        table = new Object[INITIAL_CAPACITY];
     }
 
     @Override
@@ -32,13 +36,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             node.value = value;
             return;
         }
-        if (table == null) {
-            table = new Object[DEFAULT_INITIAL_CAPACITY];
-        }
         while (size >= threshold()) {
             resize();
         }
-        putHelper(new Node<K,V>(key, value), table);
+        putNode(new Node<K,V>(key, value), table);
         size++;
     }
 
@@ -74,7 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int bucketNo = getBucketNo(hash, table);
         Node<K,V> node = (Node<K,V>) table[bucketNo];
         while (node != null) {
-            if (node.isKey(key)) {
+            if (node.compareKey(key)) {
                 return node;
             }
             node = node.next;
@@ -84,21 +85,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Object[] newTable = new Object[table.length * 2];
-        if (size == 0) {
-            table = newTable;
-            return;
-        }
         for (int i = 0; i < table.length; i++) {
             Node<K,V> node = (Node<K,V>) table[i];
             while (node != null) {
-                putHelper(new Node(node.key, node.value), newTable);
+                putNode(new Node(node.key, node.value), newTable);
                 node = node.next;
             }
         }
         table = newTable;
     }
 
-    private void putHelper(Node<K,V> node, Object[] array) {
+    private void putNode(Node<K,V> node, Object[] array) {
         int bucketNo = getBucketNo(node.hash, array);
         Node<K,V> bucketNode = (Node<K,V>) array[bucketNo];
         if (bucketNode == null) {
