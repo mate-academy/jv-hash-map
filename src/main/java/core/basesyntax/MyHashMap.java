@@ -2,9 +2,9 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    private final int DEFAULT_CAPACITY = 16;
-    private final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private int bucketsCapacity = DEFAULT_CAPACITY;
+    private final int defaultcapacity = 16;
+    private final float defaultloadfactor = 0.75f;
+    private int bucketsCapacity = defaultcapacity;
     private Node<K,V>[] buckets = new Node[bucketsCapacity];
     private int size = 0;
 
@@ -34,7 +34,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             buckets[index] = new Node<>(hash,key,value,buckets[index]);
             size++;
         }
-        if (size > bucketsCapacity * DEFAULT_LOAD_FACTOR) {
+        if (size > bucketsCapacity * defaultloadfactor) {
             resize();
         }
     }
