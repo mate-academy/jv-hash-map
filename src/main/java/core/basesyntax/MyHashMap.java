@@ -1,8 +1,10 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private int bucketsCapacity = 16;
-    private float loadFactor = 0.75f;
+
+    private final int DEFAULT_CAPACITY = 16;
+    private final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private int bucketsCapacity = DEFAULT_CAPACITY;
     private Node<K,V>[] buckets = new Node[bucketsCapacity];
     private int size = 0;
 
@@ -25,21 +27,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         int hash = hash(key);
         int index = hash % bucketsCapacity;
-        Node<K,V> currNode = getKey(key);
+        Node<K,V> currNode = getNode(key);
         if (currNode != null) {
             currNode.value = value;
         } else {
             buckets[index] = new Node<>(hash,key,value,buckets[index]);
             size++;
         }
-        if (size > bucketsCapacity * loadFactor) {
+        if (size > bucketsCapacity * DEFAULT_LOAD_FACTOR) {
             resize();
         }
     }
 
     @Override
     public V getValue(K key) {
-        Node<K,V> currNode = getKey(key);
+        Node<K,V> currNode = getNode(key);
         if (currNode != null) {
             return currNode.value;
         }
@@ -57,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     // return node by key or null if not found
-    private Node<K,V> getKey(K key) {
+    private Node<K,V> getNode(K key) {
         int hash = hash(key);
         Node<K,V> tmpnode = buckets[hash % bucketsCapacity];
         while (tmpnode != null) {
@@ -75,12 +77,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int newCap = bucketsCapacity << 1;
         Node<K,V>[] newBuckets = new Node[newCap];
         for (int i = 0; i < bucketsCapacity; i++) {
-            Node<K,V> e = buckets[i];
-            while (e != null) {
+            Node<K,V> currentBucket = buckets[i];
+            while (currentBucket != null) {
                 buckets[i] = buckets[i].next;
-                e.next = newBuckets[e.hash % newCap ];
-                newBuckets[e.hash % newCap ] = e;
-                e = buckets[i];
+                currentBucket.next = newBuckets[currentBucket.hash % newCap ];
+                newBuckets[currentBucket.hash % newCap ] = currentBucket;
+                currentBucket = buckets[i];
             }
         }
         bucketsCapacity = newBuckets.length;
