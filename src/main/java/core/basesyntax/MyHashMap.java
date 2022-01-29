@@ -62,7 +62,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return hash(key) >= hashTable.length ? null : checkValue(key).value;
     }
 
-
     @Override
     public int getSize() {
         return size;
