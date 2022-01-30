@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -55,7 +54,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (o.getClass().equals(Node.class)) {
                 Node<?, ?> that = (Node<?, ?>) o;
                 return ((this.key == that.key) || (this.key != null && this.key.equals(that.key))
-                        && (this.value == that.value) || (this.value != null && this.value.equals(that.value)));
+                        && (this.value == that.value)
+                        || (this.value != null && this.value.equals(that.value)));
             }
             return false;
         }
@@ -75,32 +75,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        if (table[hash(key) % capacity] != null) {
-            Node<K,V> node = table[hash(key) % capacity];
-            if (Objects.equals(node.key, key)) {
-                node.value = value;
-                return;
-            }
-            while (node.next != null) {
-                node = node.next;
-                if (Objects.equals(node.key, key)) {
-                    node.value = value;
-                    return;
-                }
-            }
-            node.next = new Node<K,V>(hash(key), key, value, null);
-            size++;
+        if (table[getIndex(key)] != null) {
+            putInFullBucket(key, value);
         }
-        if (table[hash(key) % capacity] == null) {
-            Node<K,V> newNode = new Node<>(hash(key), key, value, null);
-            table[hash(key) % capacity] = newNode;
-            size++;
+        if (table[getIndex(key)] == null) {
+            putInEmptyBucket(key, value);
         }
     }
 
     @Override
     public V getValue(K key) {
-        Node<K,V> node = table[hash(key) % capacity];
+        Node<K,V> node = table[getIndex(key)];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
                 return node.value;
@@ -117,6 +102,33 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int hash(K key) {
         return Math.abs((key == null) ? 0 : key.hashCode());
+    }
+
+    private int getIndex(K key) {
+        return hash(key) % capacity;
+    }
+
+    private void putInEmptyBucket(K key, V value) {
+        Node<K,V> newNode = new Node<>(hash(key), key, value, null);
+        table[getIndex(key)] = newNode;
+        size++;
+    }
+
+    private void putInFullBucket(K key, V value) {
+        Node<K,V> node = table[getIndex(key)];
+        if (Objects.equals(node.key, key)) {
+            node.value = value;
+            return;
+        }
+        while (node.next != null) {
+            node = node.next;
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
+                return;
+            }
+        }
+        node.next = new Node<>(hash(key), key, value, null);
+        size++;
     }
 
     private void resize() {
