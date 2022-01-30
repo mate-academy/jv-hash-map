@@ -77,13 +77,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         if (table[hash(key) % capacity] != null) {
             Node<K,V> node = table[hash(key) % capacity];
-            if (node.key == key || node.key.equals(key)) {
+            if (Objects.equals(node.key, key)) {
                 node.value = value;
                 return;
             }
             while (node.next != null) {
                 node = node.next;
-                if (node.key == key || node.key.equals(key)) {
+                if (Objects.equals(node.key, key)) {
                     node.value = value;
                     return;
                 }
@@ -107,7 +107,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node = node.next;
         }
-        throw new NoSuchElementException();
+        return null;
     }
 
     @Override
@@ -125,6 +125,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         threshold = (int) (capacity * LOAD_FACTOR);
         table = new Node[capacity];
-        // для каждого елемента и старой таблицы вызываем put
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
+        }
     }
 }
