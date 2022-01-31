@@ -1,11 +1,13 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private final int defaultCapacity = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private int size;
-    private int capacity = defaultCapacity;
-    private final double loadFactor = 0.75;
-    private int treshold = (int)(capacity * loadFactor);
+    private int capacity = DEFAULT_CAPACITY;
+    private static final double LOAD_FACTOR = 0.75;
+    private int treshold = (int)(capacity * LOAD_FACTOR);
     private Node[] table = new Node[capacity];
 
     @Override
@@ -13,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size + 1 > treshold) {
             resize();
         }
-        for (Node element : table) {
+        for (Node element : table) {           //To check if the element already exists
             if (element != null && (element.getValue().equals(value)
                     || element.getValue() == value)) {
                 return;
@@ -27,25 +29,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-        if (key == null || indexForElement(hash(key),capacity) == 0) {
-            addToFirstPosition(key,value);
-            return;
-        }
-        if (table[indexForElement(hash(key),capacity)] != null
-                && table[indexForElement(hash(key),capacity)].getNext() == null) {
-            Node element = table[indexForElement(hash(key),capacity)];
+        if (table[getIndexFromHash(key)] != null //This case we use when no nextNode
+                && table[getIndexFromHash(key)].getNext() == null) {
+            Node element = table[getIndexFromHash(key)];
             if (element.getKey() == key) {
                 element.setValue(value);
                 return;
             }
-            table[indexForElement(hash(key),capacity)]
-                    .setNext(new Node<>(hash(key),key,value,null));
+            table[getIndexFromHash(key)]
+                    .setNext(new Node<>(getHash(key),key,value,null));
             size++;
             return;
         }
-        if (table[indexForElement(hash(key),capacity)] != null
-                && table[indexForElement(hash(key),capacity)].getNext() != null) {
-            Node element = table[indexForElement(hash(key),capacity)];
+        if (table[getIndexFromHash(key)] != null //This case we use when we have nextNode
+                && table[getIndexFromHash(key)].getNext() != null) {
+            Node element = table[getIndexFromHash(key)];
             while (element.getNext() != null) {
                 if (element.getKey() == key) {
                     element.setValue(value);
@@ -53,34 +51,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 element = element.getNext();
             }
-            element.setNext(new Node<>(hash(key),key,value,null));
+            element.setNext(new Node<>(getHash(key),key,value,null));
             size++;
             return;
         }
-        table[indexForElement(hash(key),capacity)] = new Node<>(hash(key),key,value,null);
+        table[getIndexFromHash(key)] = new Node<>(getHash(key),key,value,null);
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        Node element = table[indexForElement(hash(key),capacity)];
-        if (element == null) {
-            return null;
-        }
-        if (element.getNext() == null) {
-            return (V) element.getValue();
-        }
-        if (element.getNext() != null) {
-            while (element.getNext() != null) {
-                if (element.getKey() != null && element.getKey().equals(key)) {
-                    return (V) element.getValue();
-                }
-                if (element.getKey() == null && key == null) {
-                    return (V) element.getValue();
-                }
-                element = element.getNext();
+        int index = getIndexFromHash(key);
+        Node<K, V> returnNode = table[index];
+        while (returnNode != null) {
+            if (Objects.equals(returnNode.getKey(), key)) {
+                return returnNode.getValue();
             }
-            return (V) element.getValue();
+            returnNode = returnNode.getNext();
         }
         return null;
     }
@@ -90,7 +77,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public int hash(K key) {
+    private int getHash(K key) {
         if (key == null) {
             return 0;
         }
@@ -102,13 +89,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return h;
     }
 
-    public int indexForElement(int h,int length) {
-        return h % (length - 1);
+    private int getIndexFromHash(K key) {
+        return key == null ? 0 : Math.abs(getHash(key) % table.length);
     }
 
     public void resize() {
         capacity = capacity * 2;
-        treshold = (int)(capacity * loadFactor);
+        treshold = (int)(capacity * LOAD_FACTOR);
         Node[] oldTable = table;
         table = new Node[capacity];
         size = 0;
@@ -117,34 +104,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 put((K) element.getKey(), (V) element.getValue());
                 element = element.getNext();
             }
-        }
-    }
-
-    public void addToFirstPosition(K key,V value) {
-        if ((key == null || indexForElement(hash(key),capacity) == 0) && table[0] == null) {
-            table[0] = new Node<>(hash(key),key,value,null);
-            size++;
-            return;
-        }
-        if ((key == null || indexForElement(hash(key),capacity) == 0) && table[0] != null) {
-            if (table[0].getNext() == null && key == null && table[0].getKey() == null) {
-                table[0].setValue(value);
-                return;
-            }
-            Node element = table[0];
-            while (element.getNext() != null) {
-                if (element.getKey() == key) {
-                    element.setValue(value);
-                    return;
-                }
-                element = element.getNext();
-            }
-            if (key == null) {
-                element.setNext(new Node<>(0,key,value,null));
-            } else {
-                element.setNext(new Node<>(key.hashCode(), key, value, null));
-            }
-            size++;
         }
     }
 }
