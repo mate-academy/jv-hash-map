@@ -116,19 +116,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void putInFullBucket(K key, V value) {
         Node<K,V> node = table[getIndex(key)];
-        if (Objects.equals(node.key, key)) {
-            node.value = value;
-            return;
-        }
-        while (node.next != null) {
-            node = node.next;
+        while (node != null) {
             if (Objects.equals(node.key, key)) {
                 node.value = value;
                 return;
+            } else if (node.next == null) {
+                node.next = new Node<>(hash(key), key, value, null);
+                size++;
+                return;
             }
+            node = node.next;
         }
-        node.next = new Node<>(hash(key), key, value, null);
-        size++;
     }
 
     private void resize() {
