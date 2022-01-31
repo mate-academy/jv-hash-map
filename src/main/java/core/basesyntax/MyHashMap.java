@@ -4,9 +4,9 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
+    private static final double LOAD_FACTOR = 0.75;
     private int size;
     private int capacity = DEFAULT_CAPACITY;
-    private static final double LOAD_FACTOR = 0.75;
     private int treshold = (int)(capacity * LOAD_FACTOR);
     private Node[] table = new Node[capacity];
 
@@ -15,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size + 1 > treshold) {
             resize();
         }
-        for (Node element : table) {           //To check if the element already exists
+        for (Node element : table) { //To check if the element already exists
             if (element != null && (element.getValue().equals(value)
                     || element.getValue() == value)) {
                 return;
