@@ -75,22 +75,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        if (table[getIndex(key)] != null) {
-            putInFullBucket(key, value);
-        }
         if (table[getIndex(key)] == null) {
             putInEmptyBucket(key, value);
+
+        } else {
+            putInFullBucket(key, value);
         }
     }
 
     @Override
     public V getValue(K key) {
-        Node<K,V> node = table[getIndex(key)];
-        while (node != null) {
+        for (Node<K,V> node = table[getIndex(key)]; node != null; node = node.next) {
             if (Objects.equals(node.key, key)) {
                 return node.value;
             }
-            node = node.next;
         }
         return null;
     }
@@ -115,8 +113,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putInFullBucket(K key, V value) {
-        Node<K,V> node = table[getIndex(key)];
-        while (node != null) {
+        for (Node<K,V> node = table[getIndex(key)]; node != null; node = node.next) {
             if (Objects.equals(node.key, key)) {
                 node.value = value;
                 return;
@@ -125,8 +122,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 size++;
                 return;
             }
-            node = node.next;
         }
+
     }
 
     private void resize() {
