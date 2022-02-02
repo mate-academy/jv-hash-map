@@ -11,8 +11,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K,V> [] table;
 
     public MyHashMap() {
-        this.table = new Node[INITIAL_CAPACITY];
-        this.capacity = INITIAL_CAPACITY;
+        table = new Node[INITIAL_CAPACITY];
+        capacity = INITIAL_CAPACITY;
         threshold = (int) (capacity * LOAD_FACTOR);
     }
 
@@ -27,46 +27,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public V setValue(V newValue) {
-            V oldValue = value;
-            value = newValue;
-            return oldValue;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null) {
-                return false;
-            }
-            if (o.getClass().equals(Node.class)) {
-                Node<?, ?> that = (Node<?, ?>) o;
-                return ((this.key == that.key) || (this.key != null && this.key.equals(that.key))
-                        && (this.value == that.value)
-                        || (this.value != null && this.value.equals(that.value)));
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = 17;
-            result = 31 * result + getKey().hashCode();
-            result = 31 * result + value.hashCode();
-            result = 31 * result + next.hashCode();
-            return result;
         }
     }
 
@@ -131,7 +91,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         capacity *= 2;
         size = 0;
         threshold = (int) (capacity * LOAD_FACTOR);
-        table = new Node[capacity];
+        table = (Node<K, V>[]) new Node[capacity];
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
