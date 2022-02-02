@@ -7,13 +7,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private int size;
 
-    public MyHashMap(int initialCapacity) {
-        table = new Node[initialCapacity];
-        threshold = (int) (LOAD_FACTOR * initialCapacity);
-    }
-
     public MyHashMap() {
-        this(DEFAULT_CAPACITY);
+        table = new Node[DEFAULT_CAPACITY];
+        threshold = (int) (LOAD_FACTOR * DEFAULT_CAPACITY);
     }
 
     static class Node<K, V> {
