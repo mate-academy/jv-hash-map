@@ -52,11 +52,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = currentTable;
         currentTable = (Node<K, V>[]) new Node[currentCapacity];
         for (Node<K, V> oldNode : oldTable) {
-            if (Objects.nonNull(oldNode)) {
-                while (hasNext(oldNode)) {
-                    put(oldNode.key, oldNode.value);
-                    oldNode = oldNode.next;
-                }
+            while (hasNext(oldNode)) {
+                put(oldNode.key, oldNode.value);
+                oldNode = oldNode.next;
             }
         }
     }
