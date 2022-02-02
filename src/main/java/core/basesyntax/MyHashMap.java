@@ -73,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             putNodeIfKeyExistsOrCollision(key, value, index);
         }
-        if (size > threshold) {
+        if (size >= threshold) {
             resize();
         }
     }
