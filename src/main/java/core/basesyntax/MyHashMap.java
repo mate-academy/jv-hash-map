@@ -11,14 +11,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        this.currentCapacity = DEFAULT_CAPACITY;
-        this.threshHold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
-        this.currentTable = (Node<K, V>[]) new Node[currentCapacity];
+        currentCapacity = DEFAULT_CAPACITY;
+        threshHold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
+        currentTable = (Node<K, V>[]) new Node[currentCapacity];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshHold) {
+        if (size == threshHold) {
             resizeTable();
         }
         if (Objects.isNull(currentTable[getIndexByKey(key)])) {
@@ -49,16 +49,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         currentCapacity += currentCapacity;
         threshHold = (int) (currentCapacity * DEFAULT_LOAD_FACTOR);
         size = 0;
-        Node<K, V>[] increasedEmptyTable = (Node<K, V>[]) new Node[currentCapacity];
         Node<K, V>[] oldTable = currentTable;
-        currentTable = increasedEmptyTable;
+        currentTable = (Node<K, V>[]) new Node[currentCapacity];
         for (Node<K, V> oldNode : oldTable) {
             if (Objects.nonNull(oldNode)) {
-                put(oldNode.key, oldNode.value);
-                Node<K, V> temp = oldNode.next;
-                while (hasNext(temp)) {
-                    put(temp.key, temp.value);
-                    temp = temp.next;
+                while (hasNext(oldNode)) {
+                    put(oldNode.key, oldNode.value);
+                    oldNode = oldNode.next;
                 }
             }
         }
