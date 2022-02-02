@@ -10,7 +10,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int treshold = (int)(capacity * LOAD_FACTOR);
     private Node<K,V>[] table = new Node[capacity];
 
-    @Override
+    @Override //improving
     public void put(K key, V value) {
         if (size + 1 > treshold) {
             resize();
