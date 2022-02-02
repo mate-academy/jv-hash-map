@@ -31,10 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        putVal(hash(key), key, value);
-    }
-
-    private void putVal(int hash, K key, V value) {
+        int hash = hash(key);
         if (size == threshold()) {
             resize();
         }
@@ -77,14 +74,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K,V> node = table[hash(key)];
-        if (node == null) {
-            return null;
-        } else {
-            do {
-                if (equalKey(node, key)) {
-                    return node.value;
-                }
-            } while ((node = node.next) != null);
+        while (node != null) {
+            if (equalKey(node, key)) {
+                return node.value;
+            }
+            node = node.next;
         }
         return null;
     }
