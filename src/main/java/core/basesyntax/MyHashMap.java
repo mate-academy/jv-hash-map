@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void putInEmptyBox(K key, V value, int index) {
         if (table[index] == null) {
-            table[findIndex(key)] = new Node<>(key, value, null);
+            table[index] = new Node<>(key, value, null);
             size++;
         }
     }
