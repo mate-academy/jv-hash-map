@@ -5,15 +5,13 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private int capacity;
     private int threshold;
     private int size;
     private Node<K,V> [] table;
 
     public MyHashMap() {
         table = new Node[INITIAL_CAPACITY];
-        capacity = INITIAL_CAPACITY;
-        threshold = (int) (capacity * LOAD_FACTOR);
+        threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
     }
 
     private static class Node<K,V> {
@@ -63,7 +61,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return hash(key) % capacity;
+        return hash(key) % table.length;
     }
 
     private void putInEmptyBucket(K key, V value) {
@@ -88,10 +86,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         final Node<K,V>[] oldTable = table;
-        capacity *= 2;
         size = 0;
-        threshold = (int) (capacity * LOAD_FACTOR);
-        table = (Node<K, V>[]) new Node[capacity];
+        threshold *= 2;
+        table = (Node<K, V>[]) new Node[table.length * 2];
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
