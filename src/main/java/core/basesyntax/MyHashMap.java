@@ -56,9 +56,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getHash(key);
         Node<K, V> searcherNode = table[index];
         while (searcherNode != null) {
-            if (table[index].key == key
-            || key != null && key.equals(table[index].key)) {
-                return table[index].value;
+            if (searcherNode.key == key
+            || key != null && key.equals(searcherNode.key)) {
+                return searcherNode.value;
             }
             searcherNode = searcherNode.next;
         }
