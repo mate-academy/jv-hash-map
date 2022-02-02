@@ -1,19 +1,118 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    static final int INITIAL_CAPACITY = 16;
+    static final double LOAD_FACTOR = 0.75;
+    static final int GROWING_INDEX = 2;
+    private int size;
+    private int threshold;
+    private Node<K, V>[] table;
+
+    public MyHashMap() {
+        table = new Node[INITIAL_CAPACITY];
+        threshold = (int) (table.length * LOAD_FACTOR);
+    }
+
+    static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+        private final int hashCode;
+
+        public Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+            if (key == null) {
+                hashCode = 0;
+            } else {
+                hashCode = Math.abs(key.hashCode());
+            }
+        }
+    }
 
     @Override
     public void put(K key, V value) {
-
+        Node<K, V> node = new Node<>(key, value);
+        if (size == 0) {
+            putFirst(key, value);
+        } else if (checkTableLoading()) {
+            int bucket = node.hashCode % table.length;
+            putToBucket(node, table, bucket);
+        } else {
+            resize();
+            int bucket = node.hashCode % table.length;
+            putToBucket(node, table, bucket);
+        }
     }
 
     @Override
     public V getValue(K key) {
-        return null;
+        if (size == 0) {
+            return null;
+        }
+        Node<K, V> node = table[getHash(key) % table.length];
+        while (!Objects.equals(node.key, key)) {
+            node = node.next;
+        }
+        return node.value;
     }
 
     @Override
     public int getSize() {
-        return 0;
+        return size;
+    }
+
+    public void putFirst(K key, V value) {
+        Node<K, V> node = new Node<>(key, value);
+        table[node.hashCode % table.length] = node;
+        size++;
+    }
+
+    public void resize() {
+        Node<K, V>[] newTable = new Node[table.length * GROWING_INDEX];
+        for (Node<K, V> node : table) {
+            if (node != null) {
+                do {
+                    int bucket = node.hashCode % newTable.length;
+                    putToBucket(node, newTable, bucket);
+                    Node<K, V> oldNode = node;
+                    node = node.next;
+                    oldNode.next = null;
+                } while (node != null);
+            }
+        }
+        table = newTable;
+        threshold = (int) (table.length * LOAD_FACTOR);
+    }
+
+    public boolean checkTableLoading() {
+        return ++size != threshold;
+    }
+
+    public boolean isBucketEmpty(int bucket, Node<K, V>[] table) {
+        return table[bucket] == null;
+    }
+
+    public void putToBucket(Node<K, V> node, Node<K, V>[] table, int bucket) {
+        if (isBucketEmpty(bucket, table)) {
+            table[bucket] = node;
+        } else {
+            Node<K, V> existingNode = table[bucket];
+            while (existingNode.next != null && (!Objects.equals(existingNode.key, node.key))) {
+                existingNode = existingNode.next;
+            }
+            if (Objects.equals(existingNode.key, node.key)) {
+                existingNode.value = node.value;
+                size--;
+            } else {
+                existingNode.next = node;
+            }
+        }
+    }
+
+    public int getHash(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode());
     }
 }
