@@ -3,6 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     static final int DEFAULT_INITIAL_CAPACITY = 16;
+    static final int RESIZING_MULTIPLIER = 2;
     private int threshold;
     private int size;
     private Node<K,V>[] table;
@@ -15,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public class Node<K, V> {
         private K key;
         private V value;
-        Node<K, V> next;
+        private Node<K, V> next;
 
         public Node(K key, V value, Node<K, V> next) {
             this.key = key;
@@ -24,8 +25,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-        @Override
-        public void put(K key, V value) {
+    @Override
+    public void put(K key, V value) {
         if (size == threshold) {
             resize();
         }
@@ -49,42 +50,45 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 targetNode = targetNode.next;
             }
         }
-        }
+    }
 
-        @Override
-        public V getValue(K key) {
+    @Override
+    public V getValue(K key) {
         int index = getHash(key);
         Node<K, V> searcherNode = table[index];
         while (searcherNode != null) {
             if (searcherNode.key == key
-            || key != null && key.equals(searcherNode.key)) {
+                    || key != null && key.equals(searcherNode.key)) {
                 return searcherNode.value;
             }
             searcherNode = searcherNode.next;
         }
-            return null;
-        }
+        return null;
+    }
 
-        @Override
-        public int getSize() {
-            return size;
-        }
+    @Override
+    public int getSize() {
+        return size;
+    }
 
-        private int getHash(Object key) {
-        return (key == null) ? 0 : Math.abs((key.hashCode() % table.length));
-        }
+    private int getHash(Object key) {
+        return (key == null) ? 0 : Math.abs((key.hashCode()) % table.length);
+    }
 
-        private void resize() {
+    private void resize() {
         Node<K,V>[] oldTable = table;
-        table = new Node[table.length * 2];
+        table = new Node[table.length * RESIZING_MULTIPLIER];
         size = 0;
+        transfer(oldTable);
+    }
+
+    private void transfer(Node<K,V>[] oldTable) {
         for (int i = 0; i < oldTable.length; i++) {
             Node<K, V> targetNode = oldTable[i];
-            while (targetNode!= null) {
+            while (targetNode != null) {
                 put(targetNode.key, targetNode.value);
                 targetNode = targetNode.next;
             }
         }
     }
-
 }
