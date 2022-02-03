@@ -55,12 +55,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
+        int index = getIndex(getHash(key));
+        Node<K, V> node = map[index];
+        if (node != null) {
+            while (node != null) {
+                if (Objects.equals(key, node.key)) {
+                    return node.value;
+                }
+                node = node.next;
+            }
+        }
         return null;
-    }
-
-    @Override
-    public int getSize() {
-        return 0;
     }
 
     @Override
