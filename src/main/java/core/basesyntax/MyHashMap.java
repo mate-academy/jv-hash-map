@@ -73,13 +73,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (Node<K, V> node : dataArray) {
-            while (node != null) {
-                if (Objects.equals(node.key, key)) {
-                    return node.value;
-                }
-                node = node.next;
+        Node<K, V> node = dataArray[getIndex(key)];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return node.value;
             }
+            node = node.next;
         }
         return null;
     }
