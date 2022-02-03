@@ -14,10 +14,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         if (size + 1 > treshold) {
             resize();
-        } //To check if the element already exists
+        }
         Node<K,V> element = table[getIndexFromHash(key)];
         if (element != null && (element.getValue().equals(value)
-                || element.getValue() == value)) {
+                || element.getValue() == value)
+                    && element.getKey().equals(key)) {
             return;
         }
         if (element != null && element.getNext() != null) {
