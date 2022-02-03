@@ -33,12 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resizeTable();
         }
         Node<K, V> current = new Node<>(key, value, null);
-        int index;
-        if (key == null) {
-            index = 0;
-        } else {
-            index = Math.abs(getHash(key) % table.length);
-        }
+        int index = getIndex(key);;
         if (table[index] == null) {
             table[index] = current;
             size++;
@@ -57,7 +52,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-
     }
 
     private void resizeTable() {
@@ -75,7 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = Math.abs(getHash(key) % table.length);
+        int index = getIndex(key);
         if (table[index] == null) {
             return null;
         } else {
@@ -83,9 +77,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             while (buffer != null) {
                 if (Objects.equals(buffer.key, key)) {
                     return buffer.value;
-                } else {
-                    buffer = buffer.next;
                 }
+                buffer = buffer.next;
             }
         }
         return null;
@@ -94,6 +87,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private int getIndex(K key) {
+        if (key == null) {
+            return 0;
+        } else {
+            return Math.abs(getHash(key) % table.length);
+        }
     }
 
     private static int getHash(Object key) {
