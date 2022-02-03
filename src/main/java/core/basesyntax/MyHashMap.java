@@ -79,10 +79,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K,V>[] oldTable = table;
         table = new Node[table.length * RESIZING_MULTIPLIER];
         size = 0;
-        transfer(oldTable);
-    }
-
-    private void transfer(Node<K,V>[] oldTable) {
         for (int i = 0; i < oldTable.length; i++) {
             Node<K, V> targetNode = oldTable[i];
             while (targetNode != null) {
