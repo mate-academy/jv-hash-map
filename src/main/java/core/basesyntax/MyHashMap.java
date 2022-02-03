@@ -82,7 +82,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int indexByHash(K key) {
-        int index = (key == null) ? 0 : (key.hashCode() % table.length);
-        return index < 0 ? -1 * index : index;
+        return (key == null) ? 0 : Math.abs((key.hashCode() % table.length));
     }
 }
