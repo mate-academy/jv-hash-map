@@ -29,11 +29,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size + 1 > threshold) {
+        if (size >= threshold) {
             resizeTable();
         }
         Node<K, V> current = new Node<>(key, value, null);
-        int index = getIndex(key);;
+        int index = getIndex(key);
         if (table[index] == null) {
             table[index] = current;
             size++;
