@@ -19,16 +19,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
-        private final int hashCode;
 
         public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            if (key == null) {
-                hashCode = 0;
-            } else {
-                hashCode = Math.abs(key.hashCode());
-            }
         }
     }
 
@@ -38,7 +32,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == 0) {
             putFirst(key, value);
         } else {
-            int bucket = getBucket(node.hashCode, table.length);
+            int bucket = getBucket(getHash(node.key), table.length);
             if (!checkTableLoading()) {
                 resize();
             }
@@ -65,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public void putFirst(K key, V value) {
         Node<K, V> node = new Node<>(key, value);
-        table[getBucket(node.hashCode, table.length)] = node;
+        table[getBucket(getHash(node.key), table.length)] = node;
         size++;
     }
 
@@ -74,7 +68,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> node : table) {
             if (node != null) {
                 do {
-                    int bucket = getBucket(node.hashCode, newTable.length);
+                    int bucket = getBucket(getHash(node.key), newTable.length);
                     putToBucket(node, newTable, bucket);
                     Node<K, V> oldNode = node;
                     node = node.next;
