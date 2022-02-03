@@ -2,7 +2,7 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75F;
-    private static final int INCREASE = 2;
+    private static final int INCREASE_INDEX = 2;
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private Node<K, V>[] table;
     private int threshold;
