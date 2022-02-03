@@ -37,12 +37,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> node = new Node<>(key, value);
         if (size == 0) {
             putFirst(key, value);
-        } else if (checkTableLoading()) {
-            int bucket = node.hashCode % table.length;
-            putToBucket(node, table, bucket);
         } else {
-            resize();
-            int bucket = node.hashCode % table.length;
+            int bucket = getBucket(node.hashCode, table.length);
+            if (!checkTableLoading()) {
+                resize();
+            }
             putToBucket(node, table, bucket);
         }
     }
@@ -52,7 +51,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == 0) {
             return null;
         }
-        Node<K, V> node = table[getHash(key) % table.length];
+        Node<K, V> node = table[getBucket(getHash(key), table.length)];
         while (!Objects.equals(node.key, key)) {
             node = node.next;
         }
@@ -66,7 +65,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public void putFirst(K key, V value) {
         Node<K, V> node = new Node<>(key, value);
-        table[node.hashCode % table.length] = node;
+        table[getBucket(node.hashCode, table.length)] = node;
         size++;
     }
 
@@ -75,7 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> node : table) {
             if (node != null) {
                 do {
-                    int bucket = node.hashCode % newTable.length;
+                    int bucket = getBucket(node.hashCode, newTable.length);
                     putToBucket(node, newTable, bucket);
                     Node<K, V> oldNode = node;
                     node = node.next;
@@ -114,5 +113,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public int getHash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
+    }
+
+    public int getBucket(int hash, int tableLength) {
+        return hash % tableLength;
     }
 }
