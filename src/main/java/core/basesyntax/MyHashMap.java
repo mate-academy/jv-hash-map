@@ -33,26 +33,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int hash = getHash(key);
         int index = getIndex(hash);
-        if (size == 0) {
+        Node<K, V> node = map[index];
+        if (node == null) {
             map[index] = new Node<>(key, value, null);
             size++;
         } else {
-            Node<K, V> node = map[index];
-            if (node == null) {
-                map[index] = new Node<>(key, value, null);
-                size++;
-            } else {
-                while (node != null) {
-                    if (Objects.equals(key, node.key)) {
-                        node.value = value;
-                        return;
-                    } else if (node.next == null) {
-                        node.next = new Node<>(key, value, null);
-                        size++;
-                        return;
-                    }
-                    node = node.next;
+            while (node != null) {
+                if (Objects.equals(key, node.key)) {
+                    node.value = value;
+                    return;
+                } else if (node.next == null) {
+                    node.next = new Node<>(key, value, null);
+                    size++;
+                    return;
                 }
+                node = node.next;
             }
         }
     }
@@ -61,9 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int index = getIndex(getHash(key));
         Node<K, V> node = map[index];
-        if (node == null) {
-            return null;
-        } else {
+        if (node != null) {
             while (node != null) {
                 if (Objects.equals(key, node.key)) {
                     return node.value;
