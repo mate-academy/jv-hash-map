@@ -31,16 +31,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        size = 0;
         capacity *= 2;
         threshold *= 2;
         Node<K, V>[] oldTable = table;
         Node<K, V>[] newTable = new Node[capacity];
         table = newTable;
-        for (int i = 0; i < oldTable.length; i++) {
-            Node<K, V> node = oldTable[i];
+        for (Node<K, V> node: oldTable) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
+
             }
         }
     }
