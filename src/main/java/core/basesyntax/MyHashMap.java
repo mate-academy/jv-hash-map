@@ -60,8 +60,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putNodeInEmptyBucket(K key, V value, int index) {
-        Node<K, V> newNode = new Node<>(key, value, null);
-        table[index] = newNode;
+        table[index] = new Node<>(key, value, null);
         size++;
     }
 
