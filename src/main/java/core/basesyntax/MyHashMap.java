@@ -4,6 +4,7 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_SIZE = 16;
+    private static final int RESIZING_MULTIPLIER = 2;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
@@ -65,15 +66,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        int res = key == null ? 0 : Math.abs(key.hashCode() % table.length);
-        return res;
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void resize() {
         int oldSize = table.length;
         size = 0;
         Node<K, V>[] oldTable = table;
-        table = new Node[oldSize * 2];
+        table = new Node[oldSize * RESIZING_MULTIPLIER ];
         for (Node<K, V> old : oldTable) {
             while (old != null) {
                 put(old.key, old.value);
