@@ -81,9 +81,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        threshold = threshold * BASEINT;
+        threshold = threshold * RESIZE_FACTOR;
         Node<K, V>[] temp = map;
-        map = new Node[temp.length * BASEINT];
+        map = new Node[temp.length * RESIZE_FACTOR];
         for (int i = 0; i < temp.length; i++) {
             Node<K, V> node = temp[i];
             while (node != null) {
