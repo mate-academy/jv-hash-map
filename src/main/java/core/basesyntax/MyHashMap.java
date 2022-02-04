@@ -6,10 +6,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_SIZE_ARRAY = 16;
     private static final int CAPACITY_INCREASE = 2;
     private static final int ZERO_SIZE = 0;
+    private static final int PRIME_NUMBER = 137;
     private static final float LOAD_FACTOR = 0.75f;
-    private Node<K, V>[] table = new Node[INITIAL_SIZE_ARRAY];
+    private Node<K, V>[] table;
     private int size;
-    private int capacity = INITIAL_SIZE_ARRAY;
+
+    public MyHashMap() {
+        table = new Node[INITIAL_SIZE_ARRAY];
+    }
 
     private static class Node<K, V> {
         private final int hash;
@@ -44,15 +48,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         @Override
         public int hashCode() {
-            return Objects.hash(key, value);
+            return Objects.hash(key);
         }
     }
 
     static int hash(Object key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(31 * key.hashCode());
+        return key == null ? 0 : Math.abs(PRIME_NUMBER * key.hashCode());
     }
 
     private Node<K, V> getNode(K key, V value) {
@@ -60,7 +61,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getArrayPosition(int hash) {
-        return hash % capacity;
+        return hash % table.length;
     }
 
     private void addIntoCollision(K key, V value, int position) {
@@ -80,10 +81,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void remap() {
-        capacity *= CAPACITY_INCREASE;
         size = ZERO_SIZE;
         Node<K, V>[] oldTable = table;
-        table = new Node[capacity];
+        table = new Node[table.length * CAPACITY_INCREASE];
         for (int i = 0; i < oldTable.length; i++) {
             Node<K, V> node = oldTable[i];
             while (node != null) {
@@ -95,7 +95,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= capacity * LOAD_FACTOR) {
+        if (size >= table.length * LOAD_FACTOR) {
             remap();
         }
         int hashCode = hash(key);
