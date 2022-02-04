@@ -5,13 +5,16 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private Node<K, V>[] hashArray = new Node[DEFAULT_INITIAL_CAPACITY];
+    private Node<K, V>[] hashArray;
     private Node<K, V> temporaryNode;
-    private int threshold = (int) (hashArray.length * DEFAULT_LOAD_FACTOR);
     private int index;
     private int size;
 
-    private class Node<K, V> {
+    public MyHashMap() {
+       hashArray = new Node[DEFAULT_INITIAL_CAPACITY];
+    }
+
+    private class Node<K, V>{
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -22,12 +25,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
         }
     }
-
     @Override
     public void put(K key, V value) {
         Node<K, V> currentNode = new Node<>(key, value, null);
         int index = setIndex(key);
-        if (size == threshold) {
+        if (size == threshold()) {
             resize();
         }
         if (hashArray[index] == null) {
@@ -77,11 +79,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 put(node.key, node.value);
                 node = node.next;
             }
-            threshold = (int) (hashArray.length * DEFAULT_LOAD_FACTOR);
         }
     }
 
     private int setIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % hashArray.length);
+    }
+
+    private int threshold() {
+        return (int) (hashArray.length * DEFAULT_LOAD_FACTOR);
     }
 }
