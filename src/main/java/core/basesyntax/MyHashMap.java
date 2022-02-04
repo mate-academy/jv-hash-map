@@ -6,7 +6,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] hashArray;
-    private Node<K, V> temporaryNode;
     private int index;
     private int size;
 
@@ -29,6 +28,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K, V> currentNode = new Node<>(key, value, null);
+        Node<K, V> temporaryNode;
         int index = setIndex(key);
         if (size == threshold()) {
             resize();
@@ -55,6 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
+        Node<K, V> temporaryNode;
         index = setIndex(key);
         temporaryNode = hashArray[index];
         while (temporaryNode != null) {
