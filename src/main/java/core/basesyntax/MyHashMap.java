@@ -5,7 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_SIZE_ARRAY = 16;
     private static final int CAPACITY_INCREASE = 2;
-    private static final int ZERO_SIZE = 2;
+    private static final int ZERO_SIZE = 0;
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table = new Node[INITIAL_SIZE_ARRAY];
     private int size;
