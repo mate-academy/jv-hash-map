@@ -60,13 +60,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         int index = hash(key);
-        if (table[index] != null) {
-            for (Node<K, V> node = table[index]; node != null; node = node.next) {
-                if (Objects.equals(node.key, key)) {
-                    return node.value;
-                }
+        for (Node<K, V> node = table[index]; node != null; node = node.next) {
+            if (Objects.equals(node.key, key)) {
+                return node.value;
             }
         }
+
         return null;
     }
 
