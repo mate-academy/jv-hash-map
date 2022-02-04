@@ -3,6 +3,12 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    public static final int INITIAL_CAPACITY = 16;
+    public static final int DEFAULT_MULTIPLIER = 2;
+    public static final double LOAD_FACTOR = 0.75F;
+    private Node<K, V>[] dataArray;
+    private int size;
+    private int threshold;
 
     static class Node<K, V> {
         private final K key;
@@ -10,19 +16,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private Node<K, V> next;
 
         public Node(K key, V value, Node<K, V> next) {
-
             this.key = key;
             this.value = value;
             this.next = next;
         }
     }
-
-    public static final int INITIAL_CAPACITY = 16;
-    public static final int DEFAULT_MULTIPLIER = 2;
-    public static final double LOAD_FACTOR = 0.75F;
-    private Node<K, V>[] dataArray;
-    private int size;
-    private int threshold;
 
     public MyHashMap() {
         dataArray = new Node[INITIAL_CAPACITY];
