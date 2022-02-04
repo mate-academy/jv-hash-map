@@ -73,8 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             startNode = startNode.next;
         }
-        Node<K, V> newFirstNode = new Node<K, V>(key, value, table[index]);
-        table[index] = newFirstNode;
+        table[index] = new Node<K, V>(key, value, table[index]);
         size++;
     }
 
