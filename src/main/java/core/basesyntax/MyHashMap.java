@@ -11,10 +11,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-       hashArray = new Node[DEFAULT_INITIAL_CAPACITY];
+        hashArray = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
-    private class Node<K, V>{
+    private class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -25,6 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
         }
     }
+
     @Override
     public void put(K key, V value) {
         Node<K, V> currentNode = new Node<>(key, value, null);
