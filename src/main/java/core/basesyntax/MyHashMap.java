@@ -36,7 +36,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         Node<K, V> newNode = new Node<>(hash(key), key, value, null);
-        int index = hash(key); // 6
+        int index = hash(key);
         if (table[index] == null) {
             table[index] = newNode;
             size++;
@@ -81,7 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
-     private void resize() {
+    private void resize() {
         size = 0;
         int capacity = table.length * DOUBLING_SIZE;
         threshold *= DOUBLING_SIZE;
