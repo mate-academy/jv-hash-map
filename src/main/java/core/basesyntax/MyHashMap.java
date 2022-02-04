@@ -56,12 +56,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-
         if (table.length == 0) {
-            throw new ArrayIndexOutOfBoundsException("sorry element is out of bound");
+            return null;
         }
         int index = hash(key);
-
         if (table[index] != null) {
             for (Node<K, V> node = table[index]; node != null; node = node.next) {
                 if (Objects.equals(node.key, key)) {
