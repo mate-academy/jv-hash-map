@@ -18,9 +18,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Node<K,V> {
         private final K key;
         private V value;
-        private MyHashMap.Node<K, V> next;
+        private Node<K, V> next;
 
-        public Node(K key, V value, MyHashMap.Node<K,V> next) {
+        public Node(K key, V value, Node<K,V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
