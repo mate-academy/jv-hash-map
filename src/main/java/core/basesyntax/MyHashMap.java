@@ -6,20 +6,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final int GROW_INDEX = 2;
-    private Node<K,V>[] table;
+    private Node[] table;
     private int size;
     private int threashold;
-    private Node<K,V> newNode;
-    private Node<K,V> boofNode;
-    private int index;
 
     @Override
     public void put(K key, V value) {
         if (size >= threashold) {
             resize();
         }
-        newNode = new Node<>(hash(key),key,value,null);
-        index = Math.abs(newNode.hash % table.length);
+        Node<K,V> newNode = new Node<>(hash(key),key,value,null);
+        int index = Math.abs(newNode.hash % table.length);
         if (table[index] != null) {
             for (Node<K,V> nodeCount = table[index];nodeCount != null;nodeCount = nodeCount.next) {
                 if (Objects.equals(nodeCount.key, newNode.key)) {
@@ -42,17 +39,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table == null) {
             return null;
         }
-        for (int i = 0;i < table.length; i++) {
-            if (table[i] != null) {
-                if (Objects.equals(table[i].key,key)) {
-                    return table[i].value;
-                }
-                boofNode = table[i].next;
-                while (boofNode != null) {
-                    if (Objects.equals(boofNode.key,key)) {
-                        return boofNode.value;
-                    }
-                    boofNode = boofNode.next;
+        int index = Math.abs(hash(key) % table.length);
+        if (table[index] != null) {
+            for (Node<K,V> node = table[index];node != null; node = node.next) {
+                if (Objects.equals(node.key, key)) {
+                    return node.value;
                 }
             }
         }
@@ -73,9 +64,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table = new Node[oldTable.length * GROW_INDEX];
             threashold = (int)(table.length * DEFAULT_LOAD_FACTOR);
             size = 0;
-            for (int i = 0;i < oldTable.length; i++) {
-                for (Node<K,V> oldTCount = oldTable[i];
-                                    oldTCount != null;oldTCount = oldTCount.next) {
+            for (Node<K, V> kvNode : oldTable) {
+                for (Node<K, V> oldTCount = kvNode;
+                                oldTCount != null; oldTCount = oldTCount.next) {
                     put(oldTCount.key, oldTCount.value);
                 }
             }
@@ -88,8 +79,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K,V> {
-        private int hash;
-        private K key;
+        private final int hash;
+        private final K key;
         private V value;
         private Node<K,V> next;
 
