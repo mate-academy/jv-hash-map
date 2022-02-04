@@ -3,8 +3,10 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
+    private static final int BASEINT = 2;
     private int size;
     private int threshold;
     private Node<K, V>[] map;
@@ -28,7 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size == threshold) {
+        if (size >= threshold) {
             resize();
         }
         int hash = getHash(key);
@@ -56,13 +58,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int index = getIndex(getHash(key));
         Node<K, V> node = map[index];
-        if (node != null) {
-            while (node != null) {
-                if (Objects.equals(key, node.key)) {
-                    return node.value;
-                }
-                node = node.next;
+        while (node != null) {
+            if (Objects.equals(key, node.key)) {
+                return node.value;
             }
+            node = node.next;
         }
         return null;
     }
@@ -73,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public int getHash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() * 31);
+        return key == null ? 0 : Math.abs(key.hashCode() * map.length);
     }
 
     private int getIndex(int keyHash) {
@@ -82,9 +82,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        threshold = threshold * 2;
+        threshold = threshold * BASEINT;
         Node<K, V>[] temp = map;
-        map = new Node[temp.length * 2];
+        map = new Node[temp.length * BASEINT];
         for (int i = 0; i < temp.length; i++) {
             Node<K, V> node = temp[i];
             while (node != null) {
