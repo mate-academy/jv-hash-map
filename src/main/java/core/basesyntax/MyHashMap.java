@@ -8,12 +8,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
     private int threshold;
-    private int capacity;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
         threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
-        capacity = DEFAULT_CAPACITY;
     }
 
     static class Node<K,V> {
@@ -32,10 +30,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        capacity *= 2;
         threshold *= 2;
         Node<K, V>[] oldTable = table;
-        Node<K, V>[] newTable = new Node[capacity];
+        Node<K, V>[] newTable = new Node[table.length * 2];
         table = newTable;
         for (Node<K, V> node: oldTable) {
             while (node != null) {
@@ -46,11 +43,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hashValue(K key) {
-        return key == null ? 0 : key.hashCode() * 11;
+        return key == null ? 0 : Math.abs(key.hashCode());
     }
 
     private int getIndex(int hashValue) {
-        return hashValue > 0 ? hashValue % capacity : -1 * hashValue % capacity;
+        return hashValue % table.length;
     }
 
     private void putValue(int index, K key, V value) {
@@ -63,7 +60,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        int index = getIndex(hashValue(key));
+        int hash = hashValue(key);
+        int index = getIndex(hash);
         Node<K, V> node = table[index];
         if (node == null) {
             putValue(index, key, value);
@@ -73,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     node.value = value;
                     return;
                 } else if (node.next == null) {
-                    node.next = new Node<>(hashValue(key), key, value, null);
+                    node.next = new Node<>(hash, key, value, null);
                     break;
                 }
                 node = node.next;
