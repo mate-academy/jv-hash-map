@@ -6,15 +6,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 1 << 4;
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] nodes;
-    private int index;
     private int volume;
 
     public MyHashMap() {
         nodes = new Node[INITIAL_CAPACITY];
-    }
-
-    private int setIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % nodes.length);
     }
 
     private class Node<K, V> {
@@ -30,10 +25,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public void put(K key, V value) {
-
         Node<K, V> currentNode = new Node<>(key, value, null);
         Node<K, V> temporaryNode;
-        int index = setIndex(key);
+        int index = getKey(key);
         if (volume == threshold()) {
             resize();
         }
@@ -57,6 +51,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    public V getValue(K key) {
+        int index;
+        Node<K, V> temporaryNode;
+        index = getKey(key);
+        temporaryNode = nodes[index];
+        while (temporaryNode != null) {
+            if (Objects.equals(temporaryNode.key, key)) {
+                return temporaryNode.value;
+            }
+            temporaryNode = temporaryNode.next;
+        }
+        return null;
+    }
+
+    public int getSize() {
+        return volume;
+    }
+
     private void resize() {
         Node<K, V>[] temporaryArray = nodes;
         nodes = new Node[nodes.length * 2];
@@ -73,20 +85,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (int) (nodes.length * LOAD_FACTOR);
     }
 
-    public V getValue(K key) {
-        Node<K, V> temporaryNode;
-        index = setIndex(key);
-        temporaryNode = nodes[index];
-        while (temporaryNode != null) {
-            if (Objects.equals(temporaryNode.key, key)) {
-                return temporaryNode.value;
-            }
-            temporaryNode = temporaryNode.next;
-        }
-        return null;
+    private int getKey(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % nodes.length);
     }
 
-    public int getSize() {
-        return volume;
-    }
 }
