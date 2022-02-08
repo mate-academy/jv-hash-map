@@ -13,6 +13,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         nodes = new Node[INITIAL_CAPACITY];
     }
 
+    private int setIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % nodes.length);
+    }
+
     private class Node<K, V> {
         private final K key;
         private V value;
@@ -80,10 +84,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             temporaryNode = temporaryNode.next;
         }
         return null;
-    }
-
-    private int setIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % nodes.length);
     }
 
     public int getSize() {
