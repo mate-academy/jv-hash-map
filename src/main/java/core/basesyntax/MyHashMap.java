@@ -3,16 +3,18 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K,V>[] table;
     private int size = 0;
-    private float loadFactor = 0.75f;
+    private final float LOAD_FACTOR = 0.75f;
     private int capacity = 16;
-    private int threshold = (int) (capacity * loadFactor);
-    private int buckedNumber;
+    private int threshold = (int) (capacity * LOAD_FACTOR);
+
+
+    public MyHashMap() {
+        this.table = new Node[capacity];
+    }
 
     @Override
     public void put(K key, V value) {
-        if (size == 0) {
-            table = new Node[capacity];
-        }
+
         if (size == threshold) {
             resizeTable();
         }
@@ -24,12 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         if (table != null) {
-            int searchingNodeHash;
-            if (key == null) {
-                searchingNodeHash = 0;
-            } else {
-                searchingNodeHash = key.hashCode();
-            }
+            int searchingNodeHash = getHash(key);
             int positionInTable = Math.abs(searchingNodeHash) % (capacity - 1);
             Node<K,V> current;
             if (table[positionInTable] != null) {
@@ -89,7 +86,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resizeTable() {
         capacity = capacity * 2;
-        threshold = (int) (capacity * loadFactor);
+        threshold = (int) (capacity * LOAD_FACTOR);
         size = 0;
 
         Node<K,V>[] oldTable = table;
@@ -107,7 +104,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void addNoneToTable(Node<K,V> node, Node<K,V>[] table) {
-        buckedNumber = Math.abs(node.hash) % (capacity - 1);
+        int buckedNumber = Math.abs(node.hash) % (capacity - 1);
         if (table[buckedNumber] == null) {
             table[buckedNumber] = node;
             size++;
@@ -116,5 +113,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         }
 
+    }
+    private int getHash(K key){
+        int result;
+        if (key == null) {
+            result = 0;
+        } else {
+            result = key.hashCode();
+        }
+        return result;
     }
 }
