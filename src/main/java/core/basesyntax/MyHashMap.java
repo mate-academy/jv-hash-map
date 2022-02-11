@@ -1,12 +1,11 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final float LOAD_FACTOR = 0.75f;
     private Node<K,V>[] table;
     private int size = 0;
-    private final float LOAD_FACTOR = 0.75f;
     private int capacity = 16;
     private int threshold = (int) (capacity * LOAD_FACTOR);
-
 
     public MyHashMap() {
         this.table = new Node[capacity];
@@ -112,9 +111,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             addNodeToList(buckedNumber, node);
 
         }
-
     }
-    private int getHash(K key){
+
+    private int getHash(K key) {
         int result;
         if (key == null) {
             result = 0;
