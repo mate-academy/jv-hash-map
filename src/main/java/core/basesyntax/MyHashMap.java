@@ -4,9 +4,9 @@ import java.util.Objects;
 
 @SuppressWarnings("unchecked")
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    static final int INCREASE_COEFFICIENT = 2;
+    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int INCREASE_COEFFICIENT = 2;
     private Node<K, V>[] table;
     private int size;
     private int threshold;
