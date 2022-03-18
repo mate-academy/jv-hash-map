@@ -57,13 +57,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (Objects.equals(node.key, key)) {
                 node.value = value;
                 return;
-            } else if (node.next == null) {
+            }
+            if (node.next == null) {
                 node.next = new Node(key, value, null);
                 size++;
                 return;
-            } else {
-                node = node.next;
             }
+            node = node.next;
         }
     }
 
@@ -72,12 +72,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        final Node<K, V>[] oldTab = table;
+        final Node<K, V>[] oldTable = table;
         threshold *= INCREASE_COEFFICIENT;
         size = 0;
         int capacity = table.length * INCREASE_COEFFICIENT;
         table = new Node[capacity];
-        for (Node<K, V> node : oldTab) {
+        for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
