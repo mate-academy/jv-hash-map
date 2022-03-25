@@ -55,8 +55,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         while (neededNode != null) {
             if (Objects.equals(neededNode.key, key)) {
                 return neededNode.value;
-            } else {
-                neededNode = neededNode.next;
             }
         }
         return null;
@@ -86,11 +84,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void transfer(Node<K, V>[] newTable) {
         Node<K, V>[] oldTable = table;
         table = newTable;
+        size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
-                size--;
             }
         }
     }
