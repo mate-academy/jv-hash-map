@@ -5,19 +5,19 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTORY = 0.75f;
-    private static final int INCREASE_COEFFICIENT = 2;
     private Node<K, V>[] table;
+    private int capacity;
     private int threshold;
     private int size;
-    private int capacity;
 
     public MyHashMap() {
+        capacity = INITIAL_CAPACITY;
         table = new Node[INITIAL_CAPACITY];
         threshold = (int) (INITIAL_CAPACITY * LOAD_FACTORY);
     }
 
     public static class Node<K, V> {
-        private K key;
+        private final K key;
         private V value;
         private Node<K, V> next;
 
@@ -31,17 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (size == threshold) {
-            threshold = threshold * INCREASE_COEFFICIENT;
-            capacity = table.length * INCREASE_COEFFICIENT;
-
-            table = new Node[capacity];
-            Node<K, V>[] oldTable = table;
-            for (Node<K, V> node : oldTable) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
-            }
+            resize();
         }
         Node<K, V> node = new Node<>(key, value, null);
         Node<K, V> currentNode = table[getIndex(key)];
@@ -59,6 +49,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         table[getIndex(key)] = node;
         size++;
+    }
+
+    private void resize() {
+        capacity = capacity * 2;
+        threshold = (int) (capacity * LOAD_FACTORY);
+        size = 0;
+
+        Node<K, V>[] oldTable = table;
+        table = new Node[capacity];
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
+        }
     }
 
     @Override
