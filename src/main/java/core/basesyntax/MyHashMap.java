@@ -56,7 +56,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (Objects.equals(neededNode.key, key)) {
                 return neededNode.value;
             }
+            neededNode = neededNode.next;
         }
+
         return null;
     }
 
@@ -73,12 +75,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
-    private Node<K, V>[] resize() {
+    private void resize() {
         int newCapacity = table.length * 2;
         Node<K, V>[] newTable = new Node[newCapacity];
         threshold = (int) (DEFAULT_LOAD_FACTOR * newCapacity);
         transfer(newTable);
-        return newTable;
     }
 
     private void transfer(Node<K, V>[] newTable) {
