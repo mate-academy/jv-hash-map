@@ -47,9 +47,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (currentNode.next == null && Objects.equals(currentNode.key, key)) {
                 V value = currentNode.value;
                 table[indexOfBucket] = null;
+                size--;
                 return value;
             } else if (currentNode.next != null && Objects.equals(currentNode.key, key)) {
                 table[indexOfBucket] = currentNode.next;
+                size--;
                 return currentNode.value;
             } else {
                 if (currentNode.next != null) {
@@ -57,6 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                         if (Objects.equals(currentNode.next.key, key)) {
                             V value = currentNode.next.value;
                             currentNode.next = currentNode.next.next;
+                            size--;
                             return value;
                         }
                         currentNode = currentNode.next;
@@ -64,6 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     if (Objects.equals(currentNode.next.key, key)) {
                         V value = currentNode.next.value;
                         currentNode.next = null;
+                        size--;
                         return value;
                     }
                 }
@@ -97,6 +101,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void clear() {
+        for (int i = 0; i < capacity; i++) {
+            table[i] = null;
+        }
+        size = 0;
     }
 
     private int hash(K key) {
