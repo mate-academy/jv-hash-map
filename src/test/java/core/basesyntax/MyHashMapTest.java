@@ -180,13 +180,14 @@ public class MyHashMapTest {
     @Test
     public void checkTheHashMapIncrease() {
         MyMap<Car, Integer> myHashMap = new MyHashMap<>();
-        for (int i = 0; i < 1000; i++) {
+        int counter = 25;
+        for (int i = 0; i < counter; i++) {
             Car car = new Car("model_" + i, "color_" + i);
             myHashMap.put(car, i);
         }
         Assert.assertEquals("Test failed! The size isn't correct. Expected 1000 but was "
-                + myHashMap.getSize(), 1000, myHashMap.getSize());
-        for (int i = 0; i < 1000; i++) {
+                + myHashMap.getSize(), counter, myHashMap.getSize());
+        for (int i = 0; i < counter; i++) {
             Assert.assertEquals(Integer.valueOf(i),
                     myHashMap.getValue(new Car("model_" + i, "color_" + i)));
         }
