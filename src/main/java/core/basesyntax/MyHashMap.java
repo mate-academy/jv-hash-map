@@ -3,48 +3,78 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_CAPACITY = 16;
-    private static final double DEFAULT_LOAD_THRESHOLD = 0.75;
+    private static final int INITIAL_CAPACITY = 16;
+    private static final double LOAD_THRESHOLD = 0.75;
     private Node<K, V>[] table;
     private int capacity;
-    private double loadThreshold;
     private int size;
 
     public MyHashMap() {
-        capacity = DEFAULT_CAPACITY;
-        loadThreshold = DEFAULT_LOAD_THRESHOLD;
-        table = new Node[capacity];
+        capacity = INITIAL_CAPACITY;
+        table = new Node[INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        int keyHash = hash(key);
-        int indexOfBucket = keyHash % capacity;
-        if (table[indexOfBucket] == null) {
-            table[indexOfBucket] = new Node<>(keyHash, key, value, null);
-            size++;
-        } else {
-            boolean foundSameKey = false;
-            Node<K, V> currentNode = table[indexOfBucket];
-            if (Objects.equals(currentNode.key, key)) {
-                currentNode.value = value;
-                foundSameKey = true;
-            }
-            while (currentNode.next != null && !foundSameKey) {
-                currentNode = currentNode.next;
-                if (Objects.equals(currentNode.key, key)) {
-                    currentNode.value = value;
-                    foundSameKey = true;
-                }
-            }
-            if (!foundSameKey) {
-                currentNode.next = new Node<>(keyHash, key, value, null);
-                size++;
-            }
-        }
-        if (size > capacity * loadThreshold) {
+        if (size > capacity * LOAD_THRESHOLD) {
             resize();
         }
+        int keyHash = hash(key);
+        int indexOfBucket = keyHash % capacity;
+        Node<K, V> current = table[indexOfBucket];
+        if (table[indexOfBucket] == null) {
+            table[indexOfBucket] = new Node<>(keyHash, key, value, null);
+        }
+        while (current != null) {
+            if (Objects.equals(current.key, key)) {
+                current.value = value;
+                return;
+            }
+            if (current.next == null) {
+                current.next = new Node<>(keyHash, key, value, null);
+                break;
+            }
+            current = current.next;
+        }
+        size++;
+    }
+
+    @Override
+    public V remove(K key) {
+        int indexOfBucket = hash(key) % capacity;
+        Node<K, V> currentNode = table[indexOfBucket];
+        if (currentNode != null) {
+            if (currentNode.next == null && Objects.equals(currentNode.key, key)) {
+                V value = currentNode.value;
+                table[indexOfBucket] = null;
+                return value;
+            } else if (currentNode.next != null && Objects.equals(currentNode.key, key)) {
+                table[indexOfBucket] = currentNode.next;
+                return currentNode.value;
+            } else {
+                if (currentNode.next != null) {
+                    while (currentNode.next.next != null) {
+                        if (Objects.equals(currentNode.next.key, key)) {
+                            V value = currentNode.next.value;
+                            currentNode.next = currentNode.next.next;
+                            return value;
+                        }
+                        currentNode = currentNode.next;
+                    }
+                    if (Objects.equals(currentNode.next.key, key)) {
+                        V value = currentNode.next.value;
+                        currentNode.next = null;
+                        return value;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean containsKey(K key) {
+        return getValue(key) != null;
     }
 
     @Override
@@ -65,14 +95,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    @Override
+    public void clear() {
+    }
+
     private int hash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
     private void resize() {
+        size = 0;
         Node<K, V>[] oldTable = table;
         table = new Node[capacity * 2];
-        size = 0;
         capacity *= 2;
         for (Node<K, V> currentNode : oldTable) {
             while (currentNode != null) {
