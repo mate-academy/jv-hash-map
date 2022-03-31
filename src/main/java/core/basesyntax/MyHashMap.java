@@ -24,22 +24,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K, V> currentNode = table[hash];
         Node<K, V> newNode = new Node<>(key, value);
-        if (currentNode == null) {
-            table[hash] = newNode;
-            size++;
-        } else {
-            while (currentNode != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    currentNode.value = value;
-                    break;
-                } else if (currentNode.next == null) {
-                    currentNode.next = newNode;
-                    size++;
-                    break;
-                }
-                currentNode = currentNode.next;
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                currentNode.value = value;
+                return;
             }
+            if (currentNode.next == null) {
+                currentNode.next = newNode;
+                size++;
+                return;
+            }
+            currentNode = currentNode.next;
         }
+        table[hash] = newNode;
+        size++;
     }
 
     @Override
@@ -61,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getKeyHash(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
+        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
     private void resize() {
