@@ -42,21 +42,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V remove(K key) {
         int indexOfBucket = hash(key) % table.length;
         Node<K, V> currentNode = table[indexOfBucket];
-        if (currentNode != null) {
-            if (Objects.equals(currentNode.key, key)) {
+        Node<K, V> previousNode = currentNode;
+        Node<K, V> nextNode;
+        while (currentNode != null) {
+            nextNode = currentNode.next;
+            if (previousNode == currentNode && Objects.equals(currentNode.key, key)) {
                 table[indexOfBucket] = currentNode.next;
                 size--;
                 return currentNode.value;
+            } else if (Objects.equals(currentNode.key, key)) {
+                previousNode.next = nextNode;
+                size--;
+                return currentNode.value;
             }
-            while (currentNode.next != null) {
-                Node<K, V> previousNode = currentNode;
-                currentNode = currentNode.next;
-                if (Objects.equals(currentNode.key, key)) {
-                    previousNode.next = currentNode.next;
-                    size--;
-                    return currentNode.value;
-                }
-            }
+            previousNode = currentNode;
+            currentNode = nextNode;
         }
         return null;
     }
