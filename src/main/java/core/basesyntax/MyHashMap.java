@@ -1,11 +1,14 @@
 package core.basesyntax;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_THRESHOLD = 0.75;
+    private static final int RESIZE_FACTOR = 2;
     private Node<K, V>[] table;
     private int size;
 
@@ -22,7 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int indexOfBucket = keyHash % table.length;
         Node<K, V> current = table[indexOfBucket];
         if (table[indexOfBucket] == null) {
-            table[indexOfBucket] = new Node<>(keyHash, key, value, null);
+            table[indexOfBucket] = new Node<>(key, value, null);
         }
         while (current != null) {
             if (Objects.equals(current.key, key)) {
@@ -30,7 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             if (current.next == null) {
-                current.next = new Node<>(keyHash, key, value, null);
+                current.next = new Node<>(key, value, null);
                 break;
             }
             current = current.next;
@@ -63,7 +66,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public boolean containsKey(K key) {
-        return getValue(key) != null;
+        for (Node<K, V> currentNode : table) {
+            while (currentNode != null) {
+                if (Objects.equals(currentNode.key, key)) {
+                    return true;
+                }
+                currentNode = currentNode.next;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -77,6 +88,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         return null;
+    }
+
+    @Override
+    public Set<K> keySet() {
+        Set<K> keySet = new HashSet<>();
+        for (Node<K, V> currentNode : table) {
+            while (currentNode != null) {
+                keySet.add(currentNode.key);
+                currentNode = currentNode.next;
+            }
+        }
+        return keySet;
     }
 
     @Override
@@ -95,9 +118,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        size = 0;
         Node<K, V>[] oldTable = table;
-        table = new Node[oldTable.length * 2];
+        size = 0;
+        table = new Node[oldTable.length * RESIZE_FACTOR];
         for (Node<K, V> currentNode : oldTable) {
             while (currentNode != null) {
                 put(currentNode.key, currentNode.value);
@@ -107,13 +130,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        private Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;

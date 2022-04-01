@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Set;
+
 public interface MyMap<K, V> {
     void put(K key, V value);
 
@@ -12,4 +14,6 @@ public interface MyMap<K, V> {
     int getSize();
 
     void clear();
+
+    Set<K> keySet();
 }
