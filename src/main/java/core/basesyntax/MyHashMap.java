@@ -43,32 +43,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int indexOfBucket = hash(key) % table.length;
         Node<K, V> currentNode = table[indexOfBucket];
         if (currentNode != null) {
-            if (currentNode.next == null && Objects.equals(currentNode.key, key)) {
-                V value = currentNode.value;
-                table[indexOfBucket] = null;
-                size--;
-                return value;
-            } else if (currentNode.next != null && Objects.equals(currentNode.key, key)) {
+            if (Objects.equals(currentNode.key, key)) {
                 table[indexOfBucket] = currentNode.next;
                 size--;
                 return currentNode.value;
-            } else {
-                if (currentNode.next != null) {
-                    while (currentNode.next.next != null) {
-                        if (Objects.equals(currentNode.next.key, key)) {
-                            V value = currentNode.next.value;
-                            currentNode.next = currentNode.next.next;
-                            size--;
-                            return value;
-                        }
-                        currentNode = currentNode.next;
-                    }
-                    if (Objects.equals(currentNode.next.key, key)) {
-                        V value = currentNode.next.value;
-                        currentNode.next = null;
-                        size--;
-                        return value;
-                    }
+            }
+            while (currentNode.next != null) {
+                Node<K, V> previousNode = currentNode;
+                currentNode = currentNode.next;
+                if (Objects.equals(currentNode.key, key)) {
+                    previousNode.next = currentNode.next;
+                    size--;
+                    return currentNode.value;
                 }
             }
         }
