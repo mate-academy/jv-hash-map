@@ -1,26 +1,25 @@
 package core.basesyntax;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_THRESHOLD = 0.75;
     private Node<K, V>[] table;
-    private int capacity;
     private int size;
 
     public MyHashMap() {
-        capacity = INITIAL_CAPACITY;
         table = new Node[INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size > capacity * LOAD_THRESHOLD) {
+        if (size > table.length * LOAD_THRESHOLD) {
             resize();
         }
         int keyHash = hash(key);
-        int indexOfBucket = keyHash % capacity;
+        int indexOfBucket = keyHash % table.length;
         Node<K, V> current = table[indexOfBucket];
         if (table[indexOfBucket] == null) {
             table[indexOfBucket] = new Node<>(keyHash, key, value, null);
@@ -41,7 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V remove(K key) {
-        int indexOfBucket = hash(key) % capacity;
+        int indexOfBucket = hash(key) % table.length;
         Node<K, V> currentNode = table[indexOfBucket];
         if (currentNode != null) {
             if (currentNode.next == null && Objects.equals(currentNode.key, key)) {
@@ -101,9 +100,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void clear() {
-        for (int i = 0; i < capacity; i++) {
-            table[i] = null;
-        }
+        Arrays.fill(table, null);
         size = 0;
     }
 
@@ -114,8 +111,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         size = 0;
         Node<K, V>[] oldTable = table;
-        table = new Node[capacity * 2];
-        capacity *= 2;
+        table = new Node[oldTable.length * 2];
         for (Node<K, V> currentNode : oldTable) {
             while (currentNode != null) {
                 put(currentNode.key, currentNode.value);
