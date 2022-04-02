@@ -1,50 +1,71 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private static final int DEFAULT_CAPACITY = 1 << 4; // 16
     private int size;
 
-    public MyHashMap() {
-        this(DEFAULT_CAPACITY);
-    }
 
-    public MyHashMap(int capacity) {
-        this.table = new Node[capacity];
+    public MyHashMap() {
+        this.table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         Node<K, V> entry = new Node<>(key, value, null);
+        if (key == null) {
+            Node<K, V> existing = table[0];
+            if (existing == null) {
+                table[0] = entry;
+                size++;
+            } else {
+                putSupplier(key, value, (Node<K, V>) entry, (Node<K, V>) existing);
+            }
+            return;
+        }
         int bucket = getHash(key) % DEFAULT_CAPACITY;
         Node<K, V> existing = table[bucket];
         if (existing == null) {
             table[bucket] = entry;
             size++;
         } else {
-            while (existing.next != null) {
-                if (existing.key.equals(key)) {
-                    existing.value = value;
-                    return;
-                }
-                existing = existing.next;
-            }
+            putSupplier(key, value, (Node<K, V>) entry, (Node<K, V>) existing);
+        }
+    }
 
-            if (existing.key.equals(key)) {
+    private void putSupplier(K key, V value, Node<K, V> entry, Node<K, V> existing) {
+        while (existing.next != null) {
+            if (Objects.equals(existing.key, key)) {
                 existing.value = value;
-            } else {
-                existing.next = entry;
-                size++;
+                return;
             }
+            existing = existing.next;
+        }
+
+        if (Objects.equals(existing.key, key)) {
+            existing.value = value;
+        } else {
+            existing.next = entry;
+            size++;
         }
     }
 
     @Override
     public V getValue(K key) {
+        if (key == null) {
+            Node<K, V> bucket = table[0];
+            while (bucket != null) {
+                if (Objects.equals(bucket.key, key)) {
+                    return bucket.value;
+                }
+                bucket = bucket.next;
+            }
+        }
         Node<K, V> bucket = table[getHash(key) % DEFAULT_CAPACITY];
-
         while (bucket != null) {
-            if (bucket.key.equals(key)) {
+            if (Objects.equals(bucket.key, key)) {
                 return bucket.value;
             }
             bucket = bucket.next;
