@@ -15,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         loadFactor = DEFAULT_LOAD_FACTOR;
         capacity = DEFAULT_CAPACITY;
         threshold = (int) (loadFactor * capacity);
-        nodesArray = new Node[capacity];
+        nodesArray = new Node[DEFAULT_CAPACITY];
     }
 
     /**
@@ -33,13 +33,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int index = hashIndexFromKey(key);
         Node<K, V> node = nodesArray[index];
-        if (node == null) { //Add block
+        if (node == null) {
             nodesArray[index] = new Node<>(key, value);
             size++;
             return;
         }
 
-        boolean isNotLast = true; //Set block
+        boolean isNotLast = true;
         while (isNotLast) {
             if (Objects.equals(node.key, key)) {
                 node.value = value;
@@ -53,22 +53,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         }
 
-        node.next = new Node<>(key, value); //Collision block
+        node.next = new Node<>(key, value);
         size++;
-    }
-
-    private void insertNodeInNewNodeArray(Node<K, V>[] newNodeArray, Node<K, V> newNode) {
-        int hashIndex = hashIndexFromKey(newNode.key);
-        Node<K, V> storedNode = newNodeArray[hashIndex];
-        if (storedNode == null) {
-            newNodeArray[hashIndex] = newNode;
-            return;
-        }
-        while (storedNode.next != null) {
-            storedNode = storedNode.next;
-        }
-        storedNode.next = newNode;
-
     }
 
     @Override
@@ -100,15 +86,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private void insertNodeInNewNodeArray(Node<K, V>[] newNodeArray, Node<K, V> newNode) {
+        int hashIndex = hashIndexFromKey(newNode.key);
+        Node<K, V> storedNode = newNodeArray[hashIndex];
+        if (storedNode == null) {
+            newNodeArray[hashIndex] = newNode;
+            return;
+        }
+        while (storedNode.next != null) {
+            storedNode = storedNode.next;
+        }
+        storedNode.next = newNode;
+
+    }
+
     private void resize() {
         capacity = calculateNewCapacity();
         Node<K, V>[] newNodeArray = new Node[capacity];
-        nodesArray = fillNewNodeArray(newNodeArray);
+        nodesArray = fillNewNodeArray(newNodeArray, nodesArray);
         threshold = (int) (capacity * loadFactor);
     }
 
-    private Node<K, V>[] fillNewNodeArray(Node<K, V>[] newNodeArray) {
-        for (Node<K, V> node : nodesArray) {
+    private Node<K, V>[] fillNewNodeArray(Node<K, V>[] newNodeArray, Node<K, V>[] oldNodeArray) {
+        for (Node<K, V> node : oldNodeArray) {
             while (node != null) {
                 Node<K,V> next = node.next;
                 node.next = null;
@@ -120,12 +120,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hashIndexFromKey(K key) {
-        int hash = Objects.hashCode(key);
-        int hashIndex = hash % capacity;
-        return hashIndex < 0 ? -hashIndex : hashIndex;
+        int hash = key == null ? 0 : key.hashCode();
+        return Math.abs(hash % capacity);
     }
 
     private int calculateNewCapacity() {
-        return capacity << 1;
+        return nodesArray.length << 1;
     }
 }
