@@ -4,17 +4,18 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
+    private static final int RESIZE_VALUE = 2;
+    private static final double LOAD_FACTOR = 0.75;
     private Node<K, V>[] table;
     private int size;
-    private double loadFactor = 0.75;
 
     public MyHashMap() {
-        this.table = new Node[DEFAULT_CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size > table.length * loadFactor) {
+        if (size >= table.length * LOAD_FACTOR) {
             resize();
         }
         Node<K, V> entry = new Node<>(key, value, null);
@@ -22,9 +23,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (existing == null) {
             table[getHash(key)] = entry;
             size++;
-        } else {
-            putSupplier(key, value, (Node<K, V>) entry, (Node<K, V>) existing);
+            return;
         }
+        while (existing.next != null) {
+            if (Objects.equals(existing.key, key)) {
+                existing.value = value;
+                return;
+            }
+            existing = existing.next;
+        }
+        if (Objects.equals(existing.key, key)) {
+            existing.value = value;
+            return;
+        }
+        existing.next = entry;
+        size++;
     }
 
     @Override
@@ -51,28 +64,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         size = 0;
         Node<K,V>[] oldTable = table;
-        table = new Node[oldTable.length * 2];
+        table = new Node[oldTable.length * RESIZE_VALUE];
         for (Node<K,V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
             }
-        }
-    }
-
-    private void putSupplier(K key, V value, Node<K, V> entry, Node<K, V> existing) {
-        while (existing.next != null) {
-            if (Objects.equals(existing.key, key)) {
-                existing.value = value;
-                return;
-            }
-            existing = existing.next;
-        }
-        if (Objects.equals(existing.key, key)) {
-            existing.value = value;
-        } else {
-            existing.next = entry;
-            size++;
         }
     }
 
