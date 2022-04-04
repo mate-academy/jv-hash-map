@@ -8,7 +8,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private Node<K, V>[] buckets;
 
-    public static class Node<K, V> {
+    private static class Node<K, V> {
         private int hash;
         private K key;
         private V value;
@@ -29,12 +29,53 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
-    private int makeHashCode(K key) {
+    @Override
+    public void put(K key, V value) {
+        Node<K, V> newNode = new Node<>(getHashCode(key), key, value, null);
+        int index = getIndex(key);
+        if (buckets[index] == null) {
+            buckets[index] = newNode;
+            size++;
+        } else {
+            Node<K, V> temp = buckets[index];
+            while (temp != null) {
+                if (checkKeys(key, temp.key)) {
+                    temp.value = value;
+                    break;
+                } else if (temp.next == null) {
+                    temp.next = newNode;
+                    size++;
+                    break;
+                } else {
+                    temp = temp.next;
+                }
+            }
+        }
+        resize();
+    }
+
+    @Override
+    public V getValue(K key) {
+        int index = getIndex(key);
+        for (Node<K, V> temp = buckets[index]; temp != null; temp = temp.next) {
+            if (checkKeys(key, temp.key)) {
+                return temp.value;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    private int getHashCode(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
-    private int toAssignIndex(K key) {
-        return key == null ? 0 : makeHashCode(key) % capacity;
+    private int getIndex(K key) {
+        return key == null ? 0 : getHashCode(key) % capacity;
     }
 
     private void transfer(Node<K, V>[] oldBuckets) {
@@ -58,48 +99,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean checkKeys(K firstKey, K secondKey) {
-        return firstKey == null && secondKey == null
+        return firstKey == secondKey
                 || firstKey != null && firstKey.equals(secondKey);
-    }
-
-    @Override
-    public void put(K key, V value) {
-        Node<K, V> newNode = new Node<>(makeHashCode(key), key, value, null);
-        int index = toAssignIndex(key);
-        if (buckets[index] == null) {
-            buckets[index] = newNode;
-            size++;
-        } else {
-            Node<K, V> temp = buckets[index];
-            while (true) {
-                if (checkKeys(key, temp.key)) {
-                    temp.value = value;
-                    break;
-                } else if (temp.next == null) {
-                    temp.next = newNode;
-                    size++;
-                    break;
-                } else {
-                    temp = temp.next;
-                }
-            }
-        }
-        resize();
-    }
-
-    @Override
-    public V getValue(K key) {
-        int index = toAssignIndex(key);
-        for (Node<K, V> temp = buckets[index]; temp != null; temp = temp.next) {
-            if (checkKeys(key, temp.key)) {
-                return temp.value;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
     }
 }
