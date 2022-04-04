@@ -9,13 +9,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] buckets;
 
     private static class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -31,7 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> newNode = new Node<>(getHashCode(key), key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, null);
         int index = getIndex(key);
         if (buckets[index] == null) {
             buckets[index] = newNode;
