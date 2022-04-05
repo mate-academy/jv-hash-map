@@ -23,7 +23,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         buckets = new Node[DEFAULT_CAPACITY];
-        size = 0;
         capacity = DEFAULT_CAPACITY;
         threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
