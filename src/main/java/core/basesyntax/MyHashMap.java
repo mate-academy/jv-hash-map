@@ -3,6 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75d;
+    private static final int MULTIPLIER = 2;
     private int threshold;
     private int capacity;
     private int size;
@@ -35,17 +36,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             buckets[index] = newNode;
             size++;
         } else {
-            Node<K, V> temp = buckets[index];
-            while (temp != null) {
-                if (checkKeys(key, temp.key)) {
-                    temp.value = value;
+            Node<K, V> currentNode = buckets[index];
+            while (currentNode != null) {
+                if (isEqual(key, currentNode.key)) {
+                    currentNode.value = value;
                     break;
-                } else if (temp.next == null) {
-                    temp.next = newNode;
+                }
+                if (currentNode.next == null) {
+                    currentNode.next = newNode;
                     size++;
-                    break;
                 } else {
-                    temp = temp.next;
+                    currentNode = currentNode.next;
                 }
             }
         }
@@ -56,7 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int index = getIndex(key);
         for (Node<K, V> temp = buckets[index]; temp != null; temp = temp.next) {
-            if (checkKeys(key, temp.key)) {
+            if (isEqual(key, temp.key)) {
                 return temp.value;
             }
         }
@@ -87,7 +88,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         if (size == threshold) {
-            capacity = capacity * 2;
+            capacity = capacity * MULTIPLIER;
             final Node<K, V>[] oldBuckets = buckets;
             buckets = new Node[capacity];
             size = 0;
@@ -96,7 +97,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private boolean checkKeys(K firstKey, K secondKey) {
+    private boolean isEqual(K firstKey, K secondKey) {
         return firstKey == secondKey
                 || firstKey != null && firstKey.equals(secondKey);
     }
