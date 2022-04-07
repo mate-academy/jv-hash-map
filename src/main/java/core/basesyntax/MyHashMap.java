@@ -15,11 +15,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int hash = hash(key);
         if (size > data.length * LOAD_FACTOR) {
             resize();
         }
-        int bucketIndex = (data.length - 1) & hash;
+        int bucketIndex = getIndex(key);
         if (data[bucketIndex] == null) {
             data[bucketIndex] = new Node<>(key, value, null);
         } else {
@@ -41,8 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key);
-        Node<K, V> current = data[(data.length - 1) & hash];
+        Node<K, V> current = data[getIndex(key)];
         while (current != null) {
             if (Objects.equals(current.key, key)) {
                 return current.value;
@@ -72,6 +70,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
 
+    }
+
+    private int getIndex(K key) {
+        return (data.length - 1) & hash(key);
     }
 
     private static class Node<K, V> {
