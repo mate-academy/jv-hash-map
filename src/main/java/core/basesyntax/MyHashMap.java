@@ -58,21 +58,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode());
+        return key == null ? 0 : key.hashCode();
     }
 
     private void resize() {
         Node<K, V>[] oldData = data;
         data = new Node[data.length * LENGTH_MULTIPLIER];
-        if (oldData != null) {
-            size = 0;
-            for (Node<K, V> node : oldData) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
+        size = 0;
+        for (Node<K, V> node : oldData) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
+
     }
 
     private static class Node<K, V> {
