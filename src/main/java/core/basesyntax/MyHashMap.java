@@ -26,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
-    public V put(K key, V value) {
+    public void put(K key, V value) {
         resize();
         Node<K, V> newNode = new Node<>(key, value, null);
         int bucketIndex = getIndex(key);
@@ -34,13 +34,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (node == null) {
             table[bucketIndex] = newNode;
             size++;
-            return value;
+            return;
         }
 
         while (node.next != null) {
             if (node.key == key || (node.key != null && node.key.equals(key))) {
                 node.value = value;
-                return value;
+                return;
             }
             node = node.next;
 
@@ -48,11 +48,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         if (node.key == key || (node.key != null && node.key.equals(key))) {
             node.value = value;
-            return value;
+            return;
         }
         node.next = newNode;
         size++;
-        return value;
+        return;
     }
 
     @Override
