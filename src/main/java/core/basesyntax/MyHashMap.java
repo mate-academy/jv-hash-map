@@ -78,7 +78,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (newSize * DEFAULT_LOAD_FACTOR);
     }
 
-    private int countHash(Object key) {
+    private int countHash(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 }
