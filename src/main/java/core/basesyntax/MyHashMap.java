@@ -3,10 +3,15 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final int DEFAULT_SIZE = 16;
     private static final int RESIZE_VALUE = 2;
     private static final double LOAD_FACTOR = 0.75;
-    private Node<K, V>[] data = new Node[16];
+    private Node<K, V>[] data;
     private int size;
+
+    public MyHashMap() {
+        data = new Node[DEFAULT_SIZE];
+    }
 
     @Override
     public void put(K key, V value) {
@@ -37,8 +42,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
-    public V getV(K key) {
-        Node<K, V> bucket = data[getIndex(key)];//9
+    public V getValue(K key) {
+        Node<K, V> bucket = data[getIndex(key)];
         while (bucket != null) {
             if (Objects.equals(bucket.key, key)) {
                 return bucket.value;
