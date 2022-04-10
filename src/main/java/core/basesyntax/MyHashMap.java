@@ -49,16 +49,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         for (Node<K, V> node : table) {
-            if (node == null) {
-                continue;
-            } else {
-                Node<K, V> current = node;
-                while (current != null) {
-                    if (Objects.equals(current.key, key)) {
-                        return current.value;
-                    }
-                    current = current.next;
+            Node<K, V> current = node;
+            while (current != null) {
+                if (Objects.equals(current.key, key)) {
+                    return current.value;
                 }
+                current = current.next;
             }
         }
         return null;
