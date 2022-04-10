@@ -7,7 +7,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private Node<K, V>[] table;
     private int capacity;
-    private int size = 0;
+    private int size;
 
     @Override
     public void put(K key, V value) {
@@ -19,11 +19,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int keyHash = getHash(key);
-        if (table[keyHash % table.length] == null) {
-            table[keyHash % table.length] = new Node<>(key, value, null);
+        if (table[keyHash] == null) {
+            table[keyHash] = new Node<>(key, value, null);
         } else {
             int checking = 0;
-            Node<K, V> newNode = table[keyHash % table.length];
+            Node<K, V> newNode = table[keyHash];
             while (newNode.next != null) {
                 if (Objects.equals(newNode.key, key)) {
                     newNode.value = value;
@@ -66,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode());
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void resize() {
