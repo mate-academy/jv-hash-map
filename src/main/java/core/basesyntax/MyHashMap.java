@@ -9,7 +9,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int capacity;
     private int size = 0;
 
-
     @Override
     public void put(K key, V value) {
         if (table == null) {
