@@ -7,30 +7,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private int size;
 
-    MyHashMap() {
+    public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
         threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
-    private static class Node<K, V> {
-        private int hash;
-        private K key;
-        private V value;
-        private Node<K, V> next;
-
-        private Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
+        int bucket = countBucket(key);
         if (size >= threshold) {
             resize();
         }
-        Node<K, V> newNode = table[countBucket(key)];
+        Node<K, V> newNode = table[bucket];
         while (newNode != null) {
             if (key == newNode.key || (key != null && key.equals(newNode.key))) {
                 newNode.value = value;
@@ -43,7 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             newNode = newNode.next;
         }
-        table[countBucket(key)] = new Node<>(key, value, null);
+        table[bucket] = new Node<>(key, value, null);
         size++;
     }
 
@@ -80,5 +68,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int countBucket(Object key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
+    }
+
+    private static class Node<K, V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        private Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
