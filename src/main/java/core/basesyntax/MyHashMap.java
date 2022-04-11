@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == buckets.length * loadFactor) {
             resize();
         }
-        Node<K, V> putNode = new Node<>(key, value, null);
+        Node<K, V> putNode = new Node(hash ,key, value, null);
         int indexOfBucket = hash % buckets.length;
         if (buckets[indexOfBucket] == null) {
             buckets[indexOfBucket] = putNode;
@@ -93,7 +93,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        public Node(int hash,K key, V value, Node<K, V> next) {
+            this.hash = hash;
             this.key = key;
             this.value = value;
             this.next = next;
