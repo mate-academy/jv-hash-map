@@ -6,48 +6,34 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTORY = 0.75f;
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private Node<K, V>[] table;
-    private int capacity;
     private int size;
+
+    public MyHashMap() {
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
-        if (table == null) {
-            table = new Node[DEFAULT_INITIAL_CAPACITY];
-            capacity = DEFAULT_INITIAL_CAPACITY;
-        }
-        if (size > capacity * DEFAULT_LOAD_FACTORY) {
+        if (size > table.length * DEFAULT_LOAD_FACTORY) {
             resize();
         }
         int keyHash = getHash(key);
         if (table[keyHash] == null) {
             table[keyHash] = new Node<>(key, value, null);
         } else {
-            int checking = 0;
             Node<K, V> newNode = table[keyHash];
             while (newNode.next != null) {
-                if (Objects.equals(newNode.key, key)) {
-                    newNode.value = value;
-                    checking++;
-                    size--;
-                }
+                getKey(newNode, key, value);
                 newNode = newNode.next;
             }
-            if (checking != 1) {
-                if (Objects.equals(newNode.key, key)) {
-                    newNode.value = value;
-                    size--;
-                }
-                newNode.next = new Node<>(key, value, null);
-            }
+            getKey(newNode, key, value);
+            newNode.next = new Node<>(key, value, null);
         }
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        if (size == 0) {
-            return null;
-        }
         for (Node<K, V> node : table) {
             Node<K, V> current = node;
             while (current != null) {
@@ -65,14 +51,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private void getKey(Node<K, V> newNode, K key, V value) {
+        if (Objects.equals(newNode.key, key)) {
+            newNode.value = value;
+            size--;
+        }
+    }
+
     private int getHash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void resize() {
         final Node<K, V>[] oldTable = table;
+        int capacity = table.length;
         table = new Node[capacity * 2];
-        capacity *= 2;
         size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
