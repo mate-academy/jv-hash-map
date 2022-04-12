@@ -20,35 +20,52 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K, V> currentNode = new Node<>(key, value, null);
         int index = getIndex(key);
-        Node<K, V> currentBucked = data[index];
-        if (currentBucked == null) {
+        Node<K, V> currentBucket = data[index];
+        if (currentBucket == null) {
             data[index] = currentNode;
             size++;
             return;
         }
-        while (currentBucked.next != null) {
-            if (Objects.equals(currentBucked.key, key)) {
-                currentBucked.value = value;
+        do {
+            if (currentBucket.next == null) {
+                currentBucket.next = currentNode;
+                size++;
                 return;
             }
-            currentBucked = currentBucked.next;
-        }
-        if (Objects.equals(currentBucked.key, key)) {
-            currentBucked.value = value;
-            return;
-        }
-        currentBucked.next = currentNode;
-        size++;
+            if (Objects.equals(currentBucket.next.key, key)) {
+                currentBucket.value = value;
+                return;
+            }
+
+            currentBucket.next = currentNode;
+            size++;
+
+            currentBucket = currentBucket.next;
+        } while (currentBucket != null);
+
+//        while (currentBucket.next != null) {
+//            if (Objects.equals(currentBucket.key, key)) {
+//                currentBucket.value = value;
+//                return;
+//            }
+//            currentBucket = currentBucket.next;
+//        }
+//        if (Objects.equals(currentBucket.key, key)) {
+//            currentBucket.value = value;
+//            return;
+//        }
+//        currentBucket.next = currentNode;
+//        size++;
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> bucket = data[getIndex(key)];
-        while (bucket != null) {
-            if (Objects.equals(bucket.key, key)) {
-                return bucket.value;
+        Node<K, V> nodeInBucket = data[getIndex(key)];
+        while (nodeInBucket != null) {
+            if (Objects.equals(nodeInBucket.key, key)) {
+                return nodeInBucket.value;
             }
-            bucket = bucket.next;
+            nodeInBucket = nodeInBucket.next;
         }
         return null;
     }
@@ -65,7 +82,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         size = 0;
         Node<K,V>[] oldData = data;
-        data = new Node [oldData.length * RESIZE_VALUE];
+        data = new Node[oldData.length * RESIZE_VALUE];
         for (Node<K,V> buckedNode : oldData) {
             while (buckedNode != null) {
                 put(buckedNode.key, buckedNode.value);
