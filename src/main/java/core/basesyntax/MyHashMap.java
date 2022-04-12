@@ -26,29 +26,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        while (thisBucket.next != null) {
+
+        do {
             if (Objects.equals(thisBucket.key, key)) {
                 thisBucket.value = value;
                 return;
             }
+            if (thisBucket.next == null) { //
+                thisBucket.next = inputNode;
+                size++;
+                return;
+            }
             thisBucket = thisBucket.next;
-        }
-        if (Objects.equals(thisBucket.key, key)) {
-            thisBucket.value = value;
-            return;
-        }
-        thisBucket.next = inputNode;
-        size++;
+        } while (thisBucket != null);
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> bucket = data[getIndex(key)];
-        while (bucket != null) {
-            if (Objects.equals(bucket.key, key)) {
-                return bucket.value;
+        Node<K, V> nodeInBucket = data[getIndex(key)];
+        while (nodeInBucket != null) {
+            if (Objects.equals(nodeInBucket.key, key)) {
+                return nodeInBucket.value;
             }
-            bucket = bucket.next;
+            nodeInBucket = nodeInBucket.next;
         }
         return null;
     }
