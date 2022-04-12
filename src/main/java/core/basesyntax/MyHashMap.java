@@ -1,8 +1,9 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
-    private static final int RESIZE_FACTOR = 2;
     private static final int INITIAL_CAPACITY = 16;
     private Node<K, V>[] table;
     private int size;
@@ -25,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (getSize() >= table.length * DEFAULT_LOAD_FACTOR) {
+        if (size == table.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
         Node<K, V> newNode = new Node<>(key, value, null);
@@ -36,7 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> currentNode = table[index];
             while (currentNode != null) {
-                if (key == currentNode.key || key != null && key.equals(currentNode.key)) {
+                if (Objects.equals(key, currentNode.key)) {
                     currentNode.value = newNode.value;
                     return;
                 }
@@ -54,7 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         Node<K, V> currentNode = table[hash(key) % table.length];
         while (currentNode != null) {
-            if (key == currentNode.key || key != null && key.equals(currentNode.key)) {
+            if (Objects.equals(key, currentNode.key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
@@ -69,7 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldTable = table;
-        table = new Node[oldTable.length * RESIZE_FACTOR];
+        table = new Node[oldTable.length << 1];
         size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
