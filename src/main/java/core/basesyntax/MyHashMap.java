@@ -18,9 +18,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (getSize() >= table.length * LOAD_FACTOR) {
             resize();
         }
-        Node<K, V> currentNode = table[getIndexOfBacked(key)];
+        int indexOfBacked = getIndexOfBacked(key);
+        Node<K, V> currentNode = table[indexOfBacked];
         if (currentNode == null) {
-            table[getIndexOfBacked(key)] = new Node<>(key, value, null);
+            table[indexOfBacked] = new Node<>(key, value, null);
         }
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
