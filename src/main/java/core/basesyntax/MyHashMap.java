@@ -58,7 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        capacity *= 2;
+        capacity = capacity << 1;
         threshold = Math.round(capacity * LOAD_FACTOR);
         Node<K, V>[] table = this.table;
         this.table = new Node[capacity];
