@@ -26,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size == table.length * DEFAULT_LOAD_FACTOR) {
+        if (size >= table.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
         int indexOfBucket = getIndex(key);
