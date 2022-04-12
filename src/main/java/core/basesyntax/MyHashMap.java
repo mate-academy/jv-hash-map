@@ -5,7 +5,6 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_CAPACITY = 16;
     static final float LOAD_FACTOR = 0.75f;
-
     private int size;
     private Node<K, V>[] table;
 
@@ -40,13 +39,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (Node<K, V> currentNode: table) {
-            while (currentNode != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    return currentNode.value;
-                }
-                currentNode = currentNode.next;
+        int bucketIndex = hash(key) % table.length;
+        Node<K, V> currentNode = table[bucketIndex];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
             }
+            currentNode = currentNode.next;
         }
         return null;
     }
