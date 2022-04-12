@@ -41,15 +41,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode;
-        for (Node<K, V> bucket : buckets) {
-            currentNode = bucket;
-            while (currentNode != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    return currentNode.value;
-                }
-                currentNode = currentNode.next;
+        Node<K, V> currentNode = buckets[hash(key) % buckets.length];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
             }
+            currentNode = currentNode.next;
         }
         return null;
     }
