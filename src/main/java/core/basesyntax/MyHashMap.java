@@ -19,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             ensureCapacity();
         }
         int keyHash = hash(key);
-        int bucketIndex = Math.abs(keyHash % table.length);
+        int bucketIndex = keyHash % table.length;
         Node<K, V> currentNode = table[bucketIndex];
         if (table[bucketIndex] == null) {
             table[bucketIndex] = new Node<>(key, value, null);
@@ -56,18 +56,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static class Node<K,V> {
-        private final K key;
-        private V value;
-        private Node<K,V> next;
-
-        Node(K key, V value, Node<K,V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     private void ensureCapacity() {
         Node<K, V> [] oldTable = table;
         size = 0;
@@ -81,6 +69,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return key == null ? 0 : key.hashCode() * 31;
+        return key == null ? 0 : Math.abs(key.hashCode() * 31);
+    }
+
+    private static class Node<K,V> {
+        private final K key;
+        private V value;
+        private Node<K,V> next;
+
+        Node(K key, V value, Node<K,V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
