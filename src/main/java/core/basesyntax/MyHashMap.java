@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == buckets.length * loadFactor) {
             resize();
         }
-        Node<K, V> putNode = new Node(hash ,key, value, null);
+        Node<K, V> putNode = new Node(key, value, null);
         int indexOfBucket = hash % buckets.length;
         if (buckets[indexOfBucket] == null) {
             buckets[indexOfBucket] = putNode;
@@ -29,8 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> currentNodeInBucket = buckets[indexOfBucket];
             while (currentNodeInBucket != null) {
-                if (currentNodeInBucket.hash == putNode.hash
-                        && Objects.equals(currentNodeInBucket.key, putNode.key)) {
+                if (Objects.equals(currentNodeInBucket.key, putNode.key)) {
                     currentNodeInBucket.value = putNode.value;
                     return;
                 }
@@ -88,13 +87,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private int hash;
-        private K key;
+        private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash,K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
