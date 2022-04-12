@@ -18,16 +18,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int keyHash = getHash(key);
+        Node<K, V> newNode = table[keyHash];
         if (table[keyHash] == null) {
             table[keyHash] = new Node<>(key, value, null);
-        } else {
-            Node<K, V> newNode = table[keyHash];
-            while (newNode.next != null) {
-                checkingEquals(newNode, key, value);
-                newNode = newNode.next;
+        }
+        while (newNode != null) {
+            if (Objects.equals(newNode.key, key)) {
+                newNode.value = value;
+                return;
             }
-            checkingEquals(newNode, key, value);
-            newNode.next = new Node<>(key, value, null);
+            if (newNode.next == null) {
+                newNode.next = new Node<>(key, value, null);
+                break;
+            }
+            newNode = newNode.next;
         }
         size++;
     }
@@ -48,13 +52,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
-    }
-
-    private void checkingEquals(Node<K, V> newNode, K key, V value) {
-        if (Objects.equals(newNode.key, key)) {
-            newNode.value = value;
-            size--;
-        }
     }
 
     private int getHash(K key) {
