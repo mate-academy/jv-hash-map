@@ -18,9 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (getSize() >= table.length * LOAD_FACTOR) {
             resize();
         }
-
         Node<K, V> currentNode = table[getIndexOfBacked(key)];
-
         if (currentNode == null) {
             table[getIndexOfBacked(key)] = new Node<>(key, value, null);
         }
@@ -82,5 +80,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
+
     }
 }
