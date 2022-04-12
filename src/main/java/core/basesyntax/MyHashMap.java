@@ -27,35 +27,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         do {
-            if (currentBucket.next == null) {
+            if (Objects.equals(currentBucket.key, key)) {
+                currentBucket.value = value;
+                return;
+            }
+            if (currentBucket.next == null) { //
                 currentBucket.next = currentNode;
                 size++;
                 return;
             }
-            if (Objects.equals(currentBucket.next.key, key)) {
-                currentBucket.value = value;
-                return;
-            }
-
-            currentBucket.next = currentNode;
-            size++;
-
             currentBucket = currentBucket.next;
         } while (currentBucket != null);
-
-//        while (currentBucket.next != null) {
-//            if (Objects.equals(currentBucket.key, key)) {
-//                currentBucket.value = value;
-//                return;
-//            }
-//            currentBucket = currentBucket.next;
-//        }
-//        if (Objects.equals(currentBucket.key, key)) {
-//            currentBucket.value = value;
-//            return;
-//        }
-//        currentBucket.next = currentNode;
-//        size++;
     }
 
     @Override
