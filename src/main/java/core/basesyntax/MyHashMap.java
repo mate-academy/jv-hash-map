@@ -3,13 +3,13 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_INITIAL_CAPACITY = 16;
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int size;
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        this.table = new Node[DEFAULT_INITIAL_CAPACITY];
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
     @Override
@@ -23,20 +23,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (currentNode == null) {
             table[index] = node;
             size++;
-        } else {
-            while (currentNode.next != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    currentNode.value = value;
-                    return;
-                }
-                currentNode = currentNode.next;
-            }
+            return;
+        }
+        while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 currentNode.value = value;
-            } else {
+                return;
+            }
+            if (currentNode.next == null) {
                 currentNode.next = node;
                 size++;
+                return;
             }
+            currentNode = currentNode.next;
         }
     }
 
