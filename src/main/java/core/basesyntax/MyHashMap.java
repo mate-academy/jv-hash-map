@@ -53,12 +53,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int indexOfBucked = getIndexOfBucked(key);
         Node<K, V> node = table[indexOfBucked];
-            while (node != null) {
-                if (Objects.equals(node.key, key)) {
-                    return node.value;
-                }
-                node = node.next;
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return node.value;
             }
+            node = node.next;
+        }
         return null;
     }
 
