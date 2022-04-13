@@ -44,13 +44,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (Node<K, V> node : table) {
-            while (node != null) {
-                if (Objects.equals(key, node.getKey())) {
-                    return node.getValue();
-                }
-                node = node.getNext();
+        int index = getPositionInTable(key);
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (Objects.equals(key, node.getKey())) {
+                return node.getValue();
             }
+            node = node.getNext();
         }
         return null;
     }
@@ -74,7 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] pastTable = table;
-        int newCapacity = pastTable.length * 2;
+        int newCapacity = pastTable.length << 1;
         table = new Node[newCapacity];
         size = 0;
 
