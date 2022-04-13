@@ -15,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         checkSize();
-        int index = indexBacket(key);
+        int index = getBucketIndex(key);
         if (table[index] == null) {
             Node<K,V> newNode = new Node<>(index, key, value, null);
             table[index] = newNode;
@@ -34,17 +34,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             curentNode.value = value;
             return;
         }
-        curentNode.next = new Node<>(indexBacket(key), key, value, null);
+        curentNode.next = new Node<>(index, key, value, null);
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        int index = indexBacket(key);
+        int index = getBucketIndex(key);
         Node<K,V> current = table[index];
-        if (current == null) {
-            return null;
-        }
         while (current != null) {
             if (Objects.equals(current.key, key)) {
                 return current.value;
@@ -74,21 +71,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int indexBacket(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode() % table.length);
+    private int getBucketIndex(K key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private static class Node<K,V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K,V> next;
 
         Node(int hash, K key, V value, Node<K,V> next) {
-            this.hash = hash;
             this.key = key;
             this.value = value;
             this.next = next;
