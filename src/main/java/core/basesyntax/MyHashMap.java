@@ -4,6 +4,7 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
+    private static final int RESIZE_FACTOR = 2;
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
@@ -18,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int index = getIndexOfBucket(key);
-        Node<K, V> insertNode = newNode(key, value, null);
+        Node<K, V> insertNode = new Node<>(key, value, null);
         Node<K, V> thisNode = table[index];
         while (thisNode != null) {
             if (Objects.equals(thisNode.key, key)) {
@@ -53,10 +54,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private MyHashMap.Node<K, V> newNode(K key, V value, MyHashMap.Node<K, V> next) {
-        return new MyHashMap.Node<>(key, value, next);
-    }
-
     private int getIndexOfBucket(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
@@ -64,7 +61,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         size = 0;
         Node<K, V>[] oldTable = table;
-        table = new Node[oldTable.length * 2];
+        table = new Node[oldTable.length * RESIZE_FACTOR];
         for (Node<K, V> bin : oldTable) {
             while (bin != null) {
                 put(bin.key, bin.value);
