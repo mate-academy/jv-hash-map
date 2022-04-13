@@ -15,11 +15,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (LOAD_FACTOR * table.length == size) {
             resize();
         }
+        int hash = hash(key);
         Node<K, V> newNode = new Node<>(key, value);
-        if (table[hash(key)] == null) {
-            table[hash(key)] = newNode;
+        if (table[hash] == null) {
+            table[hash] = newNode;
         } else {
-            Node<K, V> iterator = table[hash(key)];
+            Node<K, V> iterator = table[hash];
             while (iterator != null) {
                 if (iterator.key == key || iterator.key != null
                         && iterator.key.equals(key)) {
