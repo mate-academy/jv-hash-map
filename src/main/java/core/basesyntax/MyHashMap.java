@@ -85,13 +85,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    @Override
-    public String toString() {
-        return "MyHashMap{"
-                + "nodes=" + Arrays.toString(nodes)
-                + '}';
-    }
-
     private static class Node<K, V> {
         private V value;
         private K key;
@@ -104,24 +97,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
         }
 
-        @Override
-        public String toString() {
-            return "Node{" + "value=" + value
-                    + ", key=" + key
-                    + ", hash=" + hash
-                    + ", next=" + next + '}';
-        }
-
         public V getValue() {
             return value;
         }
 
         public K getKey() {
             return key;
-        }
-
-        public int getHash() {
-            return hash;
         }
 
         @Override
