@@ -62,7 +62,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (current.getKey() == null && current.getKey() == key
                     || current.getKey() != null && current.getKey().equals(key)) {
                 return (V) current.getValue();
-
             }
             current = current.next;
         }
@@ -141,8 +140,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     put(node.getKey(), node.getValue());
                     node = node.next;
                 }
-                put
-                        (node.getKey(), node.getValue());
+                put(node.getKey(), node.getValue());
             }
         }
     }
