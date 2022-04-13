@@ -7,15 +7,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private int capacity = INITIAL_CAPACITY;
     private int threshold;
-    private Node<K, V>[] table = new Node[capacity];
+    private Node<K, V>[] table;
     private int size;
+
+    public MyHashMap() {
+        table = new Node[INITIAL_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
         if (size >= threshold) {
             resize();
         }
-        int index = getHashCode(key) % capacity;
+        int index = getHashCode(key) % table.length;
         Node<K, V> node = table[index];
         if (node == null) {
             table[index] = new Node<>(key, value, null);
@@ -35,11 +39,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (Node<K, V> node : table) {
-            for (; node != null; node = node.next) {
-                if (node.key == key || node.key != null && node.key.equals(key)) {
-                    return node.value;
-                }
+        Node<K, V> node = table[getHashCode(key) % table.length];
+        for (; node != null; node = node.next) {
+            if (node.key == key || node.key != null && node.key.equals(key)) {
+                return node.value;
             }
         }
         return null;
@@ -51,17 +54,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHashCode(K key) {
-        if (key != null) {
-            return Math.abs(key.hashCode());
-        }
-        return 0;
+        return (key == null) ? 0 : (Math.abs(key.hashCode()));
     }
 
     private void resize() {
-        capacity = capacity << 1;
-        threshold = Math.round(capacity * LOAD_FACTOR);
+        threshold = Math.round((table.length << 1) * LOAD_FACTOR);
         Node<K, V>[] table = this.table;
-        this.table = new Node[capacity];
+        this.table = new Node[(int) (threshold / LOAD_FACTOR)];
         size = 0;
         for (Node<K, V> node : table) {
             for (; node != null; node = node.next) {
