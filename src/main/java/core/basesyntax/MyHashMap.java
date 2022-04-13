@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_START_CAPASITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int RESIZE_FACTOR = 2;
     private Node<K, V>[] table;
     private float threshold;
     private int size;
@@ -18,11 +19,42 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        private Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
+            Node<K, V> node = (Node<K, V>) obj;
+            return (this == obj) || (obj != null && obj.equals(this));
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 17;
+            hash = 31 * hash + key.hashCode();
+            hash = 31 * hash + value.hashCode();
+            return hash;
+        }
+    }
+
     @Override
     public void put(K key, V value) {
         if (size >= threshold) {
             resize();
-
         }
         Node<K, V> newNode = new Node<>(key, value, null);
         int index = hash(newNode.key);
@@ -47,9 +79,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        threshold *= 2;
+        threshold *= RESIZE_FACTOR;
         Node<K, V>[] oldTable = table;
-        table = new Node[oldTable.length * 2];
+        table = new Node[oldTable.length * RESIZE_FACTOR];
         size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
@@ -77,37 +109,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
-    }
-
-    static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null || getClass() != obj.getClass()) {
-                return false;
-            }
-            Node<K, V> node = (Node<K, V>) obj;
-            return (this == obj) || (obj != null && obj.equals(this));
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 17;
-            hash = 31 * hash + key.hashCode();
-            hash = 31 * hash + value.hashCode();
-            return hash;
-        }
     }
 }
