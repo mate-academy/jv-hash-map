@@ -25,7 +25,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (Objects.equals(thisNode.key, key)) {
                 thisNode.value = value;
                 return;
-            } else if (thisNode.next == null) {
+            }
+            if (thisNode.next == null) {
                 thisNode.next = insertNode;
                 size++;
                 return;
