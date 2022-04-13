@@ -67,10 +67,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
-                if (node != null) {
                     put(node.key, node.value);
                     node = node.next;
-                }
             }
         }
     }
@@ -88,26 +86,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null || getClass() != obj.getClass()) {
-                return false;
-            }
-            Node<K, V> node = (Node<K, V>) obj;
-            return (this == obj) || (obj != null && obj.equals(this));
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 17;
-            hash = 31 * hash + key.hashCode();
-            hash = 31 * hash + value.hashCode();
-            return hash;
         }
     }
 }
