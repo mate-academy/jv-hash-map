@@ -7,7 +7,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        this.table = new Node[DEFAULT_CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -39,19 +39,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         for (Node<K, V> bucket : table) {
-            if (bucket != null) {
-                if (bucket.key == key || bucket.key != null
-                        && bucket.key.equals(key)) {
-                    return bucket.value;
-                } else if (hash(key) == hash(key)) {
-                    Node<K, V> iterator = table[hash(key)];
-                    while (iterator != null) {
-                        if (iterator.key == key || iterator.key != null
-                                && iterator.key.equals(key)) {
-                            return iterator.value;
-                        }
-                        iterator = iterator.next;
+            if (hash(key) == hash(key)) {
+                Node<K, V> iterator = table[hash(key)];
+                while (iterator != null) {
+                    if (iterator.key == key || iterator.key != null
+                            && iterator.key.equals(key)) {
+                        return iterator.value;
                     }
+                    iterator = iterator.next;
                 }
             }
         }
