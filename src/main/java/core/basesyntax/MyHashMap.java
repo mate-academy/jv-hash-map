@@ -28,48 +28,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         Node current = nodes[index];
-        while (current.next != null) {
+        while (current != null) {
             if (current.getKey() == null && current.getKey() == key
                     || current.getKey() != null && current.getKey().equals(key)) {
                 current.value = currentNode.value;
                 return;
             }
+            if (current.next == null) {
+                current.next = currentNode;
+                size++;
+                return;
+            }
             current = current.next;
         }
-        if (current.getKey() == null && current.getKey() == key
-                || current.getKey() != null && current.getKey().equals(key)) {
-            current.value = currentNode.value;
-            return;
-        }
-        current.next = currentNode;
-        size++;
     }
 
     @Override
     public V getValue(K key) {
-        int index = hash(key);
-        Node current = nodes[index];
-        if (current == null) {
-            return null;
-        }
-        if (current.next == null) {
-            if (current.getKey() == null && current.getKey() == key
-                    || current.getKey().equals(key)) {
-                return (V) current.getValue();
-            }
-        }
-        while (current.next != null) {
+        Node current = nodes[hash(key)];
+        while (current != null) {
             if (current.getKey() == null && current.getKey() == key
                     || current.getKey() != null && current.getKey().equals(key)) {
                 return (V) current.getValue();
             }
             current = current.next;
         }
-        if (current.getKey() == null && current.getKey() == key
-                || current.getKey() != null && current.getKey().equals(key)) {
-            return (V) current.getValue();
-        }
-        throw new RuntimeException("Is not exists");
+        return null;
     }
 
     @Override
@@ -136,11 +120,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 put(node.getKey(), node.getValue());
             }
             if (node.next != null) {
-                while (node.next != null) {
+                while (node != null) {
                     put(node.getKey(), node.getValue());
                     node = node.next;
                 }
-                put(node.getKey(), node.getValue());
             }
         }
     }
