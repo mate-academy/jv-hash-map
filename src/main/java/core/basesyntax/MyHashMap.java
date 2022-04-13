@@ -18,10 +18,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= myData.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
-        Node<K, V> currentNode = myData[getIndex(key)];
-        if (currentNode == null) {
-            myData[getIndex(key)] = new Node<>(key, value, null);
-        }
+        int index = getIndex(key);
+        Node<K, V> currentNode = myData[index];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 currentNode.value = value;
@@ -29,22 +27,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             if (currentNode.next == null) {
                 currentNode.next = new Node<>(key, value, null);
-                break;
+                size++;
+                return;
             }
             currentNode = currentNode.next;
         }
+        myData[index] = new Node<>(key, value, null);
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        for (Node<K,V> node : myData) {
-            while (node != null) {
-                if (Objects.equals(node.key, key)) {
-                    return node.value;
-                }
-                node = node.next;
+        int index = getIndex(key);
+        Node<K, V> node = myData[index];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return node.value;
             }
+            node = node.next;
         }
         return null;
     }
@@ -60,9 +60,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        Node<K,V>[] oldData = myData;
+        Node<K, V>[] oldData = myData;
         myData = new Node[oldData.length * RESIZE_FACTOR];
-        for (Node<K,V> node : oldData) {
+        for (Node<K, V> node : oldData) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
