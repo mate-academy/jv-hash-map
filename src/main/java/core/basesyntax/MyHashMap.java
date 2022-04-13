@@ -20,62 +20,55 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= loaded) {
             resize();
         }
-        int hash = hash(key);
-        Node<K, V> current = new Node<>(hash, key, value);
-        if (nodes[hash] == null) {
-            nodes[hash] = current;
+        int index = hash(key);
+        Node<K, V> currentNode = new Node<>(index, key, value);
+        if (nodes[index] == null) {
+            nodes[index] = currentNode;
             size++;
             return;
         }
-        Node node = nodes[hash];
-        while (nodes[hash].next != null) {
-            if (nodes[hash].getKey() == null && nodes[hash].getKey() == key
-                    || nodes[hash].getKey() != null && nodes[hash].getKey().equals(key)) {
-                nodes[hash].value = current.value;
-                nodes[hash] = node;
+        Node current = nodes[index];
+        while (current.next != null) {
+            if (current.getKey() == null && current.getKey() == key
+                    || current.getKey() != null && current.getKey().equals(key)) {
+                current.value = currentNode.value;
                 return;
             }
-            nodes[hash] = nodes[hash].next;
+            current = current.next;
         }
-        if (nodes[hash].getKey() == null && nodes[hash].getKey() == key
-                || nodes[hash].getKey() != null && nodes[hash].getKey().equals(key)) {
-            nodes[hash].value = current.value;
-            nodes[hash] = node;
+        if (current.getKey() == null && current.getKey() == key
+                || current.getKey() != null && current.getKey().equals(key)) {
+            current.value = currentNode.value;
             return;
         }
-        nodes[hash].next = current;
-        nodes[hash] = node;
+        current.next = currentNode;
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key);
-        if (nodes[hash] == null) {
+        int index = hash(key);
+        Node current = nodes[index];
+        if (current == null) {
             return null;
         }
-        if (nodes[hash].next == null) {
-            if (nodes[hash].getKey() == null && nodes[hash].getKey() == key
-                    || nodes[hash].getKey().equals(key)) {
-                return nodes[hash].getValue();
+        if (current.next == null) {
+            if (current.getKey() == null && current.getKey() == key
+                    || current.getKey().equals(key)) {
+                return (V) current.getValue();
             }
         }
-        Node node = nodes[hash];
-        V result;
-        while (nodes[hash].next != null) {
-            if (nodes[hash].getKey() == null && nodes[hash].getKey() == key
-                    || nodes[hash].getKey() != null && nodes[hash].getKey().equals(key)) {
-                result = nodes[hash].getValue();
-                nodes[hash] = node;
-                return result;
+        while (current.next != null) {
+            if (current.getKey() == null && current.getKey() == key
+                    || current.getKey() != null && current.getKey().equals(key)) {
+                return (V) current.getValue();
+
             }
-            nodes[hash] = nodes[hash].next;
+            current = current.next;
         }
-        if (nodes[hash].getKey() == null && nodes[hash].getKey() == key
-                || nodes[hash].getKey() != null && nodes[hash].getKey().equals(key)) {
-            result = nodes[hash].getValue();
-            nodes[hash] = node;
-            return result;
+        if (current.getKey() == null && current.getKey() == key
+                || current.getKey() != null && current.getKey().equals(key)) {
+            return (V) current.getValue();
         }
         throw new RuntimeException("Is not exists");
     }
@@ -117,11 +110,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return hash == node.hash && Objects.equals(value, node.value)
                     && Objects.equals(key, node.key);
         }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(value, key);
-        }
     }
 
     private final int hash(Object key) {
@@ -153,7 +141,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     put(node.getKey(), node.getValue());
                     node = node.next;
                 }
-                put(node.getKey(), node.getValue());
+                put
+                        (node.getKey(), node.getValue());
             }
         }
     }
