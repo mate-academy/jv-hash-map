@@ -5,10 +5,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private int size;
     private int threshold;
-    private Node<K, V> [] table;
+    private Node<K, V>[] table;
 
     public MyHashMap() {
-        table = new Node [DEFAULT_INITIAL_CAPACITY];
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
         threshold = (int) (DEFAULT_INITIAL_CAPACITY * LOAD_FACTOR);
     }
 
@@ -27,7 +27,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                         && currentStoredInBucketNode.key.equals(key)) {
                     currentStoredInBucketNode.value = value;
                     return;
-                } else if (currentStoredInBucketNode.next == null) {
+                }
+                if (currentStoredInBucketNode.next == null) {
                     currentStoredInBucketNode.next = new Node(key, value, null);
                     break;
                 }
@@ -75,7 +76,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    class Node<K, V> {
+    private class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
