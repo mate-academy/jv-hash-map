@@ -3,9 +3,9 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int INITIAL_CAPACITY = 1 << 4;
-    static final double LOAD_FACTOR = 0.75;
-    static final int RESIZE_MULTIPLAYER = 2;
+    private static final int INITIAL_CAPACITY = 1 << 4;
+    private static final double LOAD_FACTOR = 0.75;
+    private static final int RESIZE_MULTIPLAYER = 2;
     private int size;
     private Node<K, V>[] table;
 
@@ -15,13 +15,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (getSize() >= table.length * LOAD_FACTOR) {
+        if (size >= table.length * LOAD_FACTOR) {
             resize();
         }
-        int indexOfBacked = getIndexOfBacked(key);
-        Node<K, V> currentNode = table[indexOfBacked];
+        int indexOfBucked = getIndexOfBucked(key);
+        Node<K, V> currentNode = table[indexOfBucked];
         if (currentNode == null) {
-            table[indexOfBacked] = new Node<>(key, value, null);
+            table[indexOfBucked] = new Node<>(key, value, null);
         }
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
@@ -39,9 +39,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        Node<K, V>[] oldTab = table;
-        table = new Node[oldTab.length * RESIZE_MULTIPLAYER];
-        for (Node<K, V> node : oldTab) {
+        Node<K, V>[] oldTable = table;
+        table = new Node[oldTable.length * RESIZE_MULTIPLAYER];
+        for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
@@ -51,14 +51,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (Node<K, V> node : table) {
+        int indexOfBucked = getIndexOfBucked(key);
+        Node<K, V> node = table[indexOfBucked];
             while (node != null) {
                 if (Objects.equals(node.key, key)) {
                     return node.value;
                 }
                 node = node.next;
             }
-        }
         return null;
     }
 
@@ -67,8 +67,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getIndexOfBacked(K key) {
-        return key == null ? 0 : Math.abs(Objects.hashCode(key)) % table.length;
+    private int getIndexOfBucked(K key) {
+        return Math.abs(Objects.hashCode(key)) % table.length;
     }
 
     private static class Node<K,V> {
