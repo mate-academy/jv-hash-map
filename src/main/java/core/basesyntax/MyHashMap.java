@@ -38,17 +38,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (Node<K, V> bucket : table) {
-            if (hash(key) == hash(key)) {
-                Node<K, V> iterator = table[hash(key)];
-                while (iterator != null) {
-                    if (iterator.key == key || iterator.key != null
-                            && iterator.key.equals(key)) {
-                        return iterator.value;
-                    }
-                    iterator = iterator.next;
-                }
+        Node<K, V> iterator = table[hash(key)];
+        while (iterator != null) {
+            if (iterator.key == key || iterator.key != null
+                    && iterator.key.equals(key)) {
+                return iterator.value;
             }
+            iterator = iterator.next;
         }
         return null;
     }
