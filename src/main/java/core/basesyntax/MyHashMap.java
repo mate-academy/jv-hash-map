@@ -113,13 +113,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         nodes = new Node[nodesCopy.length];
         size = 0;
         for (Node<K, V> node : nodesCopy) {
-            if (node == null) {
-                continue;
-            }
-            if (node != null && node.next == null) {
-                put(node.getKey(), node.getValue());
-            }
-            if (node.next != null) {
+            if (node != null) {
                 while (node != null) {
                     put(node.getKey(), node.getValue());
                     node = node.next;
