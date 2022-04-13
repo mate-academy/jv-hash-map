@@ -6,18 +6,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private int size;
-    private Node<K, V>[] keysValue;
+    private Node<K, V>[] keyValueStorage;
 
     public MyHashMap() {
-        keysValue = new Node[CAPACITY];
+        keyValueStorage = new Node[CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        chekSize();
-        Node<K, V> myNode = keysValue[index(key)];
+        checkSize();
+        Node<K, V> myNode = keyValueStorage[getIndex(key)];
         if (myNode == null) {
-            keysValue[index(key)] = new Node(null, key, value);
+            keyValueStorage[getIndex(key)] = new Node(null, key, value);
             size++;
             return;
         }
@@ -37,7 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> myNode = keysValue[index(key)];
+        Node<K, V> myNode = keyValueStorage[getIndex(key)];
         while (myNode != null) {
             if (Objects.equals(myNode.key, key)) {
                 return myNode.value;
@@ -52,11 +52,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void chekSize() {
-        if (size >= keysValue.length * LOAD_FACTOR) {
-            Node<K, V>[] newKeysValue = new Node[keysValue.length * 2];
-            Node<K, V>[] oldKeysValue = keysValue;
-            keysValue = newKeysValue;
+    private void checkSize() {
+        if (size >= keyValueStorage.length * LOAD_FACTOR) {
+            Node<K, V>[] newKeysValue = new Node[keyValueStorage.length * 2];
+            Node<K, V>[] oldKeysValue = keyValueStorage;
+            keyValueStorage = newKeysValue;
             size = 0;
             for (Node<K, V> myNode : oldKeysValue) {
                 while (myNode != null) {
@@ -67,12 +67,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int index(K key) {
-        int index = 0;
-        if (key != null) {
-            index = Math.abs(key.hashCode() % keysValue.length);
-        }
-        return index;
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % keyValueStorage.length);
     }
 
     private static class Node<K, V> {
