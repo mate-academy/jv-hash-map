@@ -5,7 +5,6 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int MULTIPLY = 2;
     private Node<K, V>[] table;
     private int size;
 
@@ -15,23 +14,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if (size == table.length * LOAD_FACTOR) {
+            resize();
+        }
         Node<K, V> newNode = new Node<>(key, value, null);
         int index = getIndex(key);
         if (table[index] == null) {
             table[index] = newNode;
             size++;
-            resize();
         } else {
             Node<K, V> currentNode = table[index];
             for (int i = 0; i < size; i++) {
-                if (currentNode.equals(newNode)) {
+                if (Objects.equals(currentNode.key, newNode.key)) {
                     currentNode.value = newNode.value;
                     return;
                 }
                 if (currentNode.next == null) {
                     currentNode.next = newNode;
                     size++;
-                    resize();
                     return;
                 }
                 currentNode = currentNode.next;
@@ -67,40 +67,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            }
-            if (o == null || o.getClass() != getClass()) {
-                return false;
-            }
-            Node<K, V> currentNode = (Node) o;
-            return key == currentNode.key || key != null && key.equals(currentNode.key);
-        }
-    }
-
-    private int hash(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode());
     }
 
     private int getIndex(K key) {
-        return (key == null) ? 0 : hash(key) % table.length;
+        return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private Node<K, V>[] resize() {
         final Node<K, V>[] oldTable = table;
         int oldCapacity = table.length;
-        int oldThreshold = (int) (oldCapacity * LOAD_FACTOR);
-        if (size == oldThreshold) {
-            int newCapacity = oldCapacity * MULTIPLY;
-            table = new Node[newCapacity];
-            size = 0;
-            transfer(oldTable);
-        } else {
-            return oldTable;
-        }
+        int newCapacity = oldCapacity * 2;
+        table = new Node[newCapacity];
+        size = 0;
+        transfer(oldTable);
         return table;
     }
 
