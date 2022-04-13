@@ -10,6 +10,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private float threshold;
     private int size;
 
+    public MyHashMap() {
+        table = new Node[DEFAULT_START_CAPASITY];
+        threshold = table.length * DEFAULT_LOAD_FACTOR;
+    }
+
     @Override
     public void put(K key, V value) {
         if (size >= threshold) {
@@ -53,11 +58,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
-    }
-
-    public MyHashMap() {
-        table = new Node[DEFAULT_START_CAPASITY];
-        threshold = table.length * DEFAULT_LOAD_FACTOR;
     }
 
     private void resize() {
