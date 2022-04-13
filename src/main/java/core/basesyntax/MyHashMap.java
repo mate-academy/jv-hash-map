@@ -1,8 +1,8 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static double LOAD_FACTOR = 0.75;
-    private static int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final double LOAD_FACTOR = 0.75;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private int size;
     private int threshold;
     private Node<K, V> [] table;
@@ -21,19 +21,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[index] == null) {
             table[index] = new Node<K,V>(key, value, null);
         } else {
-            Node<K,V> currentNode = table[index];
-            while (currentNode != null) {
-                if (currentNode.key == key || currentNode.key != null
-                        && currentNode.key.equals(key)) {
-                    currentNode.value = value;
+            Node<K,V> currentStoredInBucketNode = table[index];
+            while (currentStoredInBucketNode != null) {
+                if (currentStoredInBucketNode.key == key || currentStoredInBucketNode.key != null
+                        && currentStoredInBucketNode.key.equals(key)) {
+                    currentStoredInBucketNode.value = value;
                     return;
-                } else if (currentNode.next == null) {
-                    currentNode.next = new Node(key, value, null);
+                } else if (currentStoredInBucketNode.next == null) {
+                    currentStoredInBucketNode.next = new Node(key, value, null);
                     break;
                 }
-                currentNode = currentNode.next;
+                currentStoredInBucketNode = currentStoredInBucketNode.next;
             }
-            currentNode.next = new Node<K,V>(key, value, null);
+            currentStoredInBucketNode.next = new Node<K,V>(key, value, null);
         }
         size++;
     }
@@ -41,13 +41,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = calculateIndex(key);
-        Node<K,V> currentNode = table[index];
-        while (currentNode != null) {
-            if (currentNode.key == key || currentNode.key != null
-                    && currentNode.key.equals(key)) {
-                return currentNode.value;
+        Node<K,V> storedInBucketNode = table[index];
+        while (storedInBucketNode != null) {
+            if (storedInBucketNode.key == key || storedInBucketNode.key != null
+                    && storedInBucketNode.key.equals(key)) {
+                return storedInBucketNode.value;
             }
-            currentNode = currentNode.next;
+            storedInBucketNode = storedInBucketNode.next;
         }
         return null;
     }
