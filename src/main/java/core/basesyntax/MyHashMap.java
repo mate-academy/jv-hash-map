@@ -1,23 +1,23 @@
 package core.basesyntax;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_NODES_LENGTH = 16;
     private static final float LOAD_FACTOR = 0.75f;
 
-    private int loaded = (int) (DEFAULT_NODES_LENGTH * LOAD_FACTOR);
+    private int threshold;
     private int size;
     private Node<K, V>[] nodes;
 
     public MyHashMap() {
         nodes = new Node[DEFAULT_NODES_LENGTH];
+        threshold = (int) (DEFAULT_NODES_LENGTH * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= loaded) {
+        if (size >= threshold) {
             resize();
         }
         int index = hash(key);
@@ -29,8 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node current = nodes[index];
         while (current != null) {
-            if (current.getKey() == null && current.getKey() == key
-                    || current.getKey() != null && current.getKey().equals(key)) {
+            if (current.key == key || current.key != null && current.key.equals(key)) {
                 current.value = currentNode.value;
                 return;
             }
@@ -47,9 +46,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         Node current = nodes[hash(key)];
         while (current != null) {
-            if (current.getKey() == null && current.getKey() == key
-                    || current.getKey() != null && current.getKey().equals(key)) {
-                return (V) current.getValue();
+            if (current.key == key || current.key != null && current.key.equals(key)) {
+                return (V) current.value;
             }
             current = current.next;
         }
@@ -96,28 +94,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private final int hash(Object key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode()) % nodes.length;
+        return key == null ? 0 : Math.abs(key.hashCode()) % nodes.length;
     }
 
     private void resize() {
-        nodes = Arrays.copyOf(nodes, nodes.length * 2);
-        loaded *= 2;
-        transfer();
-    }
-
-    private void transfer() {
-        Node<K, V>[] nodesCopy = nodes;
-        nodes = new Node[nodesCopy.length];
+        final Node<K, V>[] nodesCopy = nodes;
+        threshold *= 2;
+        nodes = new Node[nodes.length * 2];
         size = 0;
         for (Node<K, V> node : nodesCopy) {
-            if (node != null) {
-                while (node != null) {
-                    put(node.getKey(), node.getValue());
-                    node = node.next;
-                }
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
