@@ -6,6 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         System.out.println("jjj");
         System.out.println("test");
         System.out.println("test");
+        System.out.println("test");
     }
 
     @Override
