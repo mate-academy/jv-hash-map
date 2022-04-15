@@ -8,6 +8,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         System.out.println("test");
         System.out.println("test");
         System.out.println("test");
+
+        System.out.println("test");
+
     }
 
     @Override
