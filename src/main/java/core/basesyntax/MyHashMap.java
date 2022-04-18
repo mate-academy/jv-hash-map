@@ -1,17 +1,16 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final double loadFactor = 0.75;
+    private static final double LOAD_FACTOR = 0.75;
+    private static final int INITIAL_CAPACITY = 16;
     private int size;
-    private int initialCapacity = 16;
-    private Node<K, V>[] nodeArray;
+    private Node<K, V>[] nodes;
 
     public MyHashMap() {
-        nodeArray = new Node[initialCapacity];
+        nodes = new Node[INITIAL_CAPACITY];
     }
 
-    class Node<K, V> {
-        private int hash;
+    private class Node<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
@@ -20,50 +19,36 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node node = new Node();
-        if (key == null) {
-            node.hash = 0;
-        } else {
-            node.hash = Math.abs(key.hashCode()) % initialCapacity;
-        }
         node.key = key;
         node.value = value;
         node.next = null;
-        for (int i = 0; i < initialCapacity; i++) {
-            if (i == node.hash) {
-                if (nodeArray[i] == null) {
-                    nodeArray[i] = node;
-                } else {
-                    Node tempNode = nodeArray[i];
-                    Node tempNodePrev = null;
-                    while (tempNode != null) {
-                        tempNodePrev = tempNode;
-                        if (key == null && tempNode.key == null
-                                || key != null && key.equals(tempNode.key)) {
-                            tempNode.value = value;
-                            return;
-                        }
-                        tempNode = tempNode.next;
-                    }
-                    tempNodePrev.next = node;
+        int bucketIndex = findingBucketIndex(key);
+        if (nodes[bucketIndex] == null) {
+            nodes[bucketIndex] = node;
+        } else {
+            Node tempNode = nodes[bucketIndex];
+            Node tempNodePrev = null;
+            while (tempNode != null) {
+                tempNodePrev = tempNode;
+                if (key == null && tempNode.key == null
+                        || key != null && key.equals(tempNode.key)) {
+                    tempNode.value = value;
+                    return;
                 }
+                tempNode = tempNode.next;
             }
+            tempNodePrev.next = node;
         }
         size++;
-        updateCapacity();
+        resize();
     }
 
     @Override
     public V getValue(K key) {
-        for (int i = 0; i < initialCapacity; i++) {
-            Node temp = nodeArray[i];
-            while (key == null) {
-                if (key == temp.key) {
-                    return (V) temp.value;
-                }
-                temp = temp.next;
-            }
-            while (temp != null) {
-                if (key.equals(temp.key)) {
+        for (int i = 0; i < nodes.length; i++) {
+            Node temp = nodes[i];
+            while (key == null || temp != null) {
+                if (key == temp.key || key != null && key.equals(temp.key)) {
                     return (V) temp.value;
                 }
                 temp = temp.next;
@@ -77,15 +62,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public int updateCapacity() {
-        if (size == initialCapacity * loadFactor + 1) {
-            Node<K, V>[] copyNodeArray = nodeArray;
-            nodeArray = new Node[initialCapacity * 2];
-            for (int i = 0; i < copyNodeArray.length; i++) {
-                nodeArray[i] = copyNodeArray[i];
-            }
-            return initialCapacity = initialCapacity * 2;
+    public int findingBucketIndex(K key) {
+        if (key == null) {
+            return 0;
+        } else {
+            return Math.abs(key.hashCode()) % nodes.length;
         }
-        return initialCapacity;
+    }
+
+    public int resize() {
+        if (size == nodes.length * LOAD_FACTOR + 1) {
+            size = 0;
+            Node<K, V>[] copyNodeArray = nodes;
+            nodes = new Node[nodes.length * 2];
+            for (int i = 0; i < copyNodeArray.length; i++) {
+                Node<K, V> temp = copyNodeArray[i];
+                while (temp != null) {
+                    put(temp.key, temp.value);
+                    temp = temp.next;
+                }
+            }
+        }
+        return nodes.length;
     }
 }
