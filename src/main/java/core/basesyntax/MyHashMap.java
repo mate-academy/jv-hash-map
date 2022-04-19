@@ -47,7 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         for (int i = 0; i < nodes.length; i++) {
             Node temp = nodes[i];
-            while (key == null || temp != null) {
+            while (temp != null) {
                 if (key == temp.key || key != null && key.equals(temp.key)) {
                     return (V) temp.value;
                 }
@@ -62,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public int findingBucketIndex(K key) {
+    private int findingBucketIndex(K key) {
         if (key == null) {
             return 0;
         } else {
@@ -70,7 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public int resize() {
+    private void resize() {
         if (size == nodes.length * LOAD_FACTOR + 1) {
             size = 0;
             Node<K, V>[] copyNodeArray = nodes;
@@ -83,6 +83,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-        return nodes.length;
     }
 }
