@@ -5,8 +5,35 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final int DEFAULT_ARRAY_INCREASE = 2;
     private static final float LOAD_FACTORY = 0.75f;
-    private Node<K, V>[] bucketsArray;
+    private Node<K, V>[] buckets;
     private int size;
+
+    public MyHashMap() {
+        this.buckets = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+    }
+
+    @Override
+    public void put(K key, V value) {
+        resize();
+        putInBucketArray(getHash(key), key, value);
+    }
+
+    @Override
+    public V getValue(K key) {
+        Node<K, V> node = (buckets == null) ? null : buckets[getIndex(key)];
+        while (node != null) {
+            if (node.key == key || node.key != null && node.key.equals(key)) {
+                return node.value;
+            }
+            node = node.next;
+        }
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
 
     private static class Node<K, V> {
         private final int hash;
@@ -22,49 +49,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    @Override
-    public void put(K key, V value) {
-        resize();
-        putInBucketArray(getHash(key), key, value);
-    }
-
-    @Override
-    public V getValue(K key) {
-        if (size == 0) {
-            return null;
-        }
-        Node<K, V> node = bucketsArray[getIndex(getHash(key))];
-        while (node != null) {
-            if (node.key == key || node.key != null && node.key.equals(key)) {
-                return node.value;
-            }
-            node = node.next;
-        }
-        return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
-    }
-
     private void resize() {
-        int newArraySize = (bucketsArray == null) ? DEFAULT_CAPACITY : bucketsArray.length
-                * DEFAULT_ARRAY_INCREASE;
-        if (size == 0) {
-            bucketsArray = (Node<K, V>[]) new Node[newArraySize];
-            return;
-        }
-        if ((float)size / bucketsArray.length >= LOAD_FACTORY) {
-            Node<K, V>[] oldBucketsArray = bucketsArray;
-            bucketsArray = (Node<K, V>[]) new Node[newArraySize];
+        int newArraySize = buckets.length * DEFAULT_ARRAY_INCREASE;
+        if ((float)size / buckets.length >= LOAD_FACTORY) {
+            Node<K, V>[] oldBucketsArray = buckets;
+            buckets = (Node<K, V>[]) new Node[newArraySize];
             size = 0;
             for (Node<K, V> node : oldBucketsArray) {
-                if (node != null) {
-                    do {
-                        putInBucketArray(node.hash, node.key, node.value);
-                        node = node.next;
-                    } while (node != null);
+                while (node != null) {
+                    putInBucketArray(node.hash, node.key, node.value);
+                    node = node.next;
                 }
             }
         }
@@ -74,18 +68,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : Math.abs(key.hashCode());
     }
 
-    private int getIndex(int hash) {
-        return hash % bucketsArray.length;
+    private int getIndex(K key) {
+        return ((key == null) ? 0 : Math.abs(key.hashCode())) % buckets.length;
     }
 
     private void putInBucketArray(int hash, K key, V value) {
-        int index = getIndex(hash);
-        if (bucketsArray[index] == null) {
-            bucketsArray[index] = new Node<>(hash, key, value);
+        int index = getIndex(key);
+        if (buckets[index] == null) {
+            buckets[index] = new Node<>(hash, key, value);
             size++;
             return;
         }
-        Node<K, V> bucketNode = bucketsArray[index];
+        Node<K, V> bucketNode = buckets[index];
         while (bucketNode != null) {
             if (key == bucketNode.key
                     || key != null && key.equals(bucketNode.key)) {
