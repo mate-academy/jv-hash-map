@@ -1,55 +1,47 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
-    private int arraySize = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private int size = 0;
-    private Node<K, V>[] array;
+    private Node<K, V>[] table;
 
     public MyHashMap() {
-        array = new Node[arraySize];
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size == (int) (arraySize * LOAD_FACTOR)) {
+        if (size == (int) (table.length * LOAD_FACTOR)) {
             resizeArray();
         }
-        if (key == null) {
-            putNullKey(value);
-            return;
-        }
-        int index = getIndex(key);
+        int index = getIndex();
         Node<K, V> newNode = new Node<>(key, value, null);
-        if (array[index] == null) {
-            array[index] = newNode;
-        } else {
-            Node<K, V> previousNode = null;
-            Node<K, V> currentNode = array[index];
-            while (currentNode != null) {
-                if (currentNode.key.equals(key)) {
-                    currentNode.value = value;
-                    return;
-                }
-                previousNode = currentNode;
-                currentNode = currentNode.next;
+        Node<K, V> nodeByIndex = table[index];
+        while (nodeByIndex != null) {
+            if (Objects.equals(key, nodeByIndex.key)) {
+                nodeByIndex.value = value;
+                return;
             }
-            if (previousNode != null) {
-                previousNode.next = newNode;
+            if (nodeByIndex.next == null) {
+                nodeByIndex.next = newNode;
+                size++;
+                return;
             }
+            nodeByIndex = nodeByIndex.next;
         }
+        table[index] = newNode;
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
-            return array[0].value;
-        }
-        int index = getIndex(key);
-        Node<K, V> newNode = array[index];
+        int index = getIndex();
+        Node<K, V> newNode = table[index];
         while (newNode != null) {
-            if (newNode.key.equals(key)) {
+            if (Objects.equals(key, newNode.key)) {
                 return newNode.value;
             }
             newNode = newNode.next;
@@ -62,42 +54,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getIndex(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return hashCode() % arraySize;
+    private int getIndex() {
+        return hashCode() % table.length;
     }
 
     private void resizeArray() {
-        arraySize = arraySize * 2;
+        int arraySize = table.length * 2;
         Node<K, V>[] newArray = new Node[arraySize];
         transfer(newArray);
-        array = newArray;
+        table = newArray;
     }
 
     private void transfer(Node<K, V>[] newArray) {
-        for (int i = 0; i < array.length; i++) {
-            Node<K, V> node = array[i];
-            if (node != null) {
-                array[i] = null;
-                do {
-                    Node<K, V> next = node.next;
-                    int index = getIndex(node.key);
-                    node.next = newArray[index];
-                    newArray[index] = node;
-                    node = next;
-                } while (node != null);
+        for (int i = 0; i < table.length;i++) {
+            Node<K, V> node = table[i];
+            table[i] = null;
+            while (node != null) {
+                Node<K, V> next = node.next;
+                int index = hashCode() % newArray.length;
+                node.next = newArray[index];
+                newArray[index] = node;
+                node = next;
             }
-        }
-    }
-
-    private void putNullKey(V value) {
-        if (array[0] == null) {
-            array[0] = new Node<>(null, value, null);
-            size++;
-        } else {
-            array[0].value = value;
         }
     }
 
@@ -114,24 +92,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         @Override
         public int hashCode() {
-            int prime = 17;
-            if (key != null) {
-                prime = prime * key.hashCode() * value.hashCode();
-                return prime;
-            }
-            return 0;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || !this.getClass().getName().equals(o.getClass().getName())) {
-                return false;
-            }
-            Node<K, V> e = (Node<K, V>) o;
-            return this.key == e.key;
+            return key != null ? 9 * key.hashCode() * value.hashCode() : 0;
         }
     }
 }
