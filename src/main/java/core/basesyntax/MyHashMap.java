@@ -92,16 +92,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table = new Node[table.length << 1];
             for (Node<K, V> oldNode : oldTable) {
                 while (oldNode != null) {
+                    Node<K, V> nodeToPut = new Node<>(
+                            oldNode.hash, oldNode.key, oldNode.value, null);
                     int newIndex = index(oldNode.hash);
                     Node<K, V> newNode = table[newIndex];
                     if (newNode == null) {
-                        table[newIndex] = new Node<>(
-                                oldNode.hash, oldNode.key, oldNode.value, null);
+                        table[newIndex] = nodeToPut;
                     } else {
                         do {
                             if (newNode.next == null) {
-                                newNode.next = new Node<>(
-                                        oldNode.hash, oldNode.key, oldNode.value, null);
+                                newNode.next = nodeToPut;
                                 break;
                             }
                             newNode = newNode.next;
