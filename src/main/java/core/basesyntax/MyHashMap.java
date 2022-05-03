@@ -44,8 +44,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void checkCapacity() {
-        if (size == (int) (nodeList.length * DEFAULT_LOAD_FACTOR))
+        if (size == (int) (nodeList.length * DEFAULT_LOAD_FACTOR)) {
             resize();
+        }
     }
 
     private int getIndex(K key) {
@@ -79,7 +80,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         size++;
     }
-
 
     private int hash(Object key) {
         return key == null ? 0 : Math.abs(key.hashCode());
