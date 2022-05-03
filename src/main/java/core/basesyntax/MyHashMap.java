@@ -7,6 +7,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private Node<K, V>[] nodeList;
 
+    public MyHashMap() {
+        nodeList = new Node[DEFAULT_INITIAL_CAPACITY];
+    }
+
     @Override
     public void put(K key, V value) {
         checkCapacity();
@@ -24,7 +28,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if ((key != null
                     && hash(tempNode.key) == hash(key)
                     && key.equals(tempNode.key))
-                    || (key == null && tempNode.key == null)) {
+                    || (key == tempNode.key)) {
                 return tempNode.item;
             }
             if (tempNode.next != null) {
@@ -40,12 +44,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void checkCapacity() {
-        if (size == 0) {
-            nodeList = new Node[DEFAULT_INITIAL_CAPACITY];
-        }
-        if (size == (int) (nodeList.length * DEFAULT_LOAD_FACTOR)) {
+        if (size == (int) (nodeList.length * DEFAULT_LOAD_FACTOR))
             resize();
-        }
     }
 
     private int getIndex(K key) {
@@ -80,17 +80,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private static class Node<K, V> {
-        private final K key;
-        private V item;
-        private Node<K, V> next;
-
-        Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.item = value;
-            this.next = next;
-        }
-    }
 
     private int hash(Object key) {
         return key == null ? 0 : Math.abs(key.hashCode());
@@ -106,6 +95,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 putValue(tempNode.key, tempNode.item);
                 tempNode = tempNode.next;
             }
+        }
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V item;
+        private Node<K, V> next;
+
+        Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.item = value;
+            this.next = next;
         }
     }
 }
