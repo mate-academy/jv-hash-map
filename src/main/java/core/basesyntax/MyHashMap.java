@@ -44,17 +44,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (Node<K, V> currentNode : table) {
-            if (currentNode != null) {
-                do {
-                    if (checkKey(key, currentNode)) {
-                        return currentNode.value;
-                    }
-                    currentNode = currentNode.next;
-                } while (currentNode != null);
-            }
+        Node<K, V> currentNode = table[getIndex(hash(key))];
+        if (currentNode != null) {
+            do {
+                if (checkKey(key, currentNode)) {
+                    return currentNode.value;
+                }
+                currentNode = currentNode.next;
+            } while (currentNode != null);
         }
-
         return null;
     }
 
