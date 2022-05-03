@@ -113,7 +113,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private boolean keyCheck(K key, Node<K, V> node) {
+    private boolean checkKey(K key, Node<K, V> node) {
         return hash(key) == node.hash && Objects.equals(key, node.key);
     }
 }
