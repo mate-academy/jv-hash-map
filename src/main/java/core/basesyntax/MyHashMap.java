@@ -15,31 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> newNode = new Node<>(hash(key), key, value, null);
-        int index = getIndex(hash(key));
-        Node<K, V> currentNode = table[index];
-        int threshold = (int) (table.length * LOAD_FACTOR);
-        if (currentNode == null) {
-            table[index] = newNode;
-            if (++size > threshold) {
-                resize();
-            }
-            return;
-        }
-        do {
-            if (checkKey(key, currentNode)) {
-                currentNode.value = value;
-                return;
-            }
-            if (currentNode.next == null) {
-                currentNode.next = newNode;
-                if (++size > threshold) {
-                    resize();
-                }
-                return;
-            }
-            currentNode = currentNode.next;
-        } while (currentNode != null);
+        putValue(key, value, true);
     }
 
     @Override
@@ -90,21 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table = new Node[table.length << 1];
             for (Node<K, V> oldNode : oldTable) {
                 while (oldNode != null) {
-                    Node<K, V> nodeToPut = new Node<>(
-                            oldNode.hash, oldNode.key, oldNode.value, null);
-                    int newIndex = getIndex(oldNode.hash);
-                    Node<K, V> newNode = table[newIndex];
-                    if (newNode == null) {
-                        table[newIndex] = nodeToPut;
-                    } else {
-                        do {
-                            if (newNode.next == null) {
-                                newNode.next = nodeToPut;
-                                break;
-                            }
-                            newNode = newNode.next;
-                        } while (newNode != null);
-                    }
+                    putValue(oldNode.key, oldNode.value, false);
                     oldNode = oldNode.next;
                 }
             }
@@ -113,5 +75,33 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private boolean checkKey(K key, Node<K, V> node) {
         return hash(key) == node.hash && Objects.equals(key, node.key);
+    }
+
+    private void putValue(K key, V value, boolean isCheckSizeAndKey) {
+        Node<K, V> newNode = new Node<>(hash(key), key, value, null);
+        int index = getIndex(hash(key));
+        Node<K, V> currentNode = table[index];
+        if (currentNode == null) {
+            table[index] = newNode;
+        } else {
+            do {
+                if (isCheckSizeAndKey) {
+                    if (checkKey(key, currentNode)) {
+                        currentNode.value = value;
+                        return;
+                    }
+                }
+                if (currentNode.next == null) {
+                    currentNode.next = newNode;
+                    break;
+                }
+                currentNode = currentNode.next;
+            } while (currentNode != null);
+        }
+        if (isCheckSizeAndKey) {
+            if (++size > table.length * LOAD_FACTOR) {
+                resize();
+            }
+        }
     }
 }
