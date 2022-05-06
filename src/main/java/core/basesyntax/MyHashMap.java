@@ -47,9 +47,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int hash = hash(key);
-        if (key == null) {
-            return table[0].value;
-        }
         Node<K,V> current = table[hash];
         while (current != null) {
             if (current.key == key || current.key != null && current.key.equals(key)) {
