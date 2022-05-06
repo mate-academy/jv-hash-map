@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int INCREASE = 2;
+    private static final int INCREASE_COEFFICIENT = 2;
     private int capacity = 16;
     private int size;
     private Node<K, V>[] table;
