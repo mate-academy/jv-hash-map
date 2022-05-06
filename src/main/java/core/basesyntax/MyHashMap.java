@@ -25,15 +25,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        if (table[hash] != null) {
             Node<K, V> current = table[hash];
             Node<K, V> tmp = null;
-            if (hash == 0 && current.key != null && node.key == null) {
-                node.next = current;
-                table[hash] = node;
-                size++;
-                return;
-            }
             while (current != null) {
                 if (current.key == node.key
                         || current.key != null && current.key.equals(node.key)) {
