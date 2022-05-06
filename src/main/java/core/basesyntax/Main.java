@@ -3,7 +3,6 @@ package core.basesyntax;
 public class Main {
 
     public static void main(String[] args) {
-
         MyHashMap<Integer, Integer> map = new MyHashMap<>();
         map.put(1, 1);
         map.put(null, 99);

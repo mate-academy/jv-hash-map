@@ -12,43 +12,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (key == null) {
-            putForNullKey(value);
-            return;
-        }
-        int hash = index(key);
-        MyNode<K, V> newEntry = new MyNode<>(hash, key, value, null);
+        int hash = getIndex(key);
+        MyNode<K, V> node = new MyNode<>(hash, key, value, null);
         if (table[hash] == null) {
-            table[hash] = newEntry;
+            table[hash] = node;
             size++;
         } else {
             MyNode<K, V> current = table[hash];
             MyNode<K, V> previous = null;
             while (current != null) {
-                if (current.key == key) {
-                    current.value = newEntry.value;
+                if ((current.key == null && key == null) || (current.key != null && current.key.equals(key))) {
+                    current.value = node.value;
                     return;
                 }
                 previous = current;
                 current = current.next;
             }
-            previous.next = newEntry;
-            size++;
-        }
-    }
-
-    private void putForNullKey(V value) {
-        MyNode<K, V> node = null;
-        try {
-            node = table[0];
-        } catch (NullPointerException ex) {
-            throw new NullPointerException();
-        }
-        if (node != null && node.getKey() == null) {
-            node.setValue(value);
-        } else {
-            MyNode<K, V> eNew = new MyNode<>(0, null, value, null);
-            table[0] = eNew;
+            previous.next = node;
             size++;
         }
     }
@@ -56,7 +36,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         V value = null;
-        int hash = index(key);
+        int hash = getIndex(key);
         if (hash == 0) {
             value = table[0].getValue();
         } else {
@@ -77,7 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int index(K key) {
+    private int getIndex(K key) {
         return (key == null) ? 0 : key.hashCode() % capacity;
     }
 
