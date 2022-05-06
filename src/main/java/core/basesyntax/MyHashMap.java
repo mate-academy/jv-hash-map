@@ -1,12 +1,12 @@
 package core.basesyntax;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final float LOAD_FACTOR = 0.75f;
+    private static final int INCREASE = 2;
     private int capacity = 16;
     private int size;
-    private final float loadFactor = 0.75f;
     private Node<K, V>[] table;
 
     public MyHashMap() {
@@ -15,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size > capacity * loadFactor) {
+        if (size > capacity * LOAD_FACTOR) {
             resize();
         }
         int hash = hash(key);
@@ -28,7 +28,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[hash] != null) {
             Node<K, V> current = table[hash];
             Node<K, V> tmp = null;
-            if (hash == 0 && current.key != null) {
+            if (hash == 0 && current.key != null && node.key == null) {
                 node.next = current;
                 table[hash] = node;
                 size++;
@@ -83,7 +83,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K,V>[] currentTable = table;
-        table = new Node[capacity * 2];
+        table = new Node[capacity * INCREASE];
         size = 0;
         Node<K, V> current;
         for (int i = 0; i < capacity; i++) {
@@ -93,7 +93,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 current = current.next;
             }
         }
-        capacity = capacity * 2;
+        capacity = capacity * INCREASE;
     }
 
     private static class Node<K, V> {
@@ -105,32 +105,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        @Override
-        public String toString() {
-            return "key="
-                    + key
-                    + ", "
-                    + " value=" + value;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o.getClass() == this.getClass())
-                    && o.hashCode() != this.hashCode()) {
-                return false;
-            }
-            Node<?, ?> node = (Node<?, ?>) o;
-            return key.equals(node.key);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(key);
         }
     }
 }
