@@ -18,12 +18,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (threshold == size) {
             resize();
         }
-        int hash = getIndex(key);
-        MyNode<K, V> node = new MyNode<>(hash, key, value, null);
-        if (table[hash] == null) {
-            table[hash] = node;
+        int index = getIndex(key);
+        MyNode<K, V> node = new MyNode<>(index, key, value, null);
+        if (table[index] == null) {
+            table[index] = node;
         } else {
-            MyNode<K, V> current = table[hash];
+            MyNode<K, V> current = table[index];
             while (current != null) {
                 if ((current.key == null && key == null)
                         || (current.key != null && current.key.equals(key))) {
