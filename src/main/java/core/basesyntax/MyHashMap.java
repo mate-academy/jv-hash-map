@@ -30,30 +30,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         checkForResize();
         Node<K, V> newNode = new Node<>(key, value);
-        if (array[newNode.hash % array.length] == null) {
-            array[newNode.hash % array.length] = newNode;
+        int currentBucketNumber = newNode.hash % array.length;
+        if (array[currentBucketNumber] == null) {
+            array[currentBucketNumber] = newNode;
             size++;
         } else {
-            Node<K, V> currentBucket = array[newNode.hash % array.length];
-            if (Objects.equals(currentBucket.key, newNode.key)) {
-                Node<K, V> nextNode = array[newNode.hash % array.length].next;
-                array[newNode.hash % array.length] = newNode;
-                newNode.next = nextNode;
-            } else {
-                boolean sameKeyWasFound = false;
-                while (currentBucket.next != null) {
-                    if (Objects.equals(currentBucket.next.key, newNode.key)) {
-                        newNode.next = currentBucket.next.next;
-                        currentBucket.next = newNode;
-                        sameKeyWasFound = true;
-                        break;
-                    }
-                    currentBucket = currentBucket.next;
+            Node<K, V> currentBucketNode = array[currentBucketNumber];
+            while (currentBucketNode != null) {
+                if (Objects.equals(currentBucketNode.key, newNode.key)) {
+                    Node<K, V> nextNode = currentBucketNode.next;
+                    currentBucketNode = newNode;
+                    newNode.next = nextNode;
+                    break;
                 }
-                if (!sameKeyWasFound) {
-                    currentBucket.next = newNode;
+                if (currentBucketNode.next == null) {
+                    currentBucketNode.next = newNode;
                     size++;
+                    break;
                 }
+                currentBucketNode = currentBucketNode.next;
             }
         }
     }
