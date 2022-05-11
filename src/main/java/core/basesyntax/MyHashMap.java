@@ -36,25 +36,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             Node<K, V> currentBucketNode = array[currentBucketNumber];
-            if (Objects.equals(currentBucketNode.key, newNode.key)) {
-                Node<K, V> nextNode = array[currentBucketNumber].next;
-                array[currentBucketNumber] = newNode;
-                newNode.next = nextNode;
-            } else {
-                boolean sameKeyWasFound = false;
-                while (currentBucketNode.next != null) {
-                    if (Objects.equals(currentBucketNode.next.key, newNode.key)) {
-                        newNode.next = currentBucketNode.next.next;
-                        currentBucketNode.next = newNode;
-                        sameKeyWasFound = true;
-                        break;
-                    }
-                    currentBucketNode = currentBucketNode.next;
+            while (currentBucketNode != null) {
+                if (Objects.equals(currentBucketNode.key, newNode.key)) {
+                    Node<K, V> nextNode = currentBucketNode.next;
+                    currentBucketNode = newNode;
+                    newNode.next = nextNode;
+                    break;
                 }
-                if (!sameKeyWasFound) {
+                if (currentBucketNode.next == null) {
                     currentBucketNode.next = newNode;
                     size++;
+                    break;
                 }
+                currentBucketNode = currentBucketNode.next;
             }
         }
     }
