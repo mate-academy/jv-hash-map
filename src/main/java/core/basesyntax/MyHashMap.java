@@ -1,16 +1,16 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private final int INITIAL_CAPACITY = 16;
-    private final float LOAD_FACTOR = 0.75f;
+    private static final int INITIAL_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75f;
     private final int toResize = 2;
     private int size;
     private Node<K, V>[] myHashMapArray;
 
     private class Node<K,V> {
-        final K key;
-        V value;
-        Node<K,V> next;
+        private final K key;
+        private V value;
+        private Node<K,V> next;
 
         Node(K key, V value, Node<K,V> next) {
             this.key = key;
@@ -18,9 +18,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
         }
 
-        public final V getValue()      { return value; }
+        public final V getValue() {
+            return value;
+        }
 
-        public final String toString() { return key + "=" + value; }
+        public final String toString() {
+            return key + "=" + value;
+        }
     }
 
     private int getBucketInHashMap(K key) {
@@ -38,12 +42,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int position = getBucketInHashMap(key);
         Node<K, V> maybe = myHashMapArray[position];
-        while(maybe != null){
+        while (maybe != null) {
             if ((key == null && maybe.key == null)
-                || (key != null
-                && hashOfKey(maybe.key) == hashOfKey(key)
-                && key.equals(maybe.key))){
-                    return maybe.value;
+                    || (key != null && hashOfKey(maybe.key) == hashOfKey(key)
+                    && key.equals(maybe.key))) {
+                return maybe.value;
             }
             maybe = maybe.next;
         }
@@ -61,8 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node bucketToPutIn = myHashMapArray[position];
             while (bucketToPutIn != null) {
-                if ((bucketToPutIn.key == null && newNode.key == null)
-                    || (newNode.key != null
+                if ((bucketToPutIn.key == null && newNode.key == null) || (newNode.key != null
                         && hashOfKey(newNode.key) == hashOfKey(bucketToPutIn.key)
                         && newNode.key.equals(bucketToPutIn.key))) {
                     bucketToPutIn.value = newNode.value;
@@ -92,7 +94,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         myHashMapArray = new Node[oldHashMap.length * toResize];
         size = 0;
         for (Node<K,V> node : oldHashMap) {
-            while(node != null) {
+            while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
             }
