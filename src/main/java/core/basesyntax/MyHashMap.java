@@ -80,7 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHash(K key) {
-        int hash = (key == null ? 0 : key.hashCode() < 0 ? key.hashCode() * -1 : key.hashCode());
+        int hash = key == null ? 0 : Math.abs(key.hashCode());
         return hash;
     }
 }
