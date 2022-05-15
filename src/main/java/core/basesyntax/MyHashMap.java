@@ -1,11 +1,12 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private int size;
+    private static final float LOAD_FACTOR = 0.75f;
+    private static final int GROWTH_COEFFICIENT = 2;
     private int capacity = 16;
-    private int threshold = (int) (capacity * 0.75);
-    Node<K, V>[] table = new Node[capacity];
-
+    private int threshold = (int) (capacity * LOAD_FACTOR);
+    private int size;
+    private Node<K, V>[] table = new Node[capacity];
 
     private static class Node<K, T> {
         private K key;
@@ -19,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int calculatePosition (K key) {
+    private int findIndex(K key) {
         if (key == null) {
             return 0;
         } else if (key.hashCode() % capacity >= 0) {
@@ -30,16 +31,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-    threshold = (int) (threshold * 2);
-    size = 0;
-    Node<K, V>[] oldTable = table;
-    table = new Node[oldTable.length * 2];
-    for (Node<K, V> node : oldTable) {
-        while (node != null) {
-            put(node.key, node.value);
-            node = node.next;
+        threshold = (int) (threshold * GROWTH_COEFFICIENT);
+        size = 0;
+        Node<K, V>[] oldTable = table;
+        table = new Node[oldTable.length * GROWTH_COEFFICIENT];
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
         }
-    }
     }
 
     @Override
@@ -48,46 +49,43 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
 
-        int index = calculatePosition(key);
+        int index = findIndex(key);
         Node<K, V> newNode = new Node<>(key, value, null);
         if (table[index] == null) {
             table[index] = newNode;
-            size++;
-            return;
-        }
-        Node<K, V> currentNode = table[index];
-        Node previousNode = null;
-        while (currentNode != null) {
-            if (key == null) {
-                if (key == currentNode.key) {
-                    currentNode.value = value;
-                    return;
+        } else {
+            Node<K, V> currentNode = table[index];
+            Node previousNode = null;
+            while (currentNode != null) {
+                if (key == null) {
+                    if (key == currentNode.key) {
+                        currentNode.value = value;
+                        return;
+                    }
+                } else {
+                    if (key.equals(currentNode.key)) {
+                        currentNode.value = value;
+                        return;
+                    }
                 }
+                previousNode = currentNode;
+                currentNode = currentNode.next;
             }
-            if (key != null) {
-                if (key.equals(currentNode.key)) {
-                    currentNode.value = value;
-                    return;
-                }
-            }
-            previousNode = currentNode;
-            currentNode = currentNode.next;
+            previousNode.next = newNode;
         }
-        previousNode.next = newNode;
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        int index = calculatePosition(key);
+        int index = findIndex(key);
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
             if (key == null) {
                 if (key == currentNode.key) {
                     return currentNode.value;
                 }
-            }
-            if (key != null) {
+            } else {
                 if (key.equals(currentNode.key)) {
                     return currentNode.value;
                 }
