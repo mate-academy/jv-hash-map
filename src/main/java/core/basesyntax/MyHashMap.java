@@ -1,4 +1,6 @@
 package core.basesyntax;
+import java.awt.image.Kernel;
+import java.util.HashMap;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
@@ -7,18 +9,38 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
 
     private static class Node<K, T> {
-        private Node item;
         private K key;
         private T value;
         private Node<K, T> next;
 
-        public Node(K key, T value) {
+        public Node(K key, T value, Node<K, T> next) {
             this.key = key;
             this.value = value;
+            this.next = next;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public void setKey(K key) {
+            this.key = key;
+        }
+
+        public T getValue() {
+            return value;
         }
 
         public void setValue(T value) {
             this.value = value;
+        }
+
+        public Node<K, T> getNext() {
+            return next;
+        }
+
+        public void setNext(Node<K, T> next) {
+            this.next = next;
         }
     }
 
@@ -32,45 +54,55 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-
-
     @Override
     public void put(K key, V value) {
-        int position = calculatePosition(key);
-        if (table[position] == null) {
-            table[position] = new Node<>(key, value);
-        } else {
-            Node<K, V> currentNode = table[position];
-            if (currentNode.key == null && currentNode.key == key) {
-                currentNode.setValue(value);
-                return;
-            }
-            while (currentNode.next != null || currentNode.key.equals(key)) {
-                if (currentNode.key.equals(key)) {
+        int index = calculatePosition(key);
+        Node<K, V> newNode = new Node<>(key, value, null);
+        if (table[index] == null) {
+            table[index] = newNode;
+            size++;
+            return;
+        }
+        Node<K, V> currentNode = table[index];
+        Node previousNode = null;
+        while (currentNode != null) {
+            if (key == null) {
+                if (key == currentNode.key) {
                     currentNode.setValue(value);
                     return;
                 }
-                currentNode = currentNode.next;
             }
-            currentNode.next = new Node<>(key, value);
+            if (key != null) {
+                if (key.equals(currentNode.key)) {
+                    currentNode.setValue(value);
+                    return;
+                }
+            }
+            previousNode = currentNode;
+            currentNode = currentNode.getNext();
         }
+        previousNode.setNext(newNode);
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        int position = calculatePosition(key);
-        if (table[position] == null) {
-            return null;
+        int index = calculatePosition(key);
+        Node<K, V> currentNode = table[index];
+        while (currentNode != null) {
+            if (key == null) {
+                if (key == currentNode.key) {
+                    return currentNode.value;
+                }
+            }
+            if (key != null) {
+                if (key.equals(currentNode.key)) {
+                    return currentNode.value;
+                }
+            }
+            currentNode = currentNode.getNext();
         }
-        Node<K, V> currentNode = table[position];
-        if (currentNode.key == null && currentNode.key == key) {
-            return currentNode.value;
-        }
-        while (!currentNode.key.equals(key)) {
-            currentNode = currentNode.next;
-        }
-        return currentNode.value;
+        return null;
     }
 
     @Override
