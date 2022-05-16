@@ -31,17 +31,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> currentNode = table[index];
             Node previousNode = null;
             while (currentNode != null) {
-                if (key == null) {
-                    if (key == currentNode.key) {
-                        currentNode.value = value;
-                        return;
-                    }
-                } else {
-                    if (key.equals(currentNode.key)) {
-                        currentNode.value = value;
-                        return;
-                    }
+                if (key == currentNode.key || (key != null && key.equals(currentNode.key))) {
+                    currentNode.value = value;
+                    return;
                 }
+
                 previousNode = currentNode;
                 currentNode = currentNode.next;
             }
@@ -55,14 +49,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
-            if (key == null) {
-                if (key == currentNode.key) {
-                    return currentNode.value;
-                }
-            } else {
-                if (key.equals(currentNode.key)) {
-                    return currentNode.value;
-                }
+            if (key == currentNode.key || (key != null && key.equals(currentNode.key))) {
+                return currentNode.value;
             }
             currentNode = currentNode.next;
         }
