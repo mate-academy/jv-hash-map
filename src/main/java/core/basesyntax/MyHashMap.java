@@ -14,6 +14,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
+        if (isEmpty()) {
+            return null;
+        }
         int position = getIndex(key);
         Node<K, V> node = buckets[position];
         while (node != null) {
@@ -28,7 +31,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        checkBeforePut();
+        if (buckets == null) {
+            buckets = new Node[INITIAL_CAPACITY];
+        }
+        if (size == (int) buckets.length * LOAD_FACTOR) {
+            resize();
+        }
         Node newNode = new Node(key, value, null);
         int index = getIndex(key);
         if (buckets[index] == null) {
@@ -73,20 +81,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : key.hashCode();
     }
 
-    private void checkBeforePut() {
-        if (buckets == null) {
-            buckets = new Node[INITIAL_CAPACITY];
-        }
-        if (size == (int) buckets.length * LOAD_FACTOR) {
-            resize();
-        }
-    }
-
     private void resize() {
-        Node<K,V>[] oldHashMap = buckets;
-        buckets = new Node[oldHashMap.length * GROWTH_COEFFICIENT];
+        Node<K,V>[] oldBuckets = buckets;
+        buckets = new Node[oldBuckets.length * GROWTH_COEFFICIENT];
         size = 0;
-        for (Node<K,V> node : oldHashMap) {
+        for (Node<K,V> node : oldBuckets) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
@@ -97,5 +96,4 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private boolean isEmpty() {
         return size == 0;
     }
-
 }
