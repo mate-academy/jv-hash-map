@@ -3,6 +3,7 @@ package core.basesyntax;
 import java.util.Map;
 import java.util.Objects;
 
+@SuppressWarnings("unchecked")
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
@@ -47,6 +48,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             return false;
         }
+
         public final int hashCode() {
             return (key == null ? 0 : Math.abs(key.hashCode()));
         }
