@@ -5,20 +5,81 @@ import java.util.Objects;
 
 @SuppressWarnings("unchecked")
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static int DEFAULT_CAPACITY;
-    private static float LOAD_FACTOR;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75f;
     private int threshold;
     private Entry<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        DEFAULT_CAPACITY = 16;
-        LOAD_FACTOR = 0.75f;
         threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
         table = new Entry[DEFAULT_CAPACITY];
     }
 
-    static class Entry<K, V> {
+    @Override
+    public void put(K key, V value) {
+        if (size >= threshold) {
+            resize(2 * table.length);
+        }
+        int index = getIndex(key);
+        Entry<K, V> entry = table[index];
+        if (entry == null) {
+            table[index] = new Entry<>(key, value, null);
+        }
+        for (; entry != null; entry = entry.next) {
+            if (entry.key == key || entry.key != null && entry.key.equals(key)) {
+                entry.value = value;
+                return;
+            }
+            if (entry.next == null) {
+                entry.next = new Entry<>(key, value, null);
+                break;
+            }
+        }
+        size++;
+    }
+
+    @Override
+    public V getValue(K key) {
+        for (Entry<K, V> entry = table[getIndex(key)]; entry != null; entry = entry.next) {
+            if (entry.key == key || entry.key != null && entry.key.equals(key)) {
+                return entry.value;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % DEFAULT_CAPACITY);
+    }
+
+    private void resize(int newCapacity) {
+        Entry<K, V>[] newTable = new Entry[newCapacity];
+        transfer(newTable);
+        table = newTable;
+        threshold = (int) (newCapacity * LOAD_FACTOR);
+    }
+
+    private void transfer(Entry<K, V>[] newTable) {
+        Entry<K, V>[] oldTable = table;
+        for (Entry<K, V> kvEntry : oldTable) {
+            Entry<K, V> entry = kvEntry;
+            while (entry != null) {
+                Entry<K, V> next = entry.next;
+                int i = getIndex(entry.key);
+                entry.next = newTable[i];
+                newTable[i] = entry;
+                entry = next;
+            }
+        }
+    }
+
+    private static class Entry<K, V> {
         private final K key;
         private V value;
         private Entry<K, V> next;
@@ -50,72 +111,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return Objects.equals(value1, value2);
             }
             return false;
-        }
-    }
-
-    @Override
-    public void put(K key, V value) {
-        if (size >= threshold) {
-            resize(2 * table.length);
-        }
-        int index = indexFor(key);
-        Entry<K, V> entry = table[index];
-        if (entry == null) {
-            table[index] = new Entry<>(key, value, null);
-        }
-        for (; entry != null; entry = entry.next) {
-            if (entry.key == key || entry.key != null && entry.key.equals(key)) {
-                entry.value = value;
-                return;
-            }
-            if (entry.next == null) {
-                entry.next = new Entry<>(key, value, null);
-                break;
-            }
-        }
-        size++;
-    }
-
-    @Override
-    public V getValue(K key) {
-        for (Entry<K, V> entry = table[indexFor(key)]; entry != null; entry = entry.next) {
-            if (entry.key == key || entry.key != null && entry.key.equals(key)) {
-                return entry.value;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
-    }
-
-    private int indexFor(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % DEFAULT_CAPACITY);
-    }
-
-    private void resize(int newCapacity) {
-        Entry<K, V>[] newTable = new Entry[newCapacity];
-        transfer(newTable);
-        table = newTable;
-        threshold = (int) (newCapacity * LOAD_FACTOR);
-    }
-
-    private void transfer(Entry<K, V>[] newTable) {
-        Entry<K, V>[] src = table;
-        for (int j = 0; j < src.length; j++) {
-            Entry<K, V> entry = src[j];
-            if (entry != null) {
-                src[j] = null;
-            }
-            while (entry != null) {
-                Entry<K, V> next = entry.next;
-                int i = indexFor(entry.key);
-                entry.next = newTable[i];
-                newTable[i] = entry;
-                entry = next;
-            }
         }
     }
 }
