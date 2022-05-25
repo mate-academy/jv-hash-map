@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 16;
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    static final int DEFAULT_GROW_SIZE = 2;
 
     static class Node<K,V> {
         private final K key;
@@ -15,11 +16,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%s=%s", key, value);
         }
     }
 
@@ -107,7 +103,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @SuppressWarnings("unchecked")
     private void resize() {
         size = 0;
-        capacity *= 2;
+        capacity *= DEFAULT_GROW_SIZE;
         threshold = calculateThreshold();
         Node<K, V>[] oldTable = table;
         table = new Node[capacity];
