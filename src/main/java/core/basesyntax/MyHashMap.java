@@ -7,18 +7,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     static final int DEFAULT_GROW_SIZE = 2;
 
-    static class Node<K,V> {
-        private final K key;
-        private V value;
-        private Node<K,V> next;
-
-        public Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     private int capacity;
     private int size;
     private float threshold;
@@ -143,5 +131,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             currentNode = currentNode.next;
         }
         return null;
+    }
+
+    static class Node<K,V> {
+        private final K key;
+        private V value;
+        private Node<K,V> next;
+
+        public Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
