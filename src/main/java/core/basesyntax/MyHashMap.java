@@ -9,7 +9,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int modCount;
     private int capacity;
 
-
     public MyHashMap() {
         capacity = DEFAULT_INITIAL_CAPACITY;
         modCount = (int) (capacity * DEFAULT_LOAD_FACTOR);
@@ -19,20 +18,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (isNeedResize()) {
-            resizeTable();
-        } else if (key == null) {
-            table[INDEX_NULL_KEY] = new Node<K, V>(INDEX_NULL_KEY, key, value, null);
-            size++;
-        } else {
-            int index = getHash(key) == 0 ? 1 : getHash(key);
-            putAfter(key, value, index);
-        }
+        putVal(key, value, table);
     }
 
     @Override
     public V getValue(K key) {
-        return null;
+        return findValue(key);
     }
 
     @Override
@@ -40,60 +31,71 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private V findValue(K key) {
+        if (key == null) {
+            return table[INDEX_NULL_KEY].value;
+        }
+        V value = null;
+        for (int i = 1; i < capacity; i++) {
+            for (Node<K, V> current = table[i]; current != null; current = current.next) {
+                if (current.key.equals(key)) {
+                    value = current.value;
+                }
+            }
+        }
+        return value;
+    }
+
     private void putVal(K key, V value, Node<K, V>[] node) {
         if (isNeedResize()) {
             resizeTable();
+            putAfter(key, value, table);
         } else if (key == null) {
-            node[INDEX_NULL_KEY] = new Node<K, V>(INDEX_NULL_KEY, key, value, null);
-            size++;
+            if (node[INDEX_NULL_KEY] == null) {
+                size++;
+            }
+            node[INDEX_NULL_KEY] = new Node<K, V>(key, value, null);
         } else {
-            int index = getHash(key) == 0 ? 1 : getHash(key);
-            putAfter(key, value, index);
+            putAfter(key, value, node);
         }
     }
 
-
     private void resizeTable() {
-        int nextCapacity = capacity * 2;
-        modCount = (int) (nextCapacity * DEFAULT_LOAD_FACTOR);
-        Node<K, V>[] newTable = (Node<K, V>[]) new Node[nextCapacity];
+        int oldCapacity = capacity;
+        capacity *= 2;
+        modCount = (int) (capacity * DEFAULT_LOAD_FACTOR);
+        Node<K, V>[] newTable = (Node<K, V>[]) new Node[capacity];
         int oldSize = size;
-        for (int i = 0; i < capacity; i++) {
+        for (int i = 0; i < oldCapacity; i++) {
             for (Node<K, V> current = table[i]; current != null; current = current.next) {
-                if (current != null) {
-                    put(current.key, current.value);
-                }
+                putVal(current.key, current.value, newTable);
             }
         }
         this.table = newTable;
         size = oldSize;
-        //!! Here to be continues
     }
 
     private int getHash(Object key) {
-        return key == null ? 0 : key.hashCode() % capacity;
+        int hash = key == null ? 0 : key.hashCode() % capacity;
+        hash += hash == 0 ? 1 : 0;
+        return hash < 0 ? hash * (-1) : hash;
     }
 
     private boolean isNeedResize() {
         return modCount == size;
     }
 
-    private boolean isCollision(Object key, Node<K, V> node) {
-        return getHash(key) == (node == null ? 0 : node.hash);
-    }
-
-    private boolean isEmptyBucket(K key) {
+    private boolean isEmptyBucket(K key, Node<K, V>[] node) {
         int index = getHash(key) == 0 ? 1 : getHash(key);
-        return table[index] == null;
+        return node[index] == null;
     }
 
-
-    private void putAfter(K key, V value, int index) {
-        index = getHash(key) == 0 ? 1 : getHash(key);
-        if (isEmptyBucket(key)) {
-            table[index] = new Node<K, V>(index, key, value, null);
+    private void putAfter(K key, V value, Node<K, V>[] node) {
+        int index = getHash(key) == 0 ? 1 : getHash(key);
+        if (isEmptyBucket(key, node)) {
+            node[index] = new Node<K, V>(key, value, null);
         } else {
-            Node<K, V> current = table[index];
+            Node<K, V> current = node[index];
             while (current.next != null) {
                 if (current.key.equals(key)) {
                     current.value = value;
@@ -101,20 +103,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 current = current.next;
             }
-            current.next = new Node<K, V>(getHash(key), key, value, null);
+            if (current.key.equals(key)) {
+                current.value = value;
+                return;
+            }
+            current.next = new Node<K, V>(key, value, null);
         }
         size++;
     }
 
-
     private static class Node<K, V> {
-        private final int hash;
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
