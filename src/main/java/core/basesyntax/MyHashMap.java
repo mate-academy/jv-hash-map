@@ -22,16 +22,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> node = table[bucket];
         Node<K, V> newNode;
         if (node == null) {
-            table[bucket] = new Node<>(getHash(key),key,value, null);
+            table[bucket] = new Node<>(key,value, null);
             size++;
             return;
         }
         while (node != null) {
-            if (getHash(key) == node.hash && Objects.equals(node.key, key)) {
+            if (Objects.equals(node.key, key)) {
                 node.value = value;
                 return;
             } else if (node.next == null) {
-                newNode = new Node<>(getHash(key),key,value, null);
+                newNode = new Node<>(key,value, null);
                 node.next = newNode;
                 size++;
                 return;
@@ -51,7 +51,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         while (node != null) {
-            if (getHash(key) == node.hash && Objects.equals(node.key, key)) {
+            if (Objects.equals(node.key, key)) {
                 return node.value;
             }
             node = node.next;
@@ -79,7 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> node = kvNode;
             while (node != null) {
                 Node<K, V> newNode = node;
-                int bucket = Math.abs(node.hash) % capacity;
+                int bucket = getBucket(node.key);
                 node = node.next;
                 newNode.next = null;
                 Node<K, V> current = newTable[bucket];
@@ -106,13 +106,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
