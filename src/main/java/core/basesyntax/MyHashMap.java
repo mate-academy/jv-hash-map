@@ -101,10 +101,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.abs(hash) % capacity;
     }
 
-    private int getHash(K key) {
-        return (key == null) ? 0 : key.hashCode();
-    }
-
     private static class Node<K, V> {
         private K key;
         private V value;
