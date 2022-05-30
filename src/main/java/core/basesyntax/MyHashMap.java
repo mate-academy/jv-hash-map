@@ -12,7 +12,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        size = 0;
         threshold = (int) (table.length * LOAD_FACTOR);
     }
 
@@ -88,13 +87,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K,V> next;
 
         Node(int hash, K key, V value, Node<K,V> next) {
-            this.hash = hash;
             this.key = key;
             this.value = value;
             this.next = next;
