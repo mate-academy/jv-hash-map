@@ -56,7 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void setAtList(Node<K,V> currentNode, Node<K,V> newNode) {
-        do {
+        while (true) {
             if (Objects.equals(currentNode.key, newNode.key)) {
                 currentNode.value = newNode.value;
                 return;
@@ -66,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             currentNode = currentNode.next;
-        } while (currentNode != null);
+        }
     }
 
     private void resize() {
