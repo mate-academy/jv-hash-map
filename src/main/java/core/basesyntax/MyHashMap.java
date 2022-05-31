@@ -4,40 +4,38 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 16;
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     static final int INDEX_NULL_KEY = 0;
-    private Node<K, V>[] table;
+    private Node<K, V>[] values;
     private int size;
     private int modCount;
-    private int capacity;
 
     public MyHashMap() {
-        capacity = DEFAULT_INITIAL_CAPACITY;
-        modCount = (int) (capacity * DEFAULT_LOAD_FACTOR);
-        table = (Node<K, V>[]) new Node[capacity];
+        modCount = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
+        values = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         if (isNeedResize()) {
-            resizeTable();
-            putAfter(key, value, table);
+            resizeValues();
+            putAfter(key, value, values);
         } else if (key == null) {
-            if (table[INDEX_NULL_KEY] == null) {
+            if (values[INDEX_NULL_KEY] == null) {
                 size++;
             }
-            table[INDEX_NULL_KEY] = new Node<K, V>(key, value, null);
+            values[INDEX_NULL_KEY] = new Node<K, V>(key, value, null);
         } else {
-            putAfter(key, value, table);
+            putAfter(key, value, values);
         }
     }
 
     @Override
     public V getValue(K key) {
         if (key == null) {
-            return table[INDEX_NULL_KEY].value;
+            return values[INDEX_NULL_KEY].value;
         }
         V value = null;
-        for (int i = 1; i < capacity; i++) {
-            for (Node<K, V> current = table[i]; current != null; current = current.next) {
+        for (int i = 1; i < values.length; i++) {
+            for (Node<K, V> current = values[i]; current != null; current = current.next) {
                 if (current.key.equals(key)) {
                     value = current.value;
                 }
@@ -51,14 +49,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resizeTable() {
-        Node<K, V>[] oldTable = table;
-        int oldCapacity = capacity;
-        modCount = (int) ((capacity *= 2) * DEFAULT_LOAD_FACTOR);
-        table = (Node<K, V>[]) new Node[capacity];
+    private void resizeValues() {
+        Node<K, V>[] oldValues = values;
+        modCount = (int) ((oldValues.length * 2) * DEFAULT_LOAD_FACTOR);
+        values = (Node<K, V>[]) new Node[oldValues.length * 2];
         int oldSize = size;
-        for (int i = 0; i < oldCapacity; i++) {
-            for (Node<K, V> current = oldTable[i]; current != null; current = current.next) {
+        for (int i = 0; i < oldValues.length; i++) {
+            for (Node<K, V> current = oldValues[i]; current != null; current = current.next) {
                 put(current.key, current.value);
             }
         }
@@ -66,7 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHash(Object key) {
-        int hash = key == null ? 0 : key.hashCode() % capacity;
+        int hash = key == null ? 0 : key.hashCode() % values.length;
         hash += hash == 0 ? 1 : 0;
         return hash < 0 ? hash * (-1) : hash;
     }
