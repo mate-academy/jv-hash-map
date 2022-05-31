@@ -13,25 +13,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         capacity = DEFAULT_INITIAL_CAPACITY;
         modCount = (int) (capacity * DEFAULT_LOAD_FACTOR);
         table = (Node<K, V>[]) new Node[capacity];
-        size = 0;
     }
 
     @Override
     public void put(K key, V value) {
-        putVal(key, value, table);
+        if (isNeedResize()) {
+            resizeTable();
+            putAfter(key, value, table);
+        } else if (key == null) {
+            if (table[INDEX_NULL_KEY] == null) {
+                size++;
+            }
+            table[INDEX_NULL_KEY] = new Node<K, V>(key, value, null);
+        } else {
+            putAfter(key, value, table);
+        }
     }
 
     @Override
     public V getValue(K key) {
-        return findValue(key);
-    }
-
-    @Override
-    public int getSize() {
-        return size;
-    }
-
-    private V findValue(K key) {
         if (key == null) {
             return table[INDEX_NULL_KEY].value;
         }
@@ -46,32 +46,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return value;
     }
 
-    private void putVal(K key, V value, Node<K, V>[] node) {
-        if (isNeedResize()) {
-            resizeTable();
-            putAfter(key, value, table);
-        } else if (key == null) {
-            if (node[INDEX_NULL_KEY] == null) {
-                size++;
-            }
-            node[INDEX_NULL_KEY] = new Node<K, V>(key, value, null);
-        } else {
-            putAfter(key, value, node);
-        }
+    @Override
+    public int getSize() {
+        return size;
     }
 
     private void resizeTable() {
+        Node<K, V>[] oldTable = table;
         int oldCapacity = capacity;
-        capacity *= 2;
-        modCount = (int) (capacity * DEFAULT_LOAD_FACTOR);
-        Node<K, V>[] newTable = (Node<K, V>[]) new Node[capacity];
+        modCount = (int) ((capacity *= 2) * DEFAULT_LOAD_FACTOR);
+        table = (Node<K, V>[]) new Node[capacity];
         int oldSize = size;
         for (int i = 0; i < oldCapacity; i++) {
-            for (Node<K, V> current = table[i]; current != null; current = current.next) {
-                putVal(current.key, current.value, newTable);
+            for (Node<K, V> current = oldTable[i]; current != null; current = current.next) {
+                put(current.key, current.value);
             }
         }
-        this.table = newTable;
         size = oldSize;
     }
 
