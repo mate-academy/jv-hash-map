@@ -7,7 +7,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int RESIZE_VALUE = 2;
 
     private Node<K, V> [] map;
-    private int size = 0;
+    private int size;
 
     public MyHashMap() {
         map = new Node[DEFAULT_LENGTH];
@@ -16,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value, null);
-        if (size > (map.length * LOAD_FACTOR)) {
+        if (size == (map.length * LOAD_FACTOR)) {
             resize();
         }
         int hash = getIndex(key);
