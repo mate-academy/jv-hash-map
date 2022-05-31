@@ -7,7 +7,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int size;
     private int threshold;
-    private int capacity;
     private Node<K, V>[] table;
 
     public MyHashMap() {
@@ -63,17 +62,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] resize() {
         if (threshold == 0) {
             threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
-            capacity = DEFAULT_INITIAL_CAPACITY;
-            return new Node[capacity];
+            return new Node[DEFAULT_INITIAL_CAPACITY];
         }
         if (threshold > size) {
             return table;
         }
         size = 0;
-        capacity = capacity << 1;
-        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
+        threshold = threshold << 1;
         Node<K, V>[] oldTable = table;
-        table = new Node[capacity];
+        table = new Node[table.length << 1];
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 this.put(node.key, node.value);
@@ -85,7 +82,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getBucket(K key) {
         int hash = (key == null) ? 0 : key.hashCode();
-        return Math.abs(hash) % capacity;
+        return Math.abs(hash) % table.length;
     }
 
     private static class Node<K, V> {
