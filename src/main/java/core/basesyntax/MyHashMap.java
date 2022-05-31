@@ -82,7 +82,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void initializateMap() {
-        size = 0;
         table = new Node[DEFAULT_SIZE];
         threshold = (int) (DEFAULT_SIZE * DEFAULT_LOAD_FACTOR);
     }
