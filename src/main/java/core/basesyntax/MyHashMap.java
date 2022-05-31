@@ -15,14 +15,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (threshold <= size) {
-            table = resize();
-        }
+        table = resize();
         int bucket = getBucket(key);
         Node<K, V> node = table[bucket];
         Node<K, V> newNode;
         if (node == null) {
-            table[bucket] = new Node<>(key,value, null);
+            table[bucket] = new Node<>(key, value, null);
             size++;
             return;
         }
@@ -31,7 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node.value = value;
                 return;
             } else if (node.next == null) {
-                newNode = new Node<>(key,value, null);
+                newNode = new Node<>(key, value, null);
                 node.next = newNode;
                 size++;
                 return;
@@ -42,9 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (threshold <= size) {
-            table = resize();
-        }
+        table = resize();
         int bucket = getBucket(key);
         Node<K, V> node = table[bucket];
         if (node == null) {
@@ -65,35 +61,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V>[] resize() {
-        int oldCapacity = (table == null) ? 0 : table.length;
         if (threshold == 0) {
             threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
             capacity = DEFAULT_INITIAL_CAPACITY;
             return new Node[capacity];
         }
-        Node<K, V>[] newTable;
-        capacity = oldCapacity << 1;
+        if (threshold > size) {
+            return table;
+        }
+        size = 0;
+        capacity = capacity << 1;
         threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
-        newTable = new Node[capacity];
-        for (Node<K, V> kvNode : table) {
-            Node<K, V> node = kvNode;
+        Node<K, V>[] oldTable = table;
+        table = new Node[capacity];
+        for (Node<K, V> node : oldTable) {
             while (node != null) {
-                Node<K, V> newNode = node;
-                int bucket = getBucket(node.key);
+                this.put(node.key, node.value);
                 node = node.next;
-                newNode.next = null;
-                Node<K, V> current = newTable[bucket];
-                if (current == null) {
-                    newTable[bucket] = newNode;
-                    continue;
-                }
-                while (current.next != null) {
-                    current = current.next;
-                }
-                current.next = newNode;
             }
         }
-        return newTable;
+        return table;
     }
 
     private int getBucket(K key) {
@@ -111,6 +98,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-
     }
 }
