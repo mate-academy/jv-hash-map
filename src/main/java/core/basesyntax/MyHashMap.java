@@ -18,12 +18,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         grow();
-        int keyHash = getHash(key);
-        if (table[keyHash % table.length] == null) {
-            table[keyHash % table.length] = new Node<>(key, value, null);
+        int buketIndex = getBuketIndex(getHash(key));
+        if (table[buketIndex] == null) {
+            table[buketIndex] = new Node<>(key, value, null);
             size++;
         } else {
-            Node<K, V> curNode = table[keyHash % table.length];
+            Node<K, V> curNode = table[buketIndex];
             while (curNode != null) {
                 if (Objects.equals(key, curNode.key)) {
                     curNode.value = value;
@@ -74,6 +74,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
+    }
+
+    private int getBuketIndex(int hash) {
+        return hash % table.length;
     }
 
     static class Node<K, V> {
