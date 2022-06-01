@@ -3,11 +3,14 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final double LOAD_FACTOR = 0.75;
+    private static final int RESIZE_VALUE = 2;
     private Node<K, V>[] buckets;
     private int size;
 
     public MyHashMap() {
-        buckets = new Node[16];
+        buckets = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -15,17 +18,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         resize();
         int index = generateIndex(key);
         if (buckets[index] != null) {
-            for (Node<K, V> currentNode = buckets[index];
-                    currentNode != null; currentNode = currentNode.next) {
-                if (Objects.equals(currentNode.key, key)) {
-                    currentNode.value = value;
+            Node<K, V> oldNode = null;
+            for (Node<K, V> i = buckets[index]; i != null; i = i.next) {
+                if (Objects.equals(i.key, key)) {
+                    i.value = value;
                     return;
                 }
-                if (currentNode.next == null) {
-                    currentNode.next = new Node<>(Objects.hash(key), key, value, null);
-                    break;
-                }
+                oldNode = i;
             }
+            oldNode.next = new Node<>(Objects.hash(key), key, value, null);
         } else {
             buckets[index] = new Node<>(Objects.hash(key), key, value, null);
         }
@@ -54,8 +55,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (size >= buckets.length * 0.75) {
-            int newCapacity = buckets.length * 2;
+        if (size >= buckets.length * LOAD_FACTOR) {
+            int newCapacity = buckets.length * RESIZE_VALUE;
             Node<K, V>[] oldArray = buckets;
             buckets = new Node[newCapacity];
             transport(oldArray);
@@ -74,13 +75,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
         private Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
             this.key = key;
             this.value = value;
             this.next = next;
