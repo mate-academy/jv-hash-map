@@ -51,9 +51,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void grow() {
-        int newCapacity = currentCapacity * 2;
-        Node<K, V>[] grown = new Node[newCapacity];
-        currentCapacity = newCapacity;
+        currentCapacity *= 2;
+        Node<K, V>[] grown = new Node[currentCapacity];
         transitValues(grown);
         values = grown;
     }
