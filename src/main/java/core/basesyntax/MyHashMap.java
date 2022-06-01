@@ -1,19 +1,16 @@
 
 package core.basesyntax;
 
-import static java.lang.System.arraycopy;
-
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_VALUE = 16;
     private static final double LOAD_FACTOR = 0.75;
     private static final int RESIZE_INDEX = 2;
-    private Node [] hashMap = new Node[DEFAULT_VALUE];
-    private int currentValue = DEFAULT_VALUE;
-    private int size = 0;
+    private Node [] elements = new Node[DEFAULT_VALUE];
+    private int size;
 
-    public class Node<K,V> {
+    private class Node<K,V> {
         private Integer hash;
         private final K key;
         private V value;
@@ -27,83 +24,69 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private int getHashCode(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode());
+    }
+
     @Override
     public void put(K key, V value) {
-        if (size > currentValue * LOAD_FACTOR) {
+        if (size > elements.length * LOAD_FACTOR) {
             resize();
         }
-        int hash = hashCode(key);
-        int index = Math.abs(hash) % currentValue;
-        if (hashMap[index] != null) {
-            Node currentNode = hashMap[index];
+        int index = Math.abs(getHashCode(key)) % elements.length;
+        if (elements[index] != null) {
+            Node currentBucket = elements[index];
             do {
-                if (currentNode.hash == hash && ((key == null && currentNode.key == null)
-                        || (Objects.equals(key, currentNode.key)))) {
-                    currentNode.value = value;
+                if (currentBucket.hash == getHashCode(key)
+                        && Objects.equals(key, currentBucket.key)) {
+                    currentBucket.value = value;
                     return;
                 }
-                if (currentNode.next != null) {
-                    currentNode = currentNode.next;
+                if (currentBucket.next != null) {
+                    currentBucket = currentBucket.next;
                 }
-            } while (currentNode.next != null);
-            if (currentNode.hash == hash && ((key == null && currentNode.key == null)
-                    || (Objects.equals(key, currentNode.key)))) {
-                currentNode.value = value;
+            } while (currentBucket.next != null);
+            if (currentBucket.hash == getHashCode(key) && Objects.equals(key, currentBucket.key)) {
+                currentBucket.value = value;
                 return;
             }
-            Node newNode = new Node<>(hash, key, value, null);
-            currentNode.next = newNode;
+            Node newNode = new Node<>(getHashCode(key), key, value, null);
+            currentBucket.next = newNode;
             size++;
             return;
         }
-        hashMap[index] = new Node(hash, key, value, null);
+        elements[index] = new Node(getHashCode(key), key, value, null);
         size++;
     }
 
     public void resize() {
-        Node [] copyHashMap = new Node[currentValue];
-        arraycopy(hashMap, 0, copyHashMap, 0, hashMap.length);
-        currentValue = currentValue * RESIZE_INDEX;
-        Node [] hashMap = new Node[currentValue];
-        this.hashMap = hashMap;
-        size = 0;
-        for (int i = 0; i < copyHashMap.length; i++) {
-            if (copyHashMap[i] != null) {
-                Node currentNode = copyHashMap[i];
-                do {
-                    put((K) currentNode.key, (V) currentNode.value);
-                    if (currentNode.next != null) {
-                        currentNode = currentNode.next;
-                    } else {
-                        break;
-                    }
-                } while (copyHashMap[i].next != null);
+        Node [] hashMap = new Node[elements.length * RESIZE_INDEX];
+        Node<K, V>[] oldBuckets = hashMap;
+        for (int i = 0; i < oldBuckets.length; i++) {
+            Node<K, V> node = oldBuckets[i];
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
 
     @Override
-    public int hashCode(Object key) {
-        int result;
-        return (key == null) ? 0 : (result = key.hashCode()) ^ (result >>> 16);
-    }
-
-    @Override
     public V getValue(K key) {
-        for (int i = 0; i < currentValue; i++) {
-            if (hashMap[i] != null) {
+        for (int i = 0; i < elements.length; i++) {
+            if (elements[i] != null) {
                 if (key == null) {
                     i = 0;
                 }
-                if (Objects.equals(key, hashMap[i].key)) {
-                    return (V) hashMap[i].value;
-                } else if (hashMap[i].next != null) {
-                    Node currentNode = hashMap[i].next;
-                    while (currentNode != null) {
-                        if (Objects.equals(key, currentNode.key)) {
-                            return (V) currentNode.value;
+                if (Objects.equals(key, elements[i].key)) {
+                    return (V) elements[i].value;
+                } else if (elements[i].next != null) {
+                    Node currentBucket = elements[i].next;
+                    while (currentBucket != null) {
+                        if (Objects.equals(key, currentBucket.key)) {
+                            return (V) currentBucket.value;
                         }
-                        currentNode = currentNode.next;
+                        currentBucket = currentBucket.next;
                     }
                 }
             }
