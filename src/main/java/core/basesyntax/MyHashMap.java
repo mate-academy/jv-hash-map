@@ -4,13 +4,14 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final double LOAD_FACTOR = 0.75;
-    private int currentCapacity = DEFAULT_CAPACITY;
+    private static final float LOAD_FACTOR = 0.75f;
+    private int currentCapacity;
     private Node<K, V>[] values;
-    private int size = 0;
+    private int size;
 
     public MyHashMap() {
-        values = new Node[DEFAULT_CAPACITY];
+        currentCapacity = DEFAULT_CAPACITY;
+        values = new Node[currentCapacity];
     }
 
     @Override
@@ -94,7 +95,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean isKeysEqual(K key1, K key2) {
-        return key1 == null ? key2 == null : key1.equals(key2);
+        return Objects.equals(key1, key2);
     }
 
     private static int hash(Object key) {
@@ -117,35 +118,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        public int getHash() {
-            return hash;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public Node<K, V> getNext() {
-            return next;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            Node<?, ?> node = (Node<?, ?>) o;
-            return Objects.equals(key, node.key) && Objects.equals(value, node.value);
-            /*Objects.equals(key, node.key) && */
         }
     }
 }
