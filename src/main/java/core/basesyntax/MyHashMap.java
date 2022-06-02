@@ -53,7 +53,7 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
     }
 
     private int getHashCode(K key) {
-        return (key == null) ? 0 : (17 * 31 + key.hashCode()) >>> 2;
+        return (key == null) ? 0 : (17 * 31 + key.hashCode() >>> 2);
     }
 
     @Override
