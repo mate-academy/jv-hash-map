@@ -61,8 +61,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public void resize() {
         Node<K, V>[] oldBuckets = elements;
-        Node<K, V> [] elements = new Node[oldBuckets.length * RESIZE_INDEX];
-        this.elements = elements;
+        elements = new Node[oldBuckets.length * RESIZE_INDEX];
         size = 0;
         for (int i = 0; i < oldBuckets.length; i++) {
             Node<K, V> node = oldBuckets[i];
