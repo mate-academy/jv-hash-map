@@ -23,6 +23,11 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
         }
     }
 
+    @Override
+    public int getSize() {
+        return size;
+    }
+
     private void resize() {
         int newSize = bucketsCapacity * 2;
         Node<K,V>[] newNodeArray = new Node[newSize];
@@ -63,11 +68,6 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
             return currentNode.value;
         }
         return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
     }
 
     private class Node<K,V> {
