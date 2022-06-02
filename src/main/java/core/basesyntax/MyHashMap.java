@@ -16,7 +16,7 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
         if (currentNode != null) {
             currentNode.value = value;
         } else {
-            buckets[bucketIndex] = new Node<>(key, value, buckets[bucketIndex], getHashCode(key));
+            buckets[bucketIndex] = new Node<>(key, value, buckets[bucketIndex]);
             size++;
         }
         if (size > bucketsSize * DEFAULT_LOAD_FACTOR) {
@@ -45,8 +45,8 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
             Node<K,V> currentNode = buckets[i];
             while (currentNode != null) {
                 buckets[i] = buckets[i].next;
-                currentNode.next = newNodeArray[currentNode.hashCode % newSize];
-                newNodeArray[currentNode.hashCode % newSize] = currentNode;
+                currentNode.next = newNodeArray[getHashCode(currentNode.key) % newSize];
+                newNodeArray[getHashCode(currentNode.key) % newSize] = currentNode;
                 currentNode = buckets[i];
             }
         }
@@ -74,13 +74,11 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
         private V value;
         private final K key;
         private Node<K, V> next;
-        private final int hashCode;
 
-        private Node(K key, V value, Node<K,V> next, int hashCode) {
+        private Node(K key, V value, Node<K,V> next) {
             this.value = value;
             this.key = key;
             this.next = next;
-            this.hashCode = hashCode;
         }
     }
 }
