@@ -5,13 +5,11 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private int currentCapacity;
     private Node<K, V>[] values;
     private int size;
 
     public MyHashMap() {
-        currentCapacity = DEFAULT_CAPACITY;
-        values = new Node[currentCapacity];
+        values = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -47,18 +45,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int countIndex(Node<K, V> node) {
-        return node.key == null ? 0 : node.hash % currentCapacity;
+        return node.key == null ? 0 : node.hash % values.length;
     }
 
     private void grow() {
-        currentCapacity *= 2;
-        Node<K, V>[] grown = new Node[currentCapacity];
+        Node<K, V>[] grown = new Node[values.length * 2];
         transitValues(grown);
         values = grown;
     }
 
     private void checkLoading() {
-        if ((currentCapacity * LOAD_FACTOR) == size) {
+        if ((values.length * LOAD_FACTOR) == size) {
             grow();
         }
     }
