@@ -50,7 +50,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> currentNode;
             for (currentNode = table[index]; currentNode.next != null;
-                 currentNode = currentNode.next) {
+                    currentNode = currentNode.next) {
                 if (key.equals(currentNode.key)) {
                     currentNode.value = value;
                     break;
