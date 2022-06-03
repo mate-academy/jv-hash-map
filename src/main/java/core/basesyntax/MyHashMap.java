@@ -24,16 +24,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getHashCode(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode());
-    }
-
     @Override
     public void put(K key, V value) {
         if (size > elements.length * LOAD_FACTOR) {
             resize();
         }
-        int index = Math.abs(getHashCode(key)) % elements.length;
+        int index = getHashCode(key) % elements.length;
         if (elements[index] != null) {
             Node currentBucket = elements[index];
             do {
@@ -59,7 +55,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    public void resize() {
+    @Override
+    public V getValue(K key) {
+        int index = getHashCode(key) % elements.length;
+        if (elements[index] != null) {
+            if (Objects.equals(key, elements[index].key)) {
+                return (V) elements[index].value;
+            } else if (elements[index].next != null) {
+                Node currentBucket = elements[index].next;
+                while (currentBucket != null) {
+                    if (Objects.equals(key, currentBucket.key)) {
+                        return (V) currentBucket.value;
+                    }
+                    currentBucket = currentBucket.next;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    private void resize() {
         Node<K, V>[] oldBuckets = elements;
         elements = new Node[oldBuckets.length * RESIZE_INDEX];
         size = 0;
@@ -72,31 +92,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    @Override
-    public V getValue(K key) {
-        for (int i = 0; i < elements.length; i++) {
-            if (elements[i] != null) {
-                if (key == null) {
-                    i = 0;
-                }
-                if (Objects.equals(key, elements[i].key)) {
-                    return (V) elements[i].value;
-                } else if (elements[i].next != null) {
-                    Node currentBucket = elements[i].next;
-                    while (currentBucket != null) {
-                        if (Objects.equals(key, currentBucket.key)) {
-                            return (V) currentBucket.value;
-                        }
-                        currentBucket = currentBucket.next;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
+    private int getHashCode(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode());
     }
 }
