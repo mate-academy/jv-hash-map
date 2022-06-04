@@ -8,20 +8,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private Node<K, V>[] values;
 
-    static class Node<K,V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node next;
-
-        Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         resize();
@@ -97,16 +83,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public int getHash(K key) {
+    private int getHash(K key) {
         return key == null ? 0 : key.hashCode();
     }
 
-    public int getIndex(K key, int hash) {
+    private int getIndex(K key, int hash) {
         return key == null ? 0 : Math.abs(hash) % capasity;
     }
 
-    public boolean isEqual(int hash1, int hash2, K key1, K key2) {
+    private boolean isEqual(int hash1, int hash2, K key1, K key2) {
         return hash1 == hash2 && (key1 == key2
                     || key1 != null && key1.equals(key2));
+    }
+
+    static class Node<K,V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node next;
+
+        Node(int hash, K key, V value, Node<K, V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
