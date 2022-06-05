@@ -2,16 +2,16 @@ package core.basesyntax;
 
 public class Main {
     public static void main(String[] args) {
-        MyHashMap<Integer, String> string = new MyHashMap<>();
-        string.put(2, "BatMan"); //2
-        string.put(3, "AquaMan"); //3
-        string.put(1, "SpiderMan"); //1
-        string.put(17, "SuperMan"); // 1
-        string.put(33, "WonderWoman"); //1
-        string.put(34, "NightWolf"); //2
-        string.put(18, "LiuKang"); //2
+        MyHashMap<Integer, String> strings = new MyHashMap<>();
+        strings.put(1, "SuperMan");
+        strings.put(2, "BatMan");
+        strings.put(17, "WonderWoman");
+        strings.put(18, "GreenLight");
+        strings.put(33, "MarcianHunter");
+        strings.put(34, "Joker");
 
-        System.out.println(string);
-        System.out.println(string.getSize());
+        System.out.println(strings);
+        System.out.println(strings.getSize());
+        System.out.println(strings.getValue(18));
     }
 }
