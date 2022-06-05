@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import org.w3c.dom.Node;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static int DEFAULT_CAPACITY = 16;
     private static float LOAD_FACTOR = 0.75f;
