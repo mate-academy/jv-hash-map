@@ -27,22 +27,42 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         }
     }
+    private void resize() {
+
+        if (size == threshold) {
+            size = 0;
+            int newCapacity = table.length << 1;
+            threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
+            Node<K,V>[] oldTable = table;
+            table = new Node[newCapacity];
+            for (Node<K, V> node : oldTable) {
+                if (node != null) {
+                    do {
+                        put(node.key, node.value);
+                        node = node.next;
+                    } while (node != null);
+                }
+            }
+        }
+    }
     @Override
     public void put(K key, V value) {
         isEmpty();
         int keyHash = key == null ? 0 : key.hashCode();
-        int index = keyHash % table.length;
+        int index = Math.abs(keyHash % table.length);
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);;
             size++;
         } else {
             iterateNodes(table[index], key, value);
         }
+        resize();
     }
 
     @Override
     public V getValue(K key) {
-        int index = key == null ? 0 : key.hashCode() % table.length;
+        isEmpty();
+        int index = key == null ? 0 : Math.abs(key.hashCode() % table.length);
         Node<K,V> node = table[index];
         if (node != null) {
             do {
@@ -59,19 +79,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("[");
-        for (Node<K, V> node : table) {
-            if (node != null) {
-                builder.append(node.key).append("=").append(node.value).append(", ");
-            }
-        }
-        String result = builder.toString();
-        return new StringBuilder(result.substring(0, result.length() - 2)).append("]").toString();
     }
 
     private void isEmpty() {
