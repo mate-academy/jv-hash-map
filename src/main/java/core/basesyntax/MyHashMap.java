@@ -6,7 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int RESIZE_VALUE = 2;
-    private static final int UNIQUE_NUMBER = 17 * 31;
+    private static final int UNIQUE_NUMBER = 527;
     private int tableSize = DEFAULT_INITIAL_CAPACITY;
     private Node<K, V>[] table;
     private int size;
@@ -17,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size > tableSize * DEFAULT_LOAD_FACTOR) {
+        if (size >= tableSize * DEFAULT_LOAD_FACTOR) {
             grow();
         }
         int bucketIndex = getIndex(key, tableSize);
@@ -61,8 +61,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> getNode(K key) {
-        int hash = getHash(key);
-        Node<K, V> testNode = table[hash % tableSize];
+        int index = getIndex(key, tableSize);
+        Node<K, V> testNode = table[index];
         while (testNode != null) {
             if (Objects.equals(key, testNode.key)) {
                 return testNode;
@@ -72,12 +72,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return testNode;
     }
 
-    private int getHash(K key) {
-        return (key == null) ? 0 : (UNIQUE_NUMBER + key.hashCode() >>> 1);
-    }
-
     private int getIndex(K key, int size) {
-        return getHash(key) % size;
+        return (key == null) ? 0 : ((UNIQUE_NUMBER + key.hashCode() >>> 1)) % size;
     }
 
     private class Node<K, V> {
