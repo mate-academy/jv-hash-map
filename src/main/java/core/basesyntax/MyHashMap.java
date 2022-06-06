@@ -52,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public void resize() {
+    private void resize() {
         if (values == null) {
             threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
             values = new Node[DEFAULT_INITIAL_CAPACITY];
