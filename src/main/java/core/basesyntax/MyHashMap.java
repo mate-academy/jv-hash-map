@@ -25,7 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         Node<K, V> currentNode = array[getIndex(key)];
         if (currentNode != null) {
-            while (currentNode.next != null && !(Objects.equals(key, currentNode.key))) {
+            while (currentNode.next != null && !Objects.equals(key, currentNode.key)) {
                 currentNode = currentNode.next;
             }
             return currentNode.value;
@@ -36,17 +36,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
-    }
-
-    private class Node<K, V> {
-        private K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
     }
 
     private int getIndex(K key) {
@@ -62,7 +51,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        while (currentNode.next != null && !(Objects.equals(key, currentNode.key))) {
+        while (currentNode.next != null && !Objects.equals(key, currentNode.key)) {
             currentNode = currentNode.next;
         }
         if (Objects.equals(key, currentNode.key)) {
@@ -86,6 +75,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
             threshold = (int) (array.length * DEFAULT_LOAD_FACTOR);
+        }
+    }
+
+    private class Node<K, V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value) {
+            this.key = key;
+            this.value = value;
         }
     }
 }
