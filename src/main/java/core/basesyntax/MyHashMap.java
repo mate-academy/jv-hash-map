@@ -19,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        int bucketIndex = Math.abs(getHash(key) % table.length);
+        int bucketIndex = getBucketIndex(key);
         if (table[bucketIndex] == null) {
             table[bucketIndex] = new Node<>(key, value, null);
             size++;
@@ -42,7 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = table[Math.abs(getHash(key) % table.length)];
+        Node<K, V> node = table[getBucketIndex(key)];
         while (node != null) {
             if (Objects.equals(key,node.key)) {
                 return node.value;
@@ -60,6 +60,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int getHash(K key) {
         int hashCode;
         return (key == null) ? 0 : (hashCode = key.hashCode()) ^ (hashCode >>> 16);
+    }
+
+    private int getBucketIndex(K key) {
+        return Math.abs(getHash(key) % table.length);
     }
 
     private void resize() {
