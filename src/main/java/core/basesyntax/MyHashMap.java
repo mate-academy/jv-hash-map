@@ -36,49 +36,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= capacity * LOAD_FACTOR) {
             resize();
         }
-        if (key == null) {
-            if (table[0] == null) {
-                table[0] = new Node<>(null, value, null);
-                size++;
-            } else {
-                Node<K, V> currentNode = table[0];
-                while (currentNode != null) {
-                    if (currentNode.key == null) {
-                        currentNode.value = value;
-                        break;
-                    }
-                    currentNode = currentNode.next;
-                }
-                if (currentNode == null) {
-                    table[0].next = new Node<>(null, value, null);
-                    size++;
-                }
-            }
-            return;
-        }
-
         int index = getIndex(key);
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
-            size++;
         } else {
-            Node<K, V> currentNode;
-            for (currentNode = table[index]; currentNode.next != null;
-                    currentNode = currentNode.next) {
-                if (key.equals(currentNode.key)) {
+            Node<K, V> currentNode = null;
+            do {
+                currentNode = currentNode == null ? table[index] : currentNode.next;
+                if (key == null && currentNode.key == null
+                        || key != null && key.equals(currentNode.key)) {
                     currentNode.value = value;
-                    break;
+                    return;
                 }
-            }
-            if (currentNode.next == null) {
-                if (key.equals(currentNode.key)) {
-                    currentNode.value = value;
-                } else {
-                    currentNode.next = new Node<>(key, value, null);
-                    size++;
-                }
-            }
+            } while (currentNode.next != null);
+            currentNode.next = new Node<>(key, value, null);
         }
+        size++;
     }
 
     @Override
