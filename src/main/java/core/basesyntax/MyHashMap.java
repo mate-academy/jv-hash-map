@@ -2,21 +2,21 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int DEF_CAPACITY = 1 << 4;
+    private static final int DEFAULT_CAPACITY = 16;
     private Node<K, V>[] table;
     private int capacity;
     private int size;
     private int threshold;
 
     public MyHashMap() {
-        capacity = DEF_CAPACITY;
-        threshold = (int) (DEF_CAPACITY * LOAD_FACTOR);
+        capacity = DEFAULT_CAPACITY;
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
         table = new Node[capacity];
     }
 
     @Override
     public void put(K key, V value) {
-        int hash = hashCode(key);
+        int hash = hash(key);
         Node<K, V> node = findNode(key);
         if (node != null) {
             node.value = value;
@@ -26,12 +26,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node = table[hash];
             if (node == null) {
-                table[hash] = new Node<>(hash, key, value, null);
+                table[hash] = new Node<>(key, value, null);
             } else {
                 while (node.next != null) {
                     node = node.next;
                 }
-                node.next = new Node<>(hash, key, value, null);
+                node.next = new Node<>(key, value, null);
             }
             size++;
         }
@@ -64,9 +64,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> findNode(K key) {
-        Node<K, V> node = table[hashCode(key)];
+        Node<K, V> node = table[hash(key)];
         while (node != null) {
-            if (Node.keysEquals(node.key, key)) {
+            if (Node.isEqual(node.key, key)) {
                 return node;
             }
             node = node.next;
@@ -74,25 +74,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private int hashCode(Object key) {
+    private int hash(Object key) {
         return key == null ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
         }
 
-        static boolean keysEquals(Object key1, Object key2) {
-            return key1 == key2 || key1 != null && key1.equals(key2);
+        static boolean isEqual(Object object1, Object object2) {
+            return object1 == object2 || object1 != null && object1.equals(object2);
         }
     }
 }
