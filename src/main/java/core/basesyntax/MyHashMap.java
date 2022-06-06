@@ -1,8 +1,8 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static int DEFAULT_CAPACITY = 16;
-    private static float LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int threshold;
     private int size;
