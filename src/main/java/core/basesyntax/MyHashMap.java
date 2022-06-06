@@ -4,7 +4,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int threshold;
-    private int capasity;
     private int size;
     private Node<K, V>[] values;
 
@@ -57,28 +56,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public void resize() {
         if (values == null) {
-            capasity = DEFAULT_INITIAL_CAPACITY;
             threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
-            values = new Node[capasity];
+            values = new Node[DEFAULT_INITIAL_CAPACITY];
         }
         if (size > threshold || values == null) {
-            capasity = capasity << 1;
-            threshold = (int) (capasity * DEFAULT_LOAD_FACTOR);
+            threshold = (int) (values.length * 2 * DEFAULT_LOAD_FACTOR);
             moveToNewCapacity();
         }
     }
 
     public void moveToNewCapacity() {
         Node<K, V>[] oldValues = values;
-        values = new Node[capasity];
+        values = new Node[values.length * 2];
         size = 0;
         for (int i = 0; i < oldValues.length; i++) {
             Node<K, V> node = oldValues[i];
-            if (node != null) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
@@ -88,7 +83,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key, int hash) {
-        return key == null ? 0 : Math.abs(hash) % capasity;
+        return key == null ? 0 : Math.abs(hash) % values.length;
     }
 
     private boolean isEqual(int hash1, int hash2, K key1, K key2) {
