@@ -32,7 +32,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
-    public V put(K key, V value) {
+    public void put(K key, V value) {
         if (size >= capacity * LOAD_FACTOR) {
             resize();
         }
@@ -54,7 +54,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     size++;
                 }
             }
-            return value;
+            return;
         }
 
         int index = getIndex(key);
@@ -79,7 +79,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-        return null;
     }
 
     @Override

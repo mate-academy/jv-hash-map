@@ -1,7 +1,7 @@
 package core.basesyntax;
 
-public interface MyMap<K, V> { //extends Map<K, V> {
-    V put(K key, V value);
+public interface MyMap<K, V> {
+    void put(K key, V value);
 
     V getValue(K key);
 
