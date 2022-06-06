@@ -20,12 +20,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int index = findIndex(key);
-        Node<K,V> node = new Node<K, V>(key, value,null);
+        Node<K, V> node = new Node<K, V>(key, value, null);
         if (table[index] == null) {
             table[index] = node;
             size++;
         } else {
-            Node<K,V> nodeCurrent = table[index];
+            Node<K, V> nodeCurrent = table[index];
             while (nodeCurrent != null) {
                 if (Objects.equals(nodeCurrent.key, key)) {
                     nodeCurrent.value = value;
@@ -43,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K,V> node = table[findIndex(key)];
+        Node<K, V> node = table[findIndex(key)];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
                 return node.value;
@@ -59,8 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int findIndex(K key) {
-        int hash = (key == null) ? 0 : key.hashCode() >>> 16;
-        return hash % table.length;
+        return (key == null) ? 0 : (key.hashCode() >>> 16) % table.length;
     }
 
     private void resize() {
@@ -73,11 +72,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void copyTab(Node<K, V>[] oldTable) {
         for (Node<K, V> node : oldTable) {
-            if (node != null) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
