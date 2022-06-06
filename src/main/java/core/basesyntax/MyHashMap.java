@@ -14,7 +14,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        validatedIndex(indexOf(key));
         if (size == threshold) {
             resize();
         }
@@ -42,7 +41,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        validatedIndex(indexOf(key));
         Node<K, V> node = table[indexOf(key)];
         while (node != null) {
             if (node.key == key || node.key != null && node.key.equals(key)) {
@@ -62,12 +60,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
-    private void validatedIndex(int index) {
-        if (index < 0 || index >= table.length) {
-            throw new ArrayIndexOutOfBoundsException("Index" + index + "is invalid");
-        }
-    }
-
     private void resize() {
         size = 0;
         Node<K, V>[] oldTable = table;
@@ -79,11 +71,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void transfer(Node<K, V>[] oldTable) {
         for (Node<K, V> node : oldTable) {
-            if (node != null) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
