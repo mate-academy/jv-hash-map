@@ -59,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int findIndex(K key) {
-        return (key == null) ? 0 : (key.hashCode() >>> 16) % table.length;
+        return (key == null) ? 0 : Math.abs((key.hashCode()) % table.length);
     }
 
     private void resize() {
