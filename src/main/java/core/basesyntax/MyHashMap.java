@@ -17,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size > thrashLoad) {
+        if (size >= thrashLoad) {
             resize();
         }
         Node<K, V> newNode = new Node<>(key, value);
@@ -37,12 +37,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> bucketNode = findNode(key);
-        if (bucketNode == null) {
-            return null;
-        }
-        if (key == bucketNode.key || (bucketNode.key != null && bucketNode.key.equals(key))) {
-            return bucketNode.value;
+        //Node<K, V> bucketNode = findNode(key);
+        Node<K, V> bucketNode = buckets[hash(key)];
+//        if (bucketNode == null) {
+//            return null;
+//        }
+        while (bucketNode != null) {
+            if (key == bucketNode.key || (bucketNode.key != null && bucketNode.key.equals(key))) {
+                return bucketNode.value;
+            }
+            bucketNode = bucketNode.next;
         }
         return null;
     }
@@ -52,24 +56,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private class Node<K, V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        private Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-            this.next = null;
-            this.hash = key == null ? 0 : Math.abs(key.hashCode());
-        }
-    }
-
     private void resize() {
         Node<K, V>[] temporary = (Node<K, V>[]) new Node[currentCapacity * 2];
-        fill(temporary);
+        Node<K, V>[] copy = buckets;
         buckets = temporary;
+
+        fill(copy);
+
+
         currentCapacity = buckets.length;
         thrashLoad = thrashLoad * 2;
     }
@@ -90,21 +84,34 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void fill(Node<K, V>[] destination) {
-        final int capacity = destination.length;
         int position;
-        for (Node<K, V> node: buckets) {
+        size = 0;
+        for (Node<K, V> node: destination) {
             if (node == null) {
                 continue;
             }
             while (node != null) {
-                position = node.hash % capacity;
-                destination[position] = node;
+                put(node.key, node.value);
                 node = node.next;
             }
         }
     }
 
     private int hash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % currentCapacity;
+        return key == null ? 0 : Math.abs(key.hashCode()) % buckets.length;
+    }
+
+    private class Node<K, V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        private Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+            this.next = null;
+            this.hash = key == null ? 0 : Math.abs(key.hashCode());
+        }
     }
 }
