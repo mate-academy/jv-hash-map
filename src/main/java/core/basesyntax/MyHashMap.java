@@ -56,9 +56,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                         continue;
                     }
                     if (newArrayElement.next != null) {
-                        while (newArrayElement.next != null) {
-                            newArray[hash(newArrayElement.key) % table.length] = newArrayElement;
-                            newArrayElement = newArrayElement.next;
+                        Node<K, V> newNode = newArrayElement;
+                        while (newNode.next != null) {
+                            newArray[hash(newNode.key) % table.length] = newArrayElement;
+                            newNode = newNode.next;
                         }
                     } else {
                         newArray[hash(newArrayElement.key) % table.length] = newArrayElement;
