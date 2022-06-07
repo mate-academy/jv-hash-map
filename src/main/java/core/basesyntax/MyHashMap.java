@@ -67,8 +67,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         Node<K, V> currentNode = buckets[position];
-        while(currentNode.next != null) {
-            if (key == currentNode.key || (currentNode.key != null && currentNode.key.equals(key))) {
+        while (currentNode.next != null) {
+            if (key == currentNode.key || currentNode.key != null && currentNode.key.equals(key)) {
                 return currentNode;
             }
             currentNode = currentNode.next;
