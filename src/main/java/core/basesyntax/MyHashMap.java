@@ -1,16 +1,16 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int CAPACITY = 16;
-    private static final float COEFFICIENT = 0.75f;
-    private static final int DOUBLING = 2;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int COEFFICIENT_DOUBLING_CAPACITY = 2;
     private int size;
     private int fullnessArray;
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        table = new Node[CAPACITY];
-        fullnessArray = (int) (CAPACITY * COEFFICIENT);
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
+        fullnessArray = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
@@ -20,34 +20,34 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K, V> newNode = new Node<>(key, value, null);
         int index = getIndexNode(key);
-        Node<K, V> tmpNode = table[index];
-        if (tmpNode == null) {
+        Node<K, V> currentNode = table[index];
+        if (currentNode == null) {
             table[index] = newNode;
             size++;
         } else {
-            while (tmpNode != null) {
-                if (keyCheck(key, tmpNode.key)) {
-                    tmpNode.value = value;
+            while (currentNode != null) {
+                if (getEqualsKeyCheck(key, currentNode.key)) {
+                    currentNode.value = value;
                     break;
                 }
-                if (tmpNode.next == null) {
-                    tmpNode.next = newNode;
+                if (currentNode.next == null) {
+                    currentNode.next = newNode;
                     size++;
                     break;
                 }
-                tmpNode = tmpNode.next;
+                currentNode = currentNode.next;
             }
         }
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> tmpNode = table[getIndexNode(key)];
-        while (tmpNode != null) {
-            if (keyCheck(key, tmpNode.key)) {
-                return tmpNode.value;
+        Node<K, V> currentNode = table[getIndexNode(key)];
+        while (currentNode != null) {
+            if (getEqualsKeyCheck(key, currentNode.key)) {
+                return currentNode.value;
             }
-            tmpNode = tmpNode.next;
+            currentNode = currentNode.next;
         }
         return null;
     }
@@ -57,12 +57,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private boolean keyCheck(K key, K inputKey) {
+    private boolean getEqualsKeyCheck(K key, K inputKey) {
         return (key == inputKey) || (inputKey != null && inputKey.equals(key));
     }
 
     private int getHash(K key) {
-        return (key.hashCode() >>> CAPACITY);
+        return (key.hashCode() >>> DEFAULT_INITIAL_CAPACITY);
     }
 
     private int getIndexNode(K key) {
@@ -72,7 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         size = 0;
         Node<K, V>[] tmpNode = table;
-        int newCapacity = tmpNode.length * DOUBLING;
+        int newCapacity = tmpNode.length * COEFFICIENT_DOUBLING_CAPACITY;
         table = new Node[newCapacity];
         for (Node<K, V> node : tmpNode) {
             while (node != null) {
@@ -80,7 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node = node.next;
             }
         }
-        fullnessArray = (int) (newCapacity * COEFFICIENT);
+        fullnessArray = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
     }
 
     private static class Node<K, V> {
