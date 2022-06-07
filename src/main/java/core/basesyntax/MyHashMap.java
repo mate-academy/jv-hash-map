@@ -15,12 +15,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size + 1 == values.length * LOAD_FACTOR) {
+        if (size == values.length * LOAD_FACTOR) {
             resize();
         }
         Node<K,V> newNode = new Node<>(key, value, null);
         int index = getIndex(key);
         setAtArray(index, newNode);
+
     }
 
     @Override
