@@ -69,7 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void setAtList(Node<K,V> oldNode, Node<K,V> newNode) {
-        while (true) {
+        while (oldNode != null) {
             if (Objects.equals(oldNode.key, newNode.key)) {
                 oldNode.value = newNode.value;
                 return;
