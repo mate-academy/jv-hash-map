@@ -5,25 +5,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K,V>[] table;
     private int size;
-    private int capacity;
     private int threshold;
 
     public MyHashMap() {
-        this.table = new Node[DEFAULT_INITIAL_CAPACITY];
-        this.capacity = DEFAULT_INITIAL_CAPACITY;
-        this.threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
-    }
-
-    private static class Node<K,V> {
-        private K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
+        threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
@@ -64,28 +50,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        capacity *= 2;
-        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
+        threshold = (int) (table.length * 2 * DEFAULT_LOAD_FACTOR);
         size = 0;
         Node<K,V>[] oldTable = table;
-        table = new Node[capacity];
+        table = new Node[table.length * 2];
         for (int i = 0; i < oldTable.length; i++) {
-            Node<K,V> currNode = oldTable[i];
-            if (currNode == null) {
+            Node<K,V> currentNode = oldTable[i];
+            if (currentNode == null) {
                 continue;
             }
-            while (currNode != null) {
-                put(currNode.key, currNode.value);
-                currNode = currNode.next;
+            while (currentNode != null) {
+                put(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
             }
         }
     }
 
     private int getIndex(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode()) % capacity;
+        return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private Node<K, V> findNodeInBucket(Node<K, V> node, K key) {
@@ -103,5 +85,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             head = head.next;
         }
         return head;
+    }
+
+    private static class Node<K,V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
