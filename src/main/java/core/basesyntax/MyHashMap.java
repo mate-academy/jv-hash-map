@@ -21,15 +21,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 table[index].value = value;
                 return;
             }
-            if (table[index].next != null) {
+            if (hasNext(table[index])) {
                 Node<K, V> current = table[index];
-                while (current.next != null) {
+                while (hasNext(current)) {
                     current = current.next;
                     if (equalsKey(current.key, key)) {
                         current.value = value;
                         return;
                     }
-                    if (current.next == null) {
+                    if (!hasNext(current)) {
                         current.next = new Node<>(key, value, null);
                         size++;
                         return;
@@ -47,14 +47,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (table == null) {
-            return null;
-        }
         for (Node<K, V> node : table) {
             if (node == null) {
                 continue;
-            } else if (node.next != null) {
-                while (node.next != null) {
+            } else if (hasNext(node)) {
+                while (hasNext(node)) {
                     if (equalsKey(node.key, key)) {
                         return node.value;
                     }
@@ -66,6 +63,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         return null;
+    }
+
+    private boolean hasNext(Node<K, V> node) {
+        return node.next != null;
     }
 
     @Override
@@ -98,21 +99,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int oldCap = table.length;
         int thresold = (int) (oldCap * LOAD_FACTOR);
         if (size + 1 > thresold) {
-            for (Node<K, V> newArrayElement : table) {
-                if (newArrayElement == null) {
-                    continue;
-                }
-                if (newArrayElement.next != null) {
-                    Node<K, V> newNode = newArrayElement;
-                    while (newNode.next != null) {
-                        newArray[hash(newNode.key)] = newArrayElement;
-                        newNode = newNode.next;
-                    }
-                } else {
-                    newArray[hash(newArrayElement.key)] = newArrayElement;
-                }
-            }
-            table = newArray;
+            fillNewArray(newArray);
         }
+    }
+
+    private void fillNewArray(Node<K, V>[] newArray) {
+        for (Node<K, V> newArrayElement : table) {
+            if (newArrayElement == null) {
+                continue;
+            }
+            if (hasNext(newArrayElement)) {
+                Node<K, V> newNode = newArrayElement;
+                while (hasNext(newNode)) {
+                    newArray[hash(newNode.key)] = newArrayElement;
+                    newNode = newNode.next;
+                }
+            } else {
+                newArray[hash(newArrayElement.key)] = newArrayElement;
+            }
+        }
+        table = newArray;
     }
 }
