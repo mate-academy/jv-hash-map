@@ -37,11 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        //Node<K, V> bucketNode = findNode(key);
         Node<K, V> bucketNode = buckets[hash(key)];
-//        if (bucketNode == null) {
-//            return null;
-//        }
         while (bucketNode != null) {
             if (key == bucketNode.key || (bucketNode.key != null && bucketNode.key.equals(key))) {
                 return bucketNode.value;
@@ -57,15 +53,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] temporary = (Node<K, V>[]) new Node[currentCapacity * 2];
+        Node<K, V>[] temporary = (Node<K, V>[]) new Node[currentCapacity * INCREAS_COEFF];
         Node<K, V>[] copy = buckets;
         buckets = temporary;
-
-        fill(copy);
-
-
         currentCapacity = buckets.length;
-        thrashLoad = thrashLoad * 2;
+        fill(copy);
+        thrashLoad = thrashLoad * INCREAS_COEFF;
     }
 
     private Node<K, V> findNode(K key) {
@@ -84,7 +77,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void fill(Node<K, V>[] destination) {
-        int position;
         size = 0;
         for (Node<K, V> node: destination) {
             if (node == null) {
@@ -102,7 +94,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -111,7 +102,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = null;
-            this.hash = key == null ? 0 : Math.abs(key.hashCode());
         }
     }
 }
