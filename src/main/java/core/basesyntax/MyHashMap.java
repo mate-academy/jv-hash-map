@@ -16,6 +16,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if (size == threshold) {
+            resize();
+        }
         int position = getPosition(key, table.length);
         Node<K, V> newNode = new Node<>(key, value, null);
         Node<K, V> currentNode = table[position];
@@ -35,9 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode = currentNode.next;
             }
         }
-        if (++size > threshold) {
-            resize();
-        }
+        size++;
     }
 
     @Override
@@ -45,9 +46,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int position = getPosition(key, table.length);
         Node<K,V> currentNode = table[position];
 
-        if (currentNode == null) {
-            return null;
-        }
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
@@ -64,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getPosition(Object key, int capacity) {
         int position = (key == null) ? 0 : (key.hashCode() % capacity);
-        return (position < 0) ? - position : position;
+        return Math.abs(position);
     }
 
     private void resize() {
