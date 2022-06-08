@@ -17,23 +17,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return hash & (table.length - 1);
     }
 
-    private void resize() {
-        if (size < capacity * LOAD_FACTOR) {
-            return;
-        }
-        if (table.length != 0) {
-            capacity *= 2;
-        }
-        Node<K, V>[] oldTable = table;
-        table = (Node<K, V>[]) new Node[capacity];
-        size = 0;
-        for (Node node : oldTable) {
-            for (Node<K, V> x = node; x != null; x = x.next) {
-                put(x.key, x.value);
-            }
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         resize();
@@ -69,6 +52,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private void resize() {
+        if (size < capacity * LOAD_FACTOR) {
+            return;
+        }
+        if (table.length != 0) {
+            capacity *= 2;
+        }
+        Node<K, V>[] oldTable = table;
+        table = (Node<K, V>[]) new Node[capacity];
+        size = 0;
+        for (Node node : oldTable) {
+            for (Node<K, V> x = node; x != null; x = x.next) {
+                put(x.key, x.value);
+            }
+        }
     }
 
     private static class Node<K, V> {
