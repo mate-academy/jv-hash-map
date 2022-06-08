@@ -65,7 +65,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-
     private boolean hasNext(Node<K, V> node) {
         return node.next != null;
     }
