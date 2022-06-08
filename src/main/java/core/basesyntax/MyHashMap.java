@@ -5,11 +5,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private Node<K, V> [] table;
     private int size;
+    private final int threshold;
 
     public MyHashMap() {
-        if (table == null) {
-            table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
-        }
+        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        threshold = (int) (LOAD_FACTOR * table.length);
     }
 
     @Override
@@ -65,6 +65,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
+
     private boolean hasNext(Node<K, V> node) {
         return node.next != null;
     }
@@ -95,10 +96,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] newArray = (Node<K, V>[]) new Node[table.length << 1];
-        int oldCap = table.length;
-        int thresold = (int) (oldCap * LOAD_FACTOR);
-        if (size + 1 > thresold) {
+        if (size == threshold) {
+            Node<K, V>[] newArray = (Node<K, V>[]) new Node[table.length << 1];
             fillNewArray(newArray);
         }
     }
