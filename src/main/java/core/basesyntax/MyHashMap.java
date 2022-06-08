@@ -12,11 +12,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = (Node<K, V>[]) new Node[capacity];
     }
 
-    public int getIndex(K key) {
-        int hash = key == null ? 0 : key.hashCode();
-        return hash & (table.length - 1);
-    }
-
     @Override
     public void put(K key, V value) {
         resize();
@@ -52,6 +47,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private int getIndex(K key) {
+        int hash = key == null ? 0 : key.hashCode();
+        return hash & (table.length - 1);
     }
 
     private void resize() {
