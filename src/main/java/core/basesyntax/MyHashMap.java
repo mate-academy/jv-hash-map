@@ -39,19 +39,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (table[hash(key)] == null) {
-            return null;
-        } else if (table[hash(key)].next != null) {
-            Node<K, V> current = table[hash(key)];
-            while (current != null) {
-                if (equalsKey(current.key, key)) {
-                    return current.value;
-                }
-                current = current.next;
+        Node<K, V> current = table[hash(key)];
+        while (current != null) {
+            if (equalsKey(current.key, key)) {
+                return current.value;
             }
-            return null;
+            current = current.next;
         }
-        return table[hash(key)].value;
+        return null;
     }
 
     @Override
@@ -81,8 +76,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         if (size == threshold) {
-            Node<K, V>[] newArray = table;
-            fillNewArray(newArray);
+            Node<K, V>[] oldArray = table;
+            fillNewArray(oldArray);
         }
     }
 
