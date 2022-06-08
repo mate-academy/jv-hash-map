@@ -18,6 +18,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        if (size < capacity * LOAD_FACTOR) {
+            return;
+        }
         if (table.length != 0) {
             capacity *= 2;
         }
@@ -33,9 +36,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= capacity * LOAD_FACTOR) {
-            resize();
-        }
+        resize();
         int index = getIndex(key);
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
