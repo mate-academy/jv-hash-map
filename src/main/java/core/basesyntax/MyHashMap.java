@@ -58,9 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size < capacity * LOAD_FACTOR) {
             return;
         }
-        if (table.length != 0) {
-            capacity *= 2;
-        }
+        capacity *= 2;
         Node<K, V>[] oldTable = table;
         table = (Node<K, V>[]) new Node[capacity];
         size = 0;
