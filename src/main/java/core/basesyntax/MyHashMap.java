@@ -22,7 +22,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int position = getPosition(key, table.length);
         Node<K, V> newNode = new Node<>(key, value, null);
         Node<K, V> currentNode = table[position];
-
         if (table[position] == null) {
             table[position] = newNode;
         } else {
@@ -45,7 +44,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int position = getPosition(key, table.length);
         Node<K,V> currentNode = table[position];
-
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
@@ -61,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getPosition(Object key, int capacity) {
-        int position = (key == null) ? 0 : (key.hashCode() % capacity);
+        int position = key == null ? 0 : key.hashCode() % capacity;
         return Math.abs(position);
     }
 
