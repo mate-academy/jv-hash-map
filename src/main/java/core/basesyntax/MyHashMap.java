@@ -66,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         for (Node<K, V> node : oldTable) {
             for (Node<K, V> currentNode = node; currentNode != null;
-                 currentNode = currentNode.next) {
+                    currentNode = currentNode.next) {
                 put(currentNode.key, currentNode.value);
             }
         }
