@@ -9,7 +9,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         capacity = DEFAULT_CAPACITY;
-        table = (Node<K, V>[]) new Node[capacity];
+        table = new Node[capacity];
     }
 
     @Override
@@ -60,9 +60,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         capacity *= 2;
         Node<K, V>[] oldTable = table;
-        table = (Node<K, V>[]) new Node[capacity];
+        table = new Node[capacity];
         size = 0;
-        for (Node node : oldTable) {
+        for (Node<K, V> node : oldTable) {
             for (Node<K, V> currentNode = node; currentNode != null;
                  currentNode = currentNode.next) {
                 put(currentNode.key, currentNode.value);
