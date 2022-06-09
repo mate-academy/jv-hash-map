@@ -7,37 +7,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
     private static final int RESIZE_INDEX = 2;
-    private Node [] buckets = new Node[DEFAULT_CAPACITY];
+    private Node[] buckets = new Node[DEFAULT_CAPACITY];
     private int size;
 
     @Override
     public void put(K key, V value) {
         int hash = getHashCode(key);
+        int index = hash % buckets.length;
         if (size > buckets.length * LOAD_FACTOR) {
             resize();
         }
-        int index = hash % buckets.length;
+        Node lastNode = new Node<>(hash, key, value, null);
         if (buckets[index] == null) {
-            buckets[index] = new Node(hash, key, value, null);
+            buckets[index] = lastNode;
         } else {
             Node currentBucket = buckets[index];
-            while (currentBucket.next != null) {
-                if (currentBucket.hash == hash
-                        && Objects.equals(key, currentBucket.key)) {
+            while (currentBucket != null) {
+                if (currentBucket.hash == hash && Objects.equals(key, currentBucket.key)) {
                     currentBucket.value = value;
                     return;
+                }
+                if (currentBucket.next == null) {
+                    currentBucket.next = lastNode;
+                    break;
                 }
                 currentBucket = currentBucket.next;
             }
-            if (currentBucket.next == null) {
-                if (currentBucket.hash == hash
-                        && Objects.equals(key, currentBucket.key)) {
-                    currentBucket.value = value;
-                    return;
-                }
-            }
-            Node newNode = new Node<>(hash, key, value, null);
-            currentBucket.next = newNode;
         }
         size++;
     }
