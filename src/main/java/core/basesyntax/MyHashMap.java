@@ -5,12 +5,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private int size;
     private Node<K, V>[] table;
-    private int capacity;
 
     @SuppressWarnings("unchecked")
     public MyHashMap() {
-        capacity = DEFAULT_CAPACITY;
-        table = new Node[capacity];
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -57,6 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @SuppressWarnings("unchecked")
     private void resize() {
+        int capacity = table.length;
         if (size < capacity * LOAD_FACTOR) {
             return;
         }
