@@ -12,16 +12,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        int hash = getHashCode(key);
         if (size > buckets.length * LOAD_FACTOR) {
             resize();
         }
-        int index = getHashCode(key) % buckets.length;
+        int index = hash % buckets.length;
         if (buckets[index] == null) {
-            buckets[index] = new Node(getHashCode(key), key, value, null);
+            buckets[index] = new Node(hash, key, value, null);
         } else {
             Node currentBucket = buckets[index];
             while (currentBucket.next != null) {
-                if (currentBucket.hash == getHashCode(key)
+                if (currentBucket.hash == hash
                         && Objects.equals(key, currentBucket.key)) {
                     currentBucket.value = value;
                     return;
@@ -29,13 +30,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentBucket = currentBucket.next;
             }
             if (currentBucket.next == null) {
-                if (currentBucket.hash == getHashCode(key)
+                if (currentBucket.hash == hash
                         && Objects.equals(key, currentBucket.key)) {
                     currentBucket.value = value;
                     return;
                 }
             }
-            Node newNode = new Node<>(getHashCode(key), key, value, null);
+            Node newNode = new Node<>(hash, key, value, null);
             currentBucket.next = newNode;
         }
         size++;
