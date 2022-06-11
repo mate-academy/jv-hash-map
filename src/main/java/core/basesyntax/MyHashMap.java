@@ -3,8 +3,8 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_INITIAL_CAPACITY = 16;
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int size;
     private Node<K, V>[] table;
 
@@ -20,18 +20,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[bucket] == null) {
             table[bucket] = newNode;
         } else {
-            Node<K, V> currentNode = table[bucket];
-            Node<K, V> previousNode = null;
-            while (currentNode != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    currentNode.value = value;
+            for (Node<K, V> node = table[bucket]; node != null; node = node.next) {
+                if (Objects.equals(node.key, key)) {
+                    node.value = value;
+                    return;
+                } else if (node.next == null) {
+                    node.next = newNode;
+                    size++;
                     return;
                 }
-                previousNode = currentNode;
-                currentNode = currentNode.next;
-            }
-            if (previousNode != null) {
-                previousNode.next = newNode;
             }
         }
         size++;
@@ -39,17 +36,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        V value = null;
         int bucket = hash(key);
         Node<K, V> node = table[bucket];
         while (node != null) {
             if (node.key != null && node.key.equals(key) || node.key == key) {
-                value = node.value;
-                break;
+                return node.value;
             }
             node = node.next;
         }
-        return value;
+        return null;
     }
 
     @Override
@@ -76,9 +71,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         if (size > table.length * DEFAULT_LOAD_FACTOR) {
             size = 0;
-            Node<K, V>[] newNodesArray = table;
+            Node<K, V>[] oldTable = table;
             table = new Node[table.length << 1];
-            for (Node<K, V> node : newNodesArray) {
+            for (Node<K, V> node : oldTable) {
                 while (node != null) {
                     this.put(node.key, node.value);
                     node = node.next;
