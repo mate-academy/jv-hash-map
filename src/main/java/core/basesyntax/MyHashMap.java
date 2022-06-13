@@ -6,11 +6,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final int TABLE_MULTIPLIER = 2;
     private static final float LOAD_FACTOR = 0.75f;
-    private int size = 0;
+    private int size;
     private int threshold;
     private Node[] table = new Node[DEFAULT_CAPACITY];
 
-    static class Node<K, V> {
+    public static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -53,10 +53,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private int getHash(K key) {
-        return Math.abs(key == null ? 0 : key.hashCode());
-    }
-
     @Override
     public V getValue(K key) {
         int index = getHash(key) % table.length;
@@ -88,5 +84,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 oldTable[i] = oldTable[i].next;
             }
         }
+    }
+
+    private int getHash(K key) {
+        return Math.abs(key == null ? 0 : key.hashCode());
     }
 }
