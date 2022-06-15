@@ -47,6 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (Objects.equals(key, node.key)) {
                 return node.value;
             }
+            node = node.next;
         }
         return null;
     }
