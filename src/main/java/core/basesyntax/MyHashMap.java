@@ -1,8 +1,8 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_INITIAL_CAPACITY = 16;
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K,V>[] table;
     private int size;
     private int threshold;
@@ -10,7 +10,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
     }
 
-    static class Node<K,V> {
+    private static class Node<K,V> {
         protected final int hash;
         protected final K key;
         protected V value;
@@ -29,7 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         putVal(hash(key), key, value);
     }
 
-    final void putVal(int hash, K key, V value) {
+    private void putVal(int hash, K key, V value) {
         Node<K,V>[] tab;
         Node<K,V> p;
         int n;
@@ -74,7 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (e = getNode(key)) == null ? null : e.value;
     }
 
-    final Node<K,V> getNode(K key) {
+    private Node<K,V> getNode(K key) {
         Node<K,V>[] tab;
         Node<K,V> first;
         Node<K,V> e;
@@ -104,7 +104,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    final Node<K,V>[] resize() {
+    private Node<K,V>[] resize() {
         Node<K,V>[] oldTab = table;
         int oldCap = (oldTab == null) ? 0 : oldTab.length;
         int oldThr = threshold;
@@ -171,7 +171,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return newTab;
     }
 
-    static int hash(Object key) {
+    private static int hash(Object key) {
         int h;
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
