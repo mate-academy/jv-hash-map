@@ -32,32 +32,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int hash = hash(key);
-        Node<K,V>[] tab = table;
-        Node<K,V> node = tab[(tab.length - 1) & hash];
-        if (node == null) {
-            tab[(tab.length - 1) & hash] = new Node<>(hash, key, value, null);
-        } else {
-            Node<K,V> nextNote;
-            if (node.hash == hash && (Objects.equals(key, node.key))) {
-                nextNote = node;
-            } else {
-                while (true) {
-                    nextNote = node.next;
-                    if (nextNote == null) {
-                        node.next = new Node<>(hash, key, value, null);
-                        break;
-                    }
-                    if (nextNote.hash == hash && (Objects.equals(key, nextNote.key))) {
-                        break;
-                    }
-                    node = nextNote;
-                }
-            }
-            if (nextNote != null) { // existing mapping for key
-                nextNote.value = value;
-                return;
-            }
+        Node<K,V> node = placeNode(key, value);
+        if (node != null) { // existing mapping for key
+            node.value = value;
+            return;
         }
         if (++size > threshold) {
             resize();
@@ -104,53 +82,45 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         Node<K,V>[] oldTab = table;
         int oldCap = oldTab.length;
-        int oldThr = threshold;
-        int newCap;
-        newCap = oldCap << 1;
-        threshold = oldThr << 1; // double threshold
+        int newCap = oldCap << 1;
+        threshold = threshold << 1; // double threshold
         @SuppressWarnings({"unchecked"})
         Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap];
         table = newTab;
-        for (int i = 0; i < oldCap; ++i) {
-            Node<K,V> node = oldTab[i];
+        for (Node<K, V> bucket : oldTab) {
+            Node<K, V> node = bucket;
             if (node != null) {
-                oldTab[i] = null;
-                if (node.next == null) {
-                    newTab[node.hash & (newCap - 1)] = node;
-                } else { // preserve order
-                    Node<K,V> loHead = null;
-                    Node<K,V> loTail = null;
-                    Node<K,V> hiHead = null;
-                    Node<K,V> hiTail = null;
-                    Node<K,V> next;
-                    do {
-                        next = node.next;
-                        if ((node.hash & oldCap) == 0) {
-                            if (loTail == null) {
-                                loHead = node;
-                            } else {
-                                loTail.next = node;
-                            }
-                            loTail = node;
-                        } else {
-                            if (hiTail == null) {
-                                hiHead = node;
-                            } else {
-                                hiTail.next = node;
-                            }
-                            hiTail = node;
-                        }
-                    } while ((node = next) != null);
-                    if (loTail != null) {
-                        loTail.next = null;
-                        newTab[i] = loHead;
+                do {
+                    placeNode(node.key, node.value);
+                    node = node.next;
+                } while (node != null);
+            }
+        }
+    }
+
+    private Node<K,V> placeNode(K key, V value) {
+        int hash = hash(key);
+        Node<K,V>[] tab = table;
+        Node<K,V> node = tab[(tab.length - 1) & hash];
+        if (node == null) {
+            tab[(tab.length - 1) & hash] = new Node<>(hash, key, value, null);
+        } else {
+            if (node.hash != hash || !(Objects.equals(key, node.key))) {
+                Node<K,V> previousNode;
+                while (true) {
+                    previousNode = node;
+                    node = node.next;
+                    if (node == null) {
+                        previousNode.next = new Node<>(hash, key, value, null);
+                        break;
                     }
-                    if (hiTail != null) {
-                        hiTail.next = null;
-                        newTab[i + oldCap] = hiHead;
+                    if (node.hash == hash && (Objects.equals(key, node.key))) {
+                        break;
                     }
                 }
             }
         }
+        return node;
     }
+
 }
