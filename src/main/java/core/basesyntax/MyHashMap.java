@@ -17,10 +17,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K,V> {
-        protected final int hash;
-        protected final K key;
-        protected V value;
-        protected Node<K, V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         Node(int hash, K key, V value, Node<K,V> next) {
             this.hash = hash;
@@ -43,9 +43,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
-    public final V getValue(K key) {
+    public V getValue(K key) {
         Node<K,V> e;
         return (e = getNode(key)) == null ? null : e.value;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
     }
 
     private Node<K,V> getNode(K key) {
@@ -67,11 +72,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
     }
 
     private int hash(Object key) {
@@ -105,19 +105,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (node == null) {
             tab[(tab.length - 1) & hash] = new Node<>(hash, key, value, null);
         } else {
-            if (node.hash != hash || !(Objects.equals(key, node.key))) {
-                Node<K,V> previousNode;
-                while (true) {
-                    previousNode = node;
-                    node = node.next;
-                    if (node == null) {
-                        previousNode.next = new Node<>(hash, key, value, null);
-                        break;
-                    }
-                    if (node.hash == hash && (Objects.equals(key, node.key))) {
-                        break;
-                    }
+            Node<K,V> previousNode;
+            do {
+                previousNode = node;
+                if (node.hash == hash && (Objects.equals(key, node.key))) {
+                    break;
                 }
+                node = node.next;
+            } while (node != null);
+            if (node == null) {
+                previousNode.next = new Node<>(hash, key, value, null);
             }
         }
         return node;
