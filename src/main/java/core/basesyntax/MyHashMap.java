@@ -3,13 +3,14 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int INCREASE_BY_TWO = 2;
+    private static final int GROWTH_COEFFICIENT = 2;
     private Node<K, V>[] table;
     private int threshold;
     private int size;
 
     public MyHashMap() {
-        resize();
+        table = new Node[DEFAULT_CAPACITY];
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
@@ -18,8 +19,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> node;
         int index = getIndex(key);
 
+        if (size > threshold) {
+            resize();
+        }
+
         if (table[index] == null) {
-            table[index] = newNode(key, value);
+            table[index] = createNode(key, value);
         } else {
             node = table[index];
             while (node != null) {
@@ -28,18 +33,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                         && node.key.equals(key))) {
                     node.value = value;
                     return;
-                } else {
-                    if (node.next == null) {
-                        node.next = newNode(key, value);
-                        break;
-                    }
+                }
+                if (node.next == null) {
+                    node.next = createNode(key, value);
+                    break;
                 }
                 node = node.next;
             }
         }
-        if (++size > threshold) {
-            resize();
-        }
+        size++;
     }
 
     @Override
@@ -67,23 +69,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return index;
     }
 
-    final void resize() {
+    private void resize() {
         Node<K, V>[] tab;
         int oldCapacity = (table == null) ? 0 : table.length;
 
         if (oldCapacity > 0) {
             if (threshold < size) {
                 tab = table;
-                table = new Node[oldCapacity * INCREASE_BY_TWO];
+                table = new Node[oldCapacity * GROWTH_COEFFICIENT];
                 threshold = (int) (table.length * LOAD_FACTOR);
                 transfer(tab);
                 tab = table;
             }
-        }
-
-        if (table == null || table.length == 0) {
-            table = new Node[DEFAULT_CAPACITY];
-            threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
         }
     }
 
@@ -97,14 +94,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hash(Object key) {
-        int h;
-        return Math.abs((key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16));
+    private int hash(K key) {
+        return Math.abs((key == null) ? 0 : key.hashCode());
     }
 
-    private Node<K, V> newNode(K key, V value) {
-        Node<K, V> newNode = new Node<>(hash(key), key, value, null);
-        return newNode;
+    private Node<K, V> createNode(K key, V value) {
+        return new Node<>(hash(key), key, value, null);
     }
 
     private static class Node<K, V> {
