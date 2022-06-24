@@ -1,19 +1,19 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_INITIAL_CAPACITY = 16;
-    private static final float DEFAULT_INITIAL_FACTOR = 0.75f;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        table = new Node[DEFAULT_INITIAL_CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size == table.length * DEFAULT_INITIAL_FACTOR) {
-            updateSize();
+        if (size == table.length * DEFAULT_LOAD_FACTOR) {
+            resize();
         }
         int index = hash(key);
         Node<K, V> newNode = new Node<K, V>(key, value, null);
@@ -53,7 +53,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void updateSize() {
+    private void resize() {
         Node<K, V>[] nodes = table;
         table = new Node[table.length * 2];
         size = 0;
