@@ -65,8 +65,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        int index = hash(key) % table.length;
-        return index;
+        return hash(key) % table.length;
     }
 
     private void resize() {
