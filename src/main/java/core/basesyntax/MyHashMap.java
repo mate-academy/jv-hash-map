@@ -7,7 +7,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private int size;
-    Node<K,V>[] table;
+    private Node<K,V> [] table;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
@@ -23,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int position = getIndex(hashCode(key));
         Node<K,V> node = table[position];
-        while(node != null) {
+        while (node != null) {
             if (Objects.equals(node.key,key)) {
                 return node.value;
             }
