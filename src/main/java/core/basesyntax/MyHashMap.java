@@ -5,9 +5,13 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INCREASE_CAPACITY_STEP = 2;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private int size;
-    private Node<K,V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
+    Node<K,V>[] table;
+
+    public MyHashMap() {
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
@@ -17,17 +21,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int position = countPosition(hashCode(key));
-        if (table[position] == null) {
-            return null;
-        }
+        int position = getIndex(hashCode(key));
         Node<K,V> node = table[position];
-        do {
+        while(node != null) {
             if (Objects.equals(node.key,key)) {
                 return node.value;
             }
             node = node.next;
-        } while (node != null);
+        }
         return null;
     }
 
@@ -51,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putValue(int hash,K key,V value) {
-        int position = countPosition(hash);
+        int position = getIndex(hash);
         if (table[position] == null) {
             Node<K, V> newNode = new Node<>(hash,key,value,null);
             table[position] = newNode;
@@ -72,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private int countPosition(int hash) {
+    private int getIndex(int hash) {
         return hash % table.length;
     }
 
