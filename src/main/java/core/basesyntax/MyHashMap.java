@@ -1,31 +1,29 @@
 package core.basesyntax;
 
-import java.util.Arrays;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private Node<K, V>[] arrayNodes;
-    private final int defaultCapacity = 16;
-    private final float loadFactor = 0.75f;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75f;
+    private static final int NEW_SIZE_MULTIPLIER = 2;
+    private Node<K, V>[] table;
     private int threshold;
     private int size;
 
+    private int hash;
+
     public MyHashMap() {
-        this.arrayNodes = (Node<K, V>[]) new Node[defaultCapacity];
-        this.threshold = (int) (loadFactor * arrayNodes.length);
+        this.table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        this.threshold = (int) (LOAD_FACTOR * table.length);
     }
 
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value);
-        int backet = getHash(newNode);
-        if (backet < 0 || backet > arrayNodes.length) {
-            throw new IndexOutOfBoundsException();
-        }
-        if (arrayNodes[backet] == null) {
-            simplePut(newNode);
+        int backet = getHash(key);
+        if (table[backet] == null) {
+            putFirstNode(newNode);
             return;
         }
-        if (getHash(arrayNodes[backet]) == backet) {
+        if (getHash(getKey(table[backet])) == backet) {
             putWithCollision(newNode);
         }
         if (size == threshold) {
@@ -39,7 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return getValueByNullKey(key);
         }
-        for (Node<K, V> nodeForGetValue : arrayNodes) {
+        for (Node<K, V> nodeForGetValue : table) {
             if (nodeForGetValue != null && key.equals(getKey(nodeForGetValue))) {
                 value = nodeForGetValue.value;
                 return value;
@@ -60,86 +58,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
-    public int getSize() {
-        return size;
-    }
-
-    @Override
-    public String toString() {
-        return "MyHashMap{"
-                + "arrayNodes="
-                + Arrays.toString(arrayNodes)
-                + '}';
-    }
-
-    public static class Node<K, V> {
-        private Node<K, V> next;
-        private int hash;
-        private final K key;
-        private V value;
-
-        public Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        @Override
-        public int hashCode() {
-            int primeNumber = 17;
-            primeNumber = 31 * primeNumber + ((this.key == null) ? 0 : this.key.hashCode());
-            primeNumber = 31 * primeNumber + ((this.value == null) ? 0 : this.value.hashCode());
-            return primeNumber;
-        }
-
-        @Override
-        public boolean equals(Object node) {
-            if (node == null) {
-                return false;
-            }
-            if (this == node) {
-                return true;
-            }
-            if (getClass() != node.getClass()) {
-                return false;
-            }
-            Node<K, V> equalNode = (Node<K, V>) node;
-            return (this.key == equalNode.key
-                    || (this.key != null && this.key.equals(equalNode.key)))
-                    && (this.value == equalNode.value
-                    || (this.value != null && this.value.equals(equalNode.value)));
-        }
-
-        @Override
-        public String toString() {
-            return "Node{"
-                    + "hash="
-                    + hash
-                    + ", key="
-                    + key
-                    + ", value="
-                    + value
-                    + ", next="
-                    + next
-                    + '}';
-        }
-    }
-
-    public void setValue(Node<K, V> node,V newValue) {
-        node.value = newValue;
-    }
-
-    public K getKey(Node<K, V> node) {
-        return node.key;
-    }
-
-    public V getValueFromNode(Node<K, V> node) {
-        return node.value;
-    }
-
-    public V[] getAllValues() {
+    public V[] values() {
         V[] valuesArray = (V[]) new Object[size];
         int index = 0;
-        for (Node<K, V> node : arrayNodes) {
+        for (Node<K, V> node : table) {
             if (node != null) {
                 valuesArray[index] = node.value;
                 index++;
@@ -159,10 +81,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return valuesArray;
     }
 
-    public K[] getAllKeys() {
+    @Override
+    public K[] keySet() {
         K[] keysArray = (K[]) new Object[size];
         int index = 0;
-        for (Node<K, V> node : arrayNodes) {
+        for (Node<K, V> node : table) {
             if (node != null) {
                 keysArray[index] = getKey(node);
                 index++;
@@ -182,22 +105,97 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return keysArray;
     }
 
-    public void resize() {
-        int oldCapacity = arrayNodes.length;
-        size = 0;
-        Node<K, V>[] oldArray = arrayNodes;
-        arrayNodes = (Node<K, V>[]) new Node[oldCapacity * 2];
-        threshold = (int) (arrayNodes.length * loadFactor);
-        transfer(oldArray);
+    @Override
+    public int getSize() {
+        return size;
     }
 
-    public void transfer(Node<K, V>[] oldArray) {
-        Node<K, V> currentNode = null;
-        for (Node<K, V> transferedNode: oldArray) {
-            if (transferedNode != null) {
-                put(getKey(transferedNode), getValueFromNode(transferedNode));
-                currentNode = transferedNode.next;
+    @Override
+    public void clear() {
+        final int sizeAfterClear = 0;
+        if (!isEmpty()) {
+            for (int i = 0; i < table.length; i++) {
+                table[i] = null;
             }
+            size = sizeAfterClear;
+        }
+    }
+
+    @Override
+    public boolean containsKey(K key) {
+        Node<K, V> currentNode;
+        for (Node<K, V> node : table) {
+            currentNode = node;
+            while (currentNode != null) {
+                if (getKey(currentNode) == key
+                        || (getKey(currentNode) != null
+                        && getKey(currentNode).equals(key))) {
+                    return true;
+                }
+                currentNode = currentNode.next;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean containsValue(V value) {
+        Node<K, V> currentNode;
+        for (Node<K, V> node : table) {
+            currentNode = node;
+            while (currentNode != null) {
+                if (getValueFromNode(currentNode) == value
+                        || (getValueFromNode(currentNode) != null
+                        && getValueFromNode(currentNode).equals(value))) {
+                    return true;
+                }
+                currentNode = currentNode.next;
+            }
+        }
+        return false;
+    }
+
+    public static class Node<K, V> {
+        private Node<K, V> next;
+        private final K key;
+        private V value;
+
+        public Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+
+    public K getKey(Node<K, V> node) {
+        return node.key;
+    }
+
+    public V getValueFromNode(Node<K, V> node) {
+        return node.value;
+    }
+
+    public V getValueByNullKey(K key) {
+        V value = null;
+        for (Node<K, V> node = table[0]; node != null; node = node.next) {
+            if (getKey(node) == null) {
+                value = getValueFromNode(node);
+            }
+        }
+        return value;
+    }
+
+    public int getHash(K key) {
+        return hash = key == null ? 0 : key.hashCode() & table.length - 1;
+    }
+
+    public void setValue(Node<K, V> node, V newValue) {
+        node.value = newValue;
+    }
+
+    private void transfer(Node<K, V>[] oldArray) {
+        Node<K, V> currentNode;
+        for (Node<K, V> transferedNode : oldArray) {
+            currentNode = transferedNode;
             while (currentNode != null) {
                 put(getKey(currentNode), getValueFromNode(currentNode));
                 currentNode = currentNode.next;
@@ -205,22 +203,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public boolean isEmpty() {
-        return getSize() == 0;
+    private void resize() {
+        int oldCapacity = table.length;
+        size = 0;
+        Node<K, V>[] oldArray = table;
+        table = (Node<K, V>[]) new Node[oldCapacity * NEW_SIZE_MULTIPLIER];
+        threshold = (int) (table.length * LOAD_FACTOR);
+        transfer(oldArray);
     }
 
-    public int getHash(Node<K, V> node) {
-        K key = getKey(node);
-        return node.hash = ((key == null) ? 0 : (key.hashCode() & (arrayNodes.length - 1)));
-    }
-
-    public void simplePut(Node<K, V> node) {
-        arrayNodes[getHash(node)] = node;
+    private void putFirstNode(Node<K, V> node) {
+        table[getHash(getKey(node))] = node;
         size++;
     }
 
-    public void putWithCollision(Node<K, V> node) {
-        Node<K, V> currentNode = arrayNodes[getHash(node)];
+    private void putWithCollision(Node<K, V> node) {
+        Node<K, V> currentNode = table[getHash(getKey(node))];
         while (currentNode != null) {
             if (getKey(currentNode) == getKey(node)
                     || (getKey(currentNode) != null
@@ -237,13 +235,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public V getValueByNullKey(K key) {
-        V value = null;
-        for (Node<K, V> node = arrayNodes[0]; node != null; node = node.next) {
-            if (getKey(node) == null) {
-                value = getValueFromNode(node);
-            }
-        }
-        return value;
+    private boolean isEmpty() {
+        return getSize() == 0;
     }
 }
