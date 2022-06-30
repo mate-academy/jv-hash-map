@@ -6,31 +6,61 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     final static int INITIAL_CAPACITY = 16;
     final static float LOAD_FACTOR = 0.75f;
     private int threshold;
+    private int capacity;
     private Node<K, V>[] table;
     private int size;
 
+    private int hash(K key) {
+        return Math.abs((key == null) ? 0 : key.hashCode());
+    }
+
+    private int getBucketIndex(int hash) {
+        return hash % capacity;
+    }
+
     @Override
     public void put(K key, V value) {
-        resize(threshold);
-        // визначити куди саме покласти нову ноду
-        if (key == null) {
-
+        resize();
+        int hash = hash(key);
+        int index = getBucketIndex(hash);
+        Node currentNode = table[index];
+        if (bucketConditionIsNull(currentNode)) {
+            table[index] = newNode(key, value);
+            size++;
+        } else {
+            // якщо хеши ключів однакові, колізія
+            if (hash((K) currentNode.key) == (hash(key))) {
+                // перевіряємо за equals
+                while (currentNode != null) {
+                    if (currentNode.key == key || currentNode.key.equals(key)) {
+                        // співпали - перезаписуєм ноду
+                        currentNode.value = value;
+                    } else {
+                        // не співпали за equals, переходимо до наступної ноди (якщо вона є)
+                        if (currentNode.next != null) {
+                            currentNode = currentNode.next;
+                        } else {
+                            currentNode.next = newNode(key, value);
+                            size++;
+                        }
+                    }
+                    currentNode = currentNode.next;
+                }
+            }
+            // якщо хеши ключів різні
+            else {
+                while (currentNode.next != null) {
+                    currentNode = currentNode.next;
+                }
+                currentNode.next = newNode(key, value);
+                size++;
+            }
         }
-
-        // бакет може бути порожнім
-            // створити нову ноду, обчислити хеш, ключ та значення вже є, поле некст = налл
-
-        // бакет може бути зайнятим іншою нодою
-            // якщо нода така сам - переписати її значення
-            // якщо нода інша - додати ноду до хвосту
-
-        table[hash(key)] = (Node<K, V>) value;
-
     }
 
     @Override
     public V getValue(K key) {
-        return null;
+        return table[hash(key)].value;
     }
 
     @Override
@@ -38,28 +68,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private Node<K, V> newNode (K key, V value) {
-        return new Node<>(hash(key), key, value, null);
-    }
-
-    private Node<K, V>[] resize(int threshold) {
-        int capacity = 0;
-        Node<K, V>[] newTable = table;
-        if (newTable == null) {
+    private Node<K, V>[] resize() {
+        if (table == null) {
             capacity = INITIAL_CAPACITY;
             threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
             table = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
         }
-        if (++size > threshold) {
+        if (size + 1 > threshold) {
             capacity = capacity * 2;
-            threshold = threshold * 2;
-            newTable = (Node<K, V>[]) new Node[capacity];
+            setThreshold(threshold * 2);
+            table = (Node<K, V>[]) new Node[capacity];
             // transfer(newTable);
         }
-        return newTable;
+        return table;
     }
 
-    private Node<K, V>[] transfer (Node<K, V>[] newTable) {
+    private Node<K, V> newNode(K key, V value) {
+        return new Node<>(hash(key), key, value, null);
+    }
+
+
+    private boolean bucketConditionIsNull(Node currentNode) {
+        return currentNode == null ? true : false;
+    }
+
+    private Node<K, V>[] transfer(Node<K, V>[] newTable) {
         for (Node<K, V> node : table) {
             if (node != null) {
                 hash(node.key);
@@ -70,37 +103,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return table;
     }
 
-    private final int hash(K key) {
-        int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+    public int setThreshold(int threshold) {
+        this.threshold = threshold;
+        return threshold;
     }
 
     private static class Node<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Node<?, ?> node = (Node<?, ?>) o;
-            return hash == node.hash
-                    && Objects.equals(key, node.key)
-                    && Objects.equals(value, node.value);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(hash, key, value, next);
         }
     }
 }
