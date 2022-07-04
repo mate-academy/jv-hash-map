@@ -9,31 +9,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private int threshold;
 
+    @SuppressWarnings({"unchecked"})
     public MyHashMap() {
-        @SuppressWarnings({"unchecked"})
-        Node<K,V>[] newTab = (Node<K,V>[])new Node[DEFAULT_INITIAL_CAPACITY];
-        table = newTab;
+        table = (Node<K,V>[])new Node[DEFAULT_INITIAL_CAPACITY];
         threshold = (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
-    }
-
-    private static class Node<K,V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(int hash, K key, V value, Node<K,V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
     }
 
     @Override
     public void put(K key, V value) {
         Node<K,V> node = placeNode(key, value);
-        if (node != null) { // existing mapping for key
+        if (node != null) {
             node.value = value;
             return;
         }
@@ -53,12 +38,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private static class Node<K,V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(int hash, K key, V value, Node<K,V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+    }
+
     private Node<K,V> getNode(K key) {
         Node<K,V> firstNote = table[(table.length - 1) & hash(key)];
         Node<K,V> nextNote;
         int hash = hash(key);
         if (firstNote != null) {
-            if (firstNote.hash == hash // always check first node
+            if (firstNote.hash == hash
                     && (Objects.equals(key, firstNote.key))) {
                 return firstNote;
             }
@@ -83,7 +82,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K,V>[] oldTab = table;
         int oldCap = oldTab.length;
         int newCap = oldCap << 1;
-        threshold = threshold << 1; // double threshold
+        threshold = threshold << 1;
         @SuppressWarnings({"unchecked"})
         Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap];
         table = newTab;
@@ -119,5 +118,4 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         return node;
     }
-
 }
