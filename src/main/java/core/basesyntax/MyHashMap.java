@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -91,21 +90,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             node = node.next;
         }
         return node;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        MyHashMap<?, ?> myHashMap = (MyHashMap<?, ?>) o;
-        return size == myHashMap.size && Arrays.equals(table, myHashMap.table);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Objects.hash(size);
-        result = 31 * result + Arrays.hashCode(table);
-        return result;
     }
 
     private static class Node<K, V> {
