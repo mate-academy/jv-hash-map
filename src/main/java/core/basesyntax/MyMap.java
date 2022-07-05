@@ -17,6 +17,4 @@ public interface MyMap<K, V> {
 
     boolean containsValue(V value);
 
-    boolean equals(Object obj);
-
 }
