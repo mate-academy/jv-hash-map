@@ -5,7 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private int size = 0;
+    private int size;
     private int threshold;
     private Node<K, V>[] table;
 
@@ -17,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (threshold == size) {
-            reSize();
+            resize();
         }
         int index = hash(key);
         Node<K, V> node = table[index];
@@ -25,9 +25,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = new Node<>(key, value, null);
             size++;
         } else {
-            Node<K, V> node1 = nodeInBucket(node, key);
-            if (node1 != null) {
-                node1.value = value;
+            Node<K, V> foundNode = findNode(node, key);
+            if (foundNode != null) {
+                foundNode.value = value;
             } else {
                 Node<K, V> lastNode = getLastNode(node);
                 lastNode.next = new Node(key, value, null);
@@ -40,7 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = hash(key);
-        Node<K, V> node = nodeInBucket(table[index], key);
+        Node<K, V> node = findNode(table[index], key);
         if (node != null) {
             return node.value;
         }
@@ -52,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public void reSize() {
+    public void resize() {
         threshold = (int) ((table.length * 2) * LOAD_FACTOR);
         size = 0;
         Node<K, V>[] oldTable = table;
@@ -67,7 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     }
 
-    private Node<K, V> nodeInBucket(Node<K, V> node, K key) {
+    private Node<K, V> findNode(Node<K, V> node, K key) {
         while (node != null) {
             if (Objects.equals(key, node.key)) {
                 return node;
