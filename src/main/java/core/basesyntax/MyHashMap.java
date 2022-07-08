@@ -3,8 +3,8 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    final static int INITIAL_CAPACITY = 16;
-    final static double LOAD_FACTOR = 0.75;
+    private static final int INITIAL_CAPACITY = 16;
+    private static final double LOAD_FACTOR = 0.75;
     private int size;
     private Node<K,V>[] buckets;
 
@@ -18,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int index = findIndex(key);
-        int hashKey = key == null ? 0: Math.abs(key.hashCode());
+        int hashKey = key == null ? 0 : Math.abs(key.hashCode());
         Node<K, V> bucket = buckets[index];
         while (bucket != null) {
             if (Objects.equals(key, bucket.key)) {
@@ -66,7 +66,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     Node<K,V> newBucket = newBuckets[index];
                     while (newBucket != null) {
                         if (newBucket.next == null) {
-                            newBucket.next = new Node<>(bucket.key, bucket.value, bucket.hash, null);
+                            newBucket.next =
+                                    new Node<>(bucket.key, bucket.value, bucket.hash, null);
                             break;
                         }
                         newBucket = newBucket.next;
@@ -79,14 +80,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int findIndex(K key) {
-        return key == null ? 0: Math.abs(key.hashCode() % buckets.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % buckets.length);
     }
 
     private static class Node<K,V> {
-        V value;
-        K key;
-        int hash;
-        Node<K,V> next;
+        private V value;
+        private K key;
+        private int hash;
+        private Node<K,V> next;
 
         Node(K key, V value, int hash, Node<K, V> next) {
             this.value = value;
