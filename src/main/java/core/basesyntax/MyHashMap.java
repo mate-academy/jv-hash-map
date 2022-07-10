@@ -29,22 +29,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> newNode = new Node<>(hash(key), key, value, null);
         if (table == null) {
             table = resize();
         }
+        Node<K, V> newNode = new Node<>(hash(key), key, value, null);
         if (key == null) {
             if (table[POSITION_FOR_NULL_KEYS] == null) {
                 table[POSITION_FOR_NULL_KEYS] = newNode;
                 size++;
             } else {
                 Node<K, V> node = table[POSITION_FOR_NULL_KEYS];
-                if (node.key == null){
+                if (node.key == null) {
                     node.value = value;
                     return;
                 }
                 while (node.next != null) {
-                    if(node.next.key == null){
+                    if (node.next.key == null) {
                         node.next.value = value;
                         return;
                     }
@@ -84,7 +84,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         for (Node<K, V> node : table) {
-            if (node == null){
+            if (node == null) {
                 continue;
             }
             if (node.key.equals(key)) {
@@ -92,7 +92,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             while (node.next != null) {
                 if (key == null && node.next.key == null
-                || node.next.key != null && node.next.key.equals(key)){
+                        || node.next.key != null && node.next.key.equals(key)) {
                     return node.next.value;
                 }
                 node = node.next;
@@ -107,7 +107,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(Object key) {
-        return (key == null) ? 0 : (Math.abs(key.hashCode() % 16));
+        return (key == null) ? 0 : (Math.abs(key.hashCode() % mapCapacity));
     }
 
 
@@ -124,8 +124,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return newTable;
         }
         newTable = (Node<K, V>[]) (new Node[newCapacity]);
-        threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
         table = newTable;
+        threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
+        for (Node<K, V> oldNode : oldTable) {
+            if (oldNode != null) {
+                put(oldNode.key, oldNode.value);
+                while (oldNode.next != null) {
+                    put(oldNode.next.key, oldNode.next.value);
+                }
+            }
+        }
         mapCapacity = newCapacity;
         return newTable;
     }
