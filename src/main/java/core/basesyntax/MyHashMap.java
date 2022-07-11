@@ -67,7 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             bucket = bucket.next;
         }
-        buckets[index] = new Node<>(key, value,  null);
+        buckets[index] = new Node<>(key, value,null);
     }
 
     private int findIndex(K key, int length) {
@@ -75,11 +75,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K,V> {
-        V value;
-        K key;
-        Node<K,V> next;
+        private V value;
+        private final K key;
+        private Node<K,V> next;
 
-        Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.value = value;
             this.key = key;
             this.next = next;
