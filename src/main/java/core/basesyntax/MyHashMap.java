@@ -20,26 +20,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (threshold == size) {
             resize();
         }
-        int index = hash(key);
+        int index = getIndex(key);
         Node<K, V> node = table[index];
         if (node == null) {
             table[index] = new Node<>(key, value, null);
             size++;
         } else {
             Node<K, V> foundNode = findNode(node, key);
-            if (foundNode != null) {
-                foundNode.value = value;
-            } else {
+            if (foundNode == null) {
                 Node<K, V> lastNode = getLastNode(node);
                 lastNode.next = new Node(key, value, null);
                 size++;
+            } else {
+                foundNode.value = value;
             }
         }
     }
 
     @Override
     public V getValue(K key) {
-        int index = hash(key);
+        int index = getIndex(key);
         Node<K, V> node = findNode(table[index], key);
         if (node != null) {
             return node.value;
@@ -77,12 +77,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private int hash(K key) {
-        int index = key == null ? 0 : key.hashCode() % table.length;
-        if (index < 0) {
-            return -(index);
-        }
-        return index;
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private Node<K, V> getLastNode(Node<K, V> node) {
