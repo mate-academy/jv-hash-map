@@ -7,14 +7,4 @@ public interface MyMap<K, V> {
 
     int getSize();
 
-    V[] values();
-
-    K[] keySet();
-
-    void clear();
-
-    boolean containsKey(K key);
-
-    boolean containsValue(V value);
-
 }
