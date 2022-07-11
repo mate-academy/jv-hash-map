@@ -87,7 +87,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (node == null) {
                 continue;
             }
-            if (node.key.equals(key)) {
+            if (key == null && node.key == null
+            || node.key.equals(key)) {
                 return node.value;
             }
             while (node.next != null) {
@@ -125,16 +126,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         newTable = (Node<K, V>[]) (new Node[newCapacity]);
         table = newTable;
+        size = 0;
         threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
+        mapCapacity = newCapacity;
         for (Node<K, V> oldNode : oldTable) {
             if (oldNode != null) {
                 put(oldNode.key, oldNode.value);
                 while (oldNode.next != null) {
                     put(oldNode.next.key, oldNode.next.value);
+                    oldNode = oldNode.next;
                 }
             }
         }
-        mapCapacity = newCapacity;
         return newTable;
     }
 }
