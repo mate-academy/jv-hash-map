@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
+    private static final int GROWTH_FACTOR = 2;
     private int size;
     private Node<K,V>[] buckets;
 
@@ -17,29 +18,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == buckets.length * LOAD_FACTOR) {
             resize();
         }
-        int index = findIndex(key);
-        int hashKey = key == null ? 0 : Math.abs(key.hashCode());
-        Node<K, V> bucket = buckets[index];
-        while (bucket != null) {
-            if (Objects.equals(key, bucket.key)) {
-                bucket.value = value;
-                return;
-            }
-            if (bucket.next == null) {
-                size++;
-                bucket.next = new Node<>(key, value, hashKey, null);
-                return;
-            }
-            bucket = bucket.next;
-        }
+        putElement(key, value, buckets);
         size++;
-        buckets[index] = new Node<>(key,value, hashKey, null);
     }
 
     @Override
     public V getValue(K key) {
-        if (buckets[findIndex(key)] != null) {
-            Node<K, V> bucket = buckets[findIndex(key)];
+        if (buckets[findIndex(key, buckets.length)] != null) {
+            Node<K, V> bucket = buckets[findIndex(key, buckets.length)];
             while (bucket != null) {
                 if (Objects.equals(key, bucket.key)) {
                     return bucket.value;
@@ -56,43 +42,46 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] newBuckets = new Node[buckets.length * 2];
+        Node<K, V>[] newBuckets = new Node[buckets.length * GROWTH_FACTOR];
         for (Node<K, V> bucket: buckets) {
             while (bucket != null) {
-                int index = bucket.hash % newBuckets.length;
-                if (newBuckets[index] == null) {
-                    newBuckets[index] = new Node<>(bucket.key, bucket.value, bucket.hash, null);
-                } else {
-                    Node<K,V> newBucket = newBuckets[index];
-                    while (newBucket != null) {
-                        if (newBucket.next == null) {
-                            newBucket.next =
-                                    new Node<>(bucket.key, bucket.value, bucket.hash, null);
-                            break;
-                        }
-                        newBucket = newBucket.next;
-                    }
-                }
+                putElement(bucket.key, bucket.value, newBuckets);
                 bucket = bucket.next;
             }
         }
         buckets = newBuckets;
     }
 
-    private int findIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % buckets.length);
+    private void putElement(K key, V value, Node<K, V>[] buckets) {
+        int index = findIndex(key, buckets.length);
+        Node<K, V> bucket = buckets[index];
+        while (bucket != null) {
+            if (Objects.equals(key, bucket.key)) {
+                bucket.value = value;
+                size--;
+                return;
+            }
+            if (bucket.next == null) {
+                bucket.next = new Node<>(key, value, null);
+                return;
+            }
+            bucket = bucket.next;
+        }
+        buckets[index] = new Node<>(key, value,  null);
+    }
+
+    private int findIndex(K key, int length) {
+        return key == null ? 0 : Math.abs(key.hashCode() % length);
     }
 
     private static class Node<K,V> {
-        private V value;
-        private K key;
-        private int hash;
-        private Node<K,V> next;
+        V value;
+        K key;
+        Node<K,V> next;
 
-        Node(K key, V value, int hash, Node<K, V> next) {
+        Node(K key, V value, Node<K, V> next) {
             this.value = value;
             this.key = key;
-            this.hash = hash;
             this.next = next;
         }
     }
