@@ -1,21 +1,19 @@
 package core.basesyntax;
 
-import java.util.Objects;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
-    final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int POSITION_FOR_NULL_KEYS = 0;
     private int size;
     private int mapCapacity;
     private Node<K, V>[] table;
     private int threshold;
-    private int POSITION_FOR_NULL_KEYS = 0;
 
-    class Node<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K, V> next;
+    static class Node<K, V> {
+        private int hash;
+        private K key;
+        private V value;
+        private Node<K, V> next;
 
         Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
@@ -23,8 +21,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-
-
     }
 
     @Override
@@ -73,7 +69,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 size++;
             }
         }
-
         if (size + 1 > threshold) {
             table = resize();
         }
@@ -89,7 +84,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 continue;
             }
             if (key == null && node.key == null
-            || node.key.equals(key)) {
+                    || node.key.equals(key)) {
                 return node.value;
             }
             while (node.next != null) {
@@ -112,12 +107,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : (Math.abs(key.hashCode() % mapCapacity));
     }
 
-
     private Node<K, V>[] resize() {
-        Node<K, V>[] oldTable = table;
+        final Node<K, V>[] oldTable = table;
         Node<K, V>[] newTable;
         int newCapacity = mapCapacity << 1;
-
         if (table == null) {
             threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
             newTable = (Node<K, V>[]) (new Node[DEFAULT_INITIAL_CAPACITY]);
