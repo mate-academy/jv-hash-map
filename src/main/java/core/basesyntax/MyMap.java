@@ -6,8 +6,4 @@ public interface MyMap<K, V> {
     V getValue(K key);
 
     int getSize();
-
-    int hashCode();
-
-    boolean equals(Object o);
 }
