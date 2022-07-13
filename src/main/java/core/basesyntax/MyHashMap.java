@@ -3,6 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int PLACE_FOR_NULL_KEY = 0;
     private static int capacity;
     private static int size;
     private static int threshold;
@@ -34,14 +35,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (key == null) {
-            putForNullKey(value);
+            if (getForNullKey(table) == null && ++size > threshold) {
+                resize();
+            }
+            putForNullKey(table, value);
             return;
         }
         Node<K, V> newNode = new Node<>(key.hashCode(), key, value, null);
         if ((currentNode = getNode(key, table, capacity)) == null
                 && ++size > threshold) {
             resize();
-        } else if (currentNode != null){
+        } else if (currentNode != null) {
             currentNode.value = value;
             return;
         }
@@ -58,9 +62,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private Node<K, V> getNode (K key, Node<K, V>[] tab, int cap) {
+    private Node<K, V> getNode(K key, Node<K, V>[] tab, int cap) {
         if (key == null) {
-            return getForNullKey();
+            return getForNullKey(tab);
         }
         index = getIndex(key, cap);
         currentNode = tab[index];
@@ -76,7 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return currentNode;
     }
 
-    private void insertNode (Node<K, V> entry, Node<K, V>[] tab, int cap) {
+    private void insertNode(Node<K, V> entry, Node<K, V>[] tab, int cap) {
         index = getIndex(entry.key, cap);
         currentNode = tab[index];
         if (currentNode == null) {
@@ -106,31 +110,37 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int elemLeft = size - 1;
         for (int i = 0; i < table.length; i++) {
             if (oldTab[i] != null) {
-                insertableNode = new Node<>(oldTab[i].hash, oldTab[i].key, oldTab[i].value, null);
-                insertNode(insertableNode, newTab, newCap);
+                if (oldTab[i].key == null) {
+                    putForNullKey(newTab, oldTab[i].value);
+                } else {
+                    insertableNode = new Node<>(oldTab[i].hash,
+                            oldTab[i].key,
+                            oldTab[i].value,
+                            null);
+                    insertNode(insertableNode, newTab, newCap);
+                }
                 currentNode = oldTab[i];
                 if (currentNode.next != null) {
                     oldTab[i] = currentNode.next;
                     i--;
-                 }
+                }
                 elemLeft--;
                 if (elemLeft == 0) {
                     capacity = newCap;
                     threshold = newThr;
                     table = newTab;
                     return;
-               }
+                }
             }
         }
     }
 
-    private void putForNullKey (V value) {
+    private void putForNullKey(Node<K, V>[] table, V value) {
         index = 0;
         currentNode = table[index];
         Node<K, V> nullNode = new Node<>(0, null, value, null);
         if (currentNode == null) {
             table[index] = nullNode;
-            size++;
             return;
         }
         while (true) {
@@ -143,15 +153,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             currentNode = currentNode.next;
         }
-        if (++size > threshold) {
-            resize();
-        }
         currentNode.next = nullNode;
     }
 
-    private Node<K, V> getForNullKey () {
-        index = 0;
-        currentNode = table[index];
+    private Node<K, V> getForNullKey(Node<K, V>[] tab) {
+        currentNode = tab[PLACE_FOR_NULL_KEY];
+        if (currentNode == null) {
+            return null;
+        }
         while (currentNode.key != null) {
             if (currentNode.next == null) {
                 return null;
