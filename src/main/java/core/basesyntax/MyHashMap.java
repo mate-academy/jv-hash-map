@@ -18,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -54,12 +54,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (Node<K, V> node : table) {
-            if (node == null) {
-                continue;
-            }
+        Node<K,V> node = table[getIndex(key)];
+       /* if (node == null){
+            return null;
+        }*/
             if (key == null && node.key == null
-                    || node.key.equals(key)) {
+                    || node != null && node.key.equals(key)) {
                 return node.value;
             }
             while (node.next != null) {
@@ -69,7 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 node = node.next;
             }
-        }
+
         return null;
     }
 
