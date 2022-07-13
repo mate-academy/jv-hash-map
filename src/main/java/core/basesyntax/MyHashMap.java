@@ -4,10 +4,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int PLACE_FOR_NULL_KEY = 0;
-    private static int capacity;
-    private static int size;
-    private static int threshold;
-    private static int index;
+    private int capacity;
+    private int size;
+    private int threshold;
     private Node<K, V>[] table;
     private Node<K, V> currentNode;
 
@@ -15,17 +14,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
         capacity = DEFAULT_INITIAL_CAPACITY;
         threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
-        size = 0;
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -34,18 +30,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (key == null) {
-            if (getForNullKey(table) == null && ++size > threshold) {
-                resize();
-            }
-            putForNullKey(table, value);
-            return;
-        }
-        Node<K, V> newNode = new Node<>(key.hashCode(), key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, null);
         if ((currentNode = getNode(key, table, capacity)) == null
                 && ++size > threshold) {
             resize();
-        } else if (currentNode != null) {
+        }
+        else if (currentNode != null) {
             currentNode.value = value;
             return;
         }
@@ -64,14 +54,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V> getNode(K key, Node<K, V>[] tab, int cap) {
         if (key == null) {
-            return getForNullKey(tab);
+            currentNode = tab[PLACE_FOR_NULL_KEY];
+        } else {
+            currentNode = tab[getIndex(key, cap)];
         }
-        index = getIndex(key, cap);
-        currentNode = tab[index];
         if (currentNode == null) {
             return null;
         }
-        while (!(key.equals(currentNode.key))) {
+        while ((key == null) ? (currentNode.key != null) : !(key.equals(currentNode.key))) {
             if (currentNode.next == null) {
                 return null;
             }
@@ -80,21 +70,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return currentNode;
     }
 
+    private int getIndex(K key, int cap) {
+        return Math.abs(key.hashCode()) % cap;
+    }
+
     private void insertNode(Node<K, V> entry, Node<K, V>[] tab, int cap) {
-        index = getIndex(entry.key, cap);
+        int index = (entry.key == null) ? PLACE_FOR_NULL_KEY : getIndex(entry.key, cap);
         currentNode = tab[index];
         if (currentNode == null) {
             tab[index] = entry;
             return;
         }
         while (currentNode.next != null) {
+//            if ((entry.key == null) ? (currentNode.key == null) : (entry.key.equals(currentNode.key))) {
+//                currentNode.value = entry.value;
+//                return;
+//            }
             currentNode = currentNode.next;
         }
         currentNode.next = entry;
-    }
-
-    private int getIndex(K key, int cap) {
-        return Math.abs(key.hashCode()) % cap;
     }
 
     private void resize() {
@@ -110,15 +104,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int elemLeft = size - 1;
         for (int i = 0; i < table.length; i++) {
             if (oldTab[i] != null) {
-                if (oldTab[i].key == null) {
-                    putForNullKey(newTab, oldTab[i].value);
-                } else {
-                    insertableNode = new Node<>(oldTab[i].hash,
-                            oldTab[i].key,
+                    insertableNode = new Node<>(oldTab[i].key,
                             oldTab[i].value,
                             null);
                     insertNode(insertableNode, newTab, newCap);
-                }
                 currentNode = oldTab[i];
                 if (currentNode.next != null) {
                     oldTab[i] = currentNode.next;
@@ -133,40 +122,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-    }
-
-    private void putForNullKey(Node<K, V>[] table, V value) {
-        index = 0;
-        currentNode = table[index];
-        Node<K, V> nullNode = new Node<>(0, null, value, null);
-        if (currentNode == null) {
-            table[index] = nullNode;
-            return;
-        }
-        while (true) {
-            if (currentNode.key == null) {
-                currentNode.value = value;
-                return;
-            }
-            if (currentNode.next == null) {
-                break;
-            }
-            currentNode = currentNode.next;
-        }
-        currentNode.next = nullNode;
-    }
-
-    private Node<K, V> getForNullKey(Node<K, V>[] tab) {
-        currentNode = tab[PLACE_FOR_NULL_KEY];
-        if (currentNode == null) {
-            return null;
-        }
-        while (currentNode.key != null) {
-            if (currentNode.next == null) {
-                return null;
-            }
-            currentNode = currentNode.next;
-        }
-        return currentNode;
     }
 }
