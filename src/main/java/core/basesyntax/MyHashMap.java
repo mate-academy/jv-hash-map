@@ -33,8 +33,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if (key == null) {
+            putForNullKey(value);
+            return;
+        }
         Node<K, V> newNode = new Node<>(key.hashCode(), key, value, null);
-        if ((currentNode = getNode(key, table, capacity)) == null && ++size > threshold) {
+        if ((currentNode = getNode(key, table, capacity)) == null
+                && ++size > threshold) {
             resize();
         } else if (currentNode != null){
             currentNode.value = value;
@@ -54,6 +59,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> getNode (K key, Node<K, V>[] tab, int cap) {
+        if (key == null) {
+            return getForNullKey();
+        }
         index = getIndex(key, cap);
         currentNode = tab[index];
         if (currentNode == null) {
@@ -72,7 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         index = getIndex(entry.key, cap);
         currentNode = tab[index];
         if (currentNode == null) {
-            table[index] = entry;
+            tab[index] = entry;
             return;
         }
         while (currentNode.next != null) {
@@ -82,7 +90,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key, int cap) {
-        return key.hashCode() % cap;
+        return Math.abs(key.hashCode()) % cap;
     }
 
     private void resize() {
@@ -92,25 +100,64 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         transfer(newTable, newThr, newCap);
     }
 
-    private void transfer(Node<K, V>[] newTable, int newThr, int newCap) {
+    private void transfer(Node<K, V>[] newTab, int newThr, int newCap) {
         Node<K, V>[] oldTab = table;
+        Node<K, V> insertableNode;
         int elemLeft = size - 1;
         for (int i = 0; i < table.length; i++) {
-            currentNode = oldTab[i];
-            if (currentNode != null) {
-               insertNode(currentNode, newTable, newCap);
-               if (currentNode.next != null) {
-                   oldTab[i] = currentNode.next;
-                   i--;
-               }
-               elemLeft--;
-               if (elemLeft == 0) {
-                   capacity = newCap;
-                   threshold = newThr;
-                   table = newTable;
-                   return;
+            if (oldTab[i] != null) {
+                insertableNode = new Node<>(oldTab[i].hash, oldTab[i].key, oldTab[i].value, null);
+                insertNode(insertableNode, newTab, newCap);
+                currentNode = oldTab[i];
+                if (currentNode.next != null) {
+                    oldTab[i] = currentNode.next;
+                    i--;
+                 }
+                elemLeft--;
+                if (elemLeft == 0) {
+                    capacity = newCap;
+                    threshold = newThr;
+                    table = newTab;
+                    return;
                }
             }
         }
+    }
+
+    private void putForNullKey (V value) {
+        index = 0;
+        currentNode = table[index];
+        Node<K, V> nullNode = new Node<>(0, null, value, null);
+        if (currentNode == null) {
+            table[index] = nullNode;
+            size++;
+            return;
+        }
+        while (true) {
+            if (currentNode.key == null) {
+                currentNode.value = value;
+                return;
+            }
+            if (currentNode.next == null) {
+                break;
+            }
+            currentNode = currentNode.next;
+        }
+        if (++size > threshold) {
+            resize();
+        }
+        currentNode.next = nullNode;
+    }
+
+    private Node<K, V> getForNullKey () {
+        index = 0;
+        currentNode = table[index];
+        while (currentNode.key != null) {
+            if (currentNode.next == null) {
+                return null;
+            }
+            currentNode = currentNode.next;
+        }
+        return currentNode;
     }
 }
