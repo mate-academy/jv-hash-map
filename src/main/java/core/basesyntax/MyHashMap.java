@@ -33,8 +33,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[getIndex(key)] = newNode;
             size++;
         } else {
-            while (true) {
-                if (node.key == null && key == null
+            while (node != null) {
+                if (key == null && node.key == null
                         || node.key != null && node.key.equals(key)) {
                     node.value = value;
                     return;
@@ -54,22 +54,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K,V> node = table[getIndex(key)];
-       /* if (node == null){
-            return null;
-        }*/
+        Node<K, V> node = table[getIndex(key)];
+        while (node != null) {
             if (key == null && node.key == null
-                    || node != null && node.key.equals(key)) {
+                    || node.key != null && node.key.equals(key)) {
                 return node.value;
             }
-            while (node.next != null) {
-                if (key == null && node.next.key == null
-                        || node.next.key != null && node.next.key.equals(key)) {
-                    return node.next.value;
-                }
+            if (node.next != null) {
                 node = node.next;
             }
-
+        }
         return null;
     }
 
