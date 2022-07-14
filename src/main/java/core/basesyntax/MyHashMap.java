@@ -38,7 +38,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        return getNode(key) == null ? null : getNode(key).value;
+        Node<K, V> searchingNode = getNode(key);
+        return searchingNode == null ? null : searchingNode.value;
     }
 
     @Override
@@ -48,11 +49,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V> getNode(K key) {
         Node<K, V> searchingNode;
-        if (key == null) {
-            searchingNode = table[PLACE_FOR_NULL_KEY];
-        } else {
-            searchingNode = table[getIndex(key)];
-        }
+        searchingNode = table[getIndex(key)];
         if (searchingNode == null) {
             return null;
         }
@@ -66,29 +63,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return Math.abs(key.hashCode()) % table.length;
+        return key == null ? PLACE_FOR_NULL_KEY : Math.abs(key.hashCode()) % table.length;
     }
 
     private void insertValue(Node<K, V> entry) {
         Node<K, V> replacingNode;
-        int index = (entry.key == null) ? PLACE_FOR_NULL_KEY : getIndex(entry.key);
+        Node<K, V> nodeBefore = null;
+        int index = getIndex(entry.key);
         replacingNode = table[index];
         if (replacingNode == null) {
             table[index] = entry;
             return;
         }
-        while (true) {
-            if (Objects.equals(entry.key, replacingNode.key)) {
-                replacingNode.value = entry.value;
-                size--;
-                return;
-            }
-            if (replacingNode.next == null) {
-                break;
-            }
+            while (replacingNode != null) {
+                if (Objects.equals(entry.key, replacingNode.key)) {
+                    replacingNode.value = entry.value;
+                    size--;
+                    return;
+                }
+                nodeBefore = replacingNode;
             replacingNode = replacingNode.next;
         }
-        replacingNode.next = entry;
+        nodeBefore.next = entry;
     }
 
     private void resize() {
@@ -104,9 +100,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int elemLeft = size - 1;
         for (int i = 0; i < oldTab.length; i++) {
             if (oldTab[i] != null) {
-                insertValue(new Node<>(oldTab[i].key,
-                            oldTab[i].value,
-                            null));
+                put(oldTab[i].key,
+                        oldTab[i].value);
+                size--;
                 current = oldTab[i];
                 if (current.next != null) {
                     oldTab[i] = current.next;
