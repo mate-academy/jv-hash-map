@@ -75,13 +75,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = entry;
             return;
         }
-            while (replacingNode != null) {
-                if (Objects.equals(entry.key, replacingNode.key)) {
-                    replacingNode.value = entry.value;
-                    size--;
-                    return;
-                }
-                nodeBefore = replacingNode;
+        while (replacingNode != null) {
+            if (Objects.equals(entry.key, replacingNode.key)) {
+                replacingNode.value = entry.value;
+                size--;
+                return;
+            }
+            nodeBefore = replacingNode;
             replacingNode = replacingNode.next;
         }
         nodeBefore.next = entry;
