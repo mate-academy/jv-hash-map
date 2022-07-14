@@ -60,9 +60,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     || node.key != null && node.key.equals(key)) {
                 return node.value;
             }
-            if (node.next != null) {
                 node = node.next;
-            }
         }
         return null;
     }
