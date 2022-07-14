@@ -1,18 +1,17 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int PLACE_FOR_NULL_KEY = 0;
-    private int capacity;
     private int size;
     private int threshold;
     private Node<K, V>[] table;
-    private Node<K, V> currentNode;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        capacity = DEFAULT_INITIAL_CAPACITY;
         threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
@@ -31,20 +30,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value, null);
-        if ((currentNode = getNode(key, table, capacity)) == null
-                && ++size > threshold) {
+        if (++size > threshold) {
             resize();
         }
-        else if (currentNode != null) {
-            currentNode.value = value;
-            return;
-        }
-        insertNode(newNode, table, capacity);
+        insertValue(newNode);
     }
 
     @Override
     public V getValue(K key) {
-        return (currentNode = getNode(key, table, capacity)) == null ? null : currentNode.value;
+        return getNode(key) == null ? null : getNode(key).value;
     }
 
     @Override
@@ -52,72 +46,74 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private Node<K, V> getNode(K key, Node<K, V>[] tab, int cap) {
+    private Node<K, V> getNode(K key) {
+        Node<K, V> searchingNode;
         if (key == null) {
-            currentNode = tab[PLACE_FOR_NULL_KEY];
+            searchingNode = table[PLACE_FOR_NULL_KEY];
         } else {
-            currentNode = tab[getIndex(key, cap)];
+            searchingNode = table[getIndex(key)];
         }
-        if (currentNode == null) {
+        if (searchingNode == null) {
             return null;
         }
-        while ((key == null) ? (currentNode.key != null) : !(key.equals(currentNode.key))) {
-            if (currentNode.next == null) {
+        while (!Objects.equals(key, searchingNode.key)) {
+            if (searchingNode.next == null) {
                 return null;
             }
-            currentNode = currentNode.next;
+            searchingNode = searchingNode.next;
         }
-        return currentNode;
+        return searchingNode;
     }
 
-    private int getIndex(K key, int cap) {
-        return Math.abs(key.hashCode()) % cap;
+    private int getIndex(K key) {
+        return Math.abs(key.hashCode()) % table.length;
     }
 
-    private void insertNode(Node<K, V> entry, Node<K, V>[] tab, int cap) {
-        int index = (entry.key == null) ? PLACE_FOR_NULL_KEY : getIndex(entry.key, cap);
-        currentNode = tab[index];
-        if (currentNode == null) {
-            tab[index] = entry;
+    private void insertValue(Node<K, V> entry) {
+        Node<K, V> replacingNode;
+        int index = (entry.key == null) ? PLACE_FOR_NULL_KEY : getIndex(entry.key);
+        replacingNode = table[index];
+        if (replacingNode == null) {
+            table[index] = entry;
             return;
         }
-        while (currentNode.next != null) {
-//            if ((entry.key == null) ? (currentNode.key == null) : (entry.key.equals(currentNode.key))) {
-//                currentNode.value = entry.value;
-//                return;
-//            }
-            currentNode = currentNode.next;
+        while (true) {
+            if (Objects.equals(entry.key, replacingNode.key)) {
+                replacingNode.value = entry.value;
+                size--;
+                return;
+            }
+            if (replacingNode.next == null) {
+                break;
+            }
+            replacingNode = replacingNode.next;
         }
-        currentNode.next = entry;
+        replacingNode.next = entry;
     }
 
     private void resize() {
-        int newCap = capacity << 1;
-        int newThr = threshold << 1;
-        Node<K, V>[] newTable = new Node[newCap];
-        transfer(newTable, newThr, newCap);
+        threshold = threshold << 1;
+        Node<K, V>[] newTable = new Node[table.length << 1];
+        transfer(newTable);
     }
 
-    private void transfer(Node<K, V>[] newTab, int newThr, int newCap) {
+    private void transfer(Node<K, V>[] newTab) {
         Node<K, V>[] oldTab = table;
-        Node<K, V> insertableNode;
+        table = newTab;
+        Node<K, V> current;
         int elemLeft = size - 1;
-        for (int i = 0; i < table.length; i++) {
+        for (int i = 0; i < oldTab.length; i++) {
             if (oldTab[i] != null) {
-                    insertableNode = new Node<>(oldTab[i].key,
+                insertValue(new Node<>(oldTab[i].key,
                             oldTab[i].value,
-                            null);
-                    insertNode(insertableNode, newTab, newCap);
-                currentNode = oldTab[i];
-                if (currentNode.next != null) {
-                    oldTab[i] = currentNode.next;
+                            null));
+                current = oldTab[i];
+                if (current.next != null) {
+                    oldTab[i] = current.next;
                     i--;
                 }
                 elemLeft--;
                 if (elemLeft == 0) {
-                    capacity = newCap;
-                    threshold = newThr;
-                    table = newTab;
                     return;
                 }
             }
