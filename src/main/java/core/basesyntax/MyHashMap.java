@@ -38,8 +38,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-
-        return null;
+        Node<K, V> findNode = getNode(key);
+        return findNode == null ? null : findNode.value;
     }
 
     @Override
@@ -100,4 +100,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
     }
+
+    private Node<K, V> getNode(K key) {
+        Node<K, V> findNode;
+        findNode = table[getIndex(key)];
+        if (findNode == null) {
+            return null;
+        }
+        while (!Objects.equals(key, findNode.key)) {
+            if (findNode.next == null) {
+                return null;
+            }
+            findNode = findNode.next;
+        }
+        return findNode;
+    }
+
 }
