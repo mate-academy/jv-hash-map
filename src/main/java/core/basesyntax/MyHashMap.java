@@ -29,9 +29,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> currentNode = table[index];
         Node<K, V> previousNode = currentNode;
         while (currentNode != null) {
-            if (node.equals(currentNode)) {
-                currentNode.item = value;
-                return;
+            // check hashcodes of keys, if ==, than check equals.
+            if (Objects.hashCode(node.key) == Objects.hashCode(currentNode.key)) {
+                if (node.equals(currentNode)) {
+                    currentNode.item = value;
+                    return;
+                }
             }
             previousNode = currentNode;
             currentNode = currentNode.next;
