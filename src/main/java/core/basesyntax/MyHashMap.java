@@ -33,9 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode.item = value;
                 return;
             }
-            if (currentNode.next == null) {
-                previousNode = currentNode;
-            }
+            previousNode = currentNode;
             currentNode = currentNode.next;
         }
         previousNode.next = node;
