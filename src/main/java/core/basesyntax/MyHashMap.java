@@ -72,7 +72,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? PLACE_FOR_NULL_KEY : Math.abs(key.hashCode()) % table.length;
     }
 
-
     private void resize() {
         threshold = threshold << 1;
         Node<K, V>[] newTable = new Node[table.length << 1];
