@@ -11,7 +11,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private float loadFactor;
 
-    public MyHashMap(){
+    public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
         threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
@@ -88,9 +88,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public boolean containsKey(K key) {
-        if (getValue(key) != null){
+        if (getValue(key) != null) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
