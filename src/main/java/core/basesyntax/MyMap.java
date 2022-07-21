@@ -1,32 +1,17 @@
 package core.basesyntax;
 
+import java.util.Set;
+
 public interface MyMap<K, V> {
+
     void put(K key, V value);
 
     V getValue(K key);
 
     int getSize();
 
-    public static class Entry<K, V>{
-        K key;
-        V value;
+    public boolean containsKey(K key);
 
-        public Entry(K key, V value){
-            this.key = key;
-            this.value = value;
-        }
+    public boolean isEmpty();
 
-        public K getKey(){
-            return key;
-        }
-
-        public V getValue(){
-            return value;
-        }
-
-        @Override
-        public String toString(){
-            return "[" + key + ", " + value + "]";
-        }
-    }
 }
