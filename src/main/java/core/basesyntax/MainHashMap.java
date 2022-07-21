@@ -10,5 +10,6 @@ public class MainHashMap {
         System.out.println(myHashMap.size);
         System.out.println(myHashMap.getValue("bob"));
 
+        Map
     }
 }
