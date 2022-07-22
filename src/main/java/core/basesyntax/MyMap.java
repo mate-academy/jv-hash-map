@@ -8,8 +8,7 @@ public interface MyMap<K, V> {
 
     int getSize();
 
-    public boolean containsKey(K key);
+    boolean containsKey(Object key);
 
-    public boolean isEmpty();
-
+    boolean isEmpty();
 }

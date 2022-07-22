@@ -26,6 +26,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
+    public boolean containsKey(Object key) {
+        if (getValue((K) key) != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public void put(K key, V value) {
         if (size == threshold) {
             resize();
@@ -47,9 +56,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     nextNode.next = newNode;
                     size++;
                     return;
-                } else {
-                    nextNode = nextNode.next;
                 }
+                nextNode = nextNode.next;
             }
         }
     }
@@ -65,15 +73,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             node = node.next;
         }
         return null;
-    }
-
-    @Override
-    public boolean containsKey(K key) {
-        if (getValue(key) != null) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     private static class Node<K, V> {
@@ -107,7 +106,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return (key == null) ? 0 :
-                Math.abs(key.hashCode() % DEFAULT_INITIAL_CAPACITY);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 }
