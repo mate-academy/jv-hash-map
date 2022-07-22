@@ -7,6 +7,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private int size;
 
+    public MyHashMap() {
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
+    }
+
     @Override
     public void put(K key, V value) {
         if (size == threshold) {
@@ -35,9 +39,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (table == null) {
-            return null;
-        }
         int index = getIndex(key);
         Node<K, V> node = table[index];
         while (node != null) {
@@ -55,16 +56,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void resize() {
         Node<K, V> [] tableCopy = table;
-        table = new Node[(table == null) ? DEFAULT_INITIAL_CAPACITY : table.length << 1];
+        table = new Node[table.length << 1];
         threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
-        if (tableCopy == null) {
-            return;
-        }
         size = 0;
         for (Node<K, V> node : tableCopy) {
             while (node != null) {
