@@ -60,7 +60,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V> [] tableCopy = table;
+        final Node<K, V>[] tableCopy = table;
         table = new Node[table.length << 1];
         threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
         size = 0;
