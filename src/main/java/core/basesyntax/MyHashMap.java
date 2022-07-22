@@ -16,22 +16,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
-    @Override
     public int getSize() {
         return size;
-    }
-
-    @Override
-    public boolean containsKey(Object key) {
-        if (getValue((K) key) != null) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     @Override
