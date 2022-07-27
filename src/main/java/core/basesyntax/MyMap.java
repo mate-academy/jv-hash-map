@@ -5,5 +5,7 @@ public interface MyMap<K, V> {
 
     V getValue(K key);
 
+    boolean remove(K key);
+
     int getSize();
 }
