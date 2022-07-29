@@ -6,7 +6,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private static final int RESIZE_COEFFICIENT = 2;
-    //    private int capacity;
     private Node<K, V>[] table;
     private int size;
 
@@ -16,7 +15,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int hash = Objects.hashCode(key);
         Node<K, V> node = new Node<>(key, value, null);
         if (size == table.length * LOAD_FACTOR) {
             resize();
@@ -35,14 +33,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             node = node.next;
         }
         return null;
-    }
-
-    private int getIndex(K key) {
-        int index = Objects.hashCode(key) % table.length;
-        if (index < 0) {
-            index = -index;
-        }
-        return index;
     }
 
     @Override
@@ -91,5 +81,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         table[index] = node;
         size++;
+    }
+
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(Objects.hashCode(key)) % table.length;
     }
 }
