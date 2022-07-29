@@ -34,9 +34,9 @@ public class Bus {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Bus plane = (Bus) o;
-        return Objects.equals(model, plane.model) &&
-                Objects.equals(color, plane.color);
+        Bus bus = (Bus) o;
+        return Objects.equals(model, bus.model) &&
+                Objects.equals(color, bus.color);
     }
 
     @Override
