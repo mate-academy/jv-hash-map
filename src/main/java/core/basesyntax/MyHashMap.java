@@ -80,25 +80,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             index = -index;
         }
         Node<K, V> currentNode = table[index];
-        if (currentNode == null) {
-            table[index] = node;
-            size++;
-        } else if (Objects.equals(currentNode.key, node.key)) {
-            currentNode.value = node.value;
-        } else {
-            while (true) {
-                Node<K, V> nextNode = currentNode.next;
-                if (nextNode == null) {
-                    nextNode = node;
-                    currentNode.next = nextNode;
-                    size++;
-                    break;
-                } else if (Objects.equals(nextNode.key, node.key)) {
-                    nextNode.value = node.value;
-                    break;
-                }
-                currentNode = nextNode;
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, node.key)) {
+                currentNode.value = node.value;
+                return;
             }
+            if (currentNode.next == null) {
+                currentNode.next = node;
+                size++;
+                return;
+            }
+            currentNode = currentNode.next;
         }
+        table[index] = node;
+        size++;
     }
 }
