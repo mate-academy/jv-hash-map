@@ -7,24 +7,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private Node<K, V>[] table;
 
-    private static class Node<K, V> {
-        private K key;
-        private V value;
-        private int hash;
-        private Node<K, V> next;
-
-        public Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-            if (key == null) {
-                this.hash = 0;
-            } else {
-                this.hash = key.hashCode();
-            }
-        }
-    }
-
     public MyHashMap() {
         table = new Node[INITIAL_CAPACITY];
     }
@@ -44,9 +26,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         while (currentNode != null) {
             if (key == currentNode.key || (key != null && key.equals(currentNode.key))) {
                 return currentNode.value;
-            } else {
-                currentNode = currentNode.next;
             }
+            currentNode = currentNode.next;
         }
         return null;
     }
@@ -54,6 +35,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private static class Node<K, V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 
     private int getBucket(K key) {
@@ -73,8 +66,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void addNode(Node<K, V> node) {
-        int h = getBucket(node.key);
-        Node<K, V> currentNode = table[h];
+        int bucket = getBucket(node.key);
+        Node<K, V> currentNode = table[bucket];
         while (currentNode != null) {
             if (currentNode.key == node.key || (currentNode.key != null
                     && currentNode.key.equals(node.key))) {
@@ -87,7 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             currentNode = currentNode.next;
         }
-        table[h] = node;
+        table[bucket] = node;
         size++;
     }
 }
