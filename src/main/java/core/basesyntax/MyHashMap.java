@@ -45,9 +45,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         if (size >= threshold) {
-            Node<K, V>[] oldTable = table;
             currentCapacity = currentCapacity << 1;
             threshold = (int)(currentCapacity * DEFAULT_LOAD_FACTOR);
+            Node<K, V>[] oldTable = table;
             table = new Node[currentCapacity];
             transfer(oldTable);
         }
@@ -86,7 +86,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int getBucketIndexForKey(K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % currentCapacity;
     }
-
 
     private class Node<K, V> {
         private int hash;
