@@ -42,12 +42,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (size == 0) {
-            return null;
-        }
         Node<K, V> currentNode = table[getIndexByKey(key)];
         while (currentNode != null) {
-            if (currentNode.key == key || currentNode.key != null && currentNode.key.equals(key)) {
+            if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
@@ -62,13 +59,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        Node<K, V>[] tmpArray = table;
-        table = (Node<K,V>[]) new Node[tmpArray.length * RESIZE_FACTOR];
+        Node<K, V>[] oldTable = table;
+        table = (Node<K,V>[]) new Node[oldTable.length * RESIZE_FACTOR];
         threshold = (int) (table.length * LOAD_FACTOR);
-        for (Node<K, V> tmpNode : tmpArray) {
-            while (tmpNode != null) {
-                put(tmpNode.key, tmpNode.value);
-                tmpNode = tmpNode.next;
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
