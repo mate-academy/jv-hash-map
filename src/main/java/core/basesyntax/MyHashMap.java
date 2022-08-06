@@ -1,15 +1,16 @@
 package core.basesyntax;
 
+import java.lang.reflect.Array;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_CAPACITY = 16;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
-    private Node<K, V>[] table;
+    private Node[] table;
     private int size;
 
-
     public MyHashMap() {
-        table = new Node<>[DEFAULT_CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
         size = 0;
     }
 
@@ -67,8 +68,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void grow() {
-        Node<K, V>[] newTable = new Node<>[table.length * 2];
-
+        Node<K, V>[] oldTable = table;
+        table = new Node[oldTable.length * 2];
+        for (int i = 0; i < oldTable.length; i++) {
+            if (oldTable[i] != null) {
+                Node<K, V> temp = oldTable[i];
+                while (temp != null) {
+                    put(temp.key, temp.value);
+                    temp = temp.next;
+                }
+            }
+        }
     }
 
     private int getHash(K key) {
