@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import java.lang.reflect.Array;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_CAPACITY = 16;
@@ -31,23 +29,41 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(getHash(key), null, key, value);
-        if (table[newNode.hash] == null) {
-            table[newNode.hash] = newNode;
+        if (table[getBucket(key)] == null) {
+            if (checkSizeOfTable()) {
+                put(key, value);
+                return;
+            }
+            table[getBucket(key)] = newNode;
         } else {
-            setNext(newNode);
+            Node<K, V> currentNode = table[getBucket(key)];
+            Node<K, V> lastNode = currentNode;
+            while (currentNode != null) {
+                if ((currentNode.key == newNode.key)
+                        || (currentNode.key != null && currentNode.key.equals(newNode.key))) {
+                    currentNode.value = newNode.value;
+                    return;
+                }
+                lastNode = currentNode;
+                currentNode = currentNode.next;
+            }
+            if (checkSizeOfTable()) {
+                put(key, value);
+                return;
+            }
+            lastNode.next = newNode;
         }
-        size ++;
-        checkSizeOfTable();
+        size++;
     }
 
     @Override
     public V getValue(K key) {
-        if (table[getHash(key)] == null) {
+        if (table[getBucket(key)] == null) {
             return null;
         } else {
-            Node<K, V> firstNode = table[getHash(key)];
+            Node<K, V> firstNode = table[getBucket(key)];
             while (firstNode != null) {
-                if (firstNode.key.equals(key)) {
+                if (firstNode.key == key || firstNode.key != null && firstNode.key.equals(key)) {
                     return firstNode.value;
                 }
                 firstNode = firstNode.next;
@@ -61,13 +77,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void checkSizeOfTable() {
+    private boolean checkSizeOfTable() {
         if (size == (int) (table.length * DEFAULT_LOAD_FACTOR)) {
             grow();
+            return true;
         }
+        return false;
     }
 
     private void grow() {
+        size = 0;
         Node<K, V>[] oldTable = table;
         table = new Node[oldTable.length * 2];
         for (int i = 0; i < oldTable.length; i++) {
@@ -83,16 +102,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getHash(K key) {
         if (key == null) {
-            return  0;
+            return 0;
         }
-        return Math.abs(key.hashCode() % table.length);
+        return key.hashCode();
     }
 
-    private void setNext(Node<K, V> node) {
-        Node<K, V> prevNode = table[node.hash];
-        while (prevNode.next != null) {
-            prevNode = prevNode.next;
+    private int getBucket(K key) {
+        if (key == null) {
+            return 0;
         }
-        prevNode.next = node;
+        return Math.abs(key.hashCode() % table.length);
     }
 }
