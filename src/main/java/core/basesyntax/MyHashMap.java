@@ -81,8 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int indexByHash(int hash) {
-        int length = table.length;
-        return (length - 1) & hash;
+        return Math.abs(hash % table.length);
     }
 
     @SuppressWarnings("unchecked")
