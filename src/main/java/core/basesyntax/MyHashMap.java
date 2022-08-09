@@ -37,7 +37,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-
+        Node<K, V> current = table[getHash(key) % capacity];
+        while (current != null) {
+            if (key == current.key || key != null && key.equals(current.key)) {
+                return current.value;
+            }
+            current = current.next;
+        }
         return null;
     }
 
