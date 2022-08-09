@@ -20,13 +20,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             currentTable[hash % currentTable.length] = new Node<>(hash, key, value, null);
         } else {
             Node<K, V> currentNode = currentTable[hash % currentTable.length];
-            if ((currentNode.key == null) && (key == null)) { // если обе нулл
+            if ((currentNode.key == null) && (key == null)) {
                 currentNode.value = value;
                 size--;
             } else {
-                if ((currentNode.hash == hash)
-                        && ((currentNode.key == key)
-                        || (currentNode.key != null && currentNode.key.equals(key)))) {
+                if (checkKeysEquals(currentNode, key)) {
                     currentNode.value = value;
                     size--;
                 } else if (currentNode.next != null) {
@@ -37,9 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                             size--;
                             break;
                         } else {
-                            if ((currentNode.hash == hash)
-                                    && ((currentNode.key == key)
-                                    || (currentNode.key != null && currentNode.key.equals(key)))) {
+                            if (checkKeysEquals(currentNode, key)) {
                                 currentNode.value = value;
                                 size--;
                                 break;
@@ -62,37 +58,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> element;
-        if (size == 0) {
+        if (table == null) {
             return null;
         }
-        for (int i = 0; i < table.length; i++) {
-            element = table[i];
-            if (element == null) {
-                continue;
-            }
-            if (element.key == null && key == null) {
-                return element.value;
-            } else if ((element.hash == hash(key))
-                    && ((element.key == key)
-                    || (element.key != null && element.key.equals(key)))) {
-                return element.value;
-            }
-            while (element.next != null) {
+        if (table[getBucket(key)] == null) {
+            return null;
+        } else {
+            Node<K, V> element = table[getBucket(key)];
+            while (element != null) {
+                if (checkKeysEquals(element,key)) {
+                    return element.value;
+                }
                 element = element.next;
-                if (element == null) {
-                    continue;
-                }
-                if (element.key == null && key == null) {
-                    return element.value;
-                } else if ((element.hash == hash(key))
-                        && ((element.key == key)
-                        || (element.key != null && element.key.equals(key)))) {
-                    return element.value;
-                }
             }
+            return element.value;
         }
-        return null;
     }
 
     @Override
@@ -162,6 +142,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private boolean checkKeysEquals(Node<K,V> currentNode, K key) {
+        int hash = hash(key);
+        return (currentNode.hash == hash)
+                && ((currentNode.key == key)
+                || (currentNode.key != null && currentNode.key.equals(key)));
+    }
+
+    private int getBucket(K key) {
+        if (hash(key) == 0) {
+            return 0;
+        }
+        return Math.abs(hash(key) % table.length);
+    }
+
     private class Node<K, V> {
         private int hash;
         private K key;
@@ -184,7 +178,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return false;
             }
             Node<K, V> node = (Node<K, V>) o;
-            return Objects.equals(key, node.key) && Objects.equals(value, node.value);
+            return (key == node.key) || ((key != null) && (key.equals(node.key)))
+                    && (value == node.value)
+                    || ((value != null) && (value.equals(node.value)));
         }
 
         @Override
