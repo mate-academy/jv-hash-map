@@ -3,7 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final float INCREASE_FACTOR = 1.5f;
+    private static final float INCREASE_FACTOR = 2.0f;
     private int capacity;
     private int threshold;
     private int size;
@@ -24,15 +24,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = getHash(key);
         Node<K, V> putted = new Node<>(hash, key, value);
         Node<K, V> prev = table[hash % capacity];
-        if (prev != null) {
-            while (prev.next != null) {
-                prev = prev.next;
-            }
-            prev.next = putted;
-        } else {
+        if (prev == null) {
             table[hash % capacity] = putted;
+            size++;
+            return;
         }
-        size++;
+        while (prev != null) {
+            if (key == prev.key || key != null && key.equals(prev.key)) {
+                prev.value = value;
+                return;
+            }
+            if (prev.next == null) {
+                prev.next = putted;
+                size++;
+                return;
+            }
+            prev = prev.next;
+        }
     }
 
     @Override
@@ -58,7 +66,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         capacity = (int) (capacity * INCREASE_FACTOR);
         threshold = (int) (capacity * LOAD_FACTOR);
         table = (Node<K, V>[]) new Node[capacity];
-        for (Node<K, V> current : table) {
+        size = 0;
+        for (Node<K, V> current : oldTable) {
             if (current != null) {
                 put(current.key, current.value);
                 while (current.next != null) {
@@ -70,7 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHash(K key) {
-        return (key == null) ? 0 : key.hashCode();
+        return (key == null) ? 0 : Math.abs(key.hashCode());
     }
 
     private class Node<K, V> {
