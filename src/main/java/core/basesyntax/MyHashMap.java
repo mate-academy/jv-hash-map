@@ -47,23 +47,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
+        public Node(int hash, K key, V value) {
             this.hash = hash;
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 
     private boolean putVal(K key, V value, Node<K, V>[] nodes, int index) {
         if (nodes[index] == null) {
-            nodes[index] = new Node<>(hashCode(key), key, value, null);
+            nodes[index] = new Node<>(hashCode(key), key, value);
             return true;
         } else {
             Node<K, V> currentNode = table[index];
             while (!Objects.equals(currentNode.key, key)) {
                 if (currentNode.next == null) {
-                    currentNode.next = new Node<>(hashCode(key), key, value, null);
+                    currentNode.next = new Node<>(hashCode(key), key, value);
                     return true;
                 }
                 currentNode = currentNode.next;
@@ -97,10 +96,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key, int capacity) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
+        return hashCode(key) % capacity;
     }
 
     private int hashCode(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
+    }
+
+    public static void main(String[] args) {
+
     }
 }
