@@ -4,9 +4,9 @@ import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
-    static final int MAXIMUM_CAPACITY = 1 << 30;
-    static final float LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+    private static final int MAXIMUM_CAPACITY = 1 << 30;
+    private static final float LOAD_FACTOR = 0.75f;
     private transient Node<K, V>[] table;
     private int size;
     private int capacity;
