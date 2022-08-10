@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -19,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshhold = capacity * LOAD_FACTOR;
     }
 
-    static class Node<K,V> implements Map.Entry<K, V> {
+    static class Node<K,V> {
         private final int hash;
         private final K key;
         private V value;
@@ -32,38 +31,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
         }
 
-        public int getHash() {
-
-            return hash;
-        }
-
-        @Override
-        public K getKey() {
-
-            return key;
-        }
-
-        @Override
-        public V getValue() {
-
-            return value;
-        }
-
-        public Node<K, V> getNext() {
-
-            return next;
-        }
-
-        @Override
-        public V setValue(V value) {
-            V oldValue = this.value;
-            this.value = value;
-            return oldValue;
-        }
-
-        public void setNext(Node<K, V> next) {
-            this.next = next;
-        }
     }
 
     @Override
@@ -134,7 +101,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void transfer(Node<K, V>[] temp) {
         for (Node<K, V> node : temp) {
             if (node != null) {
-                put(node.key,node.value);
+                put(node.key, node.value);
                 while (node.next != null) {
                     put(node.next.key, node.next.value);
                     node.next = node.next.next;
