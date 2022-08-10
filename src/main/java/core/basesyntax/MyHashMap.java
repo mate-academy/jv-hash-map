@@ -33,20 +33,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         public int getHash() {
+
             return hash;
         }
 
         @Override
         public K getKey() {
+
             return key;
         }
 
         @Override
         public V getValue() {
+
             return value;
         }
 
         public Node<K, V> getNext() {
+
             return next;
         }
 
@@ -58,7 +62,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         public void setNext(Node<K, V> next) {
-
             this.next = next;
         }
     }
@@ -111,7 +114,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public int getSize() {
-
         return size;
     }
 
@@ -121,12 +123,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] temp = table;
+        Node<K, V>[] oldTable = table;
         table = new Node[capacity = capacity << 1];
         threshhold = capacity * LOAD_FACTOR;
-        int tempSize = size;
-        transfer(temp);
-        size = tempSize;
+        int oldSize = size;
+        transfer(oldTable);
+        size = oldSize;
     }
 
     private void transfer(Node<K, V>[] temp) {
