@@ -12,16 +12,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int capacity;
     private double threshhold;
 
-    MyHashMap() {
+    public MyHashMap() {
         table = new Node[16];
         size = 0;
         capacity = DEFAULT_INITIAL_CAPACITY;
         threshhold = capacity * LOAD_FACTOR;
-    }
-
-    static final int hash(Object key) {
-        int h;
-        return key == null ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
 
     static class Node<K,V> implements Map.Entry<K, V> {
@@ -78,19 +73,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[index] == null) {
             table[index] = new Node<>(hash(key), key, value, null);
         } else {
-            Node<K, V> temp = table[index];
-            if (Objects.equals(temp.key,key)) {
-                temp.value = value;
+            Node<K, V> node = table[index];
+            if (Objects.equals(node.key,key)) {
+                node.value = value;
                 return;
             }
-            while (temp.next != null) {
-                if (Objects.equals(temp.next.key,key)) {
-                    temp.next.value = value;
+            while (node.next != null) {
+                if (Objects.equals(node.next.key,key)) {
+                    node.next.value = value;
                     return;
                 }
-                temp = temp.next;
+                node = node.next;
             }
-            temp.next = new Node<>(hash(key), key, value, null);
+            node.next = new Node<>(hash(key), key, value, null);
         }
         size++;
     }
@@ -101,22 +96,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[index] == null) {
             return null;
         }
-        Node<K,V> temp = table[index];
-        if (Objects.equals(temp.key,key)) {
-            return temp.value;
+        Node<K,V> node = table[index];
+        if (Objects.equals(node.key,key)) {
+            return node.value;
         }
-        while (temp.next != null) {
-            if (Objects.equals(temp.next.key, key)) {
-                return temp.next.value;
+        while (node.next != null) {
+            if (Objects.equals(node.next.key, key)) {
+                return node.next.value;
             }
-            temp = temp.next;
+            node = node.next;
         }
         return null;
     }
 
     @Override
     public int getSize() {
+
         return size;
+    }
+
+    private final int hash(Object key) {
+        int h;
+        return key == null ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
 
     private void resize() {
