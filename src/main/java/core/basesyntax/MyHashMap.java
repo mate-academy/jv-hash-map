@@ -102,8 +102,4 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int hashCode(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
-
-    public static void main(String[] args) {
-
-    }
 }
