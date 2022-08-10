@@ -59,21 +59,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void putValue(int hash, K key, V value) {
         if (hashTable[hash] == null) {
             hashTable[hash] = new Node<>(hash, key, value);
-        } else {
-            Node<K, V> currentNode = hashTable[hash];
-            while (currentNode.next != null) {
-                if (Objects.equals(key, currentNode.key)) {
-                    break;
-                }
-                currentNode = currentNode.next;
-            }
-            if (Objects.equals(key, currentNode.key)) {
-                currentNode.value = value;
-                size--;
-            } else {
-                currentNode.next = new Node<>(hash, key, value);
-            }
+            return;
         }
+        Node<K, V> currentNode = hashTable[hash];
+        while (currentNode.next != null) {
+            if (Objects.equals(key, currentNode.key)) {
+                break;
+            }
+            currentNode = currentNode.next;
+        }
+        if (Objects.equals(key, currentNode.key)) {
+            currentNode.value = value;
+            size--;
+            return;
+        }
+        currentNode.next = new Node<>(hash, key, value);
     }
 
     private void fill(Node<K, V>[] oldTable) {
