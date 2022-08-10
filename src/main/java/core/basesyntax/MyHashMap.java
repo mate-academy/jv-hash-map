@@ -98,8 +98,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = oldSize;
     }
 
-    private void transfer(Node<K, V>[] temp) {
-        for (Node<K, V> node : temp) {
+    private void transfer(Node<K, V>[] nodes) {
+        for (Node<K, V> node : nodes) {
             if (node != null) {
                 put(node.key, node.value);
                 while (node.next != null) {
