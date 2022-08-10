@@ -11,7 +11,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        table = new Node[DEFAULT_CAPACITY];
+        table = (Node<K,V>[]) new Node[DEFAULT_CAPACITY];
         threshold = (int) LOAD_FACTOR * DEFAULT_CAPACITY;
     }
 
@@ -67,7 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = table;
         int newCapacity = oldTable.length * RESIZE_VALUE;
         threshold = (int) (LOAD_FACTOR * newCapacity);
-        table = new Node[newCapacity];
+        table = (Node<K,V>[]) new Node[newCapacity];
         transfer(oldTable);
     }
 
