@@ -38,10 +38,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size + 1 > threshhold) {
             resize();
         }
+        Node newNode = new Node<>(hash(key), key, value, null);
         int index = hash(key);
         index = Math.abs(index) % capacity;
         if (table[index] == null) {
-            table[index] = new Node<>(hash(key), key, value, null);
+            table[index] = newNode;
         } else {
             Node<K, V> node = table[index];
             if (Objects.equals(node.key,key)) {
@@ -55,7 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 node = node.next;
             }
-            node.next = new Node<>(hash(key), key, value, null);
+            node.next = newNode;
         }
         size++;
     }
