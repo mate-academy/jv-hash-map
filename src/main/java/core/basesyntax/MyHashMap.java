@@ -21,20 +21,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[index] == null) {
             table[index] = node;
             size++;
-        } else {
-            Node<K, V> currentNode = table[index];
-            while (currentNode != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    currentNode.value = value;
-                    return;
-                }
-                if (currentNode.next == null) {
-                    currentNode.next = node;
-                    size++;
-                }
-                currentNode = currentNode.next;
-            }
+            return;
         }
+        Node<K, V> currentNode = table[index];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                currentNode.value = value;
+                return;
+            }
+            if (currentNode.next == null) {
+                currentNode.next = node;
+                size++;
+            }
+            currentNode = currentNode.next;
+        }
+
     }
 
     @Override
