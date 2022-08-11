@@ -43,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private class Node<K, V> {
+    private static class Node<K, V> {
         private Node<K, V> next;
         private int hash;
         private K key;
@@ -76,8 +76,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         currentNode.next = new Node<>(hash, key, value);
     }
 
-    private void fill(Node<K, V>[] oldTable) {
-        for (Node<K, V> node : oldTable) {
+    private void fill(Node<K, V>[] oldHashTable) {
+        for (Node<K, V> node : oldHashTable) {
             Node<K, V> currentNode = node;
             while (currentNode != null) {
                 putValue(getIndexOfBucket(currentNode.key), currentNode.key, currentNode.value);
@@ -90,9 +90,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             capacity *= 2;
             threshold = capacity * DEFAULT_LOAD_FACTOR;
-            Node<K, V>[] oldTable = hashTable;
+            Node<K, V>[] oldHashTable = hashTable;
             hashTable = new Node[capacity];
-            fill(oldTable);
+            fill(oldHashTable);
         }
     }
 
