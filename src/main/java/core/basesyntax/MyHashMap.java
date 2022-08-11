@@ -1,20 +1,6 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static class Node<K, V> {
-        private K key;
-        private V value;
-        private int hash;
-        private Node<K, V> next;
-
-        public Node(K key, V value, int hash, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.hash = hash;
-            this.next = next;
-        }
-    }
-
     private static final float LOAD_FACTOR = 0.75f;
     private static final int COEFFICIENT_GROW = 2;
     private Node<K, V>[] map;
@@ -28,10 +14,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        putItem(map, capacity, key, value);
-        if (size > capacity * LOAD_FACTOR) {
+        if (size + 1 >= capacity * LOAD_FACTOR) {
             resizeMap();
         }
+        putItem(map, capacity, key, value);
     }
 
     @Override
@@ -95,5 +81,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         map = newMap;
+    }
+
+    private static class Node<K, V> {
+        private K key;
+        private V value;
+        private int hash;
+        private Node<K, V> next;
+
+        public Node(K key, V value, int hash, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.hash = hash;
+            this.next = next;
+        }
     }
 }
