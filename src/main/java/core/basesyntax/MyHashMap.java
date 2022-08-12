@@ -9,7 +9,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private Node<K,V>[] table;
 
-    {
+    public MyHashMap() {
         table = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
         capacity = INITIAL_CAPACITY;
         threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
@@ -22,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         int hash = getHash(key);
-        Node<K, V> putted = new Node<>(hash, key, value);
+        Node<K, V> putted = new Node<>(key, value);
         Node<K, V> prev = table[hash % capacity];
         if (prev == null) {
             table[hash % capacity] = putted;
@@ -61,10 +61,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resizeTable() {
-        Node<K, V>[] oldTable = (Node<K, V>[]) new Node[capacity];
-        System.arraycopy(table, 0, oldTable, 0, table.length);
         capacity = (int) (capacity * INCREASE_FACTOR);
         threshold = (int) (capacity * LOAD_FACTOR);
+        Node<K, V>[] oldTable = table;
         table = (Node<K, V>[]) new Node[capacity];
         size = 0;
         for (Node<K, V> current : oldTable) {
@@ -83,13 +82,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        private final int hashKey;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        private Node(int hashKey, K key, V value) {
-            this.hashKey = hashKey;
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
         }
