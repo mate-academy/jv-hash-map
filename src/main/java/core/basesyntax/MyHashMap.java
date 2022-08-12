@@ -18,8 +18,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size > threshold) {
-            fill();
+        if (size >= threshold) {
+            resize();
         }
         putValue(getIndexOfBucket(key), key, value);
         size++;
@@ -61,14 +61,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         currentNode.next = newNode;
     }
 
-    private void fill() {
-        Node<K, V>[] oldHashTable = new Node[capacity];
-        if (size >= threshold) {
-            capacity *= 2;
-            threshold = capacity * DEFAULT_LOAD_FACTOR;
-            oldHashTable = hashTable;
-            hashTable = new Node[capacity];
-        }
+    private void resize() {
+        capacity *= 2;
+        threshold = capacity * DEFAULT_LOAD_FACTOR;
+        Node<K, V>[] oldHashTable = hashTable;
+        hashTable = new Node[capacity];
         for (Node<K, V> node : oldHashTable) {
             while (node != null) {
                 putValue(getIndexOfBucket(node.key), node.key, node.value);
