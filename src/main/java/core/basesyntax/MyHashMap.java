@@ -21,12 +21,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         Node<K, V> node = new Node<>(key, value, null);
-        int hash = getIndex(key);
-        if (table[hash] == null) {
-            table[hash] = node;
+        int index = getIndex(key);
+        if (table[index] == null) {
+            table[index] = node;
             size++;
         } else {
-            Node<K, V> currentNode = table[hash];
+            Node<K, V> currentNode = table[index];
             while (currentNode != null) {
                 if (Objects.equals(currentNode.key, key)) {
                     currentNode.value = value;
