@@ -6,11 +6,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private static final int GROW_NUMBER = 2;
+    private int currentCapacity;
     private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
+        currentCapacity = INITIAL_CAPACITY;
     }
 
     @Override
@@ -69,10 +71,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void ensureCapacity() {
-        if (size == INITIAL_CAPACITY * LOAD_FACTOR) {
+        if (size == currentCapacity * LOAD_FACTOR) {
             size = 0;
+            currentCapacity = currentCapacity * GROW_NUMBER;
             Node<K, V>[] oldTable = table;
-            table = new Node[(int) (INITIAL_CAPACITY * GROW_NUMBER)];
+            table = new Node[currentCapacity];
             for (Node<K, V> node : oldTable) {
                 while (node != null) {
                     put(node.key, node.value);
