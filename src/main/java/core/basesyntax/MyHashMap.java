@@ -22,9 +22,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size + 1 > threshhold) {
             resize();
         }
-        Node newNode = new Node<>(hash(key), key, value, null);
-        int index = hash(key);
-        index = Math.abs(index) % capacity;
+        Node newNode = new Node<>(key, value, null);
+        int index = index(key);
         if (table[index] == null) {
             table[index] = newNode;
         } else {
@@ -47,7 +46,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = Math.abs(hash(key)) % capacity;
+        int index = index(key);
         if (table[index] == null) {
             return null;
         }
@@ -69,9 +68,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private final int hash(Object key) {
+    private int index(Object key) {
         int h;
-        return key == null ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+        h = key == null ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+        return Math.abs(h) % capacity;
     }
 
     private void resize() {
@@ -100,11 +100,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        Node(int hash, K key, V value, Node next) {
+        Node(K key, V value, Node next) {
             this.key = key;
             this.value = value;
             this.next = next;
         }
-
     }
 }
