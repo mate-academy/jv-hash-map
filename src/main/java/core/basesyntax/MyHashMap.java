@@ -30,7 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
         }
         resizeIfNeed();
-        if (add(key, value)) {
+        if (addNode(key, value)) {
             ++size;
         }
     }
@@ -71,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private boolean add(K key, V value) {
+    private boolean addNode(K key, V value) {
         Node<K, V> node = findNode(key);
         if (node == null) {
             int index = getIndex(key);
@@ -92,7 +92,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             for (Node<K, V> node : oldStorage) {
                 if (node != null) {
                     do {
-                        add(node.key, node.value);
+                        addNode(node.key, node.value);
                         node = node.next;
                     } while (node != null);
                 }
