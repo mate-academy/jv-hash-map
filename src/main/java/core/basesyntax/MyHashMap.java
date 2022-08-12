@@ -18,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         ensureCapacity();
 
         Node<K, V> node = new Node<>(key, value, null);
-        int index = getKeyBucket(key);
+        int index = getBucketIndex(key);
         if (table[index] == null) {
             table[index] = node;
             size++;
@@ -41,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = table[getKeyBucket(key)];
+        Node<K, V> node = table[getBucketIndex(key)];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
                 return node.value;
@@ -56,16 +56,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(K key) {
+    private int getHash(K key) {
         int h;
         return (key == null) ? 0 : Math.abs((h = key.hashCode()) ^ (h >>> 16));
     }
 
-    private int getKeyBucket(K key) {
-        if (hash(key) == 0) {
+    private int getBucketIndex(K key) {
+        if (getHash(key) == 0) {
             return 0;
         }
-        return Math.abs(hash(key) % table.length);
+        return Math.abs(getHash(key) % table.length);
     }
 
     private void ensureCapacity() {
@@ -85,7 +85,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Node<K, V> {
         private K key;
         private V value;
-        private int hash;
         private Node<K, V> next;
 
         public Node(K key, V value, Node<K, V> next) {
@@ -103,15 +102,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return false;
             }
             Node<?, ?> node = (Node<?, ?>) o;
-            return hash == node.hash
-                    && Objects.equals(key, node.key)
+            return Objects.equals(key, node.key)
                     && Objects.equals(value, node.value)
                     && Objects.equals(next, node.next);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(key, value, hash, next);
+            return Objects.hash(key, value, next);
         }
     }
 }
