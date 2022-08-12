@@ -1,15 +1,18 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private static final int COEFFICIENT_GROW = 2;
+    private static final int DEFAULT_CAPACITY = 16;
     private Node<K, V>[] map;
     private int capacity;
     private int size;
 
     public MyHashMap() {
-        capacity = 16;
-        map = (Node<K, V>[]) new Node[capacity];
+        capacity = DEFAULT_CAPACITY;
+        map = new Node[capacity];
     }
 
     @Override
@@ -22,7 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = hash(key) % capacity;
+        int index = getBucketIndex(key);
         Node<K, V> node = map[index];
         while (node != null) {
             if (node.key == key || (key != null && key.equals(node.key))) {
@@ -38,22 +41,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode());
+    private int getBucketIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 
     private void putItem(Node<K, V>[] map, int capacity, K key, V value) {
-        Node<K, V> newNode = new Node<>(key, value, hash(key), null);
-        int index = newNode.hash % capacity;
+        Node<K, V> newNode = new Node<>(key, value, null);
+        int index = getBucketIndex(newNode.key);
         if (map[index] == null) {
             map[index] = newNode;
             size++;
             return;
         }
         Node<K, V> node = map[index];
-        Node<K, V> oldNode = null;
+        Node<K, V> oldNode;
         do {
-            if (key == node.key || (key != null && key.equals(node.key))) {
+            if (Objects.equals(key, node.key)) {
                 node.value = value;
                 return;
             }
@@ -86,13 +89,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Node<K, V> {
         private K key;
         private V value;
-        private int hash;
         private Node<K, V> next;
 
-        public Node(K key, V value, int hash, Node<K, V> next) {
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
-            this.hash = hash;
             this.next = next;
         }
     }
