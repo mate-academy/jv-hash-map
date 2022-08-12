@@ -77,7 +77,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[newCapacity];
         size = 0;
         for (Node<K, V> element : oldTab) {
-            while ``(element != null) {
+            while (element != null) {
                 put(element.key, element.value);
                 element = element.next;
             }
