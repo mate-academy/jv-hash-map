@@ -96,13 +96,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K,V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
         Node(int hash, K key, V value, Node next) {
-            this.hash = hash;
             this.key = key;
             this.value = value;
             this.next = next;
