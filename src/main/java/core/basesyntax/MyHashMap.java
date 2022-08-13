@@ -11,23 +11,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
     }
 
-    private class Node<K, V> {
-        private int hash;
-        private Node<K, V> next;
-        private K key;
-        private V value;
-
-        public Node(int hash, Node<K, V> next, K key, V value) {
-            this.hash = hash;
-            this.next = next;
-            this.key = key;
-            this.value = value;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
-        Node<K, V> newNode = new Node<>(getHash(key), null, key, value);
+        Node<K, V> newNode = new Node<>(key == null ? 0 : key.hashCode(), null, key, value);
         if (table[getBucket(key)] == null) {
             if (checkSizeOfTable()) {
                 put(key, value);
@@ -99,17 +85,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getHash(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return key.hashCode();
-    }
-
     private int getBucket(K key) {
         if (key == null) {
             return 0;
         }
         return Math.abs(key.hashCode() % table.length);
+    }
+
+    private class Node<K, V> {
+        private int hash;
+        private Node<K, V> next;
+        private K key;
+        private V value;
+
+        public Node(int hash, Node<K, V> next, K key, V value) {
+            this.hash = hash;
+            this.next = next;
+            this.key = key;
+            this.value = value;
+        }
     }
 }
