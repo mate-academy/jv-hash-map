@@ -60,12 +60,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void grow() {
         Node<K, V>[] oldTable = table;
         table = new Node[oldTable.length * INCREASE_FACTOR];
+        threshold *= INCREASE_FACTOR;
         size = 0;
         for (Node<K, V> element : oldTable) {
             while (element != null) {
                 put(element.key, element.value);
                 element = element.next;
-
             }
         }
     }
