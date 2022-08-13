@@ -1,13 +1,46 @@
 package core.basesyntax;
 
-public class MyHashMap<K, V> implements MyMap<K, V> {
+import java.util.Objects;
 
+public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private Node<K, V>[] table;
+    private int currentCapacity;
+    private int threshold;
     private int size;
+
+    public MyHashMap() {
+        this.table = new Node[DEFAULT_CAPACITY];
+        this.currentCapacity = DEFAULT_CAPACITY;
+        this.threshold = (int)(DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
+    }
 
     @Override
     public void put(K key, V value) {
-
+        ensureCapacity();
+        Node<K, V> node = new Node<>(key, value, null);
+        int index = getBucketIndex(key);
+        if (table[index] == null) {
+            table[index] = node;
+            size++;
+            return;
+        }
+        Node<K, V> current = table[index];
+        while (current != null) {
+            if (Objects.equals(current.key, key)) {
+                current.value = value;
+                return;
+            }
+            if (current.next == null) {
+                current.next = node;
+                size++;
+            }
+            current = current.next;
+        }
     }
+
+
 
     @Override
     public V getValue(K key) {
@@ -19,16 +52,41 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return 0;
     }
 
+    private void ensureCapacity() {
+        if (size == currentCapacity * DEFAULT_LOAD_FACTOR) {
+            size = 0;
+            currentCapacity *= 2;
+            Node<K,V>[] oldTable = table;
+            table = new Node[currentCapacity];
+            for (Node<K, V> node : oldTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
+            }
+        }
+    }
+
+    private int getBucketIndex(K key) {
+        if (getHash(key) == 0) {
+            return 0;
+        }
+        return Math.abs(getHash(key) % table.length);
+    }
+
+    private int getHash(K key) {
+        int h;
+        return (key == null) ? 0 : Math.abs((h = key.hashCode()) ^ (h >>> 16));
+    }
+
     static class Node<K, V> {
-        int hash;
         K key;
-        V Value;
+        V value;
         Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
-            Value = value;
+            value = value;
             this.next = next;
         }
 
