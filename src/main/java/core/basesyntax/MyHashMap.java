@@ -44,8 +44,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        return null;
-    }
+        Node<K, V> node = table[getBucketIndex(key)];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return node.value;
+            }
+            node = node.next;
+            }
+            return null;
+        }
+
 
     @Override
     public int getSize() {
