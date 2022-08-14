@@ -7,13 +7,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private static final int MAGNIFICATION_FACTOR = 2;
 
-    private Bucket<K, V>[] table;
+    private Node<K, V>[] table;
     private int size;
     private int capacity;
     private int threshold;
 
     public MyHashMap() {
-        table = new Bucket[DEFAULT_CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
         capacity = DEFAULT_CAPACITY;
         threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
@@ -24,23 +24,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             increaseCapacity();
         }
         int index = getBucketIndex(key);
-        Bucket<K, V> bucket = table[index];
+        Node<K, V> node = table[index];
 
-        if (bucket == null) {
-            table[index] = new Bucket<>(key, value);
+        if (node == null) {
+            table[index] = new Node<>(key, value);
+            size++;
+            return;
         } else {
-            while (bucket.next != null) {
-                if (Objects.equals(bucket.key, key)) {
-                    bucket.value = value;
+            while (node.next != null) {
+                if (Objects.equals(node.key, key)) {
+                    node.value = value;
                     return;
                 }
-                bucket = bucket.next;
+                node = node.next;
             }
-            if (Objects.equals(bucket.key, key)) {
-                bucket.value = value;
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
                 return;
             }
-            bucket.next = new Bucket<>(key, value);
+            node.next = new Node<>(key, value);
         }
         size++;
     }
@@ -48,12 +50,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = getBucketIndex(key);
-        Bucket<K, V> bucket = table[index];
-        while (bucket != null) {
-            if (Objects.equals(bucket.key, key)) {
-                return bucket.value;
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return node.value;
             }
-            bucket = bucket.next;
+            node = node.next;
         }
         return null;
     }
@@ -65,11 +67,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void increaseCapacity() {
         capacity *= MAGNIFICATION_FACTOR;
-        Bucket<K, V>[] oldTable = table;
-        table = new Bucket[capacity];
+        Node<K, V>[] oldTable = table;
+        table = new Node[capacity];
         size = 0;
-        for (Bucket<K, V> bucket : oldTable) {
-            Bucket<K, V> current = bucket;
+        for (Node<K, V> node : oldTable) {
+            Node<K, V> current = node;
             while (current != null) {
                 put(current.key, current.value);
                 current = current.next;
@@ -82,12 +84,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 
-    private class Bucket<K, V> {
+    private class Node<K, V> {
         private final K key;
         private V value;
-        private Bucket<K, V> next;
+        private Node<K, V> next;
 
-        public Bucket(K key, V value) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
         }
