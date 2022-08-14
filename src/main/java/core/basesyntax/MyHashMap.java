@@ -87,20 +87,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (!(obj instanceof Node)) {
-                return false;
-            }
-            Node<K, V> node = (Node) obj;
-            return Objects.equals(key, node.key)
-                    && Objects.equals(value, node.value)
-                    && Objects.equals(next, node.next);
-        }
-
-        @Override
         public int hashCode() {
             return (key == null ? 0 : key.hashCode() << 16)
                     & (value == null ? 0 : value.hashCode());
