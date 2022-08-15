@@ -15,29 +15,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        checkSizeOfTable();
         Node<K, V> newNode = new Node<>(null, key, value);
         if (table[getBucket(key)] == null) {
-            if (checkSizeOfTable()) {
-                put(key, value);
-                return;
-            }
             table[getBucket(key)] = newNode;
         } else {
             Node<K, V> currentNode = table[getBucket(key)];
-            Node<K, V> lastNode = currentNode;
             while (currentNode != null) {
                 if (Objects.equals(currentNode.key, newNode.key)) {
                     currentNode.value = newNode.value;
                     return;
                 }
-                lastNode = currentNode;
+                if (currentNode.next == null) {
+                    break;
+                }
                 currentNode = currentNode.next;
             }
-            if (checkSizeOfTable()) {
-                put(key, value);
-                return;
-            }
-            lastNode.next = newNode;
+            currentNode.next = newNode;
         }
         size++;
     }
@@ -63,12 +57,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private boolean checkSizeOfTable() {
+    private void checkSizeOfTable() {
         if (size == (int) (table.length * DEFAULT_LOAD_FACTOR)) {
             grow();
-            return true;
         }
-        return false;
     }
 
     private void grow() {
