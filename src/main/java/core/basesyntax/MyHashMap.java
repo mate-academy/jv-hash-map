@@ -1,11 +1,9 @@
 package core.basesyntax;
 
-import java.util.Objects;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_CAPACITY = 1 << 4;
-    static final float DEFAULT_RESIZE_FACTOR = 0.75f;
-    static final int DEFAULT_SIZE = 0;
+    private static final int DEFAULT_CAPACITY = 1 << 4;
+    private static final float DEFAULT_RESIZE_FACTOR = 0.75f;
+    private static final int DEFAULT_SIZE = 0;
     private Node<K, V>[] table;
     private int capacity;
     private int threshold;
@@ -19,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        checkSize();
+        resize();
         Node<K, V> newNode = new Node<>(hash(key), key, value);
         int index = getBucketIndex(key);
         if (table[index] == null) {
@@ -28,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> currentNode = table[index];
             while (currentNode != null) {
-                if (Objects.equals(currentNode.key, key)) {
+                if (currentNode.key == key || key != null && key.equals(currentNode.key)) {
                     currentNode.value = value;
                     break;
                 }
@@ -46,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         Node<K, V> node = table[getBucketIndex(key)];
         while (node != null) {
-            if (Objects.equals(node.key, key)) {
+            if (node.key == key || key != null && key.equals(node.key)) {
                 return node.value;
             }
             node = node.next;
@@ -80,22 +78,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
-    private void checkSize() {
-        if (size >= threshold) {
-            resize();
-        }
-    }
-
     private void resize() {
-        size = DEFAULT_SIZE;
-        capacity = capacity << 1;
-        threshold = (int) (capacity * DEFAULT_RESIZE_FACTOR);
-        Node<K, V>[] oldTab = table;
-        table = new Node[capacity];
-        for (Node<K, V> node : oldTab) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+        if (size >= threshold) {
+            size = DEFAULT_SIZE;
+            capacity = capacity << 1;
+            threshold = (int) (capacity * DEFAULT_RESIZE_FACTOR);
+            Node<K, V>[] oldTab = table;
+            table = new Node[capacity];
+            for (Node<K, V> node : oldTab) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
             }
         }
     }
