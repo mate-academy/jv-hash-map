@@ -4,16 +4,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
-    private final float loadFactor;
     private int size;
     private int capacity;
     private int threshold;
 
     public MyHashMap() {
-        this.capacity = DEFAULT_INITIAL_CAPACITY;
-        this.loadFactor = DEFAULT_LOAD_FACTOR;
-        this.threshold = (int) (capacity * loadFactor);
-        this.table = new Node[capacity];
+        capacity = DEFAULT_INITIAL_CAPACITY;
+        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
+        table = new Node[capacity];
     }
 
     static class Node<K, V> {
@@ -53,9 +51,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 size++;
             }
         }
-        if (size >= threshold) {
-            resize();
-        }
+        resize();
     }
 
     @Override
@@ -88,17 +84,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         final int oldCapacity = (oldTable == null) ? 0 : oldTable.length;
         final int newCapacity;
         final int newThreshold;
-        newCapacity = oldCapacity * 2;
-        capacity = newCapacity;
-        newThreshold = (int) (capacity * loadFactor);
-        threshold = newThreshold;
-        Node<K, V>[] newTable = (Node<K, V>[]) new Node[capacity];
-        table = newTable;
-        if (oldTable != null) {
-            for (int i = 0; i < oldTable.length; i++) {
-                Node<K, V> element = oldTable[i];
-                if (element != null) {
-                    newTable[getHash(element.key)] = element;
+        if (size >= threshold) {
+            newCapacity = oldCapacity * 2;
+            capacity = newCapacity;
+            newThreshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
+            threshold = newThreshold;
+            Node<K, V>[] newTable = (Node<K, V>[]) new Node[capacity];
+            table = newTable;
+            if (oldTable != null) {
+                for (int i = 0; i < oldTable.length; i++) {
+                    Node<K, V> element = oldTable[i];
+                    if (element != null) {
+                        newTable[getHash(element.key)] = element;
+                    }
                 }
             }
         }
