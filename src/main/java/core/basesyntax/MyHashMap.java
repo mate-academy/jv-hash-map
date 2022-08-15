@@ -7,17 +7,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int GROW_FACTOR = 2;
     private static final float LOAD_FACTOR = 0.75f;
     private int size;
-    private float threshold;
+    private int capacity;
     private Node<K, V>[] hashTable;
 
     public MyHashMap() {
-        hashTable = new Node[DEFAULT_CAPACITY];
-        threshold = DEFAULT_CAPACITY * LOAD_FACTOR;
+        capacity = DEFAULT_CAPACITY;
+        hashTable = new Node[capacity];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size == threshold) {
+        if (size == capacity * LOAD_FACTOR) {
             resize();
         }
         Node<K, V> newNode = new Node<>(key, value, null);
@@ -39,7 +39,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             current = current.next;
         }
-
     }
 
     @Override
@@ -60,9 +59,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        size = 0;
         Node<K, V>[] oldTable = hashTable;
-        hashTable = new Node[DEFAULT_CAPACITY * GROW_FACTOR];
+        capacity *= GROW_FACTOR;
+        hashTable = new Node[capacity];
+        size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
