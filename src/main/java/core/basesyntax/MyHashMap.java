@@ -75,20 +75,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = table;
         table = new Node[table.length * 2];
         threshhold = table.length * LOAD_FACTOR;
-        int oldSize = size;
+        size = 0;
         transfer(oldTable);
-        size = oldSize;
     }
 
     private void transfer(Node<K, V>[] nodes) {
         for (Node<K, V> node : nodes) {
-            if (node != null) {
-                put(node.key, node.value);
-                while (node.next != null) {
-                    put(node.next.key, node.next.value);
-                    node.next = node.next.next;
-                }
-            }
+             while (node != null) {
+                 put(node.key, node.value);
+                 node = node.next;
+             }
         }
     }
 
