@@ -6,9 +6,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final double LOAD_FACTOR = 0.75;
     private static final int DEFAULT_CAPACITY = 16;
-    private Node<K,V>[] table = new Node[DEFAULT_CAPACITY];
+    private Node<K,V>[] table;
     private int size;
-    private int threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
+    private int threshold;
+
+    public MyHashMap() {
+        table = new Node[DEFAULT_CAPACITY];
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
+    }
 
     @Override
     public void put(K key, V value) {
@@ -51,7 +56,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public int getSize() {
-
         return size;
     }
 
