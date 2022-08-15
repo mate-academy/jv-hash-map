@@ -16,12 +16,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold) {
+        if (size == threshold) {
             grow();
         }
         int index = getIndex(key);
         if (table[index] == null) {
-            table[index] = new Node<>(getHash(key), key, value, null);
+            table[index] = new Node<>(index, key, value, null);
             size++;
         } else {
             chainWalkthrough(key, value, index);
@@ -47,11 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return getHash(key) % table.length;
-    }
-
-    private int getHash(K key) {
-        return key != null ? Math.abs(key.hashCode()) : 0;
+        return key != null ? Math.abs(key.hashCode()) % table.length : 0;
     }
 
     private void grow() {
@@ -82,7 +78,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (Objects.equals(currentNode.key, key)) {
             currentNode.value = value;
         } else {
-            currentNode.next = new Node<>(getHash(key), key, value, null);
+            currentNode.next = new Node<>(getIndex(key), key, value, null);
             size++;
         }
     }
