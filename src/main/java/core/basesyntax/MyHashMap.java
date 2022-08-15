@@ -18,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        resizeIfNeed();
+        resize();
         if (addNode(key, value)) {
             ++size;
         }
@@ -70,7 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return false;
     }
 
-    private void resizeIfNeed() {
+    private void resize() {
         if (size == threshold) {
             capacity *= 2;
             Node<K, V>[] oldStorage = storage;
