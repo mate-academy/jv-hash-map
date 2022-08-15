@@ -1,6 +1,6 @@
 package core.basesyntax;
 
-import java.util.*;
+import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
@@ -77,11 +77,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             storage = new Node[capacity];
             threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
             for (Node<K, V> node : oldStorage) {
-                if (node != null) {
-                    do {
-                        addNode(node.key, node.value);
-                        node = node.next;
-                    } while (node != null);
+                while (node != null) {
+                    addNode(node.key, node.value);
+                    node = node.next;
                 }
             }
         }
