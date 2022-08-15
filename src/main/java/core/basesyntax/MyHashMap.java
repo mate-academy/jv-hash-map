@@ -6,28 +6,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75d;
     private int threshold;
-    private int initialCapacity;
+    private int capacity;
     private int size;
-    private Node[] data;
+    private Node<K, V>[] data;
 
     public MyHashMap() {
-        initialCapacity = DEFAULT_CAPACITY;
-        data = new Node[initialCapacity];
-        threshold = (int) (initialCapacity * LOAD_FACTOR);
+        capacity = DEFAULT_CAPACITY;
+        data = new Node[capacity];
+        threshold = (int) (capacity * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
         Node currentNode;
         Node newNode = new Node<>(key, value, null);
-        int hash = bucketByKey(key);
-        if (size >= threshold) {
+        int index = getBucketByKey(key);
+        if (size > threshold) {
             resize();
         }
-        if (data[hash] == null) {
-            data[hash] = newNode;
+        if (data[index] == null) {
+            data[index] = newNode;
         } else {
-            currentNode = data[hash];
+            currentNode = data[index];
             while (currentNode.next != null) {
                 if (Objects.equals(currentNode.key, key)) {
                     currentNode.value = value;
@@ -46,7 +46,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node node = data[bucketByKey(key)];
+        Node node = data[getBucketByKey(key)];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
                 return (V) node.value;
@@ -62,10 +62,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        initialCapacity *= 2;
+        capacity *= 2;
         Node<K, V> currentNode;
         Node<K, V>[] oldArray = data;
-        data = new Node[initialCapacity];
+        data = new Node[capacity];
         size = 0;
         for (Node<K, V> node : oldArray) {
             currentNode = node;
@@ -74,11 +74,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode = currentNode.next;
             }
         }
-        threshold = (int) (initialCapacity * LOAD_FACTOR);
+        threshold = (int) (capacity * LOAD_FACTOR);
     }
 
-    private int bucketByKey(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % initialCapacity);
+    private int getBucketByKey(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
     private class Node<K, V> {
