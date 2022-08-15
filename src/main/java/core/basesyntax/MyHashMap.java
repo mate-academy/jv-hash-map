@@ -16,18 +16,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[capacity];
     }
 
-    private static class Node<K, V> {
-        private K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         int bucketIndex = getBucketIndex(key);
@@ -98,5 +86,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getBucketIndex(K key) {
         return (key == null) ? 0 : (Math. abs(key.hashCode()) % capacity);
+    }
+
+    private static class Node<K, V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
