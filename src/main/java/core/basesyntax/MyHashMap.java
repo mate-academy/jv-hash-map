@@ -20,22 +20,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         Node<K, V> newNode = new Node<>(key, value, null);
-        Node<K, V> interationNode = hashMap[findIndex(key)];
-        if (interationNode == null) {
-            hashMap[findIndex(key)] = newNode;
+        int index = findIndex(key);
+        Node<K, V> iterationNode = hashMap[index];
+        if (iterationNode == null) {
+            hashMap[index] = newNode;
             size++;
         }
-        while (interationNode != null) {
-            if (Objects.equals(interationNode.key, key)) {
-                interationNode.value = value;
+        while (iterationNode != null) {
+            if (Objects.equals(iterationNode.key, key)) {
+                iterationNode.value = value;
                 return;
             }
-            if (interationNode.next == null) {
-                interationNode.next = newNode;
+            if (iterationNode.next == null) {
+                iterationNode.next = newNode;
                 size++;
                 return;
             }
-            interationNode = interationNode.next;
+            iterationNode = iterationNode.next;
         }
     }
 
@@ -72,8 +73,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
     }
-    private static class Node<K, V> {
 
+    private static class Node<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
