@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
@@ -13,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> newNode = new Node<>(key == null ? 0 : key.hashCode(), null, key, value);
+        Node<K, V> newNode = new Node<>(null, key, value);
         if (table[getBucket(key)] == null) {
             if (checkSizeOfTable()) {
                 put(key, value);
@@ -24,8 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> currentNode = table[getBucket(key)];
             Node<K, V> lastNode = currentNode;
             while (currentNode != null) {
-                if ((currentNode.key == newNode.key)
-                        || (currentNode.key != null && currentNode.key.equals(newNode.key))) {
+                if (Objects.equals(currentNode.key, newNode.key)) {
                     currentNode.value = newNode.value;
                     return;
                 }
@@ -97,7 +98,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private K key;
         private V value;
 
-        public Node(int hash, Node<K, V> next, K key, V value) {
+        public Node(Node<K, V> next, K key, V value) {
             this.next = next;
             this.key = key;
             this.value = value;
