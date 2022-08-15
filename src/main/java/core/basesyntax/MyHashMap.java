@@ -66,10 +66,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int index(Object key) {
-        int h;
-        h = key == null ? 0 : (h = key.hashCode()) ^ (h >>> 16);
-        return Math.abs(h) % table.length;
+    private int index(K key) {
+        int hash = key == null ? 0 : (hash = key.hashCode());
+        return Math.abs(hash) % table.length;
     }
 
     private void resize() {
