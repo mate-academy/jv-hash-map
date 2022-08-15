@@ -40,12 +40,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        final Node<K, V>[] oldTab = table;
-        int newCap = table.length << 1;
-        threshold = (int) (newCap * LOAD_FACTOR);
-        table = new Node[newCap];
+        final Node<K, V>[] oldTable = table;
+        int newCapacity = table.length << 1;
+        threshold = (int) (newCapacity * LOAD_FACTOR);
+        table = new Node[newCapacity];
         size = 0;
-        transfer(oldTab);
+        transfer(oldTable);
     }
 
     private void transfer(Node<K, V>[] oldTable) {
@@ -63,7 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void putValue(K key, V value) {
         int position = getBucketIndex(key);
-        Node<K, V> newNode = new Node<>(position, key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, null);
         if (table[position] == null) {
             table[position] = newNode;
         } else {
@@ -89,13 +89,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
