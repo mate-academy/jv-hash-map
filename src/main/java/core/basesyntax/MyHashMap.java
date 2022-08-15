@@ -31,7 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             while (node.next != null) {
-                if (Objects.equals(node.next.key,key)) {
+                if (Objects.equals(node.next.key, key)) {
                     node.next.value = value;
                     return;
                 }
@@ -52,9 +52,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (Objects.equals(node.key,key)) {
             return node.value;
         }
-        while (node.next != null) {
-            if (Objects.equals(node.next.key, key)) {
-                return node.next.value;
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return node.value;
             }
             node = node.next;
         }
