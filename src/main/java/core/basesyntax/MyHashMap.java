@@ -11,7 +11,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        int size;
         threshhold = table.length * LOAD_FACTOR;
     }
 
@@ -20,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size + 1 > threshhold) {
             resize();
         }
-        Node newNode = new Node<>(key, value, null);
+        Node<K,V> newNode = new Node<>(key, value, null);
         int index = index(key);
         if (table[index] == null) {
             table[index] = newNode;
@@ -74,17 +73,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         Node<K, V>[] oldTable = table;
         table = new Node[table.length * 2];
-        threshhold = table.length * LOAD_FACTOR;
         size = 0;
         transfer(oldTable);
+        threshhold = table.length * LOAD_FACTOR;
     }
 
     private void transfer(Node<K, V>[] nodes) {
         for (Node<K, V> node : nodes) {
-             while (node != null) {
-                 put(node.key, node.value);
-                 node = node.next;
-             }
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
         }
     }
 
