@@ -7,28 +7,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int COEFFICIENT_GROW = 2;
     private static final int DEFAULT_CAPACITY = 16;
     private Node<K, V>[] map;
-    private int capacity;
     private int size;
 
     public MyHashMap() {
-        capacity = DEFAULT_CAPACITY;
-        map = new Node[capacity];
+        map = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size + 1 >= capacity * LOAD_FACTOR) {
+        if (size + 1 >= map.length * LOAD_FACTOR) {
             resizeMap();
         }
-        putItem(map, capacity, key, value);
+        putItem(map, key, value);
     }
 
     @Override
     public V getValue(K key) {
-        int index = getBucketIndex(key);
+        int index = getBucketIndex(key, map.length);
         Node<K, V> node = map[index];
         while (node != null) {
-            if (node.key == key || (key != null && key.equals(node.key))) {
+            if (Objects.equals(key, node.key)) {
                 return node.value;
             }
             node = node.next;
@@ -41,13 +39,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getBucketIndex(K key) {
+    private int getBucketIndex(K key, int capacity) {
         return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 
-    private void putItem(Node<K, V>[] map, int capacity, K key, V value) {
+    private void putItem(Node<K, V>[] map, K key, V value) {
         Node<K, V> newNode = new Node<>(key, value, null);
-        int index = getBucketIndex(newNode.key);
+        int index = getBucketIndex(newNode.key, map.length);
         if (map[index] == null) {
             map[index] = newNode;
             size++;
@@ -70,17 +68,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resizeMap() {
         size = 0;
-        int oldCapacity = capacity;
-        capacity *= COEFFICIENT_GROW;
-        Node<K, V>[] newMap = (Node<K, V>[]) new Node[capacity];
+        Node<K, V>[] newMap = (Node<K, V>[]) new Node[map.length * COEFFICIENT_GROW];
 
-        for (int i = 0; i < oldCapacity; i++) {
-            if (map[i] != null) {
-                Node<K, V> node = map[i];
-                do {
-                    putItem(newMap, capacity, node.key, node.value);
-                    node = node.next;
-                } while (node != null);
+        for (Node<K, V> kvNode : map) {
+            Node<K, V> node = kvNode;
+            while (node != null) {
+                putItem(newMap, node.key, node.value);
+                node = node.next;
             }
         }
         map = newMap;
