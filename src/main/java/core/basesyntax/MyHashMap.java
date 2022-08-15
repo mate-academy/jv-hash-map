@@ -7,14 +7,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private transient Node<K, V>[] table;
     private int size;
-    private int capacity;
     private double threshhold;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
         size = 0;
-        capacity = DEFAULT_INITIAL_CAPACITY;
-        threshhold = capacity * LOAD_FACTOR;
+        threshhold = table.length * LOAD_FACTOR;
     }
 
     @Override
@@ -71,13 +69,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int index(Object key) {
         int h;
         h = key == null ? 0 : (h = key.hashCode()) ^ (h >>> 16);
-        return Math.abs(h) % capacity;
+        return Math.abs(h) % table.length;
     }
 
     private void resize() {
         Node<K, V>[] oldTable = table;
-        table = new Node[capacity = capacity << 1];
-        threshhold = capacity * LOAD_FACTOR;
+        table = new Node[table.length * 2];
+        threshhold = table.length * LOAD_FACTOR;
         int oldSize = size;
         transfer(oldTable);
         size = oldSize;
