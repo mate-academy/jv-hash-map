@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -23,10 +22,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             buckets[index] = new Node<>(key, value, null);
         } else {
             Node<K, V> currentNode = buckets[index];
-            while (currentNode.next != null) {
+            while (currentNode != null) {
+                if (Objects.equals(currentNode.key, key)) {
+                    currentNode.value = value;
+                    return;
+                }
+                if (currentNode.next == null) {
+                    currentNode.next = new Node<>(key, value, null);
+                    break;
+                }
                 currentNode = currentNode.next;
             }
-            currentNode.next = new Node<>(key, value, null);
         }
         if (++size > threshole) {
             resize();
@@ -38,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Node<K, V> currentNode = buckets[index];
         while (currentNode != null) {
-            if(Objects.equals(currentNode.key,key)) {
+            if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
@@ -52,11 +58,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return Math.abs(key.hashCode() % buckets.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % buckets.length);
     }
 
     private void resize() {
-        Node<K, V>[] temp = buckets;
+        final Node<K, V>[] temp = buckets;
         buckets = new Node[buckets.length * RESIZE_INDEX];
         threshole = threshole * RESIZE_INDEX;
         size = 0;
