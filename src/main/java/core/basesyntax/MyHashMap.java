@@ -10,17 +10,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        size = 0;
     }
 
     @Override
     public void put(K key, V value) {
+        int numberOfBucket = getBucket(key);
         checkSizeOfTable();
         Node<K, V> newNode = new Node<>(null, key, value);
-        if (table[getBucket(key)] == null) {
-            table[getBucket(key)] = newNode;
+        if (table[numberOfBucket] == null) {
+            table[numberOfBucket] = newNode;
         } else {
-            Node<K, V> currentNode = table[getBucket(key)];
+            Node<K, V> currentNode = table[numberOfBucket];
             while (currentNode != null) {
                 if (Objects.equals(currentNode.key, newNode.key)) {
                     currentNode.value = newNode.value;
@@ -38,16 +38,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (table[getBucket(key)] == null) {
-            return null;
-        } else {
-            Node<K, V> firstNode = table[getBucket(key)];
-            while (firstNode != null) {
-                if (Objects.equals(firstNode.key, key)) {
-                    return firstNode.value;
-                }
-                firstNode = firstNode.next;
+        Node<K, V> firstNode = table[getBucket(key)];
+        while (firstNode != null) {
+            if (Objects.equals(firstNode.key, key)) {
+                return firstNode.value;
             }
+            firstNode = firstNode.next;
         }
         return null;
     }
@@ -67,13 +63,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         Node<K, V>[] oldTable = table;
         table = new Node[oldTable.length * 2];
-        for (int i = 0; i < oldTable.length; i++) {
-            if (oldTable[i] != null) {
-                Node<K, V> temp = oldTable[i];
-                while (temp != null) {
-                    put(temp.key, temp.value);
-                    temp = temp.next;
-                }
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
