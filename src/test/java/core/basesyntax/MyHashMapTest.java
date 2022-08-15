@@ -14,8 +14,8 @@ public class MyHashMapTest {
     private static final Car sameSecondCar = new Car("Bmw", "red");
     private static final Car sameThirdCar = new Car("Mercedes", "grey");
 
-    private static final Plane firstPlane = new Plane("Mria", "white");
-    private static final Plane secondPlane = new Plane("Boing", "white");
+    private static final Plane firstPlane = new Plane("Maria", "white");
+    private static final Plane secondPlane = new Plane("Boeing", "white");
     private static final Plane thirdPlane = new Plane("F3T", "grey");
 
     private static final Bus firstBus = new Bus("FirstBus", "white");
