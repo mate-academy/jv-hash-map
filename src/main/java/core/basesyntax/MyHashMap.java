@@ -19,9 +19,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         Node<K, V> newNode = new Node<>(key, value, null);
-        Node<K, V> current = table[getHashcode(key) % table.length];
+        Node<K, V> current = table[getIndex(key)];
         if (current == null) {
-            table[getHashcode(key) % table.length] = newNode;
+            table[getIndex(key)] = newNode;
             size++;
         } else {
             while (current != null) {
