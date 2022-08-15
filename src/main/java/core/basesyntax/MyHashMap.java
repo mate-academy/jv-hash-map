@@ -2,31 +2,32 @@ package core.basesyntax;
 
 import java.util.Objects;
 
+@SuppressWarnings({"rawtypes"})
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75F;
     private int index;
     private int capacity;
     private int size;
-    private Object[] objects;
+    private Node[] nodes;
 
     public MyHashMap() {
-        objects = new Object[INITIAL_CAPACITY];
+        nodes = new Node[INITIAL_CAPACITY];
         capacity = INITIAL_CAPACITY;
     }
 
-    @SuppressWarnings({"rawtypes","unchecked"})
+    @SuppressWarnings({"unchecked"})
     @Override
     public void put(K key, V value) {
         if (size >= capacity * LOAD_FACTOR) {
             capacity = grow();
         }
-        index = key == null ? 0 : Math.abs(key.hashCode() % capacity);
+        indexCalculating(key);
         Node<K, V> node = new Node<>(key, value);
-        if (objects[index] == null) {
-            objects[index] = node;
+        if (nodes[index] == null) {
+            nodes[index] = node;
         } else {
-            Node<K, V> nextNode = (Node<K, V>) objects[index];
+            Node<K, V> nextNode = nodes[index];
             if (checkDuplicate(node, nextNode)) {
                 return;
             }
@@ -41,6 +42,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
+    private void indexCalculating(K key) {
+        index = key == null ? 0 : Math.abs(key.hashCode() % capacity);
+    }
+
     private boolean checkDuplicate(Node<K, V> node, Node<K, V> nextNode) {
         if (Objects.equals(node.key, nextNode.key)) {
             if (!Objects.equals(node.value, nextNode.value)) {
@@ -51,14 +56,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return false;
     }
 
-    @SuppressWarnings({"rawtypes","unchecked"})
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private int grow() {
         capacity = capacity * 2;
-        Object[] elements = objects;
-        objects = new Object[capacity];
-        for (Object element : elements) {
+        Node[] elements = nodes;
+        nodes = new Node[capacity];
+        for (Node<K, V> element : elements) {
             if (element != null) {
-                Node<K, V> node = ((Node<K, V>) element);
+                Node<K, V> node = element;
                 put(node.key, node.value);
                 size--;
                 while (node.next != null) {
@@ -71,22 +76,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return capacity;
     }
 
-    @SuppressWarnings({"rawtypes","unchecked"})
+    @SuppressWarnings({"unchecked"})
     @Override
     public V getValue(K key) {
-        index = key == null ? 0 : Math.abs(key.hashCode() % capacity);
-        Node<K, V> nextNode = (Node<K, V>) objects[index];
-        if (objects[index] == null) {
-            return null;
-        } else if (objects[index] != null && Objects.equals(nextNode.key, key)) {
-            return nextNode.value;
-        } else {
-            while (nextNode.next != null) {
-                if (Objects.equals(nextNode.next.key, key)) {
-                    return nextNode.next.value;
-                }
-                nextNode = nextNode.next;
+        indexCalculating(key);
+        Node<K, V> nextNode = nodes[index];
+        while (nextNode != null) {
+            if (Objects.equals(nextNode.key, key)) {
+                return nextNode.value;
             }
+            nextNode = nextNode.next;
         }
         return null;
     }
