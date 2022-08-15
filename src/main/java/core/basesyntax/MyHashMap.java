@@ -22,7 +22,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         putNode(key, value);
-        size++;
     }
 
     @Override
@@ -31,7 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> currentNode = table[hash];
         if (currentNode != null) {
             while (currentNode.next != null) {
-                if (isEqualsKeys(currentNode.key, key)) {
+                if (Objects.equals(currentNode.key, key)) {
                     return currentNode.value;
                 }
                 currentNode = currentNode.next;
@@ -55,6 +54,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void copyElement(Node<K, V>[] oldTable) {
+        size = 0;
         for (Node<K, V> currentNode : oldTable) {
             while (currentNode != null) {
                 putNode(currentNode.key, currentNode.value);
@@ -67,23 +67,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int bucketIndex = getBucketIndex(key);
         if (table[bucketIndex] == null) {
             table[bucketIndex] = new Node<>(key, value, null);
+            size++;
         } else {
             Node<K, V> currentNode = table[bucketIndex];
-            if (isEqualsKeys(currentNode.key, key)) {
+            if (Objects.equals(currentNode.key, key)) {
                 currentNode.value = value;
-                size--;
+                return;
             } else {
                 while (currentNode.next != null) {
-                    if (isEqualsKeys(currentNode.key, key)) {
+                    if (Objects.equals(currentNode.key, key)) {
                         break;
                     }
                     currentNode = currentNode.next;
                 }
-                if (isEqualsKeys(currentNode.key, key)) {
+                if (Objects.equals(currentNode.key, key)) {
                     currentNode.value = value;
-                    size--;
+                    return;
                 } else {
                     currentNode.next = new Node<>(key, value, null);
+                    size++;
                 }
             }
         }
@@ -91,10 +93,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getBucketIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode()) % capacity;
-    }
-
-    private boolean isEqualsKeys(K key1, K key2) {
-        return Objects.equals(key1, key2);
     }
 
     private static class Node<K, V> {
