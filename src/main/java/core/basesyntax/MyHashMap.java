@@ -3,8 +3,8 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_INITIAL_CAPACITY = 16;
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int size;
     private float threshold;
     private Node<K, V>[] hashMap;
@@ -61,10 +61,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        size = 0;
         Node<K, V>[] oldMap = hashMap;
         hashMap = new Node[DEFAULT_INITIAL_CAPACITY << 1];
         threshold = hashMap.length * DEFAULT_LOAD_FACTOR;
-        size = 0;
         for (Node<K, V> node : oldMap) {
             while (node != null) {
                 put(node.key, node.value);
@@ -73,11 +73,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
 
-        K key;
-        V value;
-        Node<K, V> next;
+        private K key;
+        private V value;
+        private Node<K, V> next;
 
         Node(K key, V value, Node<K, V> next) {
             this.key = key;
