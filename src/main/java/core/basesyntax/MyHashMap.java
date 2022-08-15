@@ -20,7 +20,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         putValue(getIndex(key), key, value);
-        size++;
     }
 
     @Override
@@ -50,11 +49,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void transfer(Node<K, V>[] oldTable) {
+        size = 0;
         for (Node<K, V> node : oldTable) {
-            Node<K, V> currentNode = node;
-            while (currentNode != null) {
-                putValue(getIndex(currentNode.key), currentNode.key, currentNode.value);
-                currentNode = currentNode.next;
+            while (node != null) {
+                putValue(getIndex(node.key), node.key, node.value);
+                node = node.next;
             }
         }
     }
@@ -66,6 +65,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void putValue(int hash, K key, V value) {
         if (table[hash] == null) {
             table[hash] = new Node<>(key, value, null);
+            size++;
         } else {
             Node<K, V> currentNode = table[hash];
             while (currentNode.next != null) {
@@ -76,9 +76,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             if (Objects.equals(currentNode.key, key)) {
                 currentNode.value = value;
-                size--;
             } else {
                 currentNode.next = new Node<>(key, value, null);
+                size++;
             }
         }
     }
