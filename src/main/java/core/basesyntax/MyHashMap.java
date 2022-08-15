@@ -9,20 +9,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private int size;
 
+    public MyHashMap() {
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
+        threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
+    }
+
     @Override
     public void put(K key, V value) {
-        if (++size >= threshold || table.length == 0) {
+        if (size == threshold) {
             resize();
         }
-        putValue(hash(key), key, value);
+        putValue(getIndex(key), key, value);
+        size++;
     }
 
     @Override
     public V getValue(K key) {
-        if (table == null) {
-            return null;
-        }
-        Node<K, V> currentNode = table[hash(key)];
+        Node<K, V> currentNode = table[getIndex(key)];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
@@ -39,37 +42,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldTable = table;
-        int oldCapacity = (oldTable == null) ? 0 : table.length;
-        int oldThreshold = threshold;
-        int newCapacity;
-        if (oldCapacity == 0) {
-            threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
-            table = new Node[DEFAULT_INITIAL_CAPACITY];
-        } else if (size > oldThreshold - 1) {
-            newCapacity = oldCapacity << 1;
-            threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
-            table = new Node[newCapacity];
-            transfer(oldTable);
-        }
+        int oldCapacity = table.length;
+        int newCapacity = oldCapacity << 1;
+        threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
+        table = new Node[newCapacity];
+        transfer(oldTable);
     }
 
     private void transfer(Node<K, V>[] oldTable) {
         for (Node<K, V> node : oldTable) {
             Node<K, V> currentNode = node;
             while (currentNode != null) {
-                putValue(hash(currentNode.key), currentNode.key, currentNode.value);
+                putValue(getIndex(currentNode.key), currentNode.key, currentNode.value);
                 currentNode = currentNode.next;
             }
         }
     }
 
-    private int hash(K key) {
+    private int getIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private void putValue(int hash, K key, V value) {
         if (table[hash] == null) {
-            table[hash] = new Node<>(hash, key, value, null);
+            table[hash] = new Node<>(key, value, null);
         } else {
             Node<K, V> currentNode = table[hash];
             while (currentNode.next != null) {
@@ -82,20 +78,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode.value = value;
                 size--;
             } else {
-                currentNode.next = new Node<>(hash, key, value, null);
+                currentNode.next = new Node<>(key, value, null);
             }
         }
-
     }
 
     private class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
