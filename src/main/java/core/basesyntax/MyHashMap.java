@@ -61,16 +61,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         capacity = capacity * 2;
         Node[] elements = nodes;
         nodes = new Node[capacity];
+        size = 0;
         for (Node<K, V> element : elements) {
-            if (element != null) {
-                Node<K, V> node = element;
-                put(node.key, node.value);
-                size--;
-                while (node.next != null) {
-                    put(node.next.key, node.next.value);
-                    node = node.next;
-                    size--;
-                }
+            while (element != null) {
+                put(element.key, element.value);
+                element = element.next;
             }
         }
         return capacity;
