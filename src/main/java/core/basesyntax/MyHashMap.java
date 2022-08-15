@@ -25,6 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (iterationNode == null) {
             hashMap[index] = newNode;
             size++;
+            return;
         }
         while (iterationNode != null) {
             if (Objects.equals(iterationNode.key, key)) {
