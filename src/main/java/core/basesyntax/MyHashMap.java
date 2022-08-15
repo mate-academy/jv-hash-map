@@ -6,7 +6,6 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75F;
-    private int index;
     private int capacity;
     private int size;
     private Node[] nodes;
@@ -22,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= capacity * LOAD_FACTOR) {
             capacity = grow();
         }
-        indexCalculating(key);
+        int index = indexCalculating(key);
         Node<K, V> node = new Node<>(key, value);
         if (nodes[index] == null) {
             nodes[index] = node;
@@ -42,15 +41,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private void indexCalculating(K key) {
-        index = key == null ? 0 : Math.abs(key.hashCode() % capacity);
+    private int indexCalculating(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
     private boolean checkDuplicate(Node<K, V> node, Node<K, V> nextNode) {
         if (Objects.equals(node.key, nextNode.key)) {
-            if (!Objects.equals(node.value, nextNode.value)) {
-                nextNode.value = node.value;
-            }
+            nextNode.value = node.value;
             return true;
         }
         return false;
@@ -74,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @SuppressWarnings({"unchecked"})
     @Override
     public V getValue(K key) {
-        indexCalculating(key);
+        int index = indexCalculating(key);
         Node<K, V> nextNode = nodes[index];
         while (nextNode != null) {
             if (Objects.equals(nextNode.key, key)) {
