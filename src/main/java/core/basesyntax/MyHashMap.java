@@ -1,9 +1,11 @@
 package core.basesyntax;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
+    private static final int RESIZE_INDEX = 2;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int size;
     private int threshole;
@@ -20,13 +22,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (buckets[index] == null) {
             buckets[index] = new Node<>(key, value, null);
         } else {
-            Node<K, V> currNode = buckets[index];
-            while (currNode.next != null) {
-                currNode = currNode.next;
+            Node<K, V> currentNode = buckets[index];
+            while (currentNode.next != null) {
+                currentNode = currentNode.next;
             }
-            currNode.next = new Node<>(key, value, null);
+            currentNode.next = new Node<>(key, value, null);
         }
-        if (++size == threshole) {
+        if (++size > threshole) {
             resize();
         }
     }
@@ -34,15 +36,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = getIndex(key);
-        if (buckets[index] == null) {
-            return null;
-        } else {
-            Node<K, V> currNode = buckets[index];
-            while (currNode.next != null) {
-                if(Objects.equals(currNode.key,key)) {
-                    return currNode.value;
-                }
+        Node<K, V> currentNode = buckets[index];
+        while (currentNode != null) {
+            if(Objects.equals(currentNode.key,key)) {
+                return currentNode.value;
             }
+            currentNode = currentNode.next;
         }
         return null;
     }
@@ -57,7 +56,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-
+        Node<K, V>[] temp = buckets;
+        buckets = new Node[buckets.length * RESIZE_INDEX];
+        threshole = threshole * RESIZE_INDEX;
+        size = 0;
+        for (Node<K, V> currentNode : temp) {
+            while (currentNode != null) {
+                put(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
+            }
+        }
     }
 
     private class Node<K, V> {
