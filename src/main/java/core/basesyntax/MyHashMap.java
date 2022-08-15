@@ -8,14 +8,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private int threshold;
 
+    public MyHashMap() {
+        storage = new Node[DEFAULT_CAPACITY];
+        capacity = DEFAULT_CAPACITY;
+        threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
+    }
 
     @Override
     public void put(K key, V value) {
-        if (capacity == 0) {
-            storage = new Node[DEFAULT_CAPACITY];
-            capacity = DEFAULT_CAPACITY;
-            threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
-        }
         resizeIfNeed();
         if (addNode(key, value)) {
             ++size;
@@ -24,9 +24,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (storage == null) {
-            return null;
-        }
         return findNode(key) == null ? null : findNode(key).value;
     }
 
