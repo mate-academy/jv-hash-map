@@ -17,7 +17,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         ensureCapacity();
-
         Node<K, V> node = new Node<>(key, value, null);
         int index = getBucketIndex(key);
         if (table[index] == null) {
@@ -85,25 +84,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof Node)) {
-                return false;
-            }
-            Node<?, ?> node = (Node<?, ?>) o;
-            return Objects.equals(key, node.key)
-                    && Objects.equals(value, node.value)
-                    && Objects.equals(next, node.next);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(key, value, next);
         }
     }
 }
