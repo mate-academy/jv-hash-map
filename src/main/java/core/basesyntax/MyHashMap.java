@@ -12,9 +12,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int currentCapacity;
 
     public MyHashMap() {
-        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
         threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
-        currentCapacity = table.length;
+        currentCapacity = DEFAULT_CAPACITY;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void addValue(K key, V value) {
         resize();
         int keyHash = getHash(key);
-        Node<K, V> newNode = new Node<>(keyHash, key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, null);
         Node<K, V> oldNode = null;
         if (table[keyHash] == null) {
             table[keyHash] = newNode;
@@ -77,7 +77,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V>[] resize() {
         if (size + 1 > threshold) {
-            Node<K, V>[] newNodeArray = new Node[DEFAULT_CAPACITY * INCREASE_FACTOR];
+            Node<K, V>[] newNodeArray = new Node[currentCapacity * INCREASE_FACTOR];
             Node<K, V>[] oldTab = table;
             table = newNodeArray;
             threshold = threshold * INCREASE_FACTOR;
@@ -100,13 +100,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
