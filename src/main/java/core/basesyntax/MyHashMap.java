@@ -17,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size == capacity * LOAD_FACTOR) {
+        if (size > capacity * LOAD_FACTOR) {
             resize();
         }
         Node<K, V> newNode = new Node<>(key, value, null);
