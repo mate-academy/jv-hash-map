@@ -12,7 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (size == 0) {
-            table = (Node<K, V>[]) new Node<>[DEFAULT_INITIAL_CAPACITY];
+            table = new Node[DEFAULT_INITIAL_CAPACITY];
             threshold = (int) (DEFAULT_INITIAL_CAPACITY * LOAD_FACTOR);
         }
         if (size == threshold) {
