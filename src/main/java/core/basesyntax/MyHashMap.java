@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 16;
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -25,15 +27,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = getNumberCellByKey(key);
+        int hash = getBucketIndex(key);
         Node<K, V> currentNode = table[hash];
         if (currentNode != null) {
             while (currentNode.next != null) {
                 if (isEqualsKeys(currentNode.key, key)) {
                     return currentNode.value;
-                } else {
-                    currentNode = currentNode.next;
                 }
+                currentNode = currentNode.next;
             }
             return currentNode.value;
         }
@@ -54,28 +55,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void copyElement(Node<K, V>[] oldTable) {
-        for (Node<K, V> element : oldTable) {
-            if (element != null) {
-                Node<K, V> currentNode = element;
-                if (currentNode.next == null) {
-                    putNode(currentNode.key, currentNode.value);
-                } else {
-                    while (currentNode != null) {
-                        putNode(currentNode.key, currentNode.value);
-                        currentNode = currentNode.next;
-                    }
-                }
-
+        for (Node<K, V> currentNode : oldTable) {
+            while (currentNode != null) {
+                putNode(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
             }
         }
     }
 
     private void putNode(K key, V value) {
-        int hash = getNumberCellByKey(key);
-        if (table[hash] == null) {
-            table[hash] = new Node<>(hash, key, value, null);
+        int bucketIndex = getBucketIndex(key);
+        if (table[bucketIndex] == null) {
+            table[bucketIndex] = new Node<>(key, value, null);
         } else {
-            Node<K, V> currentNode = table[hash];
+            Node<K, V> currentNode = table[bucketIndex];
             if (isEqualsKeys(currentNode.key, key)) {
                 currentNode.value = value;
                 size--;
@@ -90,28 +83,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     currentNode.value = value;
                     size--;
                 } else {
-                    currentNode.next = new Node<>(hash, key, value, null);
+                    currentNode.next = new Node<>(key, value, null);
                 }
             }
         }
     }
 
-    private int getNumberCellByKey(K key) {
+    private int getBucketIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 
     private boolean isEqualsKeys(K key1, K key2) {
-        return (key1 == key2 || key2 != null && key2.equals(key1));
+        return Objects.equals(key1, key2);
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
