@@ -81,19 +81,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     final void resize() {
         final Node<K,V>[] oldTable = table;
-        final int oldCapacity = (oldTable == null) ? 0 : oldTable.length;
-        final int newCapacity;
-        final int newThreshold;
         if (size > threshold) {
-            newCapacity = oldCapacity * 2;
-            capacity = newCapacity;
-            newThreshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
-            threshold = newThreshold;
+            capacity = capacity * 2;
+            threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
             Node<K, V>[] newTable = (Node<K, V>[]) new Node[capacity];
             table = newTable;
             if (oldTable != null) {
-                for (int i = 0; i < oldTable.length; i++) {
-                    Node<K, V> element = oldTable[i];
+                for (Node<K, V> element : oldTable) {
                     if (element != null) {
                         newTable[getHash(element.key)] = element;
                     }
