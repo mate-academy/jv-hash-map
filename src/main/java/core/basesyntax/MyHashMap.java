@@ -6,19 +6,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
-    private int capacity;
     private int size;
     private int threshold;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        capacity = DEFAULT_CAPACITY;
-        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        resize();
+        checkSize();
         int hash = hash(key);
         if (table[hash] == null) {
             table[hash] = new Node<>(hash, key, value, null);
@@ -45,13 +43,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int hash = hash(key);
         Node node = table[hash];
-        if (node != null) {
-            for (int i = 0; i < size; i++) {
-                if (Objects.equals(key, node.key)) {
-                    return (V) node.value;
-                }
-                node = node.next;
+        while (node != null) {
+            if (Objects.equals(key, node.key)) {
+                return (V) node.value;
             }
+            node = node.next;
         }
         return null;
     }
@@ -62,29 +58,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
+        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
-    private Node<K,V>[] resize() {
+    private void checkSize() {
         if (size >= threshold) {
             Node<K,V>[] oldTable = table;
-            Node<K,V> node;
             size = 0;
-            int oldCapacity = capacity;
-            capacity = capacity * 2;
-            table = new Node[capacity];
-            for (int i = 0; i < oldCapacity; i++) {
-                node = oldTable[i];
-                if (node != null) {
-                    while (node != null) {
-                        put(node.key, node.value);
-                        node = node.next;
-                    }
+            table = new Node[table.length * 2];
+            for (Node<K,V> node: oldTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
                 }
             }
-            threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
+            threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
         }
-        return table;
     }
 
     private class Node<K,V> {
