@@ -4,13 +4,13 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final double DEFAULT_LOAD_FACTOR = 0.75;
+    private static final double DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
     private int threshold;
 
     public MyHashMap() {
-        table = (Node<K, V> []) new Node[DEFAULT_CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
         threshold = (int)(DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
@@ -19,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size + 1 >= threshold) {
             resizeTable();
         }
-        Node<K, V> node = new Node<>(key, value, null);
+        Node<K, V> node = new Node<>(key, value);
         int index = findBucketIndex(key);
         if (table[index] == null) {
             table[index] = node;
@@ -43,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> currentNode = table[findBucketIndex(key)];
-        for (int i = 0; currentNode != null; i++) {
+        while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
             }
@@ -75,14 +75,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private K key;
+        private final K key;
         private V value;
         private Node<K,V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
 
         @Override
