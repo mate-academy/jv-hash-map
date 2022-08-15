@@ -7,12 +7,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int RESIZE_INDEX = 2;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int size;
-    private int threshole;
+    private int threshold;
     private Node<K, V>[] buckets;
 
     public MyHashMap() {
         buckets = new Node[DEFAULT_CAPACITY];
-        threshole = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
+        threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode = currentNode.next;
             }
         }
-        if (++size > threshole) {
+        if (++size > threshold) {
             resize();
         }
     }
@@ -64,7 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         final Node<K, V>[] temp = buckets;
         buckets = new Node[buckets.length * RESIZE_INDEX];
-        threshole = threshole * RESIZE_INDEX;
+        threshold = threshold * RESIZE_INDEX;
         size = 0;
         for (Node<K, V> currentNode : temp) {
             while (currentNode != null) {
@@ -75,7 +75,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-
         private K key;
         private V value;
         private Node<K, V> next;
