@@ -17,20 +17,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
-    private class Node<K, V> {
-        final K key;
-        V value;
-        Node<K, V> next;
-
-        public Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
+        if (size >= threshold) {
+            resize();
+        }
+        int index = getIndex(key);
+        Node<K, V> node = table[index];
+        if (node == null) {
+            table[index] = new Node<>(key, value, null);
+            size++;
+            return;
+        }
+        while (node.next != null) {
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
+                return;
+            }
+            node = node.next;
+        }
+        if (Objects.equals(node.key, key)) {
+            node.value = value;
+            return;
+        }
+        node.next = new Node<>(key, value, null);
+        size++;
 
     }
 
@@ -54,5 +65,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
+    }
+
+    private void resize() {
+        capacity = capacity * RESIZE_VALUE;
+        Node<K, V>[] oldTable = table;
+        table = new Node[capacity];
+        size = 0;
+        for (Node<K, V> node : oldTable) {
+            Node<K, V> currentNode = node;
+            while (currentNode != null) {
+                put(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
+            }
+        }
+        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
+    }
+
+    private class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
