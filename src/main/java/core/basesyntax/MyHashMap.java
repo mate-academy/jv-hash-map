@@ -84,7 +84,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         final int oldCapacity = (oldTable == null) ? 0 : oldTable.length;
         final int newCapacity;
         final int newThreshold;
-        if (size >= threshold) {
+        if (size > threshold) {
             newCapacity = oldCapacity * 2;
             capacity = newCapacity;
             newThreshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
