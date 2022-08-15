@@ -42,7 +42,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         node.next = new Node<>(key, value, null);
         size++;
-
     }
 
     @Override
@@ -83,7 +82,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        private final K key;
+        private K key;
         private V value;
         private Node<K, V> next;
 
