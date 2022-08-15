@@ -59,10 +59,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] oldTable = hashTable;
-        capacity *= GROW_FACTOR;
-        hashTable = new Node[capacity];
         size = 0;
+        capacity *= GROW_FACTOR;
+        Node<K, V>[] oldTable = hashTable;
+        hashTable = new Node[capacity];
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
