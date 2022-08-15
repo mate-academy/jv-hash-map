@@ -43,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> firstNode = table[getBucket(key)];
             while (firstNode != null) {
-                if (firstNode.key == key || firstNode.key != null && firstNode.key.equals(key)) {
+                if (Objects.equals(firstNode.key, key)) {
                     return firstNode.value;
                 }
                 firstNode = firstNode.next;
