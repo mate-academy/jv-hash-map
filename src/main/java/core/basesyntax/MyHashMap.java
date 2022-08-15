@@ -11,7 +11,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        size = 0;
+        int size;
         threshhold = table.length * LOAD_FACTOR;
     }
 
