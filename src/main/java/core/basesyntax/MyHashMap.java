@@ -1,10 +1,10 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int KEY_NULL_POSITION = 0;
-    private static final int KEY_NULL_HASH = 0;
     private Node<K, V>[] table;
     private int size;
     private int threshold;
@@ -19,23 +19,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        putInside(key, value);
+        putValue(key, value);
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> current;
-        for (Node<K, V> node : table) {
-            if (node == null) {
-                continue;
+        Node<K, V> current = table[getBucketIndex(key)];
+        while (current != null) {
+            if (Objects.equals(current.key, key)) {
+                return current.value;
             }
-            current = node;
-            while (current != null) {
-                if (current.key == null ? key == null : current.key.equals(key)) {
-                    return current.value;
-                }
-                current = current.next;
-            }
+            current = current.next;
         }
         return null;
     }
@@ -51,43 +45,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (newCap * LOAD_FACTOR);
         table = new Node[newCap];
         size = 0;
-        rewriteOldValues(oldTab);
+        transfer(oldTab);
     }
 
-    private void rewriteOldValues(Node<K, V>[] oldTable) {
+    private void transfer(Node<K, V>[] oldTable) {
         for (Node<K, V> node : oldTable) {
             if (node == null) {
                 continue;
             }
             Node<K, V> current = node;
             while (current != null) {
-                putInside(current.key, current.value);
+                putValue(current.key, current.value);
                 current = current.next;
             }
         }
     }
 
-    private void putInside(K key, V value) {
-        int position;
-        int keyHash;
-        if (key == null) {
-            position = KEY_NULL_POSITION;
-            keyHash = KEY_NULL_HASH;
-        } else {
-            keyHash = key.hashCode();
-            position = key.hashCode() % table.length;
-            if (position < 0) {
-                position *= -1;
-            }
-        }
-        Node<K, V> newNode = new Node<>(keyHash, key, value, null);
+    private void putValue(K key, V value) {
+        int position = getBucketIndex(key);
+        Node<K, V> newNode = new Node<>(position, key, value, null);
         if (table[position] == null) {
             table[position] = newNode;
         } else {
             Node<K, V> current = table[position];
             while (current != null) {
-                if (current.key == key
-                        || current.key != null && current.key.equals(key)) {
+                if (Objects.equals(current.key, key)) {
                     current.value = value;
                     size--;
                     break;
@@ -100,6 +82,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         size++;
+    }
+
+    private int getBucketIndex(K key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private static class Node<K, V> {
