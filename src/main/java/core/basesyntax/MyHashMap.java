@@ -7,17 +7,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int GROW_FACTOR = 2;
     private static final float LOAD_FACTOR = 0.75f;
     private int size;
-    private int capacity;
     private Node<K, V>[] hashTable;
 
     public MyHashMap() {
-        capacity = DEFAULT_CAPACITY;
-        hashTable = new Node[capacity];
+        hashTable = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size > capacity * LOAD_FACTOR) {
+        if (size > hashTable.length * LOAD_FACTOR) {
             resize();
         }
         Node<K, V> newNode = new Node<>(key, value, null);
@@ -36,6 +34,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (current.next == null) {
                 current.next = newNode;
                 size++;
+                return;
             }
             current = current.next;
         }
@@ -60,9 +59,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        capacity *= GROW_FACTOR;
         Node<K, V>[] oldTable = hashTable;
-        hashTable = new Node[capacity];
+        hashTable = new Node[hashTable.length * GROW_FACTOR];
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
@@ -72,7 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return (key == null) ? 0 : hashCode() % hashTable.length;
+        return (key == null) ? 0 : (key.hashCode() << 16) % hashTable.length;
     }
 
     private static class Node<K, V> {
@@ -84,12 +82,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        @Override
-        public int hashCode() {
-            return (key == null ? 0 : key.hashCode() << 16)
-                    & (value == null ? 0 : value.hashCode());
         }
     }
 }
