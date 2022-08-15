@@ -1,15 +1,19 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
     private int size;
     private int threshold;
+    private int capacity;
     private Node<K, V>[] table;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        threshold = (int) (table.length * LOAD_FACTOR);
+        capacity = DEFAULT_CAPACITY;
+        threshold = (int) (capacity * LOAD_FACTOR);
     }
 
     @Override
@@ -17,8 +21,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             grow();
         }
-        Node<K, V> newNode = new Node<>(key, value);
-        int index = hash(key) % table.length;
+        Node<K, V> newNode = new Node<>(key, value, null);
+        int index = hash(key);
         Node<K, V> node = table[index];
         if (node == null) {
             table[index] = newNode;
@@ -26,7 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         while (node != null) {
-            if (node.key == key || node.key != null && node.key.equals(key)) {
+            if (Objects.equals(key,node.key)) {
                 node.value = value;
                 return;
             }
@@ -41,10 +45,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = hash(key) % table.length;
+        int index = hash(key);
         Node<K, V> node = table[index];
         while (node != null) {
-            if (node.key == key || node.key != null && node.key.equals(key)) {
+            if (Objects.equals(key, node.key)) {
                 return node.value;
             }
             node = node.next;
@@ -57,31 +61,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static class Node<K, V> {
-        private K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-    }
-
     private int hash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode());
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private void grow() {
         size = 0;
         Node<K, V>[] oldNodes = table;
-        table = new Node[DEFAULT_CAPACITY * 2];
-        threshold = (int) (table.length * LOAD_FACTOR);
+        table = new Node[capacity * 2];
+        threshold = (int) (capacity * LOAD_FACTOR);
         for (Node<K, V> oldNode : oldNodes) {
             while (oldNode != null) {
                 put(oldNode.key, oldNode.value);
                 oldNode = oldNode.next;
             }
+        }
+    }
+
+    private static class Node<K, V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
         }
     }
 }
