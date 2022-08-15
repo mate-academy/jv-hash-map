@@ -57,16 +57,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getHash(K key) {
-        int h;
-        return (key == null) ? 0 : Math.abs((h = key.hashCode()) ^ (h >>> 16));
-    }
-
     private int getBucketIndex(K key) {
-        if (getHash(key) == 0) {
-            return 0;
-        }
-        return Math.abs(getHash(key) % table.length);
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private void ensureCapacity() {
