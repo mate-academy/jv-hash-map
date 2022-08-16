@@ -43,13 +43,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
         }
-
     }
 
     @Override
     public V getValue(K key) {
-        int indexOfBucket = getIndexOfBucket(key);
-        Node<K, V> currentNode = buckets[indexOfBucket];
+        Node<K, V> currentNode = buckets[getIndexOfBucket(key)];
         if (currentNode == null) {
             return null;
         }
@@ -72,7 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getIndexOfBucket(K key) {
         return (key == null) ? 0
-                : Math.abs(key.hashCode()) % 16;
+                : Math.abs(key.hashCode()) % capacity;
     }
 
     private void resize() {
@@ -81,15 +79,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] previousBuckets = buckets;
         buckets = new Node[capacity];
         threshold = (int) (capacity * LOAD_FACTOR);
-        for (Node<K, V> bucket : previousBuckets) {
-            if (bucket == null) {
-                continue;
-            }
-            Node<K, V> currentNode = bucket;
-            put(currentNode.key, currentNode.value);
-            while (currentNode.next != null) {
-                currentNode = currentNode.next;
-                put(currentNode.key, currentNode.value);
+        for (Node<K, V> node : previousBuckets) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
