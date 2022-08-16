@@ -59,7 +59,7 @@ public class MyHashMapTest {
         myHashMap.put(sameFirstCar, 3);
         myHashMap.put(sameSecondCar, 5);
         myHashMap.put(sameThirdCar, 1);
-        //("Mercedes", "grey")  &&  ("Mercedes", "grey")
+
         Assert.assertEquals("Test failed! We should add checking if the same element "
                 + "exists in the map", 3, myHashMap.getSize());
 

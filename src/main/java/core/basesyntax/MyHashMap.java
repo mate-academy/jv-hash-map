@@ -7,53 +7,46 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_ARRAY_EXPANSION = 2;
     private static final double LOAD_FACTOR = 0.75;
 
-    private Node<K, V>[] heads;
-    private int capacity;
+    private Node<K, V>[] buckets;
     private int size;
 
     public MyHashMap() {
-        capacity = START_CAPACITY;
-        heads = new Node[START_CAPACITY];
+        buckets = new Node[START_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        resize();
+        checkSize();
         int index = getIndex(key);
         Node<K, V> newNode = new Node<>(key, value);
-        if (heads[index] == null) {
-            heads[index] = newNode;
+        if (buckets[index] == null) {
+            buckets[index] = newNode;
             size++;
             return;
         }
-        Node<K, V> tmp = heads[index];
-        if (Objects.equals(tmp.key, key)) {
-            tmp.value = value;
-            return;
-        }
+        Node<K, V> temporaryNode = buckets[index];
         Node prev = null;
-        while (tmp != null) {
-            if (Objects.equals(tmp.key, key)) {
-                tmp.value = newNode.value;
+        while (temporaryNode != null) {
+            if (Objects.equals(temporaryNode.key, key)) {
+                temporaryNode.value = newNode.value;
                 return;
             }
-            prev = tmp;
-            tmp = tmp.next;
+            prev = temporaryNode;
+            temporaryNode = temporaryNode.next;
         }
         prev.next = newNode;
-        tmp = newNode;
         size++;
 
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> tmp = heads[getIndex(key)];
-        while (tmp != null) {
-            if (Objects.equals(key, tmp.key)) {
-                return tmp.value;
+        Node<K, V> temporaryNode = buckets[getIndex(key)];
+        while (temporaryNode != null) {
+            if (Objects.equals(key, temporaryNode.key)) {
+                return temporaryNode.value;
             }
-            tmp = tmp.next;
+            temporaryNode = temporaryNode.next;
         }
         return null;
     }
@@ -63,24 +56,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resize() {
-        if (((double)size / (double)capacity) >= LOAD_FACTOR) {
-            Node<K, V>[] tmp = heads;
-            capacity *= DEFAULT_ARRAY_EXPANSION;
+    private void checkSize() {
+        if (size >= buckets.length * LOAD_FACTOR) {
+            Node<K, V>[] oldBuckets = buckets;
             size = 0;
-            Node<K, V>[] newHeads = new Node[capacity];
-            heads = newHeads;
-            for (int i = 0; i < heads.length / DEFAULT_ARRAY_EXPANSION; i++) {
-                while (tmp[i] != null) {
-                    put(tmp[i].key, tmp[i].value);
-                    tmp[i] = tmp[i].next;
+            Node<K, V>[] newBuckets = new Node[buckets.length * DEFAULT_ARRAY_EXPANSION];
+            buckets = newBuckets;
+            for (Node<K, V> oldBucket : oldBuckets) {
+                while (oldBucket != null) {
+                    put(oldBucket.key, oldBucket.value);
+                    oldBucket = oldBucket.next;
                 }
             }
         }
     }
 
     private int getIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
+        return key == null ? 0 : Math.abs(key.hashCode() % buckets.length);
     }
 
     private class Node<K, V> {
