@@ -19,9 +19,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         Node<K, V> newNode = new Node<>(key, value, null);
-        Node<K, V> current = table[getIndex(key)];
+        int index = getIndex(key);
+        Node<K, V> current = table[index];
         if (current == null) {
-            table[getIndex(key)] = newNode;
+            table[index] = newNode;
             size++;
         } else {
             while (current != null) {
@@ -62,13 +63,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public boolean containsKey(K key) {
-        for (Node<K, V> current : table) {
-            while (current != null) {
-                if (Objects.equals(current.key, key)) {
-                    return true;
-                }
-                current = current.next;
+        Node<K, V> current = table[getIndex(key)];
+        while (current != null) {
+            if (Objects.equals(current.key, key)) {
+                return true;
             }
+            current = current.next;
         }
         return false;
     }
