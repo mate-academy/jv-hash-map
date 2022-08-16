@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -12,32 +11,34 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private int capacity;
     private int threshoid;
-    public MyHashMap(){
+
+    public MyHashMap() {
         table = new Node[DEFOLT_CAPASITY];
         capacity = DEFOLT_CAPASITY;
-        threshoid = (int) (Load_Factory*DEFOLT_CAPASITY);
+        threshoid = (int) (Load_Factory * DEFOLT_CAPASITY);
     }
 
     @Override
     public void put(K key, V value) {
-        if(size>threshoid){
+        if (size > threshoid) {
             increaseCapacity();
         }
-        int index=getIndex(key);
+        int index = getIndex(key);
         Node<K,V> node = table[index];
-        if(node == null) {
+
+        if (node == null) {
             table [index] = new Node<>(key, value);
             size++;
             return;
         } else {
             while (node.next != null) {
-                if(Objects.equals(node.kay, key)) {
+                if (Objects.equals(node.kay, key)) {
                     node.value = value;
                     return;
                 }
                 node = node.next;
             }
-            if(Objects.equals(node.kay, key)) {
+            if (Objects.equals(node.kay, key)) {
                 node.value = value;
                 return;
             }
@@ -51,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Node<K,V> node = table [index];
         while (node != null) {
-            if(Objects.equals(key, node.kay)) {
+            if (Objects.equals(key, node.kay)) {
                 return node.value;
             }
             node = node.next;
@@ -63,27 +64,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public int getSize() {
         return size;
     }
-    private void increaseCapacity(){
+
+    private void increaseCapacity() {
         capacity *= MAGNIFICATION_FACTOR;
         Node<K,V> [] oldTable = table;
         table = new Node[capacity];
         size = 0;
-        for (Node<K,V>node:oldTable){
-            Node<K,V>curent = node;
-            while(curent != null){
+        for (Node<K,V> node:oldTable) {
+            Node<K,V> curent = node;
+            while (curent != null) {
                 put(curent.kay,curent.value);
                 curent = curent.next;
             }
         }
-        threshoid = (int) (capacity*Load_Factory);
+        threshoid = (int) (capacity * Load_Factory);
     }
-    private int getIndex(K key){
+
+    private int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
     }
-    private static class Node<K,V>{
+
+    private static class Node<K,V> {
         private V value;
         private K kay;
-        Node<K,V> next;
+        private Node<K,V> next;
 
         public Node(K kay,V value) {
             this.value = value;
