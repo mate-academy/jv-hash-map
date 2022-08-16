@@ -3,7 +3,6 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-
     private static final double LOAD_FACTOR = 0.75;
     private static final int DEFAULT_CAPACITY = 16;
     private Node<K,V>[] table;
@@ -24,21 +23,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K,V> newNode = new Node<>(key, value, null);
         if (table[index] == null) {
             table[index] = newNode;
-            size++;
         } else {
             Node<K,V> node = table[index];
             while (node != null) {
                 if (Objects.equals(node.key, key)) {
                     node.value = value;
-                    break;
+                    return;
                 }
                 if (node.next == null) {
                     node.next = newNode;
-                    size++;
+                    break;
                 }
                 node = node.next;
             }
         }
+        size++;
     }
 
     @Override
@@ -60,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K,V> {
-        private K key;
+        private final K key;
         private V value;
         private Node<K,V> next;
 
