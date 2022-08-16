@@ -19,33 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        addValue(key, value);
-    }
-
-    @Override
-    public V getValue(K key) {
-        int keyHash = getHash(key);
-        Node<K, V> node = table[keyHash];
-        if (table[keyHash] != null && Objects.equals(node.key, key)) {
-            return node.value;
-        } else {
-            while (node != null) {
-                if (Objects.equals(node.key, key)) {
-                    return node.value;
-                }
-                node = node.next;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
-    }
-
-    private void addValue(K key, V value) {
-        resize();
+        checkSize();
         int keyHash = getHash(key);
         Node<K, V> newNode = new Node<>(key, value);
         Node<K, V> oldNode = null;
@@ -54,10 +28,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             Node<K, V> node = table[keyHash];
-            if (Objects.equals(node.key, key)) {
-                node.value = newNode.value;
-                return;
-            }
             while (node != null) {
                 if (Objects.equals(node.key, key)) {
                     node.value = newNode.value;
@@ -71,32 +41,41 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    @Override
+    public V getValue(K key) {
+        int keyHash = getHash(key);
+        Node<K, V> node = table[keyHash];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return node.value;
+            }
+            node = node.next;
+        }
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
     private int getHash(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % currentCapacity);
     }
 
-    private Node<K, V>[] resize() {
+    private void checkSize() {
         if (size + 1 > threshold) {
-            Node<K, V>[] newNodeArray = new Node[currentCapacity * INCREASE_FACTOR];
-            Node<K, V>[] oldTab = table;
-            table = newNodeArray;
+            Node<K, V>[] oldTable = table;
+            table = new Node[oldTable.length * INCREASE_FACTOR];
             threshold = threshold * INCREASE_FACTOR;
-            for (int i = 0; i < oldTab.length; i++) {
-                if (oldTab[i] != null) {
-                    int newHash = getHash(oldTab[i].key);
-                    if (table[newHash] == null) {
-                        table[newHash] = oldTab[i];
-                    } else {
-                        Node<K, V> node = table[newHash].next;
-                        while (node.next != null) {
-                            node = node.next;
-                        }
-                        node.next = oldTab[i];
-                    }
+            size = 0;
+            for (Node<K, V> node : oldTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
                 }
             }
         }
-        return table;
     }
 
     private static class Node<K, V> {
