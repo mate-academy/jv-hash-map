@@ -3,24 +3,23 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFOLT_CAPASITY = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private static final float Load_Factory = 0.75f;
     private static final int MAGNIFICATION_FACTOR = 2;
-
     private Node<K,V>[] table;
     private int size;
     private int capacity;
-    private int threshoid;
+    private int threshold;
 
     public MyHashMap() {
-        table = new Node[DEFOLT_CAPASITY];
-        capacity = DEFOLT_CAPASITY;
-        threshoid = (int) (Load_Factory * DEFOLT_CAPASITY);
+        table = new Node[DEFAULT_CAPACITY];
+        capacity = DEFAULT_CAPACITY;
+        threshold = (int) (Load_Factory * DEFAULT_CAPACITY);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size > threshoid) {
+        if (size > threshold) {
             increaseCapacity();
         }
         int index = getIndex(key);
@@ -30,20 +29,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table [index] = new Node<>(key, value);
             size++;
             return;
-        } else {
-            while (node.next != null) {
-                if (Objects.equals(node.kay, key)) {
-                    node.value = value;
-                    return;
-                }
-                node = node.next;
-            }
-            if (Objects.equals(node.kay, key)) {
+        }
+        while (node.next != null) {
+            if (Objects.equals(node.key, key)) {
                 node.value = value;
                 return;
             }
-            node.next = new Node<>(key, value);
+            node = node.next;
         }
+        if (Objects.equals(node.key, key)) {
+            node.value = value;
+            return;
+        }
+        node.next = new Node<>(key, value);
         size++;
     }
 
@@ -52,7 +50,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Node<K,V> node = table [index];
         while (node != null) {
-            if (Objects.equals(key, node.kay)) {
+            if (Objects.equals(key, node.key)) {
                 return node.value;
             }
             node = node.next;
@@ -71,13 +69,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[capacity];
         size = 0;
         for (Node<K,V> node:oldTable) {
-            Node<K,V> curent = node;
-            while (curent != null) {
-                put(curent.kay,curent.value);
-                curent = curent.next;
+            Node<K,V> current = node;
+            while (current != null) {
+                put(current.key,current.value);
+                current = current.next;
             }
         }
-        threshoid = (int) (capacity * Load_Factory);
+        threshold = (int) (capacity * Load_Factory);
     }
 
     private int getIndex(K key) {
@@ -86,12 +84,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static class Node<K,V> {
         private V value;
-        private K kay;
+        private K key;
         private Node<K,V> next;
 
-        public Node(K kay,V value) {
+        public Node(K key,V value) {
             this.value = value;
-            this.kay = kay;
+            this.key = key;
         }
     }
 }
