@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int START_CAPACITY = 16;
-    private static final int ARRAY_EXPANSION = 2;
+    private static final int DEFAULT_ARRAY_EXPANSION = 2;
     private static final double LOAD_FACTOR = 0.75;
 
     private Node<K, V>[] heads;
@@ -18,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        increaseCapacity();
+        resize();
         int index = getIndex(key);
         Node<K, V> newNode = new Node<>(key, value);
         if (heads[index] == null) {
@@ -63,14 +63,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void increaseCapacity() {
+    private void resize() {
         if (((double)size / (double)capacity) >= LOAD_FACTOR) {
             Node<K, V>[] tmp = heads;
-            capacity *= ARRAY_EXPANSION;
+            capacity *= DEFAULT_ARRAY_EXPANSION;
             size = 0;
             Node<K, V>[] newHeads = new Node[capacity];
             heads = newHeads;
-            for (int i = 0; i < heads.length / ARRAY_EXPANSION; i++) {
+            for (int i = 0; i < heads.length / DEFAULT_ARRAY_EXPANSION; i++) {
                 while (tmp[i] != null) {
                     put(tmp[i].key, tmp[i].value);
                     tmp[i] = tmp[i].next;
