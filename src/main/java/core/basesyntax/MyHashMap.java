@@ -18,11 +18,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size + 1 > threshold) {
-            resize();
-        }
         int index = countHash(key);
         putNode(key, value, index);
+        if (size > threshold) {
+            resize();
+        }
     }
 
     @Override
