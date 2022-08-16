@@ -60,8 +60,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K,V> e;
-        return (e = getNode(key)) == null ? null : e.value;
+        Node<K,V> node = getNode(key);
+        return node == null ? null : node.value;
     }
 
     @Override
@@ -73,17 +73,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : key.hashCode();
     }
 
-    private Node<K,V> getNode(K key) {
-        if (table != null) {
-            int index = getIndex(key);
-            Node<K, V> node = table[index];
-            while (node != null) {
-                if (node.hash == hash(key)
-                        && (node.key == key || (key != null && key.equals(node.key)))) {
-                    return node;
-                }
-                node = node.next;
+    private Node<K, V> getNode(K key) {
+        int index = getIndex(key);
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (node.hash == hash(key)
+                    && (node.key == key || (key != null && key.equals(node.key)))) {
+                return node;
             }
+            node = node.next;
         }
         return null;
     }
