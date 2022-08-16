@@ -3,7 +3,7 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final float DEFAULT_LOADER_SIZE = 0.75f;
+    private static final float LOAD_THRESHOLD = 0.75f;
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private int size;
     private int threshold;
@@ -12,7 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOADER_SIZE);
+        threshold = (int) (DEFAULT_INITIAL_CAPACITY * LOAD_THRESHOLD);
         capacity = DEFAULT_INITIAL_CAPACITY;
     }
 
@@ -52,18 +52,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             Node<K, V> currentNode = table[index];
-            do {
+            while (currentNode.next != null){
                 if (Objects.equals(currentNode.key, key)) {
-                    currentNode.value = value;
                     break;
                 }
-                if (currentNode.next == null) {
-                    currentNode.next = new Node<>(key, value, null);
-                    size++;
-                    return;
-                }
                 currentNode = currentNode.next;
-            } while (true);
+            }
+            if (Objects.equals(currentNode.key, key)) {
+                currentNode.value = value;
+                return;
+            } else {
+                currentNode.next = new Node<>(key, value, null);
+                size++;
+            }
         }
     }
 
@@ -74,7 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         size = 0;
         capacity *= 2;
-        threshold = (int) (capacity * DEFAULT_LOADER_SIZE);
+        threshold = (int) (capacity * LOAD_THRESHOLD);
         final Node<K, V> [] oldTable = table;
         table = new Node[capacity];
         copyFrom(oldTable);
