@@ -27,14 +27,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int hash = getIndex(key);
         Node<K, V> currentNode = table[hash];
-        if (currentNode != null) {
-            while (currentNode.next != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    return currentNode.value;
-                }
-                currentNode = currentNode.next;
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
             }
-            return currentNode.value;
+            currentNode = currentNode.next;
         }
         return null;
     }
