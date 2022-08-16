@@ -28,12 +28,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             if (currentNode.next == null) {
-                currentNode.next = new Node(hash(key), key, value, null);
+                currentNode.next = new Node(key, value, null);
                 size++;
             }
             currentNode = currentNode.next;
         }
-        table[index] = new Node(hash(key), key, value, null);
+        table[index] = new Node(key, value, null);
         size++;
     }
 
@@ -76,13 +76,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
