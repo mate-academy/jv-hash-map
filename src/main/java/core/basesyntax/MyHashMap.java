@@ -8,20 +8,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75F;
     private int capacity;
     private int size;
-    private Node[] nodes;
+    private Node<K, V>[] nodes;
 
     public MyHashMap() {
         nodes = new Node[INITIAL_CAPACITY];
         capacity = INITIAL_CAPACITY;
     }
 
-    @SuppressWarnings({"unchecked"})
     @Override
     public void put(K key, V value) {
         if (size >= capacity * LOAD_FACTOR) {
             capacity = grow();
         }
-        int index = indexCalculating(key);
+        int index = calculateIndex(key);
         Node<K, V> node = new Node<>(key, value);
         if (nodes[index] == null) {
             nodes[index] = node;
@@ -41,7 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private int indexCalculating(K key) {
+    private int calculateIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
@@ -53,10 +52,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return false;
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({"unchecked"})
     private int grow() {
         capacity = capacity * 2;
-        Node[] elements = nodes;
+        Node<K, V>[] elements = nodes;
         nodes = new Node[capacity];
         size = 0;
         for (Node<K, V> element : elements) {
@@ -68,10 +67,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return capacity;
     }
 
-    @SuppressWarnings({"unchecked"})
     @Override
     public V getValue(K key) {
-        int index = indexCalculating(key);
+        int index = calculateIndex(key);
         Node<K, V> nextNode = nodes[index];
         while (nextNode != null) {
             if (Objects.equals(nextNode.key, key)) {
