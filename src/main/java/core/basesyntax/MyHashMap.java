@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     public static final int DEFAULT_INITIAL_CAPACITY = 16;
     public static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    public static final int DEFAULT_ARRAY_EXPANSION = 2;
     private Node<K, V>[] table;
     private int capacity;
     private int threshold;
@@ -45,13 +46,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    static final int hash(Object key) {
+    private static final int hash(Object key) {
         int h;
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
 
     private void resize() {
-        capacity = capacity * 2;
+        capacity = capacity * DEFAULT_ARRAY_EXPANSION;
         threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
         Node<K, V>[] oldTable = table;
         table = new Node[capacity];
