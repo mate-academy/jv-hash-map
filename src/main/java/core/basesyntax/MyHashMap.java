@@ -5,7 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75d;
-    private int threshold;
+    private double threshold;
     private int capacity;
     private int size;
     private Node<K, V>[] data;
@@ -13,7 +13,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         capacity = DEFAULT_CAPACITY;
         data = new Node[capacity];
-        threshold = (int) (capacity * LOAD_FACTOR);
+        threshold = capacity * LOAD_FACTOR;
     }
 
     @Override
@@ -46,10 +46,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node node = data[getBucketByKey(key)];
+        Node<K, V> node = data[getBucketByKey(key)];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
-                return (V) node.value;
+                return node.value;
             }
             node = node.next;
         }
@@ -63,18 +63,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         capacity *= 2;
-        Node<K, V> currentNode;
-        Node<K, V>[] oldArray = data;
+        Node<K, V>[] oldData = data;
         data = new Node[capacity];
         size = 0;
-        for (Node<K, V> node : oldArray) {
-            currentNode = node;
-            while (currentNode != null) {
-                put(currentNode.key, currentNode.value);
-                currentNode = currentNode.next;
+        for (Node<K, V> node : oldData) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
-        threshold = (int) (capacity * LOAD_FACTOR);
+        threshold = capacity * LOAD_FACTOR;
     }
 
     private int getBucketByKey(K key) {
