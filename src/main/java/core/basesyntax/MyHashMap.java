@@ -19,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         resize();
         Node<K, V> node = new Node<>(key, value);
         int index = searchNodePosition(key);
-        if (checkBucketIsEmpty(index)) {
+        if (table[index] == null) {
             table[index] = node;
             size++;
         } else {
@@ -33,7 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         int index = searchNodePosition(key);
-        return searchValueByKey(table[index], key);
+        return searchValue(table[index], key);
     }
 
     @Override
@@ -60,10 +60,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
-    private boolean checkBucketIsEmpty(int index) {
-        return table[index] == null;
-    }
-
     private void putCollisionNode(Node<K, V> existNode, Node<K, V> newNode) {
         if (existNode.key == null && existNode.key == newNode.key) {
             existNode.value = newNode.value;
@@ -81,13 +77,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private V searchValueByKey(Node<K, V> node, K key) {
+    private V searchValue(Node<K, V> node, K key) {
         if (key == null && node.key == null) {
             return node.value;
         } else if (node.key != null && node.key.equals(key)) {
             return node.value;
         } else if (node.next != null) {
-            return searchValueByKey(node.next, key);
+            return searchValue(node.next, key);
         } else {
             return null;
         }
