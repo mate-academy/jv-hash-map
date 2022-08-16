@@ -62,7 +62,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void checkSize() {
         if (size == threshold) {
-            threshold = (int) (table.length * LOAD_FACTOR);
             Node<K, V>[] nodes = table;
             table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY * 2];
             size = 0;
