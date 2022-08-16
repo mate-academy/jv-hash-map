@@ -12,6 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         hashTable = new Node[DEFAULT_LENGTH];
     }
+
     @Override
     public void put(K key, V value) {
         int index = getIndexOfKey(key);
@@ -37,6 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
     }
+
     @Override
     public V getValue(K key) {
         int index = getIndexOfKey(key);
