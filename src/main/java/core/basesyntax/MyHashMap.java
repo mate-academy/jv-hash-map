@@ -20,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> newNode = new Node<>(key,value, null);
+        Node<K, V> newNode = new Node<>(key,value);
         int index = getBucketIndex(key);
         if (size > threshold) {
             resize();
@@ -67,10 +67,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         capacity *= MAGNIFICATION_FACTOR;
         Node<K, V> node;
-        Node<K, V>[] previousNode = table;
+        Node<K, V>[] previousTable = table;
         table = new Node[capacity];
         size = 0;
-        for (Node<K, V> nodes : previousNode) {
+        for (Node<K, V> nodes : previousTable) {
             node = nodes;
             while (node != null) {
                 put(node.key, node.value);
@@ -89,10 +89,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
