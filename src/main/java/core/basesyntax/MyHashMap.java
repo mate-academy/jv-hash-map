@@ -52,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             Node<K, V> currentNode = table[index];
-            while (currentNode.next != null){
+            while (currentNode.next != null) {
                 if (Objects.equals(currentNode.key, key)) {
                     break;
                 }
@@ -60,7 +60,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             if (Objects.equals(currentNode.key, key)) {
                 currentNode.value = value;
-                return;
             } else {
                 currentNode.next = new Node<>(key, value, null);
                 size++;
