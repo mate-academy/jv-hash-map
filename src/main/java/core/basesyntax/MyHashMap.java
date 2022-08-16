@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_CAPACITY = 16;
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -13,25 +15,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        Node<K, V> node = new Node<>(getIndex(key), key, value,null);
+        Node<K, V> node = new Node<>(getIndex(key), key, value);
         if (table[node.hash] == null) {
             table[node.hash] = node;
             size++;
-        } else {
-            Node<K, V> newNode = table[node.hash];
-            do {
-                if (key == newNode.key || newNode.key != null && newNode.key.equals(key)) {
-                    newNode.value = node.value;
-                    break;
-                }
-                if (newNode.next == null) {
-                    newNode.next = node;
-                    size++;
-                    break;
-                }
-                newNode = newNode.next;
-
-            } while (newNode != null);
+            return;
+        }
+        Node<K, V> newNode = table[node.hash];
+        while (newNode != null) {
+            if (Objects.equals(newNode.key, key)) {
+                newNode.value = node.value;
+                return;
+            }
+            if (newNode.next == null) {
+                newNode.next = node;
+                size++;
+                return;
+            }
+            newNode = newNode.next;
         }
     }
 
@@ -39,7 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         Node<K,V> node = table[getIndex(key)];
         while (node != null) {
-            if (node.key == key || node.key != null && node.key.equals(key)) {
+            if (Objects.equals(node.key, key)) {
                 return node.value;
             }
             node = node.next;
@@ -53,22 +54,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static class Node<K, V> {
-        private int hash;
-        private K key;
-        private V value;
-        private Node<K,V> next;
-
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     private void resize() {
-        if (size > table.length * DEFAULT_LOAD_FACTOR) {
+        if (size >= table.length * DEFAULT_LOAD_FACTOR) {
             Node<K,V>[] oldTable = table;
             table = new Node[table.length * 2];
             size = 0;
@@ -82,9 +69,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        if (key == null) {
-            return 0;
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
+    }
+
+    private static class Node<K, V> {
+        private int hash;
+        private K key;
+        private V value;
+        private Node<K,V> next;
+
+        public Node(int hash, K key, V value) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
         }
-        return Math.abs(key.hashCode() % table.length);
     }
 }
