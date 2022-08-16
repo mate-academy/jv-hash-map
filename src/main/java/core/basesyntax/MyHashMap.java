@@ -18,12 +18,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size + 1 >= map.length * LOAD_FACTOR) {
             resizeMap();
         }
-        putItem(map, key, value);
+        putItem(key, value);
     }
 
     @Override
     public V getValue(K key) {
-        int index = getBucketIndex(key, map.length);
+        int index = getBucketIndex(key);
         Node<K, V> node = map[index];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
@@ -39,13 +39,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getBucketIndex(K key, int capacity) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
+    private int getBucketIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % map.length;
     }
 
-    private void putItem(Node<K, V>[] map, K key, V value) {
+    private void putItem(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value, null);
-        int index = getBucketIndex(newNode.key, map.length);
+        int index = getBucketIndex(newNode.key);
         if (map[index] == null) {
             map[index] = newNode;
             size++;
@@ -68,16 +68,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resizeMap() {
         size = 0;
-        Node<K, V>[] newMap = (Node<K, V>[]) new Node[map.length * COEFFICIENT_GROW];
+        Node<K, V>[] oldMap = map;
+        map = (Node<K, V>[]) new Node[map.length * COEFFICIENT_GROW];
 
-        for (Node<K, V> kvNode : map) {
-            Node<K, V> node = kvNode;
+        for (Node<K, V> node : oldMap) {
             while (node != null) {
-                putItem(newMap, node.key, node.value);
+                putItem(node.key, node.value);
                 node = node.next;
             }
         }
-        map = newMap;
     }
 
     private static class Node<K, V> {
