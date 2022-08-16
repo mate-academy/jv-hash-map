@@ -5,7 +5,6 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-
     private Node<K, V>[] table;
     private int size;
     private int capacity;
@@ -14,7 +13,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
         capacity = DEFAULT_CAPACITY;
-        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
+        threshold = DEFAULT_CAPACITY * LOAD_FACTOR;
     }
 
     @Override
@@ -76,7 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 current = current.next;
             }
         }
-        threshold = (int) (capacity * LOAD_FACTOR);
+        threshold = capacity * LOAD_FACTOR;
     }
 
     private int getBucketIndex(K key) {
