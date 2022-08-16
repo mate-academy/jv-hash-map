@@ -7,12 +7,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private Node<K,V>[] table;
     private int size;
-    private int capacity;
     private float threshold;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        capacity = DEFAULT_INITIAL_CAPACITY;
         threshold = DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR;
     }
 
@@ -21,11 +19,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > threshold) {
             resize();
         }
-        size++;
         int hash = getIndex(key);
         Node<K, V> newNode = new Node<>(key, value);
         if (table[hash] == null) {
             table[hash] = newNode;
+            size++;
             return;
         }
         Node<K, V> currentNode = table[hash];
@@ -34,10 +32,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         if (Objects.equals(key, currentNode.key)) {
             currentNode.value = value;
-            size--;
             return;
         }
         currentNode.next = newNode;
+        size++;
     }
 
     @Override
@@ -58,21 +56,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode()) % capacity;
+        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void resize() {
-        capacity = capacity << 1;
-        threshold = capacity * DEFAULT_LOAD_FACTOR;
+        int newLength = table.length * 2;
+        threshold = newLength * DEFAULT_LOAD_FACTOR;
         Node<K, V>[] oldTable = table;
-        table = new Node[capacity];
+        table = new Node[newLength];
+        size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
-                size--;
                 node = node.next;
             }
         }
