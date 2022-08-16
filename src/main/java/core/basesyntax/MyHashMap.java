@@ -30,8 +30,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int bucketIndex = countHash(key);
         Node<K, V> currentNode = bucket[bucketIndex];
         if (currentNode != null) {
-            while(currentNode.next != null) {
-                if(Objects.equals(currentNode.key, key)) {
+            while (currentNode.next != null) {
+                if (Objects.equals(currentNode.key, key)) {
                     return currentNode.value;
                 }
                 currentNode = currentNode.next;
@@ -80,7 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void copyFrom(Node<K, V>[] oldBuckets) {
-        for(Node<K, V> currNode : oldBuckets) {
+        for (Node<K, V> currNode : oldBuckets) {
             while (currNode != null) {
                 put(currNode.key, currNode.value);
                 currNode = currNode.next;
@@ -89,11 +89,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        final K key;
+        private final K key;
         private V value;
         private Node<K,V> next;
 
-         Node(K key, V value, Node<K, V> next) {
+        Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
