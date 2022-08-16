@@ -7,12 +7,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
-    private int capacity;
     private float threshold;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        capacity = DEFAULT_CAPACITY;
         threshold = DEFAULT_CAPACITY * LOAD_FACTOR;
     }
 
@@ -28,20 +26,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = new Node<>(key, value);
             size++;
             return;
-        } else {
-            while (node.next != null) {
-                if (Objects.equals(node.key, key)) {
-                    node.value = value;
-                    return;
-                }
-                node = node.next;
-            }
+        }
+        while (node.next != null) {
             if (Objects.equals(node.key, key)) {
                 node.value = value;
                 return;
             }
-            node.next = new Node<>(key, value);
+            node = node.next;
         }
+        if (Objects.equals(node.key, key)) {
+            node.value = value;
+            return;
+        }
+        node.next = new Node<>(key, value);
         size++;
     }
 
@@ -64,22 +61,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void increaseCapacity() {
-        capacity *= 2;
         Node<K, V>[] oldTable = table;
-        table = new Node[capacity];
+        table = new Node[table.length * 2];
         size = 0;
         for (Node<K, V> node : oldTable) {
-            Node<K, V> current = node;
-            while (current != null) {
-                put(current.key, current.value);
-                current = current.next;
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
-        threshold = capacity * LOAD_FACTOR;
+        threshold = table.length * LOAD_FACTOR;
     }
 
     private int getBucketIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private static class Node<K, V> {
