@@ -9,12 +9,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
     private int threshold;
-    private int currentCapacity;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
         threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
-        currentCapacity = DEFAULT_CAPACITY;
     }
 
     @Override
@@ -60,7 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHash(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % currentCapacity);
+        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void checkSize() {
