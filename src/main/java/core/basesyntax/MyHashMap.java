@@ -6,7 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private static final int GROW_SIZE = 2;
+    private static final int GROWTH_MULTIPLIER = 2;
     private int size;
     private Node<K, V>[] table;
 
@@ -59,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == table.length * DEFAULT_LOAD_FACTOR) {
             size = 0;
             Node<K, V>[] oldTable = table;
-            table = new Node[oldTable.length * GROW_SIZE];
+            table = new Node[oldTable.length * GROWTH_MULTIPLIER];
             for (Node<K, V> node : oldTable) {
                 while (node != null) {
                     put(node.key, node.value);
@@ -78,7 +78,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        Node(K key, V value, Node<K, V> next) {
+         Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
