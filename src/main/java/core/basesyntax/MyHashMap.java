@@ -24,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int bucketIndex = getBucketIndex(key);
         Node<K, V> node = table[bucketIndex];
         if (node == null) {
-            table[bucketIndex] = new Node<>(key,value,null);
+            table[bucketIndex] = new Node<>(key, value, null);
             size++;
             return;
         }
@@ -66,8 +66,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void grow() {
         size = 0;
+        capacity *= 2;
         Node<K, V>[] oldNodes = table;
-        table = new Node[capacity * 2];
+        table = new Node[capacity];
         threshold = (int) (capacity * LOAD_FACTOR);
         for (Node<K, V> oldNode : oldNodes) {
             while (oldNode != null) {
