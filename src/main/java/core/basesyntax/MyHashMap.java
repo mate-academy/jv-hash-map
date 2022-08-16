@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
@@ -17,13 +19,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        Node<K, V> node = new Node<>(key, value);
-        int index = searchNodePosition(key);
+        Node<K, V> newNode = new Node<>(key, value);
+        int index = getBucketIndex(key);
         if (table[index] == null) {
-            table[index] = node;
+            table[index] = newNode;
             size++;
         } else {
-            putCollisionNode(table[index], node);
+            Node<K, V> node = table[index];
+            while (node != null) {
+                if (Objects.equals(node.key, newNode.key)) {
+                    node.value = value;
+                    return;
+                }
+                if (node.next == null) {
+                    node.next = newNode;
+                    size++;
+                }
+                node = node.next;
+            }
         }
     }
 
@@ -32,8 +45,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size <= 0) {
             return null;
         }
-        int index = searchNodePosition(key);
-        return searchValue(table[index], key);
+        int index = getBucketIndex(key);
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (key == null && node.key == null) {
+                return node.value;
+            } else if (node.key != null && node.key.equals(key)) {
+                return node.value;
+            }
+            node = node.next;
+        }
+        return null;
     }
 
     @Override
@@ -56,37 +78,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int searchNodePosition(K key) {
+    private int getBucketIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
-    }
-
-    private void putCollisionNode(Node<K, V> existNode, Node<K, V> newNode) {
-        if (existNode.key == null && existNode.key == newNode.key) {
-            existNode.value = newNode.value;
-            return;
-        } else if (existNode.key != null && existNode.key.equals(newNode.key)) {
-            existNode.value = newNode.value;
-            return;
-        }
-
-        if (existNode.next == null) {
-            existNode.next = newNode;
-            size++;
-        } else {
-            putCollisionNode(existNode.next, newNode);
-        }
-    }
-
-    private V searchValue(Node<K, V> node, K key) {
-        if (key == null && node.key == null) {
-            return node.value;
-        } else if (node.key != null && node.key.equals(key)) {
-            return node.value;
-        } else if (node.next != null) {
-            return searchValue(node.next, key);
-        } else {
-            return null;
-        }
     }
 
     private static class Node<K, V> {
