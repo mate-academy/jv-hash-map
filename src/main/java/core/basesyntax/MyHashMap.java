@@ -18,7 +18,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         increaseCapacity();
-
         Node<K, V> node = new Node<>(key, value, null);
         int index = getBucketIndex(key);
         if (table[index] == null) {
@@ -57,16 +56,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getHash(K key) {
-        int hash;
-        return (key == null) ? 0 : Math.abs((hash = key.hashCode()) ^ (hash >>> 16));
-    }
-
     private int getBucketIndex(K key) {
-        if (getHash(key) == 0) {
+        if (key == null) {
             return 0;
         }
-        return Math.abs(getHash(key) % table.length);
+        return Math.abs(key.hashCode() % table.length);
     }
 
     private void increaseCapacity() {
