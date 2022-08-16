@@ -62,11 +62,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        final Node<K, V>[] temp = buckets;
+        final Node<K, V>[] oldBuckets = buckets;
         buckets = new Node[buckets.length * RESIZE_INDEX];
         threshold = threshold * RESIZE_INDEX;
         size = 0;
-        for (Node<K, V> currentNode : temp) {
+        for (Node<K, V> currentNode : oldBuckets) {
             while (currentNode != null) {
                 put(currentNode.key, currentNode.value);
                 currentNode = currentNode.next;
