@@ -46,11 +46,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static final int hash(Object key) {
-        int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
-    }
-
     private void resize() {
         capacity = capacity * DEFAULT_ARRAY_EXPANSION;
         threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
