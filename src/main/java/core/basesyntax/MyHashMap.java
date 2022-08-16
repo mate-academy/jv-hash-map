@@ -17,30 +17,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value, null);
-        if (table[getBucket(key)] == null) {
-            table[getBucket(key)] = newNode;
-            size++;
+        int currentBucket = getBucket(key);
+        if (table[currentBucket] == null) {
+            table[currentBucket] = newNode;
         } else {
-            Node<K, V> currentNode = table[getBucket(key)];
-            if (Objects.equals(currentNode.key, key)) {
-                currentNode.value = value;
-            } else if (currentNode.next != null) {
-                while (currentNode.next != null) {
-                    currentNode = currentNode.next;
-                    if (Objects.equals(currentNode.key, key)) {
-                        currentNode.value = value;
-                        break;
-                    }
+            Node<K, V> currentNode = table[currentBucket];
+            while (currentNode != null) {
+                if (Objects.equals(currentNode.key, key)) {
+                    currentNode.value = value;
+                    return;
                 }
-                if (currentNode.next == null && currentNode.value != value) {
-                    currentNode.next = newNode;
-                    size++;
+                if (currentNode.next == null) {
+                    break;
                 }
-            } else {
-                currentNode.next = newNode;
-                size++;
+                currentNode = currentNode.next;
             }
+            currentNode.next = newNode;
         }
+        size++;
         if (size >= threshold) {
             resize();
         }
@@ -82,10 +76,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucket(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(hash(key) % table.length);
+        return hash(key) % table.length;
     }
 
     private class Node<K, V> {
