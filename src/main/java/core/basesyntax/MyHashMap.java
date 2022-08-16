@@ -18,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if(size + 1 > threshold) {
+        if (size + 1 > threshold) {
             resize();
         }
         int index = countHash(key);
