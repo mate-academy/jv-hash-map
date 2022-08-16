@@ -55,12 +55,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void putValue(int hash, K key, V value) {
-        if (table[hash] == null) {
-            table[hash] = new Node<>(hash, key, value);
+    private void putValue(int bucketIndex, K key, V value) {
+        if (table[bucketIndex] == null) {
+            table[bucketIndex] = new Node<>(bucketIndex, key, value);
             return;
         }
-        Node<K, V> node = table[hash];
+        Node<K, V> node = table[bucketIndex];
         while (!(node.next == null || Objects.equals(key, node.key))) {
             node = node.next;
         }
@@ -69,7 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size--;
             return;
         }
-        node.next = new Node<>(hash, key, value);
+        node.next = new Node<>(bucketIndex, key, value);
     }
 
     private int getBucketIndex(K key) {
@@ -77,15 +77,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private int hash;
+        private int bucketIndex;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value) {
+        public Node(int bucketIndex, K key, V value) {
             this.key = key;
             this.value = value;
-            this.hash = hash;
+            this.bucketIndex = bucketIndex;
         }
     }
 }
