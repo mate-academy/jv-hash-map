@@ -10,7 +10,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int capacity;
     private Node<K, V> [] table;
 
-    public MyHashMap() {
+    MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
         threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOADER_SIZE);
         capacity = DEFAULT_INITIAL_CAPACITY;
@@ -52,18 +52,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             Node<K, V> currentNode = table[index];
-            while (currentNode.next != null) {
+            do {
                 if (Objects.equals(currentNode.key, key)) {
+                    currentNode.value = value;
                     break;
                 }
+                if (currentNode.next == null) {
+                    currentNode.next = new Node<>(key, value, null);
+                    size++;
+                    return;
+                }
                 currentNode = currentNode.next;
-            }
-            if (Objects.equals(currentNode.key, key)) {
-                currentNode.value = value;
-            } else {
-                currentNode.next = new Node<>(key, value, null);
-                size++;
-            }
+            } while (true);
         }
     }
 
@@ -94,7 +94,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K,V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
