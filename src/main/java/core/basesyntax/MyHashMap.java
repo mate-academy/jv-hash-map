@@ -23,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (++size > threshold) {
             resize();
         }
-        putValue(getBucketIndex(key), key, value);
+        putValue(key, value);
     }
 
     @Override
@@ -49,15 +49,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[capacity];
         for (Node<K, V> node : oldTable) {
             while (node != null) {
-                putValue(getBucketIndex(node.key), node.key, node.value);
+                putValue(node.key, node.value);
                 node = node.next;
             }
         }
     }
 
-    private void putValue(int bucketIndex, K key, V value) {
+    private void putValue(K key, V value) {
+        int bucketIndex = getBucketIndex(key);
         if (table[bucketIndex] == null) {
-            table[bucketIndex] = new Node<>(bucketIndex, key, value);
+            table[bucketIndex] = new Node<>(key, value);
             return;
         }
         Node<K, V> node = table[bucketIndex];
@@ -69,7 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size--;
             return;
         }
-        node.next = new Node<>(bucketIndex, key, value);
+        node.next = new Node<>(key, value);
     }
 
     private int getBucketIndex(K key) {
@@ -82,10 +83,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(int bucketIndex, K key, V value) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.bucketIndex = bucketIndex;
         }
     }
 }
