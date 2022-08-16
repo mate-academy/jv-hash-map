@@ -61,11 +61,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        Node<K, V>[] oldTab = table;
-        int newCapacity = oldTab.length * RESIZE_CAPACITY;
+        Node<K, V>[] oldTable = table;
+        int newCapacity = oldTable.length * RESIZE_CAPACITY;
         threshold = (int) (DEFAULT_LOAD_FACTOR * newCapacity);
         table = (Node<K, V>[]) new Node[newCapacity];
-        for (Node<K, V> node : oldTab) {
+        for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
@@ -77,7 +77,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
-    public static class Node<K,V> {
+    private static class Node<K,V> {
         private K key;
         private V value;
         private Node<K,V> next;
