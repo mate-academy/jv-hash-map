@@ -20,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        Node<K, V> newNode = new Node<>(getBucketIndex(key), key, value);
+        Node<K, V> newNode = new Node<>(key, value);
         int index = getBucketIndex(key);
         if (table[index] == null) {
             table[index] = newNode;
@@ -58,19 +58,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static class Node<K, V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(int hash, K key, V value) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-        }
-    }
-
     private int getBucketIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
@@ -88,6 +75,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     node = node.next;
                 }
             }
+        }
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value) {
+            this.key = key;
+            this.value = value;
         }
     }
 }
