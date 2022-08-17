@@ -16,24 +16,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        putNode(key,value,true);
+        putNode(key,value);
         resize();
     }
 
     @Override
     public V getValue(K key) {
-        int index = findIndexBucket(hash(key));
-        if (table[index] == null) {
-            return null;
-        }
-        Node<K,V> findNode = table[index];
-        while (findNode != null) {
-            if (Objects.equals(key,findNode.key)) {
-                break;
+        int index = findIndexByKey(key);
+        Node<K,V> node = table[index];
+        while (node != null) {
+            if (Objects.equals(key,node.key)) {
+                return node.value;
             }
-            findNode = findNode.next;
+            node = node.next;
         }
-        return (findNode == null) ? null : findNode.value;
+        return null;
     }
 
     @Override
@@ -41,26 +38,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private Boolean replaceValueInBucket(int index, K key, V value) {
-        Node<K,V> findNode = table[index];
-        while (findNode != null) {
-            if (key == findNode.key
-                    || key != null
-                    && key.equals(findNode.key)
-                    && key.hashCode() == findNode.key.hashCode()) {
-                findNode.value = value;
-                return true;
-            }
-            findNode = findNode.next;
-        }
-        return false;
-    }
-
-    private int hash(Object key) {
-        return (key == null) ? 0 : key.hashCode();
-    }
-
-    private int findIndexBucket(int hash) {
+    private int findIndexByKey(Object key) {
+        int hash = (key == null) ? 0 : key.hashCode();
         return hash & (table.length - 1);
     }
 
@@ -69,45 +48,46 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V>[] oldTable = table;
             table = new Node[oldTable.length * 2];
             threshold *= 2;
+            size = 0;
             for (Node<K, V> oldNode : oldTable) {
-                if (oldNode != null) {
-                    Node<K,V> findNode = oldNode;
-                    while (findNode != null) {
-                        putNode(findNode.key,findNode.value,false);
-                        findNode = findNode.next;
-                    }
+                Node<K,V> currentNode = oldNode;
+                while (currentNode != null) {
+                    putNode(currentNode.key,currentNode.value);
+                    currentNode = currentNode.next;
                 }
             }
         }
     }
 
-    private void putNode(K key, V value, Boolean increaseSize) {
-        int hash = hash(key);
-        int index = findIndexBucket(hash);
-        Node<K,V> addNode = new Node<>(hash,key,value,null);
+    private void putNode(K key, V value) {
+        int index = findIndexByKey(key);
+        Node<K,V> newNode = new Node<>(key,value,null);
         if (table[index] == null) {
-            table[index] = addNode;
-            size = (increaseSize) ? (size + 1) : size;
+            table[index] = newNode;
+            size++;
+            return;
         }
-        Boolean replace = replaceValueInBucket(index,key,value);
-        if (!replace) {
-            Node<K,V> findNode = table[index];
-            while (findNode.next != null) {
-                findNode = findNode.next;
+        Node<K,V> currentNode = table[index];
+        while (currentNode != null) {
+            if (Objects.equals(key, currentNode.key)) {
+                currentNode.value = value;
+                return;
             }
-            findNode.next = addNode;
-            size = (increaseSize) ? (size + 1) : size;
+            if (currentNode.next == null) {
+                currentNode.next = newNode;
+                size++;
+                return;
+            }
+            currentNode = currentNode.next;
         }
     }
 
-    private class Node<K,V> {
-        private final int hash;
+    class Node<K,V> {
         private final K key;
         private V value;
         private Node<K,V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
