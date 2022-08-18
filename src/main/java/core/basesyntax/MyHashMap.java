@@ -39,15 +39,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int findIndexByKey(Object key) {
-        int hash = (key == null) ? 0 : key.hashCode();
+        int hash = key == null ? 0 : key.hashCode();
         return hash & (table.length - 1);
     }
 
     private void resize() {
         if (size == threshold) {
             Node<K, V>[] oldTable = table;
-            table = new Node[oldTable.length * 2];
-            threshold *= 2;
+            int increaselength = 2;
+            table = new Node[oldTable.length * increaselength];
+            threshold = (int)(table.length * LOAD_FACTOR);
             size = 0;
             for (Node<K, V> oldNode : oldTable) {
                 Node<K,V> currentNode = oldNode;
