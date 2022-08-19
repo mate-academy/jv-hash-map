@@ -29,7 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         while (true) {
             if (node.key == key
-                    || node.key.equals(key)) {
+                    || node.key != null && node.key.equals(key)) {
                 node.value = value;
                 return;
             }
