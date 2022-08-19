@@ -27,7 +27,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        while (true) {
+        while (node != null) {
             if (node.key == key
                     || node.key != null && node.key.equals(key)) {
                 node.value = value;
