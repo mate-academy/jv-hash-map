@@ -96,7 +96,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-            Node<?, ?> node = (Node<?, ?>) o;
+            Node<K, V> node = (Node<K, V>) o;
             return Objects.equals(key, node.key) && Objects.equals(value, node.value);
         }
 
