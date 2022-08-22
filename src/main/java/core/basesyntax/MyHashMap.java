@@ -13,23 +13,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int bucketIndex = getBucketIndex(key, buckets.length);
-        Node currentNode = null;
-        if (buckets[bucketIndex] != null) {
-            currentNode = getNodeByKey(bucketIndex, key);
+        if (buckets[bucketIndex] == null) {
+            buckets[bucketIndex] = new Node(key, value);
+            size++;
+            resize();
+            return;
         }
-        if (currentNode != null) {
+        Node currentNode = getNodeByKey(bucketIndex, key);
+        if (keyMatch(currentNode, key)) {
             currentNode.value = value;
             return;
         }
-        currentNode = new Node<>(key, value);
-        addNode(bucketIndex, currentNode);
+        currentNode.next = new Node(key, value);
+        size++;
+        resize();
     }
 
     @Override
     public V getValue(K key) {
         int index = getBucketIndex(key, buckets.length);
+        if (buckets[index] == null) {
+            return null;
+        }
         Node currentNode = getNodeByKey(index, key);
-        if (currentNode != null) {
+        if (keyMatch(currentNode, key)) {
             return (V) currentNode.value;
         }
         return null;
@@ -40,59 +47,45 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void addNode(int index, Node node) {
-        if (buckets[index] != null) {
-            Node currentNode = buckets[index];
-            linkNodes(currentNode, node);
-            size++;
-            resize();
-            return;
-        }
-        buckets[index] = node;
-        size++;
-        resize();
-    }
-
     private Node getNodeByKey(int index, K key) {
         Node currentNode = buckets[index];
+        Node temp = null;
         while (currentNode != null) {
-            if (currentNode.key == key
-                    || currentNode.key != null && currentNode.key.equals(key)) {
+            if (keyMatch(currentNode, key)) {
                 return currentNode;
             }
+            temp = currentNode;
             currentNode = currentNode.next;
         }
-        return null;
+        return temp;
     }
 
     private int getBucketIndex(K key, int capacity) {
-        if (key == null) {
-            return 0;
-        }
-        return key.hashCode() & (capacity - 1);
+        return key == null ? 0 : key.hashCode() & (capacity - 1);
+    }
+
+    private boolean keyMatch(Node node, K key) {
+        return node.key == key
+                || node.key != null && node.key.equals(key);
     }
 
     private void resize() {
         if (size > (int) (buckets.length * LOAD_FACTOR)) {
-            Node[] newBuckets = new Node[(int) (buckets.length * 2)];
-            for (Node node : buckets) {
+            Node[] previousBuckets = buckets;
+            buckets = new Node[(int) (buckets.length * 2)];
+            size = 0;
+            for (Node node : previousBuckets) {
                 if (node == null) {
                     continue;
                 }
                 Node currentNode = node;
                 while (currentNode != null) {
-                    int index = getBucketIndex((K) currentNode.key, newBuckets.length);
-                    if (newBuckets[index] != null) {
-                        linkNodes(newBuckets[index], currentNode);
-                    } else {
-                        newBuckets[index] = currentNode;
-                    }
+                    put((K) currentNode.key, (V) currentNode.value);
                     Node temp = currentNode;
                     currentNode = currentNode.next;
                     temp.next = null;
                 }
             }
-            this.buckets = newBuckets;
         }
     }
 
@@ -108,9 +101,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         currentNode.next = nextNode;
     }
 
-    private static class Node<K,V> {
-        private K key;
-        private V value;
+    private static class Node<K extends Object,V extends Object> {
+        private Object key;
+        private Object value;
+
         private Node next;
 
         public Node(K key, V value) {
