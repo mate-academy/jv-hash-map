@@ -15,14 +15,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        increaseSize();
-        int bucketIndex = getBucketIndex(key);
-        if (table[bucketIndex] == null) {
-            table[bucketIndex] = new Node<>(key, value, null);
+        if (size == (int) (table.length * DEFAULT_LOAD_FACTOR)) {
+            increaseSize();
+        }
+        int index = getIndex(key);
+        if (table[index] == null) {
+            table[index] = new Node<>(key, value, null);
             size++;
         } else {
             Node<K, V> newNode = new Node<>(key, value, null);
-            for (Node<K, V> node = table[bucketIndex]; node != null; node = node.next) {
+            for (Node<K, V> node = table[index]; node != null; node = node.next) {
                 if (Objects.equals(node.key, newNode.key)) {
                     node.value = newNode.value;
                     return;
@@ -38,7 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (Node<K, V> node = table[getBucketIndex(key)]; node != null; node = node.next) {
+        for (Node<K, V> node = table[getIndex(key)]; node != null; node = node.next) {
             if (Objects.equals(node.key, key)) {
                 return node.value;
             }
@@ -51,20 +53,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getBucketIndex(K key) {
+    private int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void increaseSize() {
-        if (size == (int) (table.length * DEFAULT_LOAD_FACTOR)) {
-            Node<K, V>[] oldTable = table;
-            table = new Node[oldTable.length * GROW_RATE];
-            for (Node<K, V> node : oldTable) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    size--;
-                    node = node.next;
-                }
+        Node<K, V>[] oldTable = table;
+        table = new Node[oldTable.length * GROW_RATE];
+        size = 0;
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
