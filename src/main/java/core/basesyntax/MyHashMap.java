@@ -13,6 +13,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
         threshold = (int) (LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
     }
+
     @Override
     public void put(K key, V value) {
         if (size == threshold) {
@@ -76,9 +77,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     class Node<K,V> {
-    final K key;
-    V value;
-    Node<K,V> next;
+    private K key;
+    private V value;
+    private Node<K,V> next;
 
         public Node(K key, V value, Node<K,V> next) {
             this.key = key;
