@@ -46,10 +46,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = table;
         table = new Node[table.length * DEFAULT_ARRAY_EXPANSION];
         size = 0;
-        copyTable(oldTable);
+        moveValues(oldTable);
     }
 
-    private void copyTable(Node<K, V>[] oldTable) {
+    private void moveValues(Node<K, V>[] oldTable) {
         for (Node<K, V> currentNode : oldTable) {
             while (currentNode != null) {
                 putValue(currentNode.key, currentNode.value);
