@@ -20,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size + 1 > threshold) {
             resize();
         }
-         putNode(key, value);
+        putNode(key, value);
     }
 
     @Override
