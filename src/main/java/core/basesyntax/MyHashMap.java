@@ -65,18 +65,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             Node<K, V> currentNode = table[bucketIndex];
-            while (currentNode.next != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    break;
+            while (currentNode!= null) {
+                if (currentNode.key == key
+                        || currentNode.key != null && currentNode.key.equals(key)) {
+                    currentNode.value = value;
+                    return;
+                }
+                if (currentNode.next == null) {
+                    currentNode.next = new Node<>(key, value, null);
+                    size++;
+                    return;
                 }
                 currentNode = currentNode.next;
             }
-            if (Objects.equals(currentNode.key, key)) {
-                currentNode.value = value;
-                return;
-            }
-            currentNode.next = new Node<>(key, value, null);
-            size++;
         }
     }
 
