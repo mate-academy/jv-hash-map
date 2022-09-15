@@ -4,7 +4,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int ARRAY_DOUBLING = 2;
-
     private Node<K, V>[] table;
     private int size;
     private int threshold;
@@ -58,18 +57,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        Node<K, V>[] oldTable;
-        oldTable = table;
+        Node<K, V>[] oldTable = table;
         table = new Node[table.length * ARRAY_DOUBLING];
         threshold *= ARRAY_DOUBLING;
         for (Node<K, V> currentNode : oldTable) {
-            if (currentNode != null) {
-                Node<K, V> oldNode = currentNode;
-                while (oldNode.next != null) {
-                    put(oldNode.next.key, oldNode.next.value);
-                    oldNode = oldNode.next;
-                }
+            while (currentNode != null) {
                 put(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
             }
         }
     }
