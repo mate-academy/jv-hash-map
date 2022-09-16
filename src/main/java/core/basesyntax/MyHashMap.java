@@ -7,6 +7,63 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
 
+    @Override
+    public void put(K key, V value) {
+        int hashCodeNode = hashCode(key);
+        Node<K, V> lastElement;
+        if (table == null) {
+            table = (Node<K, V>[]) new Node[1 << 4];
+            threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
+            table[getTableIndex(key, table.length)] = new Node<>(hashCodeNode, key, value, null);
+            size = 1;
+            return;
+        }
+        int tableIndex = getTableIndex(key, table.length);
+        Node<K, V> element = table[tableIndex];
+        if (element == null) {
+            table[tableIndex] = new Node<>(hashCodeNode, key, value, null);
+        } else {
+            do {
+                if (key == null && element.key == null
+                        || element.key != null && element.key.equals(key)) {
+                    element.value = value;
+                    return;
+                }
+                lastElement = element;
+                element = element.next;
+            } while (element != null);
+            lastElement.next = new Node<>(hashCodeNode, key, value, null);
+        }
+        if (++size > threshold) {
+            table = resize();
+        }
+    }
+
+    @Override
+    public V getValue(K key) {
+        if (size == 0) {
+            return null;
+        }
+        int tableIndex = getTableIndex(key, table.length);
+        if (table[tableIndex] == null) {
+            return null;
+        }
+        Node<K, V> element = table[tableIndex];
+        do {
+            if (key == null && element.key == null
+                    || element.key != null && element.key.equals(key)) {
+                return element.value;
+            }
+            element = element.next;
+        } while (element != null);
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
     private static class Node<K, V> {
         private final int hash;
         private final K key;
@@ -75,63 +132,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getTableIndex(K key, int tableLength) {
         return hashCode(key) % tableLength;
-    }
-
-    @Override
-    public void put(K key, V value) {
-        int hashCodeNode = hashCode(key);
-        Node<K, V> lastElement;
-        if (table == null) {
-            table = (Node<K, V>[]) new Node[1 << 4];
-            threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
-            table[getTableIndex(key, table.length)] = new Node<>(hashCodeNode, key, value, null);
-            size = 1;
-            return;
-        }
-        int tableIndex = getTableIndex(key, table.length);
-        Node<K, V> element = table[tableIndex];
-        if (element == null) {
-            table[tableIndex] = new Node<>(hashCodeNode, key, value, null);
-        } else {
-            do {
-                if (key == null && element.key == null
-                        || element.key != null && element.key.equals(key)) {
-                    element.value = value;
-                    return;
-                }
-                lastElement = element;
-                element = element.next;
-            } while (element != null);
-            lastElement.next = new Node<>(hashCodeNode, key, value, null);
-        }
-        if (++size > threshold) {
-            table = resize();
-        }
-
-    }
-
-    @Override
-    public V getValue(K key) {
-        if (size == 0) {
-            return null;
-        }
-        int tableIndex = getTableIndex(key, table.length);
-        if (table[tableIndex] == null) {
-            return null;
-        }
-        Node<K, V> element = table[tableIndex];
-        do {
-            if (key == null && element.key == null
-                    || element.key != null && element.key.equals(key)) {
-                return element.value;
-            }
-            element = element.next;
-        } while (element != null);
-        return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
     }
 }
