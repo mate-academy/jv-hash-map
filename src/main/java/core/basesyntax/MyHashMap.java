@@ -18,7 +18,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         Node<K, V> newNode = new Node<>(key, value, null);
-        int index = getKeyHashcode(key) != 0 ? Math.abs(getKeyHashcode(newNode.key)) % table.length : 0;
+        int index = getKeyHashcode(key) != 0
+                ? Math.abs(getKeyHashcode(newNode.key)) % table.length : 0;
         Node<K, V> node = table[index];
         if (node != null) {
             while (true) {
@@ -81,7 +82,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getKeyHashcode(K key){
+    private int getKeyHashcode(K key) {
         return key != null ? key.hashCode() : 0;
     }
 
