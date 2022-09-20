@@ -1,41 +1,24 @@
 package core.basesyntax;
 
-public class MyHashMap<K, V> implements MyMap<K, V> {
+import java.util.Objects;
 
+public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int INITIAL_TABLE_SIZE = 1 << 4;
     private int threshold;
     private Node<K, V>[] table;
     private int size;
 
+    public MyHashMap() {
+        table = (Node<K, V>[]) new Node[INITIAL_TABLE_SIZE];
+        threshold = (int) (INITIAL_TABLE_SIZE * DEFAULT_LOAD_FACTOR);
+    }
+
     @Override
     public void put(K key, V value) {
-        int hashCodeNode = hashCode(key);
-        Node<K, V> lastElement;
-        if (table == null) {
-            table = (Node<K, V>[]) new Node[1 << 4];
-            threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
-            table[getTableIndex(key, table.length)] = new Node<>(hashCodeNode, key, value, null);
-            size = 1;
-            return;
-        }
-        int tableIndex = getTableIndex(key, table.length);
-        Node<K, V> element = table[tableIndex];
-        if (element == null) {
-            table[tableIndex] = new Node<>(hashCodeNode, key, value, null);
-        } else {
-            do {
-                if (key == null && element.key == null
-                        || element.key != null && element.key.equals(key)) {
-                    element.value = value;
-                    return;
-                }
-                lastElement = element;
-                element = element.next;
-            } while (element != null);
-            lastElement.next = new Node<>(hashCodeNode, key, value, null);
-        }
-        if (++size > threshold) {
-            table = resize();
+        putElement(key, value, hashCode(key));
+        if (size > threshold) {
+            resize();
         }
     }
 
@@ -44,18 +27,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == 0) {
             return null;
         }
-        int tableIndex = getTableIndex(key, table.length);
+        int tableIndex = getTableIndex(key);
         if (table[tableIndex] == null) {
             return null;
         }
         Node<K, V> element = table[tableIndex];
-        do {
-            if (key == null && element.key == null
-                    || element.key != null && element.key.equals(key)) {
+        while (element != null) {
+            if (Objects.equals(element.key, key)) {
                 return element.value;
             }
             element = element.next;
-        } while (element != null);
+        }
         return null;
     }
 
@@ -78,21 +60,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         public final String toString() {
-            return key + "=" + value;
-        }
-
-        public final boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            }
-
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-
-            Node<K, V> node = (Node<K, V>) o;
-            return node.key.equals(key)
-                    && node.value.equals(value);
+            return "Node[ " + key + "=" + value + "]";
         }
     }
 
@@ -100,37 +68,46 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
-    private void move(K key, V value, int hash, Node<K, V>[] newTable) {
-        int tableIndex = getTableIndex(key, newTable.length);
-        Node<K, V> element = newTable[tableIndex];
+    private void putElement(K key, V value, int hash) {
+        int tableIndex = getTableIndex(key);
+        Node<K, V> element = table[tableIndex];
         if (element == null) {
-            newTable[tableIndex] = new Node<>(hash, key, value, null);
+            table[tableIndex] = new Node<>(hash, key, value, null);
         } else {
-            while (element.next != null) {
+            while (element != null) {
+                if (Objects.equals(element.key, key)) {
+                    element.value = value;
+                    return;
+                }
+                if (element.next == null) {
+                    element.next = new Node<>(hash, key, value, null);
+                    break;
+                }
                 element = element.next;
             }
-            element.next = new Node<>(hash, key, value, null);
         }
+        size++;
     }
 
-    private Node<K, V>[] resize() {
-        int oldCapacity = (table == null) ? 0 : table.length;
+    private void resize() {
+        int oldCapacity = table.length;
         threshold = threshold << 1;
         int newCapacity = oldCapacity << 1;
-        Node<K, V>[] newTable = new Node[newCapacity];
+        Node<K, V>[] oldTable = table;
+        table = (Node<K, V>[]) new Node[newCapacity];
+        size = 0;
         for (int i = 0; i < oldCapacity; i++) {
-            if (table[i] != null) {
-                Node<K, V> elem = table[i];
+            if (oldTable[i] != null) {
+                Node<K, V> elem = oldTable[i];
                 while (elem != null) {
-                    move(elem.key, elem.value, elem.hash, newTable);
+                    putElement(elem.key, elem.value, elem.hash);
                     elem = elem.next;
                 }
             }
         }
-        return newTable;
     }
 
-    private int getTableIndex(K key, int tableLength) {
-        return hashCode(key) % tableLength;
+    private int getTableIndex(K key) {
+        return hashCode(key) % table.length;
     }
 }
