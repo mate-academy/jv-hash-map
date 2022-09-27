@@ -23,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = findHash(key);
+        int hash = getIndex(key);
         Node<K, V> currentNode = table[hash];
         for (int i = 0; i < size; i++) {
             if (currentNode.key == key || currentNode.key != null
@@ -38,18 +38,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
-    }
-
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
     }
 
     private void resize() {
@@ -70,12 +58,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putValue(K key, V value) {
-        int hash = findHash(key);
-        if (table[hash] == null) {
-            table[hash] = new Node<>(key, value, null);
+        int index = getIndex(key);
+        if (table[index] == null) {
+            table[index] = new Node<>(key, value, null);
             size++;
         } else {
-            Node<K, V> currentNode = table[hash];
+            Node<K, V> currentNode = table[index];
             for (int i = 0; i < size; i++) {
                 if (currentNode.key == key || currentNode.key != null
                         && currentNode.key.equals(key)) {
@@ -92,7 +80,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int findHash(K key) {
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+    }
+
+    private int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 }
