@@ -69,9 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private boolean isKeysEquals(Node<K, V> currentNode, K key) {
         // currentNode must be != null
         return ((key == currentNode.key) // including (key == currentNode.key == null)
-                || ((key != null)
-                && ((key.hashCode() == currentNode.hash)
-                && key.equals(currentNode.key))));
+                || ((key != null) && key.equals(currentNode.key)));
     }
 
     private int getIndex(K key) {
