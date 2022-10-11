@@ -1,6 +1,7 @@
 package core.basesyntax;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
@@ -10,6 +11,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int capacity;
     private int size;
 
+    @SuppressWarnings("unchecked")
     MyHashMap() {
         capacity = INITIAL_CAPACITY;
         table =(Node<K,V>[]) new Node[capacity];
@@ -20,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         System.out.println();
         Node<K, V> node = new Node<>(key, value, hash(key));
-        int placeInArray = node.hashCode % capacity;
+        int placeInArray = positionByHash(key);
         System.out.println(key);
         System.out.println(placeInArray);
          if (table[placeInArray] == null) {
@@ -28,10 +30,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
              table[placeInArray] = node;
              size++;
          } else {
-
              Node<K, V> thatNode = table[placeInArray];
              while (thatNode.next != null) {
-                 if ((thatNode.key == null ? key == null : thatNode.key.equals(key))) {
+                 if ((Objects.equals(thatNode.key, key))) { // ToDo: here IDEA can replace on Object.equals();
                      System.out.println("Equal");
                      thatNode.value = value;
                      return;
@@ -46,12 +47,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        return null;
+
+        int position = positionByHash(key);
+        if (position < 0 || position > capacity) {
+            return null;
+        }
+        Node<K, V> node = table[position];
+        V value = null;
+        while (node  != null) {
+            if (Objects.equals(node.key, key)) {
+                System.out.println("Get found");
+                value = node.value;
+                break;
+            }
+            node = node.next;
+        }
+
+        return value;
     }
 
     @Override
     public int getSize() {
         return size;
+    }
+
+    private int positionByHash(K key) {
+        return hash(key) % capacity;
     }
 
     private int hash(K key) {
