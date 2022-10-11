@@ -6,6 +6,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
+    private static final int MOD_FACTOR = 2;
 
     private Node<K, V>[] table;
     private int capacity;
@@ -20,22 +21,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if (size + 1 > capacity * LOAD_FACTOR) {
+            System.out.println("resize");
+            resize();
+            System.out.println("capacity " + capacity);
+        }
         System.out.println();
         Node<K, V> node = new Node<>(key, value, hash(key));
         int placeInArray = positionByHash(key);
+
         System.out.println(key);
         System.out.println(placeInArray);
+
          if (table[placeInArray] == null) {
              System.out.println("Clear");
              table[placeInArray] = node;
              size++;
          } else {
              Node<K, V> thatNode = table[placeInArray];
-             while (thatNode.next != null) {
-                 if ((Objects.equals(thatNode.key, key))) { // ToDo: here IDEA can replace on Object.equals();
+             while (true) {
+                 if (Objects.equals(thatNode.key, key)) {
                      System.out.println("Equal");
                      thatNode.value = value;
                      return;
+                 }
+                 if (thatNode.next == null) {
+                     break;
                  }
                  thatNode = thatNode.next;
              }
@@ -47,6 +58,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
+        System.out.println();
+        System.out.println("Start looking");
 
         int position = positionByHash(key);
         if (position < 0 || position > capacity) {
@@ -54,7 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K, V> node = table[position];
         V value = null;
-        while (node  != null) {
+        while (node != null) {
             if (Objects.equals(node.key, key)) {
                 System.out.println("Get found");
                 value = node.value;
@@ -71,8 +84,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private void resize() {
+        size = 0;
+        int newCapacity = capacity * MOD_FACTOR;
+        Node<K, V>[] oldArray = table;
+
+        table = (Node<K,V>[]) new Node[newCapacity];
+        capacity = newCapacity;
+        for (int i = 0; i < oldArray.length; i++) {
+            if (oldArray[i] != null) {
+                Node<K, V> node = oldArray[i];
+
+                while (node != null) {
+                    Node<K, V> tempNode = node.next;
+                    node.next = null;
+                    put(node.key, node.value);
+                    node = tempNode;
+                }
+            }
+        }
+
+    }
+
+
     private int positionByHash(K key) {
-        return hash(key) % capacity;
+        return Math.abs(hash(key)) % capacity;
     }
 
     private int hash(K key) {
