@@ -26,6 +26,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         putInTable(node, table);
     }
 
+    @Override
+    public V getValue(K key) {
+        int index = getIndex(key);
+        if (table[index] == null) {
+            return null;
+        }
+        Node<K, V> currentNode = table[index];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
+            }
+            currentNode = currentNode.next;
+        }
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
     private void increaseCapacity() {
         int newCapacity = capacity * INCREASE_FACTOR;
         Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
@@ -73,27 +94,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode = oldNext;
             }
         }
-    }
-
-    @Override
-    public V getValue(K key) {
-        int index = getIndex(key);
-        if (table[index] == null) {
-            return null;
-        }
-        Node<K, V> currentNode = table[index];
-        while (currentNode != null) {
-            if (Objects.equals(currentNode.key, key)) {
-                return currentNode.value;
-            }
-            currentNode = currentNode.next;
-        }
-        return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
     }
 
     private static class Node<K, V> {
