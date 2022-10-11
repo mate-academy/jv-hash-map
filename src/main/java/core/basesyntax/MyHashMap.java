@@ -8,17 +8,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INCREASE_FACTOR = 2;
     private Node<K, V>[] table;
     private int capacity;
+    private float threshold;
     private int size;
 
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
         capacity = INITIAL_CAPACITY;
+        threshold = INITIAL_CAPACITY * LOAD_FACTOR;
         size = 0;
     }
 
     @Override
     public void put(K key, V value) {
-        float threshold = capacity * LOAD_FACTOR;
         if (size >= threshold) {
             increaseCapacity();
         }
@@ -54,6 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         capacity = newCapacity;
         transfer(table, newTable);
         table = newTable;
+        threshold = capacity * LOAD_FACTOR;
     }
 
     private void putInTable(Node<K, V> node, Node<K, V>[] table) {
