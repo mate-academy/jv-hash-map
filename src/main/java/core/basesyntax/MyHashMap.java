@@ -17,47 +17,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         recountThreshold();
     }
 
-    private class Node<K, V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value) {
-            this.hash = hash(key);
-            this.key = key;
-            this.value = value;
-        }
-    }
-
-    private int hash(Object key) {
-        return key == null ? HASH_CODE_OF_NULL : Math.abs(key.hashCode() % table.length);
-    }
-
-    private void recountThreshold() {
-        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
-    }
-
-    private void grow() {
-        final Node<K, V>[] oldTable = table;
-        int newCapacity = table.length * NUMBER_OF_SCALING_NEW_TABLE;
-        table = new Node[newCapacity];
-        recountThreshold();
-        size = DEFAULT_SIZE;
-
-        for (Node<K, V> node : oldTable) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
-            }
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         int index = hash(key);
         Node<K, V> node = table[index];
         Node<K, V> prevNode = null;
+
         while (node != null) {
             if (Objects.equals(node.key, key)) {
                 node.value = value;
@@ -92,12 +57,47 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node = node.next;
         }
-
         return null;
     }
 
     @Override
     public int getSize() {
         return size;
+    }
+
+    private class Node<K, V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value) {
+            this.hash = hash(key);
+            this.key = key;
+            this.value = value;
+        }
+    }
+
+    private int hash(Object key) {
+        return key == null ? HASH_CODE_OF_NULL : Math.abs(key.hashCode() % table.length);
+    }
+
+    private void recountThreshold() {
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
+    }
+
+    private void grow() {
+        final Node<K, V>[] oldTable = table;
+        int newCapacity = table.length * NUMBER_OF_SCALING_NEW_TABLE;
+        table = new Node[newCapacity];
+        recountThreshold();
+        size = DEFAULT_SIZE;
+
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
+        }
     }
 }
