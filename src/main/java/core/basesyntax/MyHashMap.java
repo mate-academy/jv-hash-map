@@ -2,6 +2,7 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
+    private static final int INCREASE_FACTOR = 1;
     private int capacity = 16;
     private int threshold;
     private int size;
@@ -19,13 +20,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == 0 || arrWithKeyValues[remainder] == null) {
             return null;
         }
-        Node<K, V> temp = arrWithKeyValues[remainder];
-        while (temp != null) {
-            if ((temp.key == null && key == null)
-                    || (temp.key != null && temp.key.hashCode() == getHash(key) && temp.key.equals(key))) {
-                return temp.value;
+        Node<K, V> tempNode = arrWithKeyValues[remainder];
+        while (tempNode != null) {
+            if (isEquals(tempNode, key)) {
+                return tempNode.value;
             }
-            temp = temp.next;
+            tempNode = tempNode.next;
         }
         return null;
     }
@@ -43,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         if (threshold == size) {
             Node<K, V>[] tempArr = new Node[capacity];
-            capacity = capacity << 1;
+            capacity = capacity << INCREASE_FACTOR;
             transformArray(tempArr);
             threshold = (int) (LOAD_FACTOR * capacity);
         }
@@ -56,28 +56,33 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        iterateAndPut(arrWithKeyValues[remainder], key, value);
+        iterateBucketAndPut(arrWithKeyValues[remainder], key, value);
     }
 
     private int getHash(Object key) {
         return key == null ? 0 : key.hashCode();
     }
 
-    private void iterateAndPut(Node<K, V> node, K key, V value) {
-        Node<K, V> temp = node;
-        while (temp != null) {
-            if ((temp.key == null && key == null)
-                    || (temp.key != null && temp.key.hashCode() == getHash(key) && temp.key.equals(key))) {
-                temp.value = value;
+    private void iterateBucketAndPut(Node<K, V> node, K key, V value) {
+        Node<K, V> tempNode = node;
+        while (tempNode != null) {
+            if(isEquals(tempNode, key)) {
+                tempNode.value = value;
                 return;
             }
-            if (temp.next == null) {
-                temp.next = new Node<>(getHash(key), key, value, null);
+            if (tempNode.next == null) {
+                tempNode.next = new Node<>(getHash(key), key, value, null);
                 size++;
                 return;
             }
-            temp = temp.next;
+            tempNode = tempNode.next;
         }
+    }
+
+    private boolean isEquals(Node<K, V> temp, K key) {
+        return (temp.key == null && key == null)
+                || (temp.key != null && temp.key.hashCode() == getHash(key)
+                && temp.key.equals(key));
     }
 
     private void transformArray(Node<K, V>[] tempArr) {
@@ -96,8 +101,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private int hash;
-        private K key;
+        private final int hash;
+        private final K key;
         private V value;
         private Node<K, V> next;
 
