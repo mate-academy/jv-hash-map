@@ -2,17 +2,13 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    private final float loadFactor = 0.75f;
-    private final int firstIndex = 0;
-    private int initialSize = 16;
+    private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
+    private int initialSize = 16;
     private int size = 0;
 
     MyHashMap() {
         table = new Node[initialSize];
-        for (int i = 0; i < initialSize; i++) {
-            table[i] = null;
-        }
     }
 
     private static class Node<K,V> {
@@ -31,59 +27,56 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= initialSize * loadFactor) {
-            checkSize();
-        }
         Node<K, V> first;
         int index;
-        if (key == null) {
-            if (table[firstIndex] == null) {
-                table[firstIndex] = new Node<>(0, null, value, null);
-                size++;
-                return;
-            }
-            first = table[firstIndex];
-            if (first.key == null) {
-                first.value = value;
-                return;
-            }
-            while (first.next != null) {
-                first = first.next;
-                if (first.key == null) {
-                    first.value = value;
-                    return;
-                }
-            }
-            first.next = new Node<>(0, null, value, null);
-            size++;
-            return;
+        if (size >= initialSize * LOAD_FACTOR) {
+            resize();
         }
-        index = Math.abs(key.hashCode()) % initialSize;
+        index = (key == null ? 0 : Math.abs(key.hashCode())) % initialSize;
         first = table[index];
         if (table[index] == null) {
-            first = new Node<>(key.hashCode(), key, value, null);
-            table[index] = first;
+            table[index] = new Node<>(key == null ? 0 : key.hashCode(), key, value, null);
             size++;
             return;
         }
         if (table[index] != null) {
             while (first != null) {
-                if (key.equals(first.key)) {
+                if ((first.key == null && key == null) || (key != null && key.equals(first.key))) {
                     first.value = value;
                     return;
                 }
                 first = first.next;
             }
         }
-        first = table[index];
-        while (first.next != null) {
-            first = first.next;
-        }
-        first.next = new Node<>(key.hashCode(), key, value, null);
-        size++;
+        setNewNode(index, key, value);
     }
 
-    private void checkSize() {
+    @Override
+    public V getValue(K key) {
+        Node<K, V> first;
+        int index = (key == null ? 0 : Math.abs(key.hashCode())) % initialSize;
+        if (table[index] == null) {
+            return null;
+        } else {
+            first = table[index];
+            while (first != null) {
+                if (first.key == null && key == null) {
+                    return first.value;
+                } else if (key != null && key.equals(first.key)) {
+                    return first.value;
+                }
+                first = first.next;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    private void resize() {
         initialSize *= 2;
         size = 0;
         Node<K, V>[] tempO = table;
@@ -99,37 +92,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    @Override
-    public V getValue(K key) {
+    private void setNewNode(int index, K key, V value) {
         Node<K, V> first;
-        if (key == null) {
-            first = table[firstIndex];
-            while (first != null) {
-                if (first.key == null) {
-                    return first.value;
-                }
-                first = first.next;
-            }
-            return null;
+        first = table[index];
+        while (first.next != null) {
+            first = first.next;
         }
-        int index = Math.abs(key.hashCode()) % initialSize;
-        if (table[index] == null) {
-            return null;
-        } else {
-            first = table[index];
-            while (first != null) {
-                if ((key.hashCode() == (first.hash)) && key.equals(first.key)) {
-                    return first.value;
-                }
-                first = first.next;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
+        first.next = new Node<>(key == null ? 0 : key.hashCode(), key, value, null);
+        size++;
     }
 }
-
