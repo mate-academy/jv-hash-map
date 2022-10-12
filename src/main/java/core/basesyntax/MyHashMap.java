@@ -15,7 +15,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     MyHashMap() {
         capacity = INITIAL_CAPACITY;
         table = (Node<K,V>[]) new Node[capacity];
-        size = 0;
     }
 
     @Override
@@ -23,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size + 1 > capacity * LOAD_FACTOR) {
             resize();
         }
-        Node<K, V> node = new Node<>(key, value, hash(key));
+        Node<K, V> node = new Node<>(key, value);
         int placeInArray = positionByHash(key);
 
         if (table[placeInArray] == null) {
@@ -98,20 +97,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.abs(hash(key)) % capacity;
     }
 
-    private int hash(K key) {
+    private int hash(Object key) {
         return key == null ? 0 : key.hashCode();
     }
 
-    static class Node<K, V> {
+    private class Node<K, V> {
         private final K key;
         private V value;
         private final int hashCode;
         private Node<K, V> next;
 
-        Node(K key, V value, int hashCode) {
+        Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.hashCode = hashCode;
+            this.hashCode = hash(key);
             next = null;
         }
 
