@@ -66,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void iterateBucketAndPut(Node<K, V> node, K key, V value) {
         Node<K, V> tempNode = node;
         while (tempNode != null) {
-            if(isEquals(tempNode, key)) {
+            if (isEquals(tempNode, key)) {
                 tempNode.value = value;
                 return;
             }
