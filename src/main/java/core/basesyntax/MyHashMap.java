@@ -5,74 +5,73 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K,V>[] table;
     private int capacity = INITIAL_CAPACITY;
-    private int size = 0;
-    private int threshold = (int) (capacity * LOAD_FACTOR);
+    private int size;
+    private int threshold;
 
     MyHashMap() {
         table = (Node<K, V>[]) new Node[capacity];
+        size = 0;
+        threshold = (int) (capacity * LOAD_FACTOR);
     }
 
-    private int getHash(Object key, int capacity) {
+    private int getBucketIndex(Object key, int capacity) {
         return key == null ? 0 : key.hashCode() & (capacity - 1);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size > threshold) {
-            resize();
-        }
-        int bucket = getHash(key,capacity);
-        Node<K,V> insertedElement = new Node<>(bucket, key, value, null);
+        int bucket = getBucketIndex(key,capacity);
         Node<K,V> currentElement = table[bucket];
 
         if (currentElement == null) {
-            table[bucket] = insertedElement;
+            table[bucket] = new Node<>(bucket, key, value, null);
             size++;
         } else {
             while (currentElement.next != null) {
-                if (currentElement.key == insertedElement.key
-                        || currentElement.key != null
-                        && currentElement.key.equals(insertedElement.key)) {
-                    currentElement.value = insertedElement.value;
+                if (areEqual(currentElement.key, key)) {
+                    currentElement.value = value;
                     return;
                 }
                 currentElement = currentElement.next;
             }
-            if ((currentElement.key == insertedElement.key
-                    || currentElement.key != null
-                    && currentElement.key.equals(insertedElement.key))) {
-                currentElement.value = insertedElement.value;
+            if (areEqual(currentElement.key, key)) {
+                currentElement.value = value;
             } else {
-                currentElement.next = insertedElement;
+                currentElement.next = new Node<>(bucket, key, value, null);
                 size++;
             }
+        }
+        if (size > threshold) {
+            resize();
         }
     }
 
     @Override
     public V getValue(K key) {
-        int hash = getHash(key,capacity);
-        Node<K, V> element = table[hash];
+        int bucket = getBucketIndex(key,capacity);
+        Node<K, V> element = table[bucket];
         if (element == null) {
             return null;
         }
-        if (element.key == key || element.key != null && element.key.equals(key)) {
-            return table[hash].getValue();
+        if (areEqual(element.key, key)) {
+            return table[bucket].getValue();
         } else {
             while (element != null) {
-                if (element.key == key || element.key != null && element.key.equals(key)) {
+                if (areEqual(element.key, key)) {
                     return element.getValue();
                 }
                 element = element.next;
             }
+
             return null;
         }
+
     }
 
     private void resize() {
         int newCapacity = capacity << 1;
+        Node<K,V> [] newTable = getTable(newCapacity);
         threshold = threshold << 1;
-        Node<K,V> [] newTable = (Node<K, V>[]) new Node [newCapacity];
         transfer(table, newTable);
         table = newTable;
         capacity = newCapacity;
@@ -80,17 +79,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void transfer(Node<K,V> [] oldTable, Node<K,V> [] newTable) {
         int index = 0;
+
         while (index < oldTable.length) {
-            Node<K,V> oldNode = oldTable[index];
-            if (oldNode != null) {
-                oldTable[index] = null;
+            Node<K,V> currentNode = oldTable[index];
+            if (currentNode != null) {
                 do {
-                    Node<K,V> next = oldNode.next;
-                    int hash = getHash(oldNode.key, newTable.length);
-                    oldNode.next = newTable[hash];
-                    newTable[hash] = oldNode;
-                    oldNode = next;
-                } while (oldNode != null);
+                    oldTable[index] = null;
+                    int bucket = getBucketIndex(currentNode.key, newTable.length);
+                    Node<K, V> next = currentNode.next;
+                    currentNode.next = newTable[bucket];
+                    newTable[bucket] = currentNode;
+                    currentNode = next;
+                } while (currentNode != null);
             }
             index++;
         }
@@ -101,7 +101,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static class Node<K,V> {
+    private Node<K,V>[] getTable(int capacity) {
+        return (Node<K, V>[]) new Node[capacity];
+    }
+
+    private boolean areEqual(Object firstElement, Object secondElement) {
+        return firstElement == secondElement
+                || firstElement != null && firstElement.equals(secondElement);
+    }
+
+    private static final class Node<K,V> {
         private final int hash;
         private K key;
         private V value;
