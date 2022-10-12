@@ -10,23 +10,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
-    static class Node<K, V> {
-        private int hash;
-        private K key;
-        private V value;
-        private Node<K,V> next;
-
-        Node(int hash, K key, V value, Node<K,V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = table[getBucket(key)];
+        Node<K, V> currentNode = table[getBucketIndex(key)];
         while (currentNode != null) {
             if (key == currentNode.key || (key != null && key.equals(currentNode.key))) {
                 return currentNode.value;
@@ -46,8 +32,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == table.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
-        Node<K, V> node = new Node<>(getBucket(key), key, value, null);
-        int bucket = getBucket(node.key);
+        Node<K, V> node = new Node<>(key, value, null);
+        int bucket = getBucketIndex(node.key);
         Node<K, V> currentNode = table[bucket];
         while (currentNode != null) {
             if (currentNode.key == node.key
@@ -65,6 +51,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
+    private static class Node<K, V> {
+        private K key;
+        private V value;
+        private Node<K,V> next;
+
+        Node(K key, V value, Node<K,V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+    }
+
     private void resize() {
         Node<K, V>[] oldTable = table;
         table = new Node[table.length * 2];
@@ -77,7 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    final int getBucket(K key) {
+    private int getBucketIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 }
