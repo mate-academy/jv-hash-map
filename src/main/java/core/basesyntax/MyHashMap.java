@@ -58,8 +58,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int keyHash = key == null ? 0 : Math.abs(key.hashCode());
-        int position = keyHash % maxSize;
+        int keyHash = key == null ? 0 : key.hashCode();
+        int position = Math.abs(keyHash) % maxSize;
         Node<K, V> pointer = buckets[position];
         if (pointer != null) {
             while (pointer != null) {
