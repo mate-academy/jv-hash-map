@@ -4,11 +4,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K,V>[] table;
-    private int capacity = INITIAL_CAPACITY;
+    private int capacity;
     private int size;
     private int threshold;
 
     MyHashMap() {
+        capacity = INITIAL_CAPACITY;
         table = (Node<K, V>[]) new Node[capacity];
         size = 0;
         threshold = (int) (capacity * LOAD_FACTOR);
@@ -18,13 +19,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : key.hashCode() & (capacity - 1);
     }
 
+    private int hash(Object key) {
+        return key == null ? 0 : key.hashCode();
+    }
+
     @Override
     public void put(K key, V value) {
         int bucket = getBucketIndex(key,capacity);
         Node<K,V> currentElement = table[bucket];
 
         if (currentElement == null) {
-            table[bucket] = new Node<>(bucket, key, value, null);
+            table[bucket] = new Node<>(hash(key), key, value, null);
             size++;
         } else {
             while (currentElement.next != null) {
@@ -37,7 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (areEqual(currentElement.key, key)) {
                 currentElement.value = value;
             } else {
-                currentElement.next = new Node<>(bucket, key, value, null);
+                currentElement.next = new Node<>(hash(key), key, value, null);
                 size++;
             }
         }
@@ -105,7 +110,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (Node<K, V>[]) new Node[capacity];
     }
 
-    private boolean areEqual(Object firstElement, Object secondElement) {
+    private boolean areEqual(K firstElement, K secondElement) {
         return firstElement == secondElement
                 || firstElement != null && firstElement.equals(secondElement);
     }
