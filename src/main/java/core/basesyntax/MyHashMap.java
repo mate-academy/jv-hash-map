@@ -34,8 +34,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         checkSize();
-        int keyHash = key == null ? 0 : Math.abs(key.hashCode());
-        int position = keyHash % maxSize;
+        int keyHash = key == null ? 0 : key.hashCode();
+        int position = Math.abs(keyHash) % maxSize;
         if (buckets[position] == null) {
             buckets[position] = new Node<>(keyHash, key, value, null);
         } else {
