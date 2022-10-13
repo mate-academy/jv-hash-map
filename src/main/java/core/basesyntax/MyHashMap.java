@@ -10,7 +10,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         entries = new Object[INITIAL_CAPACITY];
-        size = 0;
         threshold = (int)(INITIAL_CAPACITY * LOAD_FACTOR);
     }
 
