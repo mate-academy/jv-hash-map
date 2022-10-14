@@ -16,11 +16,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int remainder = Math.abs(getHash(key)) % capacity;
-        if (size == 0 || table[remainder] == null) {
+        int index = getIndex(key);
+        if (size == 0 || table[index] == null) {
             return null;
         }
-        Node<K, V> tempNode = table[remainder];
+        Node<K, V> tempNode = table[index];
         while (tempNode != null) {
             if (isEquals(tempNode, key)) {
                 return tempNode.value;
@@ -50,17 +50,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putValue(K key, V value) {
-        int remainder = Math.abs(getHash(key)) % capacity;
-        if (table[remainder] == null) {
-            table[remainder] = new Node<>(getHash(key), key, value, null);
+        int index = getIndex(key);
+        if (table[index] == null) {
+            table[index] = new Node<>(getHash(key), key, value, null);
             size++;
             return;
         }
-        iterateBucketAndPut(table[remainder], key, value);
+        iterateBucketAndPut(table[index], key, value);
     }
 
     private int getHash(Object key) {
         return key == null ? 0 : key.hashCode();
+    }
+
+    private int getIndex(K key) {
+        return Math.abs(getHash(key)) % capacity;
     }
 
     private void iterateBucketAndPut(Node<K, V> node, K key, V value) {
