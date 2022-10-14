@@ -25,7 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
-      public void put(K key, V value) {
+    public void put(K key, V value) {
         resize();
         int index = getIndex(key);
         Node<K, V> newElement = new Node<>(hash(key), key, value, null);
@@ -48,7 +48,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
-     public V getValue(K key) {
+    public V getValue(K key) {
         int index = getIndex(key);
         Node<K,V> element = table[index];
         while (element != null) {
