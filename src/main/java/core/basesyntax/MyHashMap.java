@@ -89,11 +89,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] buffer = Arrays.copyOf(buckets, oldSize);
         buckets = (Node<K, V>[]) new Node[maxSize];
         for (int i = 0; i < buffer.length; i++) {
-            if (buffer[i] != null) {
-                while (buffer[i] != null) {
-                    put(buffer[i].key, buffer[i].value);
-                    buffer[i] = buffer[i].next;
-                }
+            while (buffer[i] != null) {
+                put(buffer[i].key, buffer[i].value);
+                buffer[i] = buffer[i].next;
             }
         }
     }
