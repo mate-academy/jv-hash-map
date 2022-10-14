@@ -6,7 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int capacity = 16;
     private int threshold;
     private int size;
-    private Node<K, V>[] arrWithKeyValues;
+    private Node<K, V>[] table;
 
     @Override
     public void put(K key, V value) {
@@ -17,10 +17,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int remainder = Math.abs(getHash(key)) % capacity;
-        if (size == 0 || arrWithKeyValues[remainder] == null) {
+        if (size == 0 || table[remainder] == null) {
             return null;
         }
-        Node<K, V> tempNode = arrWithKeyValues[remainder];
+        Node<K, V> tempNode = table[remainder];
         while (tempNode != null) {
             if (isEquals(tempNode, key)) {
                 return tempNode.value;
@@ -38,11 +38,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resizeIfNecessary() {
         if (threshold == 0) {
             threshold = (int) (LOAD_FACTOR * capacity);
-            arrWithKeyValues = new Node[capacity];
+            table = new Node[capacity];
             return;
         }
         if (threshold == size) {
-            Node<K, V>[] tempArr = arrWithKeyValues;
+            Node<K, V>[] tempArr = table;
             capacity = capacity << INCREASE_FACTOR;
             transformArray(tempArr);
             threshold = (int) (LOAD_FACTOR * capacity);
@@ -51,12 +51,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void putValue(K key, V value) {
         int remainder = Math.abs(getHash(key)) % capacity;
-        if (arrWithKeyValues[remainder] == null) {
-            arrWithKeyValues[remainder] = new Node<>(getHash(key), key, value, null);
+        if (table[remainder] == null) {
+            table[remainder] = new Node<>(getHash(key), key, value, null);
             size++;
             return;
         }
-        iterateBucketAndPut(arrWithKeyValues[remainder], key, value);
+        iterateBucketAndPut(table[remainder], key, value);
     }
 
     private int getHash(Object key) {
@@ -86,7 +86,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void transformArray(Node<K, V>[] tempArr) {
-        arrWithKeyValues = new Node[capacity];
+        table = new Node[capacity];
         size = 0;
         for (Node<K, V> node : tempArr) {
             if (node != null) {
