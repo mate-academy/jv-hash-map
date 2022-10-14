@@ -83,8 +83,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        int hash;
-        return (key == null) ? 0 : (hash = key.hashCode()) ^ (hash >>> 16);
+        return key == null ? 0 : key.hashCode();
     }
 
     private int getIndex(K key) {
@@ -92,6 +91,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean isEquals(Node<K, V> node, K key) {
-        return node.key == key || key != null && key.equals(node.key);
+        return node.key == key || node.key != null
+                && node.key.hashCode() == hash(key)
+                && node.key.equals(key);
     }
 }
