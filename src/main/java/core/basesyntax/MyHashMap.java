@@ -8,18 +8,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K,V>[] table;
     private int size;
 
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     public MyHashMap() {
         table = new Node[INITIAL_CAPACITY];
         threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
@@ -94,5 +82,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return node.key == key || node.key != null
                 && node.key.hashCode() == hash(key)
                 && node.key.equals(key);
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
