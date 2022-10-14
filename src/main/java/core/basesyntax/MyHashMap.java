@@ -42,7 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         if (threshold == size) {
-            Node<K, V>[] tempArr = new Node[capacity];
+            Node<K, V>[] tempArr = arrWithKeyValues;
             capacity = capacity << INCREASE_FACTOR;
             transformArray(tempArr);
             threshold = (int) (LOAD_FACTOR * capacity);
@@ -80,13 +80,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean isEquals(Node<K, V> temp, K key) {
-        return (temp.key == null && key == null)
+        return (temp.key == key)
                 || (temp.key != null && temp.key.hashCode() == getHash(key)
                 && temp.key.equals(key));
     }
 
     private void transformArray(Node<K, V>[] tempArr) {
-        System.arraycopy(arrWithKeyValues, 0, tempArr, 0, arrWithKeyValues.length);
         arrWithKeyValues = new Node[capacity];
         size = 0;
         for (Node<K, V> node : tempArr) {
