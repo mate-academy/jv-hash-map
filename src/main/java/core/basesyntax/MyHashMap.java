@@ -29,29 +29,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getHash(K key) {
-        return (key == null) ? 0 : key.hashCode() % bucketArray.length;
-    }
-
-    private int getIndex(K key) {
-        return getHash(key) & bucketArray.length - 1;
-    }
-
-    private void resize() {
-        if (load == size) {
-            size = 0;
-            Node<K, V>[] oldBucketArray = bucketArray;
-            bucketArray = new Node[bucketArray.length * DEFAULT_RESIZE_COEFFICIENT];
-            load *= DEFAULT_RESIZE_COEFFICIENT;
-            for (Node<K, V> eachBucket: oldBucketArray) {
-                while (eachBucket != null) {
-                    put(eachBucket.key, eachBucket.value);
-                    eachBucket = eachBucket.next;
-                }
-            }
-        }
-    }
-
     public boolean isHashAndKeysEquals(Node<K,V> bucket, int hash, K key) {
         return (bucket.hash == hash && Objects.equals(bucket.key, key));
     }
@@ -97,5 +74,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private int getHash(K key) {
+        return (key == null) ? 0 : key.hashCode() % bucketArray.length;
+    }
+
+    private int getIndex(K key) {
+        return getHash(key) & bucketArray.length - 1;
+    }
+
+    private void resize() {
+        if (load == size) {
+            size = 0;
+            Node<K, V>[] oldBucketArray = bucketArray;
+            bucketArray = new Node[bucketArray.length * DEFAULT_RESIZE_COEFFICIENT];
+            load *= DEFAULT_RESIZE_COEFFICIENT;
+            for (Node<K, V> eachBucket: oldBucketArray) {
+                while (eachBucket != null) {
+                    put(eachBucket.key, eachBucket.value);
+                    eachBucket = eachBucket.next;
+                }
+            }
+        }
     }
 }
