@@ -6,7 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_CAPACITY = 16;
     static final double LOAD_FACTOR = 0.75;
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private int hash;
         private K key;
         private V value;
@@ -34,12 +34,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         checkSize();
-        int keyHash = key == null ? 0 : key.hashCode();
-        int position = Math.abs(keyHash) % maxSize;
+        int keyHash = getKeyHash(key);
+        int position = getPosition(keyHash);
         if (buckets[position] == null) {
             buckets[position] = new Node<>(keyHash, key, value, null);
         } else {
-            Node<K,V> pointer = buckets[position];
+            Node<K, V> pointer = buckets[position];
             while (pointer.next != null) {
                 if (key == pointer.key || key != null && key.equals(pointer.key)) {
                     pointer.value = value;
@@ -50,24 +50,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (key == pointer.key || key != null && key.equals(pointer.key)) {
                 pointer.value = value;
                 return;
+            } else {
+                pointer.next = new Node<>(keyHash, key, value, null);
             }
-            pointer.next = new Node<>(keyHash, key, value, null);
         }
         hashSize++;
     }
 
     @Override
     public V getValue(K key) {
-        int keyHash = key == null ? 0 : key.hashCode();
-        int position = Math.abs(keyHash) % maxSize;
-        Node<K, V> pointer = buckets[position];
-        if (pointer != null) {
-            while (pointer != null) {
-                if (key == pointer.key || key != null && key.equals(pointer.key)) {
-                    return pointer.value;
-                }
-                pointer = pointer.next;
+        int keyHash = getKeyHash(key);
+        Node<K, V> pointer = buckets[getPosition(keyHash)];
+        while (pointer != null) {
+            if (key == pointer.key || key != null && key.equals(pointer.key)) {
+                return pointer.value;
             }
+            pointer = pointer.next;
         }
         return null;
     }
@@ -98,5 +96,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
+    }
+
+    private int getPosition(int keyHash) {
+        return Math.abs(keyHash) % maxSize;
+    }
+
+    private int getKeyHash(K key) {
+        return key == null ? 0 : key.hashCode();
     }
 }
