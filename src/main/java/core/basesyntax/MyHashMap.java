@@ -6,9 +6,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private int size;
     private int capacity = DEFAULT_INITIAL_CAPACITY;
-
+    private int size;
     private Entry<K, V>[] table;
 
     @SuppressWarnings("unchecked")
@@ -23,18 +22,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         Entry(K key, V value) {
             this.key = key;
-            this.value = value;
-        }
-
-        public final K getKey() {
-            return key;
-        }
-
-        public final V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
             this.value = value;
         }
 
@@ -70,22 +57,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             while (e.next != null) {
-                if ((e.getKey() != null) && (e.getKey().equals(key))) {
-                    e.setValue(value);
+                if ((e.key != null) && (e.key.equals(key))) {
+                    e.value = value;
                     return;
                 }
-                if (e.getKey() == null && key == null) {
-                    e.setValue(value);
+                if (e.key == null && key == null) {
+                    e.value = value;
                     return;
                 }
                 e = e.next;
             }
-            if ((e.getKey() != null) && (e.getKey().equals(key))) {
-                e.setValue(value);
+            if ((e.key != null) && (e.key.equals(key))) {
+                e.value = value;
                 return;
             }
-            if (e.getKey() == null && key == null) {
-                e.setValue(value);
+            if (e.key == null && key == null) {
+                e.value = value;
                 return;
             }
             e.next = new Entry<>(key, value);
@@ -102,11 +89,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         while (e != null) {
             if (key == null) {
-                if (e.getKey() == null) {
-                    return e.getValue();
+                if (e.key == null) {
+                    return e.value;
                 }
-            } else if (key.equals(e.getKey())) {
-                return e.getValue();
+            } else if (key.equals(e.key)) {
+                return e.value;
             }
             e = e.next;
         }
@@ -124,10 +111,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Entry<K, V> e : table) {
             if (e != null) {
                 while (e.next != null) {
-                    transfer(e.getKey(), e.getValue(), newTable);
+                    transfer(e.key, e.value, newTable);
                     e = e.next;
                 }
-                transfer(e.getKey(), e.getValue(), newTable);
+                transfer(e.key, e.value, newTable);
             }
         }
         table = newTable;
@@ -142,22 +129,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             newTable[hash] = new Entry<>(key, value);
         } else {
             while (e.next != null) {
-                if ((e.getKey() != null) && (e.getKey().equals(key))) {
-                    e.setValue(value);
+                if ((e.key != null) && (e.key.equals(key))) {
+                    e.value = value;
                     return;
                 }
-                if (e.getKey() == null && key == null) {
-                    e.setValue(value);
+                if (e.key == null && key == null) {
+                    e.value = value;
                     return;
                 }
                 e = e.next;
             }
-            if ((e.getKey() != null) && (e.getKey().equals(key))) {
-                e.setValue(value);
+            if ((e.key != null) && (e.key.equals(key))) {
+                e.value = value;
                 return;
             }
-            if (e.getKey() == null && key == null) {
-                e.setValue(value);
+            if (e.key == null && key == null) {
+                e.value = value;
                 return;
             }
             e.next = new Entry<>(key, value);
