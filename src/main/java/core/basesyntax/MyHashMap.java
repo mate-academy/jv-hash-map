@@ -3,21 +3,21 @@ package core.basesyntax;
 import java.util.Arrays;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_CAPACITY = 16;
-    static final double LOAD_FACTOR = 0.75;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final double LOAD_FACTOR = 0.75;
     private int size;
-    private MyEntry<K, V>[] values = new MyEntry[DEFAULT_CAPACITY];
+    private MyEntry<K, V>[] values;
+
+    public MyHashMap() {
+        values = new MyEntry[DEFAULT_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
         boolean insert = true;
         for (int i = 0; i < size; i++) {
-            if (values[i].key != null) {
-                if (values[i].key.equals(key)) {
-                    values[i].value = value;
-                    insert = false;
-                }
-            } else if (values[i].key == null && key == null) {
+            if ((values[i].key != null && values[i].key.equals(key))
+                    || values[i].key == null && key == null) {
                 values[i].value = value;
                 insert = false;
             }
@@ -25,17 +25,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (insert) {
             ensureCap();
             values[size++] = new MyEntry<>(key, value);
+            return;
         }
     }
 
     @Override
     public V getValue(K key) {
         for (int i = 0; i < size; i++) {
-            if (values[i] != null && values[i].key != null) {
-                if (values[i].key.equals(key)) {
-                    return values[i].value;
-                }
-            } else if (key == null && values[i].key == null) {
+            if ((values[i].key != null && values[i].key.equals(key))
+                    || values[i].key == null && key == null) {
                 return values[i].value;
             }
         }
