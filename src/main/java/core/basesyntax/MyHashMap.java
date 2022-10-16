@@ -23,8 +23,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         if (insert) {
-            ensureCapa();
-            values[size++] = new MyEntry<K, V>(key, value);
+            ensureCap();
+            values[size++] = new MyEntry<>(key, value);
         }
     }
 
@@ -47,7 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void ensureCapa() {
+    private void ensureCap() {
         if (size == values.length * LOAD_FACTOR) {
             int newSize = values.length * 2;
             values = Arrays.copyOf(values, newSize);
