@@ -1,19 +1,100 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_COEFFICIENT = 0.75f;
+    private static final int DEFAULT_RESIZE_COEFFICIENT = 2;
+    private Node<K, V>[] massOfNode;
+    private int currentLoad;
+    private int size;
+
+    public MyHashMap() {
+        this.massOfNode = new Node[DEFAULT_INITIAL_CAPACITY];
+        this.currentLoad = (int) (DEFAULT_LOAD_COEFFICIENT * DEFAULT_INITIAL_CAPACITY);
+    }
 
     @Override
     public void put(K key, V value) {
-
+        resize();
+        int hash = getHashCode(key);
+        int index = getIndex(key);
+        Node<K, V> newElement = new Node<>(hash, key, value, null);
+        Node<K, V> element = massOfNode[index];
+        if (element == null) {
+            massOfNode[index] = newElement;
+        }
+        while (element != null) {
+            if (element.hash == hash && Objects.equals(key, element.key)) {
+                element.value = value;
+                return;
+            }
+            if (element.next == null) {
+                element.next = newElement;
+                break;
+            }
+            element = element.next;
+        }
+        size++;
     }
 
     @Override
     public V getValue(K key) {
+        int hash = getHashCode(key);
+        int index = getIndex(key);
+        Node<K, V> element = massOfNode[index];
+        while (element != null) {
+            if (element.hash == hash && Objects.equals(key, element.key)) {
+                return element.value;
+            }
+            element = element.next;
+        }
         return null;
     }
 
     @Override
     public int getSize() {
-        return 0;
+        return size;
+    }
+
+    private int getHashCode(K key) {
+        int hash;
+        return (key == null)
+               ? 0
+               : (hash = key.hashCode()) ^ (hash >>> 16);
+    }
+
+    private int getIndex(K key) {
+        return getHashCode(key) & (massOfNode.length - 1);
+    }
+
+    private void resize() {
+        if (currentLoad == size) {
+            size = 0;
+            Node<K, V>[] oldTable = massOfNode;
+            massOfNode = new Node[massOfNode.length * DEFAULT_RESIZE_COEFFICIENT];
+            currentLoad *= DEFAULT_RESIZE_COEFFICIENT;
+            for (Node<K, V> node : oldTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
+            }
+        }
+    }
+
+    private class Node<K, V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(int hash, K key, V value, Node<K, V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
