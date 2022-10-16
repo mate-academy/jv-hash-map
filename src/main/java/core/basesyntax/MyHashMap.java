@@ -3,8 +3,8 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_INITIAL_CAPACITY = 16;
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int RESIZE_FACTOR = 2;
     private Node<K, V>[] table;
     private int size;
@@ -15,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private K key;
         private V value;
         private int hash;
