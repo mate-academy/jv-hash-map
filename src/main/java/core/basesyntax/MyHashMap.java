@@ -85,7 +85,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @SuppressWarnings("unchecked")
     private void resize() {
-        Node<K, V>[] newTable = new Node[capacity * 2];
+        capacity *= 2;
+        Node<K, V>[] newTable = new Node[capacity];
         for (Node<K, V> e : values) {
             if (e != null) {
                 while (e.next != null) {
@@ -96,15 +97,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         values = newTable;
-        capacity *= 2;
     }
 
     private void transfer(K key, V value, Node<K, V>[] newTable) {
-        int hash = (key == null) ? 0 : (key.hashCode() % (capacity * 2));
-        hash = hash < 0 ? -hash : hash;
-        Node<K, V> e = newTable[hash];
+        int indexByTheKey = getIndexByTheKey(key);
+        Node<K, V> e = newTable[indexByTheKey];
         if (e == null) {
-            newTable[hash] = new Node<>(key, value);
+            newTable[indexByTheKey] = new Node<>(key, value);
         } else {
             while (e.next != null) {
                 if ((e.key != null) && (e.key.equals(key))) {
@@ -130,7 +129,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndexByTheKey(K key) {
-        int hash = (key == null) ? 0 : (key.hashCode() % capacity);
-        return hash < 0 ? -hash : hash;
+        int index = (key == null) ? 0 : (key.hashCode() % capacity);
+        return index < 0 ? -index : index;
     }
 }
