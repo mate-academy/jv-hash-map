@@ -11,15 +11,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        this.nodeArr = new Node[DEFAULT_CAPACITY];
-        this.threshold = (int) (DEFAULT_CAPACITY * LOUD_FACTOR);
+        nodeArr = new Node[DEFAULT_CAPACITY];
+        threshold = (int) (DEFAULT_CAPACITY * LOUD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
         resizeIfNeed();
         int hash = getHashCode(key);
-        int index = getIndex(key);
+        int index = getIndexByHash(hash);
         Node<K, V> newElement = new Node<>(hash, key, value, null);
         Node<K, V> element = nodeArr[index];
         if (element == null) {
@@ -41,9 +41,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> element = nodeArr[getIndex(key)];
+        Node<K, V> element = nodeArr[getIndexByHash(getHashCode(key))];
         while (element != null) {
-            if (element.hash == getHashCode(key) && Objects.equals(key, element.key)) {
+            if (Objects.equals(key, element.key)) {
                 return element.value;
             }
             element = element.next;
@@ -76,8 +76,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : (hash = key.hashCode()) ^ (hash >>> 16);
     }
 
-    private int getIndex(K key) {
-        return getHashCode(key) & (nodeArr.length - 1);
+    private int getIndexByHash(int hash) {
+        return hash & (nodeArr.length - 1);
     }
 
     static class Node<K, V> {
