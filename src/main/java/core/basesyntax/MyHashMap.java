@@ -20,13 +20,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         resizeIfNeed();
         int hash = getHashCode(key);
         int index = getIndexByHash(hash);
-        Node<K, V> newElement = new Node<>(hash, key, value, null);
+        Node<K, V> newElement = new Node<>(key, value, null);
         Node<K, V> element = nodeArr[index];
         if (element == null) {
             nodeArr[index] = newElement;
         }
         while (element != null) {
-            if (element.hash == hash && Objects.equals(key, element.key)) {
+            if (Objects.equals(key, element.key)) {
                 element.value = value;
                 return;
             }
@@ -81,13 +81,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
