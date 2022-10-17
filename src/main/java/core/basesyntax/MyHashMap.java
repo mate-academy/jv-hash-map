@@ -12,7 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         this.table = new Node[DEFAULT_CAPACITY];
-        this.defaultLoad = (int) (LOAD_FACTOR * DEFAULT_CAPACITY);
+        this.defaultLoad = (int) LOAD_FACTOR * DEFAULT_CAPACITY;
     }
 
     @Override
@@ -63,7 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return getHash(key) & (table.length - 1);
+        return getHash(key) & table.length - 1;
     }
 
     private void resize() {
