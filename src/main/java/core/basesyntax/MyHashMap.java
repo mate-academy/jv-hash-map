@@ -26,15 +26,34 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
+    }
 
-        public final int hashCode() {
-            return Objects.hashCode(key) ^ Objects.hashCode(value);
+    @Override
+    public void put(K key, V value) {
+        if (putToNode(key,value)) {
+            size++;
+            if (size > threshold) {
+                table = resize();
+            }
         }
     }
 
-    static final int hash(Object key) {
-        int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+    @Override
+    public V getValue(K key) {
+        int hashKey = hash(key);
+        Node<K, V> node = table[table.length - 1 & hashKey];
+        while (node != null) {
+            if (node.hash == hashKey && Objects.equals(node.key, key)) {
+                return node.value;
+            }
+            node = node.next;
+        }
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
     }
 
     private Node<K,V>[] resize() {
@@ -70,31 +89,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return true;
     }
 
-    @Override
-    public void put(K key, V value) {
-        if (putToNode(key,value)) {
-            size++;
-            if (size > threshold) {
-                table = resize();
-            }
-        }
-    }
-
-    @Override
-    public V getValue(K key) {
-        int hashKey = hash(key);
-        Node<K, V> node = table[table.length - 1 & hashKey];
-        while (node != null) {
-            if (node.hash == hashKey && Objects.equals(node.key, key)) {
-                return node.value;
-            }
-            node = node.next;
-        }
-        return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
+    private int hash(Object key) {
+        int h;
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
 }
