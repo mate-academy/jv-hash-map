@@ -11,8 +11,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        this.table = new Node[DEFAULT_INITIAL_CAPACITY];
-        this.currentLoad = (int) (DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
+        currentLoad = (int) DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY;
     }
 
     @Override
@@ -26,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = newElement;
         }
         while (element != null) {
-            if (element.hash == hash && Objects.equals(key, element.key)) {
+            if (Objects.equals(key, element.key)) {
                 element.value = value;
                 return;
             }
@@ -64,7 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return getHashCode(key) & (table.length - 1);
+        return getHashCode(key) & table.length - 1;
     }
 
     private void resize() {
