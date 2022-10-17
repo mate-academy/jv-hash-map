@@ -13,17 +13,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         values = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         if (size >= capacity * LOAD_FACTOR) {
@@ -36,21 +25,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             while (node.next != null) {
-                if ((node.key != null) && (node.key.equals(key))) {
-                    node.value = value;
-                    return;
-                }
-                if (node.key == null && key == null) {
+                if ((node.key != null) && (node.key.equals(key))
+                        || (node.key == null && key == null)) {
                     node.value = value;
                     return;
                 }
                 node = node.next;
             }
-            if ((node.key != null) && (node.key.equals(key))) {
-                node.value = value;
-                return;
-            }
-            if (node.key == null && key == null) {
+            if ((node.key != null) && (node.key.equals(key))
+                    || (node.key == null && key == null)) {
                 node.value = value;
                 return;
             }
@@ -63,14 +46,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int indexByTheKey = getIndexByTheKey(key);
         Node<K, V> node = values[indexByTheKey];
-        if (node == null) {
-            return null;
-        }
         while (node != null) {
-            if (key == null && node.key == null) {
-                return node.value;
-            }
-            if (key != null && key.equals(node.key)) {
+            if ((key == null && node.key == null) || (key != null && key.equals(node.key))) {
                 return node.value;
             }
             node = node.next;
@@ -83,53 +60,35 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private void resize() {
         capacity *= 2;
-        Node<K, V>[] newTable = new Node[capacity];
-        for (Node<K, V> value: values) {
+        size = 0;
+        Node<K, V>[] oldValuesMap = values;
+        values = (Node<K, V>[]) new Node[capacity];
+        for (Node<K, V> value : oldValuesMap) {
             if (value != null) {
                 while (value.next != null) {
-                    transfer(value.key, value.value, newTable);
+                    put(value.key, value.value);
                     value = value.next;
                 }
-                transfer(value.key, value.value, newTable);
+                put(value.key, value.value);
             }
-        }
-        values = newTable;
-    }
-
-    private void transfer(K key, V value, Node<K, V>[] newTable) {
-        int indexByTheKey = getIndexByTheKey(key);
-        Node<K, V> node = newTable[indexByTheKey];
-        if (node == null) {
-            newTable[indexByTheKey] = new Node<>(key, value);
-        } else {
-            while (node.next != null) {
-                if ((node.key != null) && (node.key.equals(key))) {
-                    node.value = value;
-                    return;
-                }
-                if (node.key == null && key == null) {
-                    node.value = value;
-                    return;
-                }
-                node = node.next;
-            }
-            if ((node.key != null) && (node.key.equals(key))) {
-                node.value = value;
-                return;
-            }
-            if (node.key == null && key == null) {
-                node.value = value;
-                return;
-            }
-            node.next = new Node<>(key, value);
         }
     }
 
     private int getIndexByTheKey(K key) {
-        int index = (key == null) ? 0 : (key.hashCode() % capacity);
-        return index < 0 ? -index : index;
+        return Math.abs((key == null) ? 0 : (key.hashCode() % capacity));
     }
 }
