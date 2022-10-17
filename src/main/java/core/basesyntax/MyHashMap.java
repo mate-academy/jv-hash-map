@@ -12,7 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = new Node[DEFAULT_SIZE];
-        currentLoad = (int) (DEFAULT_SIZE * DEFAULT_LOAD_FACTOR);
+        currentLoad = DEFAULT_SIZE * (int) DEFAULT_LOAD_FACTOR;
     }
 
     @Override
