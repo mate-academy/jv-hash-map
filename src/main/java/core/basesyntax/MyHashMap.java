@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final float LOAD_FACTOR = 0.75f;
@@ -33,41 +35,36 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= initialSize * LOAD_FACTOR) {
             resize();
         }
-        index = (key == null ? 0 : Math.abs(key.hashCode())) % initialSize;
+        index = Math.abs(getHashCode(key) % initialSize);
         first = table[index];
         if (table[index] == null) {
-            table[index] = new Node<>(key == null ? 0 : key.hashCode(), key, value, null);
+            table[index] = new Node<>(getHashCode(key), key, value, null);
             size++;
-            return;
         }
-        if (table[index] != null) {
-            while (first != null) {
-                if ((first.key == null && key == null) || (key != null && key.equals(first.key))) {
-                    first.value = value;
-                    return;
-                }
-                if (first.next == null) {
-                    first.next = new Node<>(key == null ? 0 : key.hashCode(), key, value, null);
-                    size++;
-                    return;
-                }
-                first = first.next;
+        while (first != null) {
+            if ((first.hash == getHashCode(key)) && (Objects.equals(first.key, key))) {
+                first.value = value;
+                return;
             }
+            if (first.next == null) {
+                first.next = new Node<>(getHashCode(key), key, value, null);
+                size++;
+                return;
+            }
+            first = first.next;
         }
     }
 
     @Override
     public V getValue(K key) {
         Node<K, V> first;
-        int index = (key == null ? 0 : Math.abs(key.hashCode())) % initialSize;
+        int index = Math.abs(getHashCode(key) % initialSize);
         if (table[index] == null) {
             return null;
         } else {
             first = table[index];
             while (first != null) {
-                if (first.key == null && key == null) {
-                    return first.value;
-                } else if (key != null && key.equals(first.key)) {
+                if ((first.hash == getHashCode(key)) && (Objects.equals(key, first.key))) {
                     return first.value;
                 }
                 first = first.next;
@@ -95,5 +92,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 } while (first != null);
             }
         }
+    }
+
+    private int getHashCode(K key) {
+        return key == null ? 0 : key.hashCode();
     }
 }
