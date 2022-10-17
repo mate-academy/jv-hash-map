@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private static final int INCREASE_FACTOR = 1;
@@ -7,6 +9,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private int size;
     private Node<K, V>[] table;
+
+    public MyHashMap() {
+        threshold = (int) (LOAD_FACTOR * capacity);
+        table = new Node[capacity];
+    }
 
     @Override
     public void put(K key, V value) {
@@ -36,11 +43,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resizeIfNecessary() {
-        if (threshold == 0) {
-            threshold = (int) (LOAD_FACTOR * capacity);
-            table = new Node[capacity];
-            return;
-        }
         if (threshold == size) {
             Node<K, V>[] tempArr = table;
             capacity = capacity << INCREASE_FACTOR;
@@ -52,7 +54,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void putValue(K key, V value) {
         int index = getIndex(key);
         if (table[index] == null) {
-            table[index] = new Node<>(getHash(key), key, value, null);
+            table[index] = new Node<>(key, value, null);
             size++;
             return;
         }
@@ -75,7 +77,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             if (tempNode.next == null) {
-                tempNode.next = new Node<>(getHash(key), key, value, null);
+                tempNode.next = new Node<>(key, value, null);
                 size++;
                 return;
             }
@@ -84,9 +86,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean isEquals(Node<K, V> temp, K key) {
-        return (temp.key == key)
-                || (temp.key != null && temp.key.hashCode() == getHash(key)
-                && temp.key.equals(key));
+        return Objects.equals(temp.key, key);
     }
 
     private void transformArray(Node<K, V>[] tempArr) {
@@ -104,13 +104,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
