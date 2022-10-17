@@ -7,13 +7,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private static final int INCREASE_FACTOR = 2;
     private Node<K, V>[] table;
-    private int capacity;
     private float threshold;
     private int size;
 
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
-        capacity = INITIAL_CAPACITY;
         threshold = INITIAL_CAPACITY * LOAD_FACTOR;
     }
 
@@ -48,13 +46,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void increaseCapacity() {
-        int newCapacity = capacity * INCREASE_FACTOR;
-        Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
         size = 0;
-        capacity = newCapacity;
-        transfer(table, newTable);
-        table = newTable;
-        threshold = capacity * LOAD_FACTOR;
+        Node<K, V>[] oldTable = table;
+        int newCapacity = table.length * INCREASE_FACTOR;
+        table = (Node<K, V>[]) new Node[newCapacity];
+        transfer(oldTable, table);
+        threshold = table.length * LOAD_FACTOR;
     }
 
     private void putInTable(Node<K, V> node, Node<K, V>[] table) {
@@ -79,7 +76,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private void transfer(Node<K, V>[] table, Node<K,V>[] newTable) {
