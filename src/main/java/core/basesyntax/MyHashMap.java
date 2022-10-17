@@ -5,20 +5,8 @@ import java.util.Arrays;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_CAPACITY = 16;
     static final double LOAD_FACTOR = 0.75;
-
-    private static class Node<K, V> {
-        private int hash;
-        private K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(int hash, K key, V value, Node<K,V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
+    static final int INCREASE_FACTOR = 2;
+    static final int ZERO_SIZE = 0;
 
     private Node<K, V>[] buckets;
     private int hashSize;
@@ -82,9 +70,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        hashSize = 0;
+        hashSize = ZERO_SIZE;
         int oldSize = maxSize;
-        maxSize *= 2;
+        maxSize *= INCREASE_FACTOR;
         threshold = (int) (maxSize * LOAD_FACTOR);
         Node<K, V>[] buffer = Arrays.copyOf(buckets, oldSize);
         buckets = (Node<K, V>[]) new Node[maxSize];
@@ -103,4 +91,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int getKeyHash(K key) {
         return key == null ? 0 : key.hashCode();
     }
+
+    private static class Node<K, V> {
+        private int hash;
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(int hash, K key, V value, Node<K,V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+    }
+
 }
