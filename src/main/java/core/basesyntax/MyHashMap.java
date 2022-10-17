@@ -27,7 +27,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> newNode = new Node<>(key, value, null);
         if (table[index] == null) {
             table[index] = newNode;
-            table[index].value = value;
             size++;
         } else {
             Node<K, V> currNode = table[index];
