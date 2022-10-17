@@ -1,19 +1,15 @@
 package core.basesyntax;
 
-import java.util.Map;
-import java.util.Objects;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
-    static final int MAXIMUM_CAPACITY = 1 << 30;
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+    private static final int MAXIMUM_CAPACITY = 1 << 30;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
     private MyHashMap.Node<K,V>[] table;
     private int size;
     private int threshold;
-    private float loadFactor;
 
-    static class Node<K,V> implements Map.Entry<K,V> {
+    private static class Node<K,V> {
         private final int hash;
         private final K key;
         private V value;
@@ -24,42 +20,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        public final K getKey() {
-            return key;
-        }
-
-        public final V getValue() {
-            return value;
-        }
-
-        public final String toString() {
-            return key + "=" + value;
-        }
-
-        public final int hashCode() {
-            return Objects.hashCode(key) ^ Objects.hashCode(value);
-        }
-
-        public final V setValue(V newValue) {
-            V oldValue = value;
-            value = newValue;
-            return oldValue;
-        }
-
-        public final boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            }
-            if (o instanceof Map.Entry) {
-                Map.Entry<?,?> e = (Map.Entry<?,?>)o;
-                if (Objects.equals(key, e.getKey())
-                        && Objects.equals(value, e.getValue())) {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 
@@ -79,12 +39,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    static final int hash(Object key) {
+    public static final int hash(Object key) {
         int h;
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
 
-    final MyHashMap.Node<K,V>[] resize() {
+    private final MyHashMap.Node<K,V>[] resize() {
         MyHashMap.Node<K,V>[] oldTab = table;
         int oldCap = (oldTab == null) ? 0 : oldTab.length;
         int oldThr = threshold;
@@ -103,11 +63,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             newCap = DEFAULT_INITIAL_CAPACITY;
             newThr = (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
-        }
-        if (newThr == 0) {
-            float ft = (float)newCap * loadFactor;
-            newThr = (newCap < MAXIMUM_CAPACITY && ft < (float)MAXIMUM_CAPACITY
-                    ? (int)ft : Integer.MAX_VALUE);
         }
 
         threshold = newThr;
@@ -159,7 +114,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return newTab;
     }
 
-    final MyHashMap.Node<K,V> getNode(int hash, Object key) {
+    public final MyHashMap.Node<K,V> getNode(int hash, Object key) {
         MyHashMap.Node<K,V>[] tab;
         MyHashMap.Node<K,V> first;
         MyHashMap.Node<K,V> e;
@@ -183,7 +138,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    final V putVal(int hash, K key, V value, boolean onlyIfAbsent) {
+    public final V putVal(int hash, K key, V value, boolean onlyIfAbsent) {
         MyHashMap.Node<K,V>[] tab;
         MyHashMap.Node<K,V> p;
         int n;
