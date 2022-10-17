@@ -6,13 +6,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_COEFFICIENT = 0.75f;
     private static final int DEFAULT_RESIZE_COEFFICIENT = 2;
-    private Node<K, V>[] massOfNode;
+    private Node<K, V>[] buckets;
     private int currentLoad;
     private int size;
 
     public MyHashMap() {
-        this.massOfNode = new Node[DEFAULT_INITIAL_CAPACITY];
-        this.currentLoad = (int) (DEFAULT_LOAD_COEFFICIENT * DEFAULT_INITIAL_CAPACITY);
+        buckets = new Node[DEFAULT_INITIAL_CAPACITY];
+        currentLoad = (int) DEFAULT_LOAD_COEFFICIENT * DEFAULT_INITIAL_CAPACITY;
     }
 
     @Override
@@ -21,12 +21,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = getHashCode(key);
         int index = getIndex(key);
         Node<K, V> newElement = new Node<>(hash, key, value, null);
-        Node<K, V> element = massOfNode[index];
+        Node<K, V> element = buckets[index];
         if (element == null) {
-            massOfNode[index] = newElement;
+            buckets[index] = newElement;
         }
         while (element != null) {
-            if (element.hash == hash && Objects.equals(key, element.key)) {
+            if (Objects.equals(key, element.key)) {
                 element.value = value;
                 return;
             }
@@ -43,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int hash = getHashCode(key);
         int index = getIndex(key);
-        Node<K, V> element = massOfNode[index];
+        Node<K, V> element = buckets[index];
         while (element != null) {
             if (element.hash == hash && Objects.equals(key, element.key)) {
                 return element.value;
@@ -66,14 +66,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return getHashCode(key) & (massOfNode.length - 1);
+        return getHashCode(key) & buckets.length - 1;
     }
 
     private void resize() {
         if (currentLoad == size) {
             size = 0;
-            Node<K, V>[] oldTable = massOfNode;
-            massOfNode = new Node[massOfNode.length * DEFAULT_RESIZE_COEFFICIENT];
+            Node<K, V>[] oldTable = buckets;
+            buckets = new Node[buckets.length * DEFAULT_RESIZE_COEFFICIENT];
             currentLoad *= DEFAULT_RESIZE_COEFFICIENT;
             for (Node<K, V> node : oldTable) {
                 while (node != null) {
