@@ -3,8 +3,8 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private final float LOAD_FACTOR = 0.75f;
-    private final int INITIAL_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75f;
+    private static final int INITIAL_CAPACITY = 16;
     private MyNode<K, V>[] table;
     private int size;
 
