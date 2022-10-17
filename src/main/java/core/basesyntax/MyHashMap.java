@@ -12,7 +12,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private Node<K, V>[] table;
 
-
     public MyHashMap() {
         this.table = new Node[INITIAL_CAPACITY];
         this.currentCapacity = INITIAL_CAPACITY;
