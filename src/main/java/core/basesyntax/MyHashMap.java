@@ -15,7 +15,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
         capacity = INITIAL_CAPACITY;
         threshold = INITIAL_CAPACITY * LOAD_FACTOR;
-        size = 0;
     }
 
     @Override
