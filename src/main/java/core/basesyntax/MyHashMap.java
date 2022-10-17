@@ -45,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Node<K, V> element = buckets[index];
         while (element != null) {
-            if (element.hash == hash && Objects.equals(key, element.key)) {
+            if (Objects.equals(key, element.key)) {
                 return element.value;
             }
             element = element.next;
@@ -85,13 +85,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
         public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
             this.key = key;
             this.value = value;
             this.next = next;
