@@ -59,11 +59,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         if (areEqual(element.key, key)) {
-            return table[bucket].getValue();
+            return table[bucket].value;
         } else {
             while (element != null) {
                 if (areEqual(element.key, key)) {
-                    return element.getValue();
+                    return element.value;
                 }
                 element = element.next;
             }
@@ -126,10 +126,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
             this.value = value;
             this.key = key;
-        }
-
-        public V getValue() {
-            return value;
         }
 
         @Override
