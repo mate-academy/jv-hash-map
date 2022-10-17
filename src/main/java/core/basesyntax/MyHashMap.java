@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -63,19 +65,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return getNode(key) != null;
     }
 
-    private int hash(Object key) {
-        int h;
-        if (key == null) {
-            return 0;
-        } else {
-            h = key.hashCode();
-            if (h < 0) {
-                h = h * (-1);
-            }
-            return h;
-        }
-    }
-
     private Node<K, V> getNode(K key) {
         if (table != null) {
             Node<K, V> currentNode;
@@ -109,5 +98,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 curr = curr.next;
             }
         }
+    }
+
+    private int hash(K key) {
+        return key == null ? 0 : Math.abs(Objects.hash(key));
     }
 }
