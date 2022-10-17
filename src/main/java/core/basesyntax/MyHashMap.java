@@ -12,13 +12,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        size = 0;
         threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> node = new Node<>(hash(key), key, value, null);
+        Node<K, V> node = new Node<>(key, value, null);
         int index = getIndex(key);
         if (table[index] == null) {
             table[index] = node;
@@ -35,7 +34,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[getIndex(key)] == null) {
             return null;
         }
-        Node<K,V> node = getNodeByKey(key);
+        Node<K, V> node = getNodeByKey(key);
         return (node != null ? node.value : null);
     }
 
@@ -44,17 +43,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private Node<K,V> getNodeByKey(K key) {
-        Node<K,V> node = table[getIndex(key)];
-        while (true) {
+    private Node<K, V> getNodeByKey(K key) {
+        Node<K, V> node = table[getIndex(key)];
+        while (node.next != null) {
             if (Objects.equals(node.key, key)) {
                 return node;
             }
             node = node.next;
-            if (node == null) {
-                return null;
-            }
         }
+        return node;
     }
 
     private int getIndex(K key) {
@@ -66,7 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putInNodeLink(Node node, int index) {
-        Node<K,V> findNode = table[index];
+        Node<K, V> findNode = table[index];
         while (true) {
             if (Objects.equals(findNode.key, node.key)) {
                 findNode.value = (V) node.value;
@@ -98,13 +95,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
