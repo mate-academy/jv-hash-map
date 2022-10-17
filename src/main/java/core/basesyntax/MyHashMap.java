@@ -8,18 +8,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int MOD_FACTOR = 2;
 
     private Node<K, V>[] table;
-    private int capacity;
     private int size;
 
     @SuppressWarnings("unchecked")
     MyHashMap() {
-        capacity = INITIAL_CAPACITY;
-        table = (Node<K,V>[]) new Node[capacity];
+        table = (Node<K,V>[]) new Node[INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size + 1 > capacity * LOAD_FACTOR) {
+        if (size + 1 > table.length * LOAD_FACTOR) {
             resize();
         }
         Node<K, V> node = new Node<>(key, value);
@@ -47,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int position = positionByHash(key);
-        if (position < 0 || position > capacity) {
+        if (position < 0 || position > table.length) {
             return null;
         }
         Node<K, V> node = table[position];
@@ -59,7 +57,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node = node.next;
         }
-
         return value;
     }
 
@@ -71,10 +68,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @SuppressWarnings("unchecked")
     private void resize() {
         size = 0;
-        int newCapacity = capacity * MOD_FACTOR;
+        int newCapacity = table.length * MOD_FACTOR;
         Node<K, V>[] oldArray = table;
         table = (Node<K,V>[]) new Node[newCapacity];
-        capacity = newCapacity;
         replaceAll(oldArray);
     }
 
@@ -94,7 +90,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int positionByHash(K key) {
-        return Math.abs(hash(key)) % capacity;
+        return Math.abs(hash(key)) % table.length;
     }
 
     private int hash(Object key) {
@@ -104,14 +100,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private class Node<K, V> {
         private final K key;
         private V value;
-        private final int hashCode;
         private Node<K, V> next;
 
         Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.hashCode = hash(key);
-            next = null;
         }
 
         public String toString() {
