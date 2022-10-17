@@ -7,16 +7,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final int SIZE_MULTIPLIER = 2;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private int currentCapacity;
-    private int threshold;
     private int size;
     private Node<K, V>[] table;
 
     public MyHashMap() {
         this.table = new Node[INITIAL_CAPACITY];
-        this.currentCapacity = INITIAL_CAPACITY;
-        this.threshold = (int) (INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
-        this.size = 0;
     }
 
     @Override
@@ -61,14 +56,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int defineCell(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % currentCapacity;
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private void resize() {
-        if (size == threshold) {
-            currentCapacity *= SIZE_MULTIPLIER;
-            threshold = (int) (DEFAULT_LOAD_FACTOR * currentCapacity);
-            transfer(currentCapacity);
+        if (size == (int) (DEFAULT_LOAD_FACTOR * table.length)) {
+            transfer(table.length * SIZE_MULTIPLIER);
         }
     }
 
