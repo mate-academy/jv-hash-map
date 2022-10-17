@@ -35,7 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         Node<K, V> node = getNodeByKey(key);
-        return (node != null ? node.value : null);
+        return node != null ? node.value : null;
     }
 
     @Override
@@ -59,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(Object key) {
-        return (key == null) ? 0 : (Math.abs(key.hashCode()));
+        return (key == null) ? 0 : Math.abs(key.hashCode());
     }
 
     private void putInNodeLink(Node node, int index) {
@@ -97,7 +97,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Node<K, V> {
         private final K key;
         private V value;
-        private Node<K, V> next;
+        private Node next;
 
         Node(K key, V value, Node<K, V> next) {
             this.key = key;
