@@ -31,13 +31,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         table = resize();
-        int hash = key == null ? 0 : Math.abs(key.hashCode());
-        int index = hash % table.length;
+        int hash = getHash(key);
+        int index = Math.abs(hash) % table.length;
         Node<K, V> node = table[index];
         if (node != null) {
             while (node.next != null) {
                 if (node.key.equals(key)) {
                     node.value = value;
+                    size--;
                 } else {
                     node = node.next;
                 }
@@ -51,8 +52,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
+        int hash = getHash(key);
+        int index = Math.abs(hash) % table.length;
+        Node<K, V> node = table[index];
+        return findEqual(node, key).value;
+    }
 
-        return null;
+    private Node<K, V> findEqual(Node<K, V> node, K key) {
+        while (node.key != key) {
+            node = node.next;
+        }
+        return node;
     }
 
     @Override
@@ -97,5 +107,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             nodeTo = nodeTo.next;
         }
         return nodeTo;
+    }
+
+    private int getHash(K key) {
+        return key == null ? 0 : key.hashCode();
     }
 }
