@@ -8,7 +8,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K,V>[] table;
     private int size;
     private int threshold;
-    private float loadFactor;
 
     private static class Node<K, V> {
         private int hash;
@@ -30,9 +29,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @SuppressWarnings("unchecked")
     public MyHashMap() {
-        loadFactor = DEFAULT_LOAD_FACTOR;
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        threshold = (int) (table.length * loadFactor);
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
