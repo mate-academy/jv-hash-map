@@ -3,9 +3,9 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static int DEFAULT_SIZE = 1 << 4;
-    private static int DEFAULT_INCREASE = 2;
-    private static float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_SIZE = 1 << 4;
+    private static final int DEFAULT_INCREASE = 1 << 1;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int currentLoad;
     private int size;
@@ -87,8 +87,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHash(K key) {
-        int h;
-        return (key == null) ? 0 : key.hashCode() ^ key.hashCode() >>> 16;
+        return Objects.hash(key);
     }
 
     private int getIndex(K key) {
