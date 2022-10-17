@@ -1,7 +1,18 @@
 package core.basesyntax;
 
+import java.util.Map;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private transient Node<K, V>[] table;
+    public static final int INITIAL_CAPACITY = 16;
+    public static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private Node<K, V>[] table;
+    private int size;
+    private int threshold;
+//    private final float loadFactor;
+
+    public MyHashMap() {
+//        loadFactor = DEFAULT_LOAD_FACTOR;
+    }
 
     static class Node<K, V> {
         final int hash;
@@ -19,7 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-
+        table = resize();
     }
 
     @Override
@@ -29,6 +40,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public int getSize() {
-        return 0;
+        return size;
     }
+
+    private Node<K, V>[] resize() {
+        if (table == null || table.length == 0) {
+            threshold = (int) (INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
+            return (Node<K, V>[]) new Node[INITIAL_CAPACITY];
+        }
+        return null;
+    }
+
+    private void transfer() {}
 }
