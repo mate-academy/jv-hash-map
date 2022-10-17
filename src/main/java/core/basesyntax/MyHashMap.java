@@ -27,7 +27,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
         threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
@@ -87,10 +86,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    @SuppressWarnings("unchecked")
     private void resize() {
         final Node<K, V>[] temp = table;
-        table = (Node<K,V>[])new Node[table.length << 1];
+        table = (Node<K,V>[]) new Node[table.length << 1];
         threshold = threshold << 1;
         size = 0;
         copyTabContent(temp);
