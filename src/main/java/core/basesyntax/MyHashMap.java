@@ -1,16 +1,18 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int NULL_KEY_HASH = 0;
     private static final int RESIZE = 2;
     private int size;
-    private int threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
+    private int threshold;
     private Node<K, V>[] table;
 
     public MyHashMap() {
         table = new Node[INITIAL_CAPACITY];
+        threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
@@ -33,11 +35,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (entryWithTheSameKey != null) {
                 entry.value = value;
             } else {
-                entry.next = createNewNode(key, value);
+                entry.next = new Node<>(Objects.hashCode(key), key, value, null);
                 size++;
             }
         } else {
-            table[index] = createNewNode(key, value);
+            table[index] = new Node<>(Objects.hashCode(key), key, value, null);
             size++;
         }
     }
@@ -79,13 +81,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int findIndex(K key) {
         return key != null ? Math.abs(key.hashCode() % table.length) : 0;
-    }
-
-    private Node<K, V> createNewNode(K key, V value) {
-        if (key == null) {
-            return new Node<>(NULL_KEY_HASH, key, value,null);
-        }
-        return new Node<>(key.hashCode(), key, value, null);
     }
 
     private static class Node<K, V> {
