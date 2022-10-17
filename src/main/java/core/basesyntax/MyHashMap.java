@@ -8,7 +8,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_RESIZE_COUNT = 2;
     private int size;
     private int threshold;
-
     private Node<K, V>[] table;
 
     public MyHashMap() {
@@ -19,10 +18,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        Node<K, V> element = table[getIndex(key)];
+        int index = getIndex(key);
+        Node<K, V> element = table[index];
         Node<K, V> newElement = new Node<>(getHashCode(key), key, value, null);
         if (element == null) {
-            table[getIndex(key)] = newElement;
+            table[index] = newElement;
         }
         while (element != null) {
             if (Objects.equals(key, element.key)) {
