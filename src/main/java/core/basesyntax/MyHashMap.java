@@ -26,11 +26,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = getHashCode(key);
-        int index = hash % table.length;
+        int index = getHashCode(key) % table.length;
         Node<K,V> node = table[index];
         while (node != null) {
-            if (node.key == key || node.key != null && node.key.equals(key)) {
+            if (compareKeys(node.key, key)) {
                 return node.value;
             }
             node = node.next;
@@ -62,15 +61,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean putToArray(K key, V value, Node[] array) {
-        int hashCode = getHashCode(key);
-        int index = hashCode % array.length;
+        int index = getHashCode(key) % array.length;
         if (array[index] == null) {
-            array[index] = new Node<K,V>(key,value,null, hashCode);
+            array[index] = new Node<K,V>(key,value,null);
             return true;
         }
         Node<K,V> current = array[index];
         while (true) {
-            if (current.key == key || current.key != null && current.key.equals(key)) {
+            if (compareKeys(current.key, key)) {
                 current.value = value;
                 return false;
             }
@@ -79,21 +77,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             current = current.next;
         }
-        current.next = new Node<K,V>(key,value,null, hashCode);
+        current.next = new Node<K,V>(key,value,null);
         return true;
+    }
+
+    private boolean compareKeys(K current, K key) {
+        return current == key || current != null && current.equals(key);
     }
 
     private static class Node<K,V> {
         private K key;
         private V value;
-        private int hash;
         private Node<K,V> next;
 
-        Node(K key,V value, Node<K,V> next, int hash) {
+        Node(K key,V value, Node<K,V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
-            this.hash = hash;
         }
     }
 }
