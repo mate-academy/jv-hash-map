@@ -3,6 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final float LOAD_FACTOR = 0.75f;
+    private static final int MULTIPLIER = 2;
     private Node<K, V>[] table;
     private int initialSize = 16;
     private int size = 0;
@@ -45,10 +46,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     first.value = value;
                     return;
                 }
+                if (first.next == null) {
+                    first.next = new Node<>(key == null ? 0 : key.hashCode(), key, value, null);
+                    size++;
+                    return;
+                }
                 first = first.next;
             }
         }
-        setNewNode(index, key, value);
     }
 
     @Override
@@ -77,7 +82,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        initialSize *= 2;
+        initialSize *= MULTIPLIER;
         size = 0;
         Node<K, V>[] tempO = table;
         table = new Node[initialSize];
@@ -90,15 +95,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 } while (first != null);
             }
         }
-    }
-
-    private void setNewNode(int index, K key, V value) {
-        Node<K, V> first;
-        first = table[index];
-        while (first.next != null) {
-            first = first.next;
-        }
-        first.next = new Node<>(key == null ? 0 : key.hashCode(), key, value, null);
-        size++;
     }
 }
