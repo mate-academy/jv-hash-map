@@ -4,7 +4,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final int INCREASE_FACTOR = 2;
     private static final double LOAD_MAX_PERCENT = 0.75;
-    private static final int ZERO = 0;
 
     private Node<K,V>[] table;
     private int size;
@@ -27,12 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash;
-        if (key == null) {
-            hash = ZERO;
-        } else {
-            hash = getHashCode(key);
-        }
+        int hash = getHashCode(key);
         int index = hash % table.length;
         Node<K,V> node = table[index];
         while (node != null) {
@@ -64,20 +58,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHashCode(K key) {
-        int hashCode = key.hashCode();
-        if (hashCode < ZERO) {
-            hashCode = -hashCode;
-        }
-        return hashCode;
+        return key == null ? 0 : Math.abs(key.hashCode());
     }
 
     private boolean putToArray(K key, V value, Node[] array) {
-        int hashCode;
-        if (key == null) {
-            hashCode = ZERO;
-        } else {
-            hashCode = getHashCode(key);
-        }
+        int hashCode = getHashCode(key);
         int index = hashCode % array.length;
         if (array[index] == null) {
             array[index] = new Node<K,V>(key,value,null, hashCode);
