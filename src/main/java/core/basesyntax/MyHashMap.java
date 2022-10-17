@@ -31,10 +31,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         table = resize();
+        int hash = key == null ? 0 : Math.abs(key.hashCode());
+        int index = hash % table.length;
+        Node<K, V> node = table[index];
+        if (node != null) {
+            while (node.next != null) {
+                if (node.key.equals(key)) {
+                    node.value = value;
+                } else {
+                    node = node.next;
+                }
+            }
+            node.next = new Node<>(hash, key, value, null);
+        } else {
+            table[index] = new Node<>(hash, key, value, null);
+        }
+        size++;
     }
 
     @Override
     public V getValue(K key) {
+
         return null;
     }
 
@@ -44,12 +61,41 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V>[] resize() {
+        Node<K, V>[] newTab;
         if (table == null || table.length == 0) {
             threshold = (int) (INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
-            return (Node<K, V>[]) new Node[INITIAL_CAPACITY];
+            newTab = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
+        } else if (size > threshold) {
+            newTab = transfer();
+        } else {
+            newTab = table;
         }
-        return null;
+        return newTab;
     }
 
-    private void transfer() {}
+    private Node<K, V>[] transfer() {
+        int newCap = table.length * 2;
+        threshold = threshold * 2;
+        Node<K, V>[] newTab = (Node<K, V>[]) new Node[newCap];
+        for (int i = 0; i < table.length; i++) {
+            Node<K, V> nodeFrom = table[i];
+            if (nodeFrom != null) {
+                int index = nodeFrom.hash % newCap;
+                Node<K, V> nodeTo = newTab[index];
+                if (nodeTo != null) {
+                    getTail(nodeTo).next = nodeFrom;
+                } else {
+                    newTab[index] = nodeFrom;
+                }
+            }
+        }
+        return newTab;
+    }
+
+    private Node<K, V> getTail(Node<K, V> nodeTo) {
+        while (nodeTo.next != null) {
+            nodeTo = nodeTo.next;
+        }
+        return nodeTo;
+    }
 }
