@@ -1,7 +1,9 @@
 package core.basesyntax;
 
+import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("ALL")
 public class MyHashMap<K, V> implements MyMap<K, V> {
     public static final int INITIAL_CAPACITY = 16;
     public static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -102,22 +104,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V>[] transfer() {
-        int newCap = table.length * 2;
+        int newCapacity = table.length * 2;
         threshold = threshold * 2;
-        Node<K, V>[] newTab = (Node<K, V>[]) new Node[newCap];
+        Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
         for (int i = 0; i < table.length; i++) {
-            Node<K, V> nodeFrom = table[i];
-            if (nodeFrom != null) {
-                int index = Math.abs(nodeFrom.hash) % newCap;
-                Node<K, V> nodeTo = newTab[index];
-                if (nodeTo != null) {
-                    getTail(nodeTo).next = nodeFrom;
+            Node<K, V> sourceNode;
+            if ((sourceNode = table[i]) != null) {
+                int index = Math.abs(sourceNode.hash) % newCapacity;
+                Node<K, V> targetNode = newTable[index];
+                if (targetNode != null) {
+                    getTail(targetNode).next = sourceNode;
                 } else {
-                    newTab[index] = nodeFrom;
+                    newTable[index] = sourceNode;
                 }
+                sourceNode = sourceNode.next;
             }
         }
-        return newTab;
+        return newTable;
     }
 
     private Node<K, V> getTail(Node<K, V> nodeTo) {
