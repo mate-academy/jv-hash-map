@@ -8,7 +8,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private Node<K, V>[] values;
 
-    @SuppressWarnings("unchecked")
     public MyHashMap() {
         values = new Node[DEFAULT_INITIAL_CAPACITY];
     }
@@ -45,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int indexByTheKey = getIndexByTheKey(key);
         Node<K, V> node = values[indexByTheKey];
         while (node != null) {
-            if ((key == null && node.key == null) || (key != null && key.equals(node.key))) {
+            if (key == node.key || key != null && key.equals(node.key)) {
                 return node.value;
             }
             node = node.next;
@@ -53,48 +52,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    /*
-    Removes element by its key, returns value removed. If there's no such key, returns null.
-     */
-
-    public V remove(K key) {
-        V removedValue;
-        for (Node<K, V> node : values) {
-            while (node.next != null) {
-                if ((key == null && node.next.key == null)
-                        || (key != null && key.equals(node.next.key))) {
-                    removedValue = node.next.value;
-                    node.next = node.next.next;
-                    size--;
-                    return removedValue;
-                }
-                node = node.next;
-            }
-            if ((key == null && node.key == null)
-                    || (key != null && key.equals(node.key))) {
-                removedValue = node.value;
-                node = new Node<>(null, null);
-                size--;
-                return removedValue;
-            }
-        }
-        return null;
-    }
-
     @Override
     public int getSize() {
         return size;
-    }
-
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -113,5 +73,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getIndexByTheKey(K key) {
         return Math.abs((key == null) ? 0 : (key.hashCode() % capacity));
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 }
