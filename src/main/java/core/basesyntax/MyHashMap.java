@@ -3,15 +3,15 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
-    private static final int RESIZE = 2;
+    private static final int SCALING_NUMBER = 2;
     private Object[] table;
     private int size;
     private int threshold;
 
     public MyHashMap() {
-        this.table = new Object[DEFAULT_CAPACITY];
-        this.size = size;
-        this.threshold = (int) LOAD_FACTOR * DEFAULT_CAPACITY;
+        table = new Object[DEFAULT_CAPACITY];
+        size = size;
+        threshold = (int) LOAD_FACTOR * DEFAULT_CAPACITY;
     }
 
     @Override
@@ -59,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Object[] resize() {
-        Object[] newTable = new Object[table.length * RESIZE];
+        Object[] newTable = new Object[table.length * SCALING_NUMBER];
         for (int i = 0; i < table.length; i++) {
             Node<K, V> node = (Node<K, V>) table[i];
             while (node != null) {
