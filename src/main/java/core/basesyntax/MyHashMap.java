@@ -17,10 +17,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        int index = defineCell(key);
-        Node<K, V> newNode = new Node<>(key, value, null);
+        int index = defineCell(getHash(key));
         if (table[index] == null) {
-            table[index] = newNode;
+            table[index] = new Node<>(key, value, getHash(key));
             size++;
         } else {
             Node<K, V> currNode = table[index];
@@ -29,7 +28,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     currNode.value = value;
                     return;
                 } else if (currNode.next == null) {
-                    currNode.next = newNode;
+                    currNode.next = new Node<>(key, value, getHash(key));
                     break;
                 }
                 currNode = currNode.next;
@@ -40,7 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = table[defineCell(key)];
+        Node<K, V> currentNode = table[defineCell(getHash(key))];
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
                 return currentNode.value;
@@ -55,8 +54,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int defineCell(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
+    private int defineCell(int hash) {
+        return hash % table.length;
+    }
+
+    private int getHash(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode());
     }
 
     private void resize() {
@@ -81,11 +84,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
+        private final int hash;
 
-        Node(K key, V value, Node<K, V> next) {
+        Node(K key, V value, int hash) {
             this.key = key;
             this.value = value;
-            this.next = null;
+            this.hash = hash;
         }
     }
 }
