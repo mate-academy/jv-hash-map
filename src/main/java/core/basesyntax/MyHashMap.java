@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
     private static final int DEFAULT_CAPACITY = 16;
+    private static final int INCREASE_CAPACITY = 2;
     private int size;
     private int threshold;
     private Node<K, V>[] table;
@@ -16,10 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-
-        if (size > threshold) {
-            resize();
-        }
+        resize();
         Node<K, V> newNode = table[getIndex(key)];
         if (newNode == null) {
             table[getIndex(key)] = new Node<>(key, value);
@@ -60,7 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         if (size > threshold) {
-            int newCapacity = table.length * 2;
+            int newCapacity = table.length * INCREASE_CAPACITY;
             Node<K, V>[] oldNodes = table;
             table = new Node[newCapacity];
             size = 0;
