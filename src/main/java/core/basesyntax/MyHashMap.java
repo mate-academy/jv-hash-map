@@ -107,9 +107,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public static int hashCode(Object key) {
             return (key == null) ? 0 : key.hashCode() * 17 + 1;
         }
-
-        public final String toString() {
-            return key + "=" + value;
-        }
     }
 }
