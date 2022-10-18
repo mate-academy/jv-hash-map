@@ -38,15 +38,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @SuppressWarnings("unchecked")
     private V getValue(K key, int index) {
         Entry<K, V> entry = (Entry<K, V>) entries[index];
-        while (true) {
+        while (entry.next != null) {
             if (checkKeyEquality(key, entry.key)) {
                 return entry.value;
             }
-            if (entry.next == null) {
-                break;
-            } else {
-                entry = entry.next;
-            }
+            entry = entry.next;
         }
         return null;
     }
@@ -72,16 +68,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @SuppressWarnings("unchecked")
     private void addOrUpdateEntry(K key, V value, int index) {
         Entry<K, V> entryAtIndex = (Entry<K, V>) entries[index];
-        while (true) {
+        while (entryAtIndex.next != null) {
             if (checkKeyEquality(key, entryAtIndex.key)) {
                 entryAtIndex.value = value;
                 return;
             }
-            if (entryAtIndex.next == null) {
-                break;
-            } else {
-                entryAtIndex = entryAtIndex.next;
-            }
+            entryAtIndex = entryAtIndex.next;
         }
         entryAtIndex.next = new Entry<>(key, value);
         size++;
@@ -120,7 +112,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Entry(K key, V value) {
             this.key = key;
             this.value = value;
-            next = null;
         }
     }
 }
