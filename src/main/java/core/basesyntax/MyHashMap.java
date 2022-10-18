@@ -39,7 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             table[index] = node;
         }
-        size++;
+        size += 1;
     }
 
     @Override
