@@ -8,50 +8,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private int threshold;
 
-    static class Node<K, V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     public MyHashMap() {
         buckets = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
         size = 0;
         threshold = (int) (DEFAULT_INITIAL_CAPACITY * LOAD_FACTOR);
-    }
-
-    private int getKeyHash(K key) {
-        int hash;
-        return (key == null) ? 0 : (hash = key.hashCode()) ^ (hash >>> 16);
-    }
-
-    private int getBucketIndex(K key) {
-        int index = getKeyHash(key) % buckets.length;
-        return index < 0 ? index * (-1) : index;
-    }
-
-    private Node<K, V>[] resize() {
-        if (size >= threshold) {
-            size = 0;
-            Node<K, V>[] oldBuckets = buckets;
-            buckets = (Node<K, V>[]) new Node[oldBuckets.length * CAPACITY_INCREASE_FACTOR];
-            threshold = (int) (buckets.length * LOAD_FACTOR);
-            for (Node<K, V> node : oldBuckets) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
-            }
-        }
-        return buckets;
     }
 
     @Override
@@ -94,5 +54,45 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private int getKeyHash(K key) {
+        int hash;
+        return (key == null) ? 0 : (hash = key.hashCode()) ^ (hash >>> 16);
+    }
+
+    private int getBucketIndex(K key) {
+        int index = getKeyHash(key) % buckets.length;
+        return index < 0 ? index * (-1) : index;
+    }
+
+    private Node<K, V>[] resize() {
+        if (size >= threshold) {
+            size = 0;
+            Node<K, V>[] oldBuckets = buckets;
+            buckets = (Node<K, V>[]) new Node[oldBuckets.length * CAPACITY_INCREASE_FACTOR];
+            threshold = (int) (buckets.length * LOAD_FACTOR);
+            for (Node<K, V> node : oldBuckets) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
+            }
+        }
+        return buckets;
+    }
+
+    private static class Node<K, V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(int hash, K key, V value, Node<K, V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
