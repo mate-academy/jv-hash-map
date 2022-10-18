@@ -19,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         resize();
         int index = defineCell(getHash(key));
         if (table[index] == null) {
-            table[index] = new Node<>(key, value, getHash(key));
+            table[index] = new Node<>(null, getHash(key), key, value);
             size++;
         } else {
             Node<K, V> currNode = table[index];
@@ -28,7 +28,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     currNode.value = value;
                     return;
                 } else if (currNode.next == null) {
-                    currNode.next = new Node<>(key, value, getHash(key));
+                    currNode.next = new Node<>(null, getHash(key), key, value);
                     break;
                 }
                 currNode = currNode.next;
@@ -86,10 +86,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private Node<K, V> next;
         private final int hash;
 
-        Node(K key, V value, int hash) {
+        Node(Node<K, V> next, int hash, K key, V value) {
             this.key = key;
             this.value = value;
             this.hash = hash;
+            this.next = next;
         }
     }
 }
