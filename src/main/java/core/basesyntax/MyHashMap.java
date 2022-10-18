@@ -34,35 +34,53 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = getHash(key);
         int index = Math.abs(hash) % table.length;
         Node<K, V> node = table[index];
-        if (node != null) {
-            while (node.next != null) {
-                if (node.key.equals(key)) {
+        boolean isOverwritten = false;
+        if (node == null) {
+            node = new Node<>(hash, key, value, null);
+            table[index] = node;
+            size++;
+        } else {
+            while (true) {
+                if (node.key == key || node.key != null && node.key.equals(key)) {
                     node.value = value;
-                    size--;
-                } else {
+                    isOverwritten = true;
+                    break;
+                } else if (node.next != null) {
                     node = node.next;
+                } else {
+                    break;
                 }
             }
-            node.next = new Node<>(hash, key, value, null);
-        } else {
-            table[index] = new Node<>(hash, key, value, null);
+            if (!isOverwritten) {
+                node.next = new Node<>(hash, key, value, null);
+                size ++;
+            }
         }
-        size++;
     }
 
     @Override
     public V getValue(K key) {
+        if (table == null) {
+            return null;
+        }
         int hash = getHash(key);
         int index = Math.abs(hash) % table.length;
         Node<K, V> node = table[index];
-        return findEqual(node, key).value;
+        Node<K, V> equal = findEqual(node, key);
+        if (equal != null) {
+            return equal.value;
+        }
+        return null;
     }
 
     private Node<K, V> findEqual(Node<K, V> node, K key) {
-        while (node.key != key) {
+        while (node != null) {
+            if (node.key == key || node.key != null && node.key.equals(key)) {
+                return node;
+            }
             node = node.next;
         }
-        return node;
+        return null;
     }
 
     @Override
@@ -90,7 +108,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (int i = 0; i < table.length; i++) {
             Node<K, V> nodeFrom = table[i];
             if (nodeFrom != null) {
-                int index = nodeFrom.hash % newCap;
+                int index = Math.abs(nodeFrom.hash) % newCap;
                 Node<K, V> nodeTo = newTab[index];
                 if (nodeTo != null) {
                     getTail(nodeTo).next = nodeFrom;
