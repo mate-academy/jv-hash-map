@@ -2,6 +2,7 @@ package core.basesyntax;
 
 import java.util.Objects;
 
+@SuppressWarnings("unchecked")
 public class MyHashMap<K, V> implements MyMap<K, V> {
     public static final int INITIAL_CAPACITY = 16;
     public static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -81,10 +82,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int newCapacity = table.length * 2;
         threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
         Node<K, V>[] newTable = new Node[newCapacity];
-        transferTo(newTable);
+        updateTable(newTable);
     }
 
-    private void transferTo(Node<K, V>[] newTable) {
+    private void updateTable(Node<K, V>[] newTable) {
         for (Node<K, V> node : table) {
             if (node != null) {
                 while (true) {
