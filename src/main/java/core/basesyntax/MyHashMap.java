@@ -20,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         resize();
         int index = getIndex(key);
         Node<K, V> element = table[index];
-        Node<K, V> newElement = new Node<>(getHashCode(key), key, value, null);
+        Node<K, V> newElement = new Node<>(key, value, null);
         if (element == null) {
             table[index] = newElement;
         }
@@ -57,7 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getHashCode(K key) {
         int keysHash;
-        return key == null ? 0 : (keysHash = key.hashCode()) ^ (keysHash >>> 16);
+        return key == null ? 0 : (keysHash = key.hashCode()) ^ keysHash >>> 16;
     }
 
     private int getIndex(K key) {
@@ -83,13 +83,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
