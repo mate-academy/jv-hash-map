@@ -24,21 +24,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             values[indexByTheKey] = new Node<>(key, value);
             size++;
         } else {
-            while (node.next != null) {
+            while (node != null) {
                 if ((node.key != null) && (node.key.equals(key))
                         || (node.key == null && key == null)) {
                     node.value = value;
                     return;
                 }
+                if (node.next == null) {
+                    node.next = new Node<>(key, value);
+                    size++;
+                    return;
+                }
                 node = node.next;
             }
-            if ((node.key != null) && (node.key.equals(key))
-                    || (node.key == null && key == null)) {
-                node.value = value;
-                return;
-            }
-            node.next = new Node<>(key, value);
-            size++;
         }
     }
 
@@ -51,6 +49,34 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return node.value;
             }
             node = node.next;
+        }
+        return null;
+    }
+
+    /*
+    Removes element by its key, returns value removed. If there's no such key, returns null.
+     */
+
+    public V remove(K key) {
+        V removedValue;
+        for (Node<K, V> node : values) {
+            while (node.next != null) {
+                if ((key == null && node.next.key == null)
+                        || (key != null && key.equals(node.next.key))) {
+                    removedValue = node.next.value;
+                    node.next = node.next.next;
+                    size--;
+                    return removedValue;
+                }
+                node = node.next;
+            }
+            if ((key == null && node.key == null)
+                    || (key != null && key.equals(node.key))) {
+                removedValue = node.value;
+                node = new Node<>(null, null);
+                size--;
+                return removedValue;
+            }
         }
         return null;
     }
@@ -78,12 +104,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldValuesMap = values;
         values = (Node<K, V>[]) new Node[capacity];
         for (Node<K, V> value : oldValuesMap) {
-            if (value != null) {
-                while (value.next != null) {
-                    put(value.key, value.value);
-                    value = value.next;
-                }
+            while (value != null) {
                 put(value.key, value.value);
+                value = value.next;
             }
         }
     }
