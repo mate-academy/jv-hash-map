@@ -21,22 +21,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = findIndex(key);
         if (table[index] != null) {
             Node<K, V> entry = table[index];
-            Node<K, V> entryWithTheSameKey = null;
             while (entry != null) {
                 if (entry.key == key || (entry.key != null && entry.key.equals(key))) {
-                    entryWithTheSameKey = entry;
+                    entry.value = value;
                     break;
                 }
                 if (entry.next == null) {
+                    entry.next = new Node<>(Objects.hashCode(key), key, value, null);
+                    size++;
                     break;
                 }
                 entry = entry.next;
-            }
-            if (entryWithTheSameKey != null) {
-                entry.value = value;
-            } else {
-                entry.next = new Node<>(Objects.hashCode(key), key, value, null);
-                size++;
             }
         } else {
             table[index] = new Node<>(Objects.hashCode(key), key, value, null);
@@ -65,7 +60,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (size + 1 > threshold) {
+        if (size == threshold) {
             size = 0;
             Node<K, V>[] array = table;
             table = new Node[table.length * RESIZE];
