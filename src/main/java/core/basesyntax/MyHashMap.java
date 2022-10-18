@@ -1,19 +1,17 @@
 package core.basesyntax;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
-@SuppressWarnings("ALL")
 public class MyHashMap<K, V> implements MyMap<K, V> {
     public static final int INITIAL_CAPACITY = 16;
     public static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
     private int threshold;
-//    private final float loadFactor;
 
     public MyHashMap() {
-//        loadFactor = DEFAULT_LOAD_FACTOR;
+        table = new Node<>[INITIAL_CAPACITY];
+        threshold = (int) (INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
     static class Node<K, V> {
@@ -32,56 +30,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        table = resize();
+        if (size > threshold) {
+            resize();
+        }
         int hash = getHash(key);
+        Node<K, V> newNode = new Node<>(hash, key, value, null);
         int index = Math.abs(hash) % table.length;
-        Node<K, V> node = table[index];
-        boolean isOverwritten = false;
-        if (node == null) {
-            node = new Node<>(hash, key, value, null);
-            table[index] = node;
+
+        if (table[index] == null) {
+            table[index] = newNode;
             size++;
         } else {
-            while (true) {
-                if (node.key == key || node.key != null && node.key.equals(key)) {
+            Node<K, V> node = table[index];
+            while (node != null) {
+                if (Objects.equals(node.key, key)) {
                     node.value = value;
-                    isOverwritten = true;
-                    break;
-                } else if (node.next != null) {
-                    node = node.next;
-                } else {
                     break;
                 }
+                node = node.next;
             }
-            if (!isOverwritten) {
-                node.next = new Node<>(hash, key, value, null);
-                size ++;
-            }
+            newNode.next = table[index];
+            table[index] = newNode;
         }
     }
 
     @Override
     public V getValue(K key) {
-        if (table == null) {
-            return null;
-        }
-        int hash = getHash(key);
-        int index = Math.abs(hash) % table.length;
-        Node<K, V> node = table[index];
-        Node<K, V> equal = findEqual(node, key);
-        if (equal != null) {
-            return equal.value;
-        }
-        return null;
-    }
-
-    private Node<K, V> findEqual(Node<K, V> node, K key) {
-        while (node != null) {
-            if (node.key == key || node.key != null && node.key.equals(key)) {
-                return node;
-            }
-            node = node.next;
-        }
         return null;
     }
 
@@ -90,44 +64,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private Node<K, V>[] resize() {
-        Node<K, V>[] newTab;
-        if (table == null || table.length == 0) {
-            threshold = (int) (INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
-            newTab = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
-        } else if (size > threshold) {
-            newTab = transfer();
-        } else {
-            newTab = table;
-        }
-        return newTab;
+    private void resize() {
+        int newCapacity = table.length * 2;
+        threshold = (int) (threshold * DEFAULT_LOAD_FACTOR);
+        Node<K, V>[] newTable = new Node[newCapacity];
+        transferTo(newTable);
     }
 
-    private Node<K, V>[] transfer() {
-        int newCapacity = table.length * 2;
-        threshold = threshold * 2;
-        Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
-        for (int i = 0; i < table.length; i++) {
-            Node<K, V> sourceNode;
-            if ((sourceNode = table[i]) != null) {
-                int index = Math.abs(sourceNode.hash) % newCapacity;
-                Node<K, V> targetNode = newTable[index];
-                if (targetNode != null) {
-                    getTail(targetNode).next = sourceNode;
-                } else {
-                    newTable[index] = sourceNode;
+    private void transferTo(Node<K, V>[] newTable) {
+        for (Node<K, V> node : table) {
+            if (node != null) {
+                while (true) {
+                    Node<K, V> nextNode = node.next;
+                    int index = Math.abs(node.hash) % newTable.length;
+                    node.next = newTable[index];
+                    newTable[index] = node;
+                    node = nextNode;
+                    if (node == null) {
+                        break;
+                    }
                 }
-                sourceNode = sourceNode.next;
+                table = newTable;
             }
         }
-        return newTable;
-    }
-
-    private Node<K, V> getTail(Node<K, V> nodeTo) {
-        while (nodeTo.next != null) {
-            nodeTo = nodeTo.next;
-        }
-        return nodeTo;
     }
 
     private int getHash(K key) {
