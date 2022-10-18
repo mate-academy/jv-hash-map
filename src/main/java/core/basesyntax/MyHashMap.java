@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
         }
-        putValue(key, value, hashValue,index);
+        putValue(key, value, index);
     }
 
     public boolean isEmpty() {
@@ -47,9 +47,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void putValue(K key, V value, int hashvalue, int index) {
+    private void putValue(K key, V value, int index) {
         Node<K,V> nextNode = elements[index];
-        elements[index] = new Node<K,V>(key, value, hashvalue, nextNode);
+        elements[index] = new Node<K,V>(key, value, nextNode);
         if (++size >= threshold) {
             resize();
         }
@@ -92,13 +92,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, int hash,Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value,Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
