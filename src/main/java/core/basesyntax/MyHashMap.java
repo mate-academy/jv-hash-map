@@ -10,7 +10,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
 
     public MyHashMap() {
-        table = new Node<>[INITIAL_CAPACITY];
+        table = new Node[INITIAL_CAPACITY];
         threshold = (int) (INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
@@ -36,6 +36,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = getHash(key);
         Node<K, V> newNode = new Node<>(hash, key, value, null);
         int index = Math.abs(hash) % table.length;
+        boolean isOverwritten = false;
 
         if (table[index] == null) {
             table[index] = newNode;
@@ -45,17 +46,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             while (node != null) {
                 if (Objects.equals(node.key, key)) {
                     node.value = value;
+                    isOverwritten = true;
                     break;
                 }
                 node = node.next;
             }
-            newNode.next = table[index];
-            table[index] = newNode;
+            if (!isOverwritten) {
+                newNode.next = table[index];
+                table[index] = newNode;
+                size++;
+            }
         }
     }
 
     @Override
     public V getValue(K key) {
+        int index = Math.abs(getHash(key)) % table.length;
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return node.value;
+            }
+            node = node.next;
+        }
         return null;
     }
 
@@ -66,7 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         int newCapacity = table.length * 2;
-        threshold = (int) (threshold * DEFAULT_LOAD_FACTOR);
+        threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
         Node<K, V>[] newTable = new Node[newCapacity];
         transferTo(newTable);
     }
