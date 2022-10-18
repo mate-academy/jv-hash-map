@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_INCREMENT = 2;
     private Node<K,V>[] table;
     private int size;
     private int threshold;
@@ -41,7 +42,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int hashKey = hash(key);
-        Node<K, V> node = table[table.length - 1 & hashKey];
+        int index = getIndex(hashKey);
+        Node<K, V> node = table[index];
         while (node != null) {
             if (node.hash == hashKey && Objects.equals(node.key, key)) {
                 return node.value;
@@ -58,8 +60,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K,V>[] resize() {
         Node<K,V>[] oldTab = table;
-        threshold = threshold << 1;
-        table = (Node<K,V>[])new Node[oldTab.length << 1];
+        threshold = threshold * DEFAULT_INCREMENT;
+        table = (Node<K,V>[])new Node[oldTab.length * DEFAULT_INCREMENT];
         for (Node<K,V> node : oldTab) {
             while (node != null) {
                 putToNode(node.key, node.value);
@@ -71,9 +73,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private boolean putToNode(K key, V value) {
         int keyHash = hash(key);
-        Node<K, V> node = table[table.length - 1 & keyHash];
+        int index = getIndex(keyHash);
+        Node<K, V> node = table[index];
         if (node == null) {
-            table[table.length - 1 & keyHash] = new Node<>(keyHash, key, value, null);
+            table[index] = new Node<>(keyHash, key, value, null);
         }
         while (node != null) {
             if (node.hash == keyHash && Objects.equals(node.key,key)) {
@@ -92,5 +95,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int hash(Object key) {
         int h;
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+    }
+
+    private int getIndex(int hashKey) {
+        return table.length - 1 & hashKey;
     }
 }
