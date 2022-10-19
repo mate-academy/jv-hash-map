@@ -5,16 +5,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private static final int PRIME_NUMBER = 31;
     private static final int PRIME_NUMBER1 = 311;
-    private int capacity;
     private Node<K, V>[] table;
     private int threshold;
-    private int modifications;
     private int size;
 
     @Override
     public void put(K key, V value) {
         if (size == 0 && table == null) {
-            capacity = DEFAULT_CAPACITY;
             threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
             table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
         }
@@ -35,9 +32,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node.next = newNode;
         }
-        modifications++;
         size++;
-        if (modifications == threshold) {
+        if (size == threshold) {
             resize();
         }
     }
@@ -63,9 +59,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private class Node<K, V> {
+    private static class Node<K, V> {
         private final int hash;
-        private K key;
+        private final K key;
         private Node<K, V> next;
         private V value;
 
@@ -77,15 +73,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hash(Object key) {
+    private int hash(K key) {
         return key == null ? 0 : Math.abs(PRIME_NUMBER1 + key.hashCode() * PRIME_NUMBER);
     }
 
-    private int bucketIndex(Object key) {
-        return key == null ? 0 : hash(key) % capacity;
+    private int bucketIndex(K key) {
+        return key == null ? 0 : hash(key) % table.length;
     }
 
-    private Node<K, V>[] resize() {
+    private void resize() {
         final Node<K, V>[] oldTable = table;
         int growCapacity = 1;
         int newCapacity = DEFAULT_CAPACITY << growCapacity;
@@ -102,6 +98,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-        return table;
     }
 }
