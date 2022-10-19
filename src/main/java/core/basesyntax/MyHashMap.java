@@ -17,19 +17,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int bucket = hash(key);
-        Node<K, V> node = table[bucket];
-        while (node != null) {
-            if ((node.key == key) || (node.key != null && node.key.equals(key))) {
-                node.value = value;
-                return;
-            } else if (node.next != null) {
-                node = node.next;
-            } else {
-                break;
-            }
-        }
-        if (table[bucket] == null) {
+        Node<K, V> node = findKey(table[bucket], key, value);
+        if (node == null) {
             table[bucket] = new Node<>(key,value);
+        } else if ((node.key == key) || (node.key != null && node.key.equals(key))) {
+            return;
         } else {
             node.next = new Node<>(key,value);
         }
@@ -88,5 +80,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void thresholdCounter() {
         threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
+    }
+
+    private Node<K, V> findKey(Node<K, V> startNode, K key, V value) {
+        Node<K, V> newNode = startNode;
+        while (newNode != null) {
+            if ((newNode.key == key) || (newNode.key != null && newNode.key.equals(key))) {
+                newNode.value = value;
+                return newNode;
+            } else if (newNode.next != null) {
+                newNode = newNode.next;
+            } else {
+                break;
+            }
+        }
+        return newNode;
     }
 }
