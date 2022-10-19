@@ -12,7 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         this.table = new Node[DEFAULT_LENGTH];
-        this.threshold = (int) (DEFAULT_LENGTH * LOAD_FACTOR);
+
     }
 
     @Override
@@ -58,15 +58,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHashCode(K key) {
-        int hash;
         if (key == null) {
             return 0;
         }
-        return (hash = key.hashCode()) ^ (hash >>> 16);
+        return (key.hashCode()) ^ (key.hashCode() >>> 16);
     }
 
     private int getIndex(K key) {
-        int index = getHashCode(key) % (table.length - 1);
+        int index = getHashCode(key) % table.length;
         if (index < 0) {
             index = -index;
         }
