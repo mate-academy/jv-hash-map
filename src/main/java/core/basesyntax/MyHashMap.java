@@ -12,22 +12,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = countThreshold();
     }
 
-    private MyHashMap(int capacity) {
-        table = new Node[capacity];
-        threshold = countThreshold();
-    }
-
     @Override
     public void put(K key, V value) {
         int idx = getIndex(key);
         Node<K, V> bucket = table[idx];
         Node<K, V> existing = getNode(key);
-        if (bucket == null || existing == null) {
-            table[idx] = new Node<>(key, value, bucket);
-        } else {
+        if (bucket != null && existing != null) {
             existing.val = value;
             return;
         }
+        table[idx] = new Node<>(key, value, bucket);
         if (++size > threshold) {
             resize();
         }
@@ -65,15 +59,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        MyHashMap<K, V> map = new MyHashMap<>(table.length << 1);
-        for (Node<K, V> node : table) {
+        Node<K, V>[] oldTable = table;
+        table = new Node[oldTable.length << 1];
+        threshold = countThreshold();
+        size = 0;
+        for (Node<K, V> node : oldTable) {
             while (node != null) {
-                map.put(node.key, node.val);
+                put(node.key, node.val);
                 node = node.next;
             }
         }
-        table = map.table;
-        threshold = countThreshold();
     }
 
     private static class Node<K, V> {
