@@ -81,7 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return keyHashCode(key) & table.length - 1;
     }
 
-    static class Node<K,V> {
+    private static class Node<K,V> {
         private int hash;
         private K key;
         private V value;
