@@ -16,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
