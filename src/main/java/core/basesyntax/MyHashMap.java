@@ -11,7 +11,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         this.table = new Node[DEFAULT_CAPACITY];
-        this.size = 0;
         this.loaded = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
@@ -19,12 +18,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         resizeTable();
         Node<K,V> newNode = new Node<>(keyHash(key), key, value, null);
-        Node<K,V> bucketToPut = table[getBucketIndexByKey(key)];
+        Node<K,V> bucketToPut = table[keyHash(key)];
         if (bucketToPut == null) {
-            table[getBucketIndexByKey(key)] = newNode;
+            table[keyHash(key)] = newNode;
         } else {
             while (bucketToPut != null) {
-                if (bucketToPut.hash == keyHash(key) && Objects.equals(bucketToPut.key, key)) {
+                if (Objects.equals(bucketToPut.key, key)) {
                     bucketToPut.value = value;
                     return;
                 }
@@ -40,7 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K,V> bucketToFind = table[getBucketIndexByKey(key)];
+        Node<K,V> bucketToFind = table[keyHash(key)];
         while (bucketToFind != null) {
             if (bucketToFind.hash == keyHash(key) && Objects.equals(bucketToFind.key, key)) {
                 return bucketToFind.value;
@@ -71,14 +70,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int keyHash(K key) {
-        return (key == null) ? 0 : key.hashCode() % table.length;
+        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
-    private int getBucketIndexByKey(K key) {
-        return keyHash(key) & table.length - 1;
-    }
-
-    class Node<K,V> {
+    private class Node<K,V> {
         private int hash;
         private K key;
         private V value;
