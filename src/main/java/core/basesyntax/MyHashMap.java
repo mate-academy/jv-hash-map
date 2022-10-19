@@ -36,9 +36,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> node = getNode(key);
-        return node != null
-               ? node.val
-               : null;
+        return node != null ? node.val : null;
     }
 
     @Override
@@ -47,9 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        int hash = key == null
-                ? 0
-                : key.hashCode();
+        int hash = key == null ? 0 : key.hashCode();
         return Math.floorMod(hash, table.length);
     }
 
@@ -71,12 +67,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         MyHashMap<K, V> map = new MyHashMap<>(table.length << 1);
         for (Node<K, V> node : table) {
-            Node<K, V> runner = node;
-            if (runner != null) {
-                while (runner != null) {
-                    map.put(runner.key, runner.val);
-                    runner = runner.next;
-                }
+            while (node != null) {
+                map.put(node.key, node.val);
+                node = node.next;
             }
         }
         table = map.table;
