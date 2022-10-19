@@ -41,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         Node<K,V> bucketToFind = table[keyHash(key)];
         while (bucketToFind != null) {
-            if (bucketToFind.hash == keyHash(key) && Objects.equals(bucketToFind.key, key)) {
+            if (Objects.equals(bucketToFind.key, key)) {
                 return bucketToFind.value;
             }
             bucketToFind = bucketToFind.next;
