@@ -4,7 +4,8 @@ Let's create your own HashMap and implement methods:
 - `getValue()` 
 - `getSize()`
 
-Be attentive with basic requirements for the implementation of the map (initial capacity, load factor, resize ...)
+Be attentive with basic requirements for the implementation of the map 
+(initial capacity, load factor, resize ...)
 
 P.s: you can implement other methods of the Map interface.
 
