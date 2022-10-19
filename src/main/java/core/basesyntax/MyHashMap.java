@@ -83,7 +83,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private Node<K, V> putNode(Node<K, V> node) {
+    Node<K, V> putNode(Node<K, V> node) {
         Node<K, V> nextNode = node.next;
         node.next = null;
         while (node != null) {
