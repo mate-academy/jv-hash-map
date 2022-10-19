@@ -17,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= capacity * LOAD_FACTOR) {
             resize();
         }
-        int indexByTheKey = getIndexByTheKey(key);
+        int indexByTheKey = getIndexByKey(key);
         Node<K, V> node = values[indexByTheKey];
         if (node == null) {
             values[indexByTheKey] = new Node<>(key, value);
@@ -41,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int indexByTheKey = getIndexByTheKey(key);
+        int indexByTheKey = getIndexByKey(key);
         Node<K, V> node = values[indexByTheKey];
         while (node != null) {
             if (key == node.key || key != null && key.equals(node.key)) {
@@ -71,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getIndexByTheKey(K key) {
+    private int getIndexByKey(K key) {
         return Math.abs((key == null) ? 0 : (key.hashCode() % capacity));
     }
 
@@ -79,6 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
+
 
         Node(K key, V value) {
             this.key = key;
