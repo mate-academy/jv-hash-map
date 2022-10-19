@@ -26,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[bucket] = newNode;
         }
         while (node != null) {
-            if (node.hash == hashOfKey && Objects.equals(key, node.key)) {
+            if (Objects.equals(key, node.key)) {
                 node.value = value;
                 return;
             } else if (node.next == null) {
@@ -40,11 +40,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hashOfKey = getHashCode(key);
         int bucket = getIndex(key);
         Node<K, V> node = table[bucket];
         while (node != null) {
-            if (node.hash == hashOfKey && Objects.equals(key, node.key)) {
+            if (Objects.equals(key, node.key)) {
                 return node.value;
             }
             node = node.next;
