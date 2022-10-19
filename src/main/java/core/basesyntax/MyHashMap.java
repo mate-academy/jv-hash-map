@@ -3,43 +3,48 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int INCREASE_THE_LENGTH = 2;
-    private Node<K,V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
-    private int currentLength = table.length;
+    private final int currentLoad;
+    private Node<K, V>[] table;
+    private int currentLength;
     private int size;
+
+    public MyHashMap() {
+        this.table = new Node[DEFAULT_INITIAL_CAPACITY];
+        this.currentLength = table.length;
+        this.currentLoad = (int) (currentLength * DEFAULT_LOAD_FACTOR);
+    }
 
     @Override
     public void put(K key, V value) {
         resizeIfNeed();
         int index = getIndex(key);
         Node<K, V> node = new Node<>(index, key, value, null);
-        Node<K, V> currentNode;
-        index = index % currentLength;
-        currentNode = table[index];
         if (node.hash == 0) {
             setInNullBucket(node);
             return;
         }
-        if (table[index] != null) {
-            if (!table[index].key.equals(node.key)) {
-                while (true) {
-                    if (currentNode.next == null) {
-                        currentNode.next = node;
-                        size++;
-                        return;
-                    }
-                    currentNode = currentNode.next;
-                }
-            } else {
-                table[index].value = node.value;
-                return;
-            }
-        } else {
+        index = index % currentLength;
+        Node<K, V> getNodeFromTable = table[index];
+        if (table[index] == null) {
             table[index] = node;
+            size++;
+        } else {
+            while (getNodeFromTable != null) {
+                if (Objects.equals(getNodeFromTable.key, node.key)) {
+                    table[index].value = node.value;
+                    return;
+                }
+                if (getNodeFromTable.next == null) {
+                    getNodeFromTable.next = node;
+                    size++;
+                    return;
+                }
+                getNodeFromTable = getNodeFromTable.next;
+            }
         }
-        size++;
     }
 
     @Override
@@ -61,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resizeIfNeed() {
-        if (size == currentLength * DEFAULT_LOAD_FACTOR) {
+        if (size == currentLoad) {
             Node<K,V>[] oldTab = table;
             table = new Node[currentLength *= INCREASE_THE_LENGTH];
             size = 0;
@@ -91,7 +96,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
