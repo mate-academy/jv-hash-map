@@ -1,10 +1,11 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int PRIME_NUMBER = 31;
-    private static final int PRIME_NUMBER1 = 311;
+    private static final int PRIME_NUMBER = 11;
     private Node<K, V>[] table;
     private int threshold;
     private int size;
@@ -15,13 +16,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
             table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
         }
-        Node<K, V> newNode = new Node<>(hash(key), key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, null);
         int index = bucketIndex(key);
         if (table[index] == null) {
             table[index] = newNode;
-        } else if (table[index].key == key
-                || key != null && table[index].key.equals(key)) {
-            table[index].value = newNode.value;
+        } else if (Objects.equals(table[index].key, key)) {
+            table[index].value = value;
             size--;
         } else if (table[index].next == null) {
             table[index].next = newNode;
@@ -60,25 +60,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private Node<K, V> next;
         private V value;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
         }
     }
 
-    private int hash(K key) {
-        return key == null ? 0 : Math.abs(PRIME_NUMBER1 + key.hashCode() * PRIME_NUMBER);
-    }
-
     private int bucketIndex(K key) {
-        return key == null ? 0 : hash(key) % table.length;
+        return key == null ? 0 : Math.abs((key.hashCode()
+                * PRIME_NUMBER) + PRIME_NUMBER) % table.length;
     }
 
     private void resize() {
