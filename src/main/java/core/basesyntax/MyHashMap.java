@@ -20,13 +20,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> node = findKey(table[bucket], key, value);
         if (node == null) {
             table[bucket] = new Node<>(key,value);
+            checkForResize();
         } else if ((node.key == key) || (node.key != null && node.key.equals(key))) {
-            return;
+            node.value = value;
         } else {
             node.next = new Node<>(key,value);
-        }
-        if (++size == threshold) {
-            resize();
+            checkForResize();
         }
     }
 
@@ -61,6 +60,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private Node<K, V> findKey(Node<K, V> startNode, K key, V value) {
+        Node<K, V> newNode = startNode;
+        while (newNode != null) {
+            if ((newNode.key == key) || (newNode.key != null && newNode.key.equals(key))) {
+                return newNode;
+            } else if (newNode.next != null) {
+                newNode = newNode.next;
+            } else {
+                break;
+            }
+        }
+        return newNode;
+    }
+
     private void resize() {
         final Node<K, V>[] oldTable = table;
         table = new Node[table.length * DEFAULT_SCALING_NUMBER];
@@ -82,18 +95,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
     }
 
-    private Node<K, V> findKey(Node<K, V> startNode, K key, V value) {
-        Node<K, V> newNode = startNode;
-        while (newNode != null) {
-            if ((newNode.key == key) || (newNode.key != null && newNode.key.equals(key))) {
-                newNode.value = value;
-                return newNode;
-            } else if (newNode.next != null) {
-                newNode = newNode.next;
-            } else {
-                break;
-            }
+    private void checkForResize() {
+        if (++size == threshold) {
+            resize();
         }
-        return newNode;
     }
 }
