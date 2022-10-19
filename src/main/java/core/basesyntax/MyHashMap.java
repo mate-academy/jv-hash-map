@@ -64,8 +64,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (size + 1 >= threshold) {
+        if (size == threshold) {
             capacity = capacity << 1;
+            size = 0;
             Node<K, V>[] oldTable = table;
             table = (Node<K,V>[])new Node[capacity];
             threshold = (int) (capacity * LOAD_FACTOR);
@@ -83,22 +84,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> putNode(Node<K, V> node) {
-        int bucket = hash(node.key);
         Node<K, V> nextNode = node.next;
         node.next = null;
-        if (table[bucket] == null) {
-            table[bucket] = node;
-        } else {
-            Node<K, V> position = table[bucket];
-            while (position.next != null) {
-                position = position.next;
-            }
-            position.next = node;
+        while (node != null) {
+            put(node.key, node.value);
+            node = node.next;
         }
         return nextNode;
     }
-
-    //private void resize
 
     static class Node<K, V> {
         private final K key;
