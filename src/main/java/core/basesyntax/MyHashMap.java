@@ -83,10 +83,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         final Node<K, V>[] oldTable = table;
-        int growCapacity = 1;
-        int newCapacity = DEFAULT_CAPACITY << growCapacity;
-        threshold = threshold << growCapacity;
-        growCapacity++;
+        int newCapacity = oldTable.length << 1;
+        threshold = threshold << 1;
         table = (Node<K, V>[]) new Node[newCapacity];
         size = 0;
         for (Node<K, V> bucket : oldTable) {
