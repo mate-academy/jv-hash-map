@@ -71,11 +71,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return 0;
         }
-        return key.hashCode();
+        return key.hashCode() ^ key.hashCode() >>> 16;
     }
 
     private int getIndex(K key) {
-        return hash(key) & (table.length - 1);
+        return Math.abs(hash(key)) % table.length;
     }
 
     private void resize() {
