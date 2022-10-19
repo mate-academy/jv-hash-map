@@ -18,10 +18,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resizing();
-        int hashOfKey = getHashCode(key);
         int bucket = getIndex(key);
         Node<K, V> node = table[bucket];
-        Node<K, V> newNode = new Node<>(hashOfKey, key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, null);
         if (node == null) {
             table[bucket] = newNode;
         }
@@ -87,13 +86,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
