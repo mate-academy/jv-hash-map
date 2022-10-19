@@ -6,6 +6,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     public static final int INITIAL_CAPACITY = 16;
     public static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    public static final int GROW_RATIO = 2;
     private Node<K, V>[] table;
     private int size;
     private int threshold;
@@ -36,7 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int hash = getHash(key);
         Node<K, V> newNode = new Node<>(hash, key, value, null);
-        int index = Math.abs(hash) % table.length;
+        int index = getIndex(hash);
         boolean isOverwritten = false;
 
         if (table[index] == null) {
@@ -62,7 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = Math.abs(getHash(key)) % table.length;
+        int index = getIndex(getHash(key));
         Node<K, V> node = table[index];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
@@ -79,7 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int newCapacity = table.length * 2;
+        int newCapacity = table.length * GROW_RATIO;
         threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
         Node<K, V>[] newTable = new Node[newCapacity];
         updateTable(newTable);
@@ -105,5 +106,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getHash(K key) {
         return key == null ? 0 : key.hashCode();
+    }
+
+    private int getIndex(int hash) {
+        return Math.abs(hash) % table.length;
     }
 }
