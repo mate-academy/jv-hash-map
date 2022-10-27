@@ -17,8 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (size >= loadFactor * capacity) {
-            size = 0;
-            table = grow();
+            table = resize();
         }
         int hashKey = hash(key);
         if (table[hashKey] == null) {
@@ -30,7 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         while (node.next != null && !Objects.equals(node.key, key)) {
             node = node.next;
         }
-        if (node.key == null && key == null || Objects.equals(node.key, key)) {
+        if (Objects.equals(node.key, key)) {
             node.value = value;
             return;
         }
@@ -80,7 +79,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return h % capacity;
     }
 
-    private Node [] grow() {
+    private Node [] resize() {
+        size = 0;
         capacity = capacity * 2;
         Node[] oldTable = table;
         table = new Node[capacity];
