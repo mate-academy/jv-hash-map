@@ -2,12 +2,12 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int CAPACITY = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private int size;
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        table = new Node[CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -15,10 +15,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= table.length * LOAD_FACTOR) {
             resize();
         }
-        int index = getHash(key);
+        int index = getIndexForKey(key);
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
-            size++;
         } else {
             Node<K, V> current = table[index];
             while (current.next != null) {
@@ -33,8 +32,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             current.next = new Node<>(key, value, null);
-            size++;
         }
+        size++;
     }
 
     @Override
@@ -42,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return getForNullKey(key);
         }
-        Node<K, V> node = table[getHash(key)]; //
+        Node<K, V> node = table[getIndexForKey(key)]; //
         if (node == null) {
             return null;
         } else {
@@ -62,7 +61,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getHash(K key) {
+    private int getIndexForKey(K key) {
         if (key == null) {
             return 0;
         }
