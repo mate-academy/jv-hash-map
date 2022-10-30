@@ -2,23 +2,18 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
-    private int capacity = 16;
+    private static final int CAPACITY = 16;
     private int size;
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        table = new Node[capacity];
+        table = new Node[CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= capacity * LOAD_FACTOR) {
-            capacity *= 2;
+        if (size >= table.length * LOAD_FACTOR) {
             resize();
-        }
-        if (key == null) {
-            putForNullKey(value);
-            return;
         }
         int index = getHash(key);
         if (table[index] == null) {
@@ -27,15 +22,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> current = table[index];
             while (current.next != null) {
-                if (current.key != null && current.key.equals(key)) {
+                if (current.key != null && current.key.equals(key) || current.key == key) {
                     current.value = value;
                     return;
                 }
                 current = current.next;
             }
-            if (current.value.equals(value)) {
-                return;
-            } else if (current.key != null && current.key.equals(key)) {
+            if (current.key != null && current.key.equals(key) || current.key == key) {
                 current.value = value;
                 return;
             }
@@ -52,8 +45,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> node = table[getHash(key)]; //
         if (node == null) {
             return null;
-        } else if (node.next == null) {
-            return node.value;
         } else {
             Node<K, V> current = node;
             while (current.next != null) {
@@ -72,26 +63,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHash(K key) {
-        return Math.abs(key.hashCode() % capacity);
-    }
-
-    private void putForNullKey(V value) {
-        if (table[0] == null) {
-            table[0] = new Node<>(null, value, null);
-            size++;
-        } else if (table[0].key == null) {
-            table[0].value = value;
-        } else if (table[0].next == null) {
-            table[0].next = new Node<>(null, value, null);
-            size++;
-        } else {
-            for (Node<K,V> curr = table[0]; curr != null; curr = curr.next) {
-                if (curr.key == null) {
-                    curr.value = value;
-                    return;
-                }
-            }
+        if (key == null) {
+            return 0;
         }
+        return Math.abs(key.hashCode() % table.length);
     }
 
     private V getForNullKey(K key) {
@@ -108,7 +83,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldMap = table;
-        table = new Node[capacity];
+        table = new Node[table.length * 2];
         size = 0;
         for (Node<K, V> kvNode : oldMap) {
             if (kvNode != null) {
@@ -133,5 +108,4 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
         }
     }
-
 }
