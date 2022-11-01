@@ -7,14 +7,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
 
-    @SuppressWarnings("unchecked")
     public MyHashMap() {
-        this.table = (Node<K,V>[])new Node[DEFAULT_CAPACITY];
+        this.table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        resizeIfNeeded();
+        if (size == table.length * DEFAULT_LOAD_FACTOR) {
+            resize();
+        }
         int index = calculateIndex(key);
         if (table[index] == null) {
             Node<K, V> newNode = new Node<>(key, value);
@@ -39,22 +40,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (Node<K, V> node : table) {
-            if (node != null) {
-                if (node.next == null) {
-                    if (isEqual(key, node.key)) {
-                        return node.value;
-                    }
-                } else {
-                    Node<K, V> current = node;
-                    do {
-                        if (isEqual(key, current.key)) {
-                            return current.value;
-                        }
-                        current = current.next;
-                    } while (current != null);
-                }
+        int index = calculateIndex(key);
+        Node<K, V> currentNode = table[index];
+        while (currentNode != null) {
+            if (isEqual(key, currentNode.key)) {
+                return currentNode.value;
             }
+            currentNode = currentNode.next;
         }
         return null;
     }
@@ -109,41 +101,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return hash(key) & (table.length - 1);
     }
 
-    private void resizeIfNeeded() {
-        if (size == table.length * DEFAULT_LOAD_FACTOR) {
-            Node<K, V>[] oldTable = table;
-            @SuppressWarnings("unchecked")
-            Node<K, V>[] newTable = (Node<K, V>[]) new Node[table.length << 1];
-            table = newTable;
-            for (int i = 0; i < oldTable.length; i++) {
-                if (oldTable[i] != null) {
-                    if (oldTable[i].next == null) {
-                        putNodeInNewTable(oldTable[i], newTable);
-                        oldTable[i] = null;
-                    } else {
-                        Node<K, V> currentNode = oldTable[i];
-                        do {
-                            putNodeInNewTable(currentNode, newTable);
-                            currentNode = currentNode.next;
-                        } while (currentNode != null);
-                        oldTable[i] = null;
+    private void resize() {
+        Node<K, V>[] oldTable = table;
+        Node<K, V>[] newTable = new Node[table.length << 1];
+        table = newTable;
+        for (int i = 0; i < oldTable.length; i++) {
+            while (oldTable[i] != null) {
+                Node<K, V> newNode = new Node<>(oldTable[i].key, oldTable[i].value);
+                int index = calculateIndex(newNode.key);
+                if (table[index] == null) {
+                    table[index] = newNode;
+                } else {
+                    Node<K, V> currentNode = table[index];
+                    while (currentNode.next != null) {
+                        currentNode = currentNode.next;
                     }
+                    currentNode.next = newNode;
                 }
+                oldTable[i] = oldTable[i].next;
             }
-        }
-    }
-
-    private void putNodeInNewTable(Node<K, V> node, Node<K, V>[] table) {
-        Node<K, V> newNode = new Node<>(node.key, node.value);
-        int index = calculateIndex(newNode.key);
-        if (table[index] == null) {
-            table[index] = newNode;
-        } else {
-            Node<K, V> currentNode = table[index];
-            while (currentNode.next != null) {
-                currentNode = currentNode.next;
-            }
-            currentNode.next = newNode;
+            oldTable[i] = null;
         }
     }
 
