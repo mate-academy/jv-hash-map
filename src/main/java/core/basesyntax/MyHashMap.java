@@ -77,15 +77,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public boolean containsValue(V value) {
-        if (table != null && size > 0) {
-            for (Node<K, V> currentNode : table) {
-                if (currentNode != null) {
-                    while (currentNode != null) {
-                        if (isEqual(value, currentNode.value)) {
-                            return true;
-                        }
-                        currentNode = currentNode.next;
+        for (Node<K, V> currentNode : table) {
+            if (currentNode != null) {
+                while (currentNode != null) {
+                    if (isEqual(value, currentNode.value)) {
+                        return true;
                     }
+                    currentNode = currentNode.next;
                 }
             }
         }
@@ -129,35 +127,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> removeNode(Object key) {
-        Node<K, V> removedNode;
         int index = calculateIndex(key);
-        if (table[index] != null) {
-            if (isEqual(key, table[index].key)) {
-                removedNode = table[index];
-                table[index] = table[index].next;
-                size--;
-                return removedNode;
-            } else {
-                Node<K, V> currentNode = table[index];
-                while (currentNode.next != null) {
-                    if (currentNode.next.next != null) {
-                        if (isEqual(key, currentNode.next.key)) {
-                            removedNode = currentNode.next;
-                            currentNode.next = currentNode.next.next;
-                            size--;
-                            return removedNode;
-                        }
-                    } else {
-                        if (isEqual(key, currentNode.next.key)) {
-                            removedNode = currentNode.next;
-                            currentNode.next = null;
-                            size--;
-                            return removedNode;
-                        }
-                    }
-                    currentNode = currentNode.next;
+        Node<K, V> node = table[index];
+        if (node == null) {
+            return null;
+        }
+        Node<K, V> prev = null;
+        while (node != null) {
+            if (isEqual(node.key, key)) {
+                if (prev == null) {
+                    table[index] = node.next;
+                } else {
+                    prev.next = node.next;
                 }
+                size--;
+                return node;
             }
+            prev = node;
+            node = node.next;
         }
         return null;
     }
