@@ -1,6 +1,8 @@
 package core.basesyntax;
 
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -70,6 +72,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         return collection;
+    }
+
+    @Override
+    public void clear() {
+        capacity = DEFAULT_CAPACITY;
+        dataTable = new Node[capacity];
+        size = 0;
     }
 
     private boolean checkKey(K key, V value) {
