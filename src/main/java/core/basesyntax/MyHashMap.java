@@ -54,6 +54,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    public int getCapacity() {
+        return capacity;
+    }
+
     private int getHash(K key) {
         return key != null ? key.hashCode() : 0;
     }
