@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -56,6 +58,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             node = node.next;
         }
         return false;
+    }
+
+    @Override
+    public Collection<V> values() {
+        Collection<V> collection = new ArrayList<>();
+        for (Node<K, V> node: dataTable) {
+            while (node != null) {
+                collection.add(node.value);
+                node = node.next;
+            }
+        }
+        return collection;
     }
 
     private boolean checkKey(K key, V value) {

@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Collection;
+
 public interface MyMap<K, V> {
     void put(K key, V value);
 
@@ -10,4 +12,6 @@ public interface MyMap<K, V> {
     int getCapacity();
 
     boolean containsKey(Object key);
+
+    Collection<V> values();
 }
