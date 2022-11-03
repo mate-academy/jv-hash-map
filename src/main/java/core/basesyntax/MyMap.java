@@ -8,4 +8,6 @@ public interface MyMap<K, V> {
     int getSize();
 
     int getCapacity();
+
+    boolean containsKey(Object key);
 }

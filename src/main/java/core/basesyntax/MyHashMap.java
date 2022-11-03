@@ -25,18 +25,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private boolean checkKey(K key, V value) {
-        Node<K, V> node = dataTable[getIndex(key)];
-        while (node != null) {
-            if (Objects.equals(node.key, key)) {
-                node.value = value;
-                return false;
-            }
-            node = node.next;
-        }
-        return true;
-    }
-
     @Override
     public V getValue(K key) {
         Node<K, V> node = dataTable[getIndex(key)];
@@ -56,6 +44,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public int getCapacity() {
         return capacity;
+    }
+
+    @Override
+    public boolean containsKey(Object key) {
+        Node<K, V> node = dataTable[getIndex((K)key)];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return true;
+            }
+            node = node.next;
+        }
+        return false;
+    }
+
+    private boolean checkKey(K key, V value) {
+        Node<K, V> node = dataTable[getIndex(key)];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
+                return false;
+            }
+            node = node.next;
+        }
+        return true;
     }
 
     private int getHash(K key) {
