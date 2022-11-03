@@ -76,8 +76,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void clear() {
+        dataTable = new Node[DEFAULT_CAPACITY];
         capacity = DEFAULT_CAPACITY;
-        dataTable = new Node[capacity];
         size = 0;
     }
 
