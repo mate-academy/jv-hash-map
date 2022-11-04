@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size + 1 > capacity * LOAD_FACTORY) {
             resize();
         }
-        if (checkKey(key, value)) {
+        if (checkKeyAndPutValueOrNot(key, value)) {
             putNewNode(getHash(key), key, value, dataTable);
             ++size;
         }
@@ -79,7 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
     }
 
-    private boolean checkKey(K key, V value) {
+    private boolean checkKeyAndPutValueOrNot(K key, V value) {
         Node<K, V> node = dataTable[getIndex(key)];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
