@@ -96,8 +96,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        int hash = getHash(key);
-        return (hash < 0 ? hash * -1 : hash) % capacity;
+        return Math.abs(getHash(key)) % capacity;
     }
 
     private void putNewNode(int hash, K key, V value, Node<K, V>[] data) {
