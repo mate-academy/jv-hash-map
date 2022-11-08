@@ -6,8 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final int DEFAULT_GROW = 2;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
-    private int capacity = DEFAULT_CAPACITY;
-    private double threshold = 12;
+    private double threshold = DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR;
     private int size;
     private Node<K, V>[] table;
 
@@ -17,23 +16,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        resizeIfNeeded();
-        int hash = Math.abs(key == null ? 0 : (key.hashCode() % capacity));
-        Node<K,V> node = table[hash];
+        resize();
+        Node<K,V> node = table[getIndex(key)];
         if (node == null) {
-            table[hash] = new Node<>(key, value);
+            table[getIndex(key)] = new Node<>(key, value);
             size++;
             return;
         } else {
             while (node.next != null) {
-                if (Objects.equals(node.getKey(),key)) {
-                    node.setValue(value);
+                if (Objects.equals(node.key,key)) {
+                    node.value = value;
                     return;
                 }
                 node = node.next;
             }
-            if (Objects.equals(node.getKey(),key)) {
-                node.setValue(value);
+            if (Objects.equals(node.key,key)) {
+                node.value = value;
                 return;
             }
         }
@@ -43,16 +41,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = Math.abs(key == null ? 0 : key.hashCode() % capacity);
-        Node<K,V> node = table[hash];
+        Node<K,V> node = table[getIndex(key)];
 
         if (node == null) {
             return null;
         }
-
         while (node != null) {
-            if (Objects.equals(node.getKey(),key)) {
-                return node.getValue();
+            if (Objects.equals(node.key,key)) {
+                return node.value;
             }
             node = node.next;
         }
@@ -64,25 +60,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public void resizeIfNeeded() {
+    public void resize() {
         if (size == threshold) {
             size = 0;
-            Node<K,V>[] newArray = new Node[capacity * DEFAULT_GROW];
+            Node<K,V>[] newArray = new Node[table.length * DEFAULT_GROW];
             Node<K,V>[] oldArray = table;
             table = newArray;
-            capacity = capacity * DEFAULT_GROW;
-            for (Node<K,V> node: oldArray) {
+            for (Node<K,V> node : oldArray) {
                 if (node != null) {
-                    put(node.getKey(), node.getValue());
+                    put(node.key, node.value);
                     while (node.next != null) {
                         node = node.next;
-                        put(node.getKey(), node.getValue());
+                        put(node.key, node.value);
                     }
                 }
             }
-            threshold = capacity * DEFAULT_LOAD_FACTOR;
+            threshold = table.length * DEFAULT_LOAD_FACTOR;
         }
 
+    }
+
+    public int getIndex(K key) {
+        return Math.abs(key == null ? 0 : key.hashCode() % table.length);
     }
 
     private class Node<K, V> {
@@ -93,27 +92,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public Node(K key, V value) {
             this.key = key;
             this.value = value;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 17;
-            hash = hash * 31 + (key == null ? 0 : key.hashCode());
-            hash = hash * 31 + (value == null ? 0 : value.hashCode());
-            hash = hash * 31 + (next == null ? 0 : next.hashCode());
-            return Math.abs(hash);
         }
     }
 }
