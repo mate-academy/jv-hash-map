@@ -3,10 +3,10 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75F;
-    private int size = 0;
+    private int size;
     private MyNode<K,V>[] bucketArray = new MyNode[DEFAULT_INITIAL_CAPACITY];
 
-    class MyNode<K,V> {
+    private class MyNode<K,V> {
         private int hash;
         private K key;
         private V value;
@@ -18,36 +18,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-
-        public MyNode() {
-
-        }
     }
 
     public MyHashMap() {
-
+        clear();
     }
 
     @Override
     public void put(K key, V value) {
-        int arrayIndex = arrayIndexCalculation(key);
-        MyNode<K,V> tempNode = new MyNode<>();
+        int arrayIndex = getIndexForKey(key);
+        MyNode<K,V> tempNode = bucketArray[arrayIndex];
         MyNode<K,V> newNode = new MyNode<>(key != null ? key.hashCode() : 0, key, value, null);
-        tempNode = bucketArray[arrayIndex];
-
-        do {
-            if (tempNode == null) {
-                bucketArray[arrayIndex] = newNode;
-                size++;
-                break;
-            } else if (newNode.key == null && tempNode.key == newNode.key) {
-                tempNode.value = newNode.value;
-                break;
-            } else if (newNode.key == null && tempNode.next == null) {
-                tempNode.next = newNode;
-                size++;
-                break;
-            } else if (tempNode.key != null && tempNode.key.equals(newNode.key)) {
+        if (tempNode == null) {
+            bucketArray[arrayIndex] = newNode;
+            size++;
+            checkSize();
+            return;
+        }
+        while (tempNode != null) {
+            if (newNode.key == null && tempNode.key == newNode.key
+                    || newNode.key != null && isKeysEquals(tempNode, newNode.key)) {
                 tempNode.value = newNode.value;
                 break;
             } else if (tempNode.next == null) {
@@ -56,15 +46,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 break;
             }
             tempNode = tempNode.next;
-        } while (tempNode != null);
-        if (size == bucketArray.length * DEFAULT_LOAD_FACTOR) {
-            resize();
         }
+        checkSize();
     }
 
     @Override
     public V getValue(K key) {
-        return getRemove(key, true);
+        MyNode<K, V> tempNode;
+        tempNode = bucketArray[getIndexForKey(key)];
+        if (tempNode != null) {
+            while (tempNode != null) {
+                if ((tempNode.key == null && key == null)
+                        || (key != null && isKeysEquals(tempNode, key))) {
+                    return tempNode.value;
+                } else {
+                    tempNode = tempNode.next;
+                }
+            }
+        }
+        return null;
     }
 
     public void clear() {
@@ -72,7 +72,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public V remove(K key) {
-        return getRemove(key, false);
+        int arrayIndex = getIndexForKey(key);
+        MyNode<K, V> tempNode;
+        tempNode = bucketArray[arrayIndex];
+        if (tempNode != null) {
+            while (tempNode != null) {
+                if ((tempNode.key == null && key == null)
+                        || (key != null
+                        && isKeysEquals(tempNode, key))) {
+                    tempNode.next = tempNode.next.next;
+                    size--;
+
+                    return tempNode.value;
+                } else {
+                    tempNode = tempNode.next;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
@@ -80,52 +97,37 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private V getRemove(K key, boolean getTrue) {
-        int arrayIndex = arrayIndexCalculation(key);
-        MyNode<K, V> tempNode = new MyNode<>();
-        tempNode = bucketArray[arrayIndex];
-        if (tempNode != null) {
-            do {
-                if ((tempNode.key == null && key == null)
-                        || (key != null && key.equals(tempNode.key))) {
-                    if (!getTrue) {
-                        tempNode.next = tempNode.next.next;
-                        size--;
-                    }
-                    return tempNode.value;
-                } else {
-                    tempNode = tempNode.next;
-                }
-            } while (tempNode != null);
-        }
-
-        return null;
-    }
-
     private MyNode<K, V>[] resize() {
-        MyNode<K,V>[] oldBucketArray = new MyNode[bucketArray.length];
-
+        MyNode<K,V>[] oldBucketArray;
         oldBucketArray = bucketArray;
         int oldSize = size;
         size = 0;
         bucketArray = new MyNode[bucketArray.length << 1];
         for (MyNode<K,V> tempNode : oldBucketArray) {
-            do {
-                if (tempNode != null) {
-                    put(tempNode.key, tempNode.value);
-                    tempNode = tempNode.next;
-                }
-            } while (tempNode != null);
+            while (tempNode != null) {
+                put(tempNode.key, tempNode.value);
+                tempNode = tempNode.next;
+            }
         }
-
         return bucketArray;
     }
 
-    private int arrayIndexCalculation(K key) {
+    private int getIndexForKey(K key) {
         if (key != null) {
-            return Math.abs(key.hashCode()) % DEFAULT_INITIAL_CAPACITY;
+            return Math.abs(key.hashCode()) % bucketArray.length;
         } else {
             return 0;
         }
     }
+
+    private void checkSize() {
+        if (size == bucketArray.length * DEFAULT_LOAD_FACTOR) {
+            resize();
+        }
+    }
+
+    private boolean isKeysEquals(MyNode node, K key) {
+        return key.hashCode() != node.hash ? false : key.equals(node.key);
+    }
 }
+
