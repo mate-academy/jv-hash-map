@@ -68,7 +68,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getBucketIndex(Object key, Entry<K,V>[] table) {
+    private int getBucketIndex(Object key, Entry<K, V>[] table) {
         if (key == null) {
             return 0;
         }
@@ -83,7 +83,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     void transfer(Entry<K, V>[] newTable) {
         for (Entry<K, V> e : table) {
-            while(e != null) {
+            while (e != null) {
                 Entry<K, V> next = e.next;
                 int index = getBucketIndex(e.key, newTable);
                 e.next = newTable[index];
