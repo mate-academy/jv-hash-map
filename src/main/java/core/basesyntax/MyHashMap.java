@@ -4,7 +4,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75F;
     private int size;
-    private MyNode<K,V>[] bucketArray = new MyNode[DEFAULT_INITIAL_CAPACITY];
+    private MyNode<K,V>[] bucketArray;
 
     private class MyNode<K,V> {
         private int hash;
@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public MyHashMap() {
-        clear();
+        bucketArray = new MyNode[DEFAULT_INITIAL_CAPACITY];
     }
 
     @Override
@@ -68,7 +68,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public void clear() {
-        bucketArray = new MyNode[DEFAULT_INITIAL_CAPACITY];
+        new MyHashMap();
+        size = 0;
     }
 
     public V remove(K key) {
