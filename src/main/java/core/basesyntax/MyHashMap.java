@@ -7,13 +7,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private MyNode<K,V>[] bucketArray;
 
     private class MyNode<K,V> {
-        private int hash;
         private K key;
         private V value;
         private MyNode<K, V> next;
 
-        public MyNode(int hash, K key, V value, MyNode<K, V> next) {
-            this.hash = hash;
+        public MyNode(K key, V value, MyNode<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -28,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         int arrayIndex = getIndexForKey(key);
         MyNode<K,V> tempNode = bucketArray[arrayIndex];
-        MyNode<K,V> newNode = new MyNode<>(key != null ? key.hashCode() : 0, key, value, null);
+        MyNode<K,V> newNode = new MyNode<>(key, value, null);
         if (tempNode == null) {
             bucketArray[arrayIndex] = newNode;
             size++;
@@ -54,14 +52,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         MyNode<K, V> tempNode;
         tempNode = bucketArray[getIndexForKey(key)];
-        if (tempNode != null) {
-            while (tempNode != null) {
-                if ((tempNode.key == null && key == null)
-                        || (key != null && isKeysEquals(tempNode, key))) {
-                    return tempNode.value;
-                } else {
-                    tempNode = tempNode.next;
-                }
+        while (tempNode != null) {
+            if ((tempNode.key == null && key == null)
+                    || (key != null && isKeysEquals(tempNode, key))) {
+                return tempNode.value;
+            } else {
+                tempNode = tempNode.next;
             }
         }
         return null;
@@ -76,18 +72,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int arrayIndex = getIndexForKey(key);
         MyNode<K, V> tempNode;
         tempNode = bucketArray[arrayIndex];
-        if (tempNode != null) {
-            while (tempNode != null) {
-                if ((tempNode.key == null && key == null)
-                        || (key != null
-                        && isKeysEquals(tempNode, key))) {
-                    tempNode.next = tempNode.next.next;
-                    size--;
-
-                    return tempNode.value;
-                } else {
-                    tempNode = tempNode.next;
-                }
+        while (tempNode != null) {
+            if ((tempNode.key == null && key == null)
+                    || (key != null
+                    && isKeysEquals(tempNode, key))) {
+                tempNode.next = tempNode.next.next;
+                size--;
+                return tempNode.value;
+            } else {
+                tempNode = tempNode.next;
             }
         }
         return null;
@@ -114,11 +107,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndexForKey(K key) {
-        if (key != null) {
-            return Math.abs(key.hashCode()) % bucketArray.length;
-        } else {
-            return 0;
-        }
+        return key != null ? Math.abs(key.hashCode()) % bucketArray.length : 0;
     }
 
     private void checkSize() {
@@ -128,7 +117,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean isKeysEquals(MyNode node, K key) {
-        return key.hashCode() != node.hash ? false : key.equals(node.key);
+        return node.key != null && key.hashCode() != node.key.hashCode()
+                ? false : key.equals(node.key);
     }
 }
-
