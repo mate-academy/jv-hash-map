@@ -15,10 +15,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int hash = key == null ? 0 : key.hashCode();
-        int index = hash & (table.length - 1);
-        Node<K, V> element = table[index];
+        Node<K, V> element = table[getIndex(key)];
         if (element == null) {
-            table[index] = new Node<>(hash, key, value, null);
+            table[getIndex(key)] = new Node<>(hash, key, value, null);
         } else {
             do {
                 if (hash == element.hash && (key == element.key
@@ -41,7 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int hash = key == null ? 0 : key.hashCode();
-        Node<K, V> element = table[hash & (table.length - 1)];
+        Node<K, V> element = table[getIndex(key)];
         while (element != null) {
             if (element.hash == hash && (element.key == key
                     || (key != null && key.equals(element.key)))) {
@@ -87,6 +86,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         table = newTab;
+    }
+
+    private int getIndex(K key) {
+        return key == null ? 0 : key.hashCode() & (table.length - 1);
     }
 
     private static class Node<K, V> {
