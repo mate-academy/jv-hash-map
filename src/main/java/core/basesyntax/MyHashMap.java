@@ -1,25 +1,13 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_INITIAL_CAPACITY = 16;
-    private static final float DEFAULT_LOAD_FACTOR = 0.75F;
+    private static final int INITIAL_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75F;
     private int size;
     private MyNode<K,V>[] bucketArray;
 
-    private class MyNode<K,V> {
-        private K key;
-        private V value;
-        private MyNode<K, V> next;
-
-        public MyNode(K key, V value, MyNode<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     public MyHashMap() {
-        bucketArray = new MyNode[DEFAULT_INITIAL_CAPACITY];
+        bucketArray = new MyNode[INITIAL_CAPACITY];
     }
 
     @Override
@@ -30,22 +18,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (tempNode == null) {
             bucketArray[arrayIndex] = newNode;
             size++;
-            checkSize();
+            resizeIfNeed();
             return;
-        }
-        while (tempNode != null) {
-            if (newNode.key == null && tempNode.key == newNode.key
-                    || newNode.key != null && isKeysEquals(tempNode, newNode.key)) {
-                tempNode.value = newNode.value;
-                break;
-            } else if (tempNode.next == null) {
-                tempNode.next = newNode;
-                size++;
-                break;
+        } else {
+            while (tempNode != null) {
+                if (isKeysEquals(tempNode.key, newNode.key)) {
+                    tempNode.value = newNode.value;
+                    break;
+                } else if (tempNode.next == null) {
+                    tempNode.next = newNode;
+                    size++;
+                    break;
+                }
+                tempNode = tempNode.next;
             }
-            tempNode = tempNode.next;
         }
-        checkSize();
+        resizeIfNeed();
     }
 
     @Override
@@ -53,8 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         MyNode<K, V> tempNode;
         tempNode = bucketArray[getIndexForKey(key)];
         while (tempNode != null) {
-            if ((tempNode.key == null && key == null)
-                    || (key != null && isKeysEquals(tempNode, key))) {
+            if (isKeysEquals(tempNode.key, key)) {
                 return tempNode.value;
             } else {
                 tempNode = tempNode.next;
@@ -73,9 +60,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         MyNode<K, V> tempNode;
         tempNode = bucketArray[arrayIndex];
         while (tempNode != null) {
-            if ((tempNode.key == null && key == null)
-                    || (key != null
-                    && isKeysEquals(tempNode, key))) {
+            if (isKeysEquals(tempNode.key, key)) {
                 tempNode.next = tempNode.next.next;
                 size--;
                 return tempNode.value;
@@ -89,6 +74,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private class MyNode<K,V> {
+        private K key;
+        private V value;
+        private MyNode<K, V> next;
+
+        public MyNode(K key, V value, MyNode<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 
     private MyNode<K, V>[] resize() {
@@ -110,14 +107,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key != null ? Math.abs(key.hashCode()) % bucketArray.length : 0;
     }
 
-    private void checkSize() {
-        if (size == bucketArray.length * DEFAULT_LOAD_FACTOR) {
+    private void resizeIfNeed() {
+        if (size == bucketArray.length * LOAD_FACTOR) {
             resize();
         }
     }
 
-    private boolean isKeysEquals(MyNode node, K key) {
-        return node.key != null && key.hashCode() != node.key.hashCode()
-                ? false : key.equals(node.key);
+    private boolean isKeysEquals(K keyOne, K keyTwo) {
+        return keyOne == keyTwo || keyOne != null && keyOne.equals(keyTwo);
     }
 }
