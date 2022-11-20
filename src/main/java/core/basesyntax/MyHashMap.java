@@ -13,27 +13,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[INITIAL_CAPACITY];
     }
 
-    private static class Node<K, V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         if (size >= table.length * LOAD_FACTOR) {
             resize();
         }
-        Node<K, V> newNode = new Node<>(getHashFromKey(key), key, value, null);
-        int index = getIndexFromHash(newNode.hash);
+        Node<K, V> newNode = new Node<>(getHash(key), key, value, null);
+        int index = getIndexForHash(newNode.hash);
         if (table[index] == null) {
             table[index] = newNode;
             size++;
@@ -53,7 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = table[getIndexFromHash(getHashFromKey(key))];
+        Node<K, V> node = table[getIndexForHash(getHash(key))];
         while (node != null && !Objects.equals(node.key, key)) {
             node = node.next;
         }
@@ -65,11 +51,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getHashFromKey(K key) {
+    private static class Node<K, V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(int hash, K key, V value, Node<K, V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+    }
+
+    private int getHash(K key) {
         return (key == null) ? 0 : key.hashCode();
     }
 
-    private int getIndexFromHash(int hash) {
+    private int getIndexForHash(int hash) {
         return Math.abs(hash % table.length);
     }
 
