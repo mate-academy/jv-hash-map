@@ -23,22 +23,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[bucketIndex] = newElement;
         } else {
             while (element.next != null) {
-                if (keyChecking(element, key, value)) {
+                if (Objects.equals(element.key, key)) {
+                    element.value = value;
                     return;
                 }
                 element = element.next;
             }
-            if (keyChecking(element, key, value)) {
+            if (Objects.equals(element.key, key)) {
+                element.value = value;
                 return;
             }
             element.next = newElement;
         }
         size++;
         if (size == threshold) {
-            Entry<K, V>[] newTable = new Entry[table.length * 2];
-            copy(newTable);
-            table = newTable;
-            threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
+            resize();
         }
     }
 
@@ -46,9 +45,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int bucketIndex = getBucketIndex(key, table);
         Entry<K, V> element = table[bucketIndex];
-        if (element == null) {
-            return null;
-        }
         while (element != null) {
             if (Objects.equals(element.key, key)) {
                 return element.value;
@@ -79,12 +75,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private boolean keyChecking(Entry<K, V> element, K key, V value) {
-        if (Objects.equals(element.key, key)) {
-            element.value = value;
-            return true;
-        }
-        return false;
+    private void resize() {
+        Entry<K, V>[] newTable = new Entry[table.length * 2];
+        copy(newTable);
+        table = newTable;
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
     }
 
     private class Entry<K, V> {
