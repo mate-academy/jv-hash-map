@@ -1,43 +1,31 @@
 package core.basesyntax;
 
-import java.util.Map;
-import java.util.Objects;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_INITIAL_CAPACITY = 1 << 4; // aka 16
-
-    static final int MAXIMUM_CAPACITY = 1 << 30;
-
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
-
-    static final int TREEIFY_THRESHOLD = 9;
-
-    static final int MIN_TREEIFY_CAPACITY = 64;
-
+    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4; // aka 16
+    private static final int MAXIMUM_CAPACITY = 1 << 30;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int TREEIFY_THRESHOLD = 9;
+    private static final int MIN_TREEIFY_CAPACITY = 64;
     private Node<K, V>[] table;
-
     private int size;
-
     private int threshold;
-
     private final float loadFactor;
 
     public MyHashMap() {
         this.loadFactor = DEFAULT_LOAD_FACTOR; // all other fields defaulted
     }
 
-    static final int hash(Object key) {
+    private static int hash(Object key) {
         int h;
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
 
     @Override
     public void put(K key, V value) {
-        putVal(hash(key), key, value, false, true);
+        putVal(hash(key), key, value);
     }
 
-    final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
-                   boolean evict) {
+    private V putVal(int hash, K key, V value) {
         Node<K, V>[] tab;
         Node<K, V> p;
         int n;
@@ -72,17 +60,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             if (e != null) { // existing mapping for key
                 V oldValue = e.value;
-                if (!onlyIfAbsent || oldValue == null) {
-                    e.value = value;
-                }
-                afterNodeAccess(e);
+                e.value = value;
                 return oldValue;
             }
         }
         if (++size > threshold) {
             resize();
         }
-        afterNodeInsertion(evict);
         return null;
     }
 
@@ -97,7 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    static class Node<K, V> implements Map.Entry<K, V> {
+    private static class Node<K, V> {
         protected Node<K, V> next;
         private final int hash;
         private final K key;
@@ -109,45 +93,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-
-        public final K getKey() {
-            return key;
-        }
-
-        public final V getValue() {
-            return value;
-        }
-
-        public final String toString() {
-            return key + "=" + value;
-        }
-
-        public final int hashCode() {
-            return Objects.hashCode(key) ^ Objects.hashCode(value);
-        }
-
-        public final V setValue(V newValue) {
-            V oldValue = value;
-            value = newValue;
-            return oldValue;
-        }
-
-        public final boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            }
-            if (o instanceof Map.Entry) {
-                Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
-                if (Objects.equals(key, e.getKey())
-                        && Objects.equals(value, e.getValue())) {
-                    return true;
-                }
-            }
-            return false;
-        }
     }
 
-    final Node<K, V> getNode(int hash, Object key) {
+    private Node<K, V> getNode(int hash, Object key) {
         Node<K, V>[] tab;
         Node<K, V> first;
         Node<K, V> e;
@@ -173,7 +121,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    final Node<K, V>[] resize() {
+    private Node<K, V>[] resize() {
         Node<K, V>[] oldTab = table;
         int oldCap = (oldTab == null) ? 0 : oldTab.length;
         int oldThr = threshold;
@@ -248,19 +196,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return newTab;
     }
 
-    final void treeifyBin(Node<K, V>[] tab, int hash) {
+    private void treeifyBin(Node<K, V>[] tab, int hash) {
         if (tab == null || (tab.length) < MIN_TREEIFY_CAPACITY) {
             resize();
         }
     }
 
-    Node<K, V> newNode(int hash, K key, V value, Node<K, V> next) {
+    private Node<K, V> newNode(int hash, K key, V value, Node<K, V> next) {
         return new Node<>(hash, key, value, next);
-    }
-
-    void afterNodeAccess(Node<K, V> p) {
-    }
-
-    void afterNodeInsertion(boolean evict) {
     }
 }
