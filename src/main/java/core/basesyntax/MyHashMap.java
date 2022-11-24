@@ -112,7 +112,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 do {
                     if (e.hash == hash
                             && ((k = e.key) == key || (key != null
-                                    && key.equals(k)))) {
+                            && key.equals(k)))) {
                         return e;
                     }
                 } while ((e = e.next) != null);
