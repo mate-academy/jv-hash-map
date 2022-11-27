@@ -14,7 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
         currentCapacity = DEFAULT_INITIAL_CAPACITY;
-        threshold = calculateThresholdValue();
+        threshold = (int) (currentCapacity * DEFAULT_LOAD_FACTOR);;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int indexOfKey = getIndex(key);
-        if (isIndexInTheTable(indexOfKey)) {
+        if (getIndex(key) < table.length) {
             Node<K, V> current = table[indexOfKey];
             while (current != null) {
                 if (Objects.equals(current.key,key)) {
@@ -70,14 +70,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int calculateThresholdValue() {
-        return (int) (currentCapacity * DEFAULT_LOAD_FACTOR);
-    }
-
     private void resize() {
         if (size == threshold) {
             currentCapacity *= GROW_COEFFICIENT;
-            threshold = calculateThresholdValue();
+            threshold *= GROW_COEFFICIENT;
             size = 0;
             Node<K, V>[] oldTable = table;
             table = (Node<K, V>[]) new Node[currentCapacity];
@@ -101,40 +97,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             index *= -1;
         }
         return index;
-    }
-
-    private void putNewNodeInTheTable(int index, K key, V value) {
-        Node<K, V> newNode = new Node<>(index, key, value, null);
-        if (table[index] == null) {
-            table[index] = newNode;
-            size++;
-        } else if (Objects.equals(table[index].key, newNode.key)
-                && table[index].next == null) {
-            table[index] = newNode;
-        } else if (Objects.equals(table[index].key, newNode.key)
-                && table[index].next != null) {
-            newNode.next = table[index].next;
-            table[index] = newNode;
-        } else {
-            Node<K, V> current = table[index];
-            while (current != null) {
-                if (current.next == null) {
-                    current.next = newNode;
-                    size++;
-                    break;
-                }
-                if (Objects.equals(current.next.key, newNode.key)) {
-                    newNode.next = current.next.next;
-                    current.next = newNode;
-                    break;
-                }
-                current = current.next;
-            }
-        }
-    }
-
-    private boolean isIndexInTheTable(int index) {
-        return index < table.length;
     }
 
     private static class Node<K, V> {
