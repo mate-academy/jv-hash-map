@@ -92,11 +92,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        int index = key == null ? 0 : key.hashCode() % currentCapacity;
-        if (index < 0) {
-            index *= -1;
-        }
-        return index;
+        return key == null ? 0 : Math.abs(key.hashCode() % currentCapacity);
     }
 
     private static class Node<K, V> {
