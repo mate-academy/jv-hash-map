@@ -33,8 +33,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        int hashOfKey = hash(key);
-        putNewNodeInTheTable(hashOfKey, key, value);
+        int index = getIndex(hash(key));
+        putNewNodeInTheTable(index, key, value);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (currentCapacity == 0) {
             return null;
         }
-        int indexOfKey = hash(key);
+        int indexOfKey = getIndex(hash(key));
         if (isIndexInTheTable(indexOfKey)) {
             Node<K, V> current = table[indexOfKey];
             while (current != null) {
@@ -82,35 +82,39 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             Node<K, V> current = oldTable[i];
             while (current != null) {
-                int newHashOfKey = hash(current.key);
-                putNewNodeInTheTable(newHashOfKey, current.key, current.value);
+                int newIndex = getIndex(hash(current.key));
+                putNewNodeInTheTable(newIndex, current.key, current.value);
                 current = current.next;
             }
         }
     }
 
     private int hash(Object key) {
-        int index = key == null ? 0 : key.hashCode() % currentCapacity;
+        return key == null ? 0 : key.hashCode();
+    }
+
+    private int getIndex(int hashOfKey) {
+        int index = hashOfKey % currentCapacity;
         if (index < 0) {
             index *= -1;
         }
         return index;
     }
 
-    private void putNewNodeInTheTable(int hashOfKey, K key, V value) {
-        Node<K, V> newNode = new Node<>(hashOfKey, key, value, null);
-        if (table[hashOfKey] == null) {
-            table[hashOfKey] = newNode;
+    private void putNewNodeInTheTable(int index, K key, V value) {
+        Node<K, V> newNode = new Node<>(index, key, value, null);
+        if (table[index] == null) {
+            table[index] = newNode;
             size++;
-        } else if (Objects.equals(table[hashOfKey].key, newNode.key)
-                && table[hashOfKey].next == null) {
-            table[hashOfKey] = newNode;
-        } else if (Objects.equals(table[hashOfKey].key, newNode.key)
-                && table[hashOfKey].next != null) {
-            newNode.next = table[hashOfKey].next;
-            table[hashOfKey] = newNode;
+        } else if (Objects.equals(table[index].key, newNode.key)
+                && table[index].next == null) {
+            table[index] = newNode;
+        } else if (Objects.equals(table[index].key, newNode.key)
+                && table[index].next != null) {
+            newNode.next = table[index].next;
+            table[index] = newNode;
         } else {
-            Node<K, V> current = table[hashOfKey];
+            Node<K, V> current = table[index];
             while (true) {
                 if (current.next == null) {
                     current.next = newNode;
