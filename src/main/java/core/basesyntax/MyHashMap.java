@@ -10,7 +10,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size = 0;
 
     public MyHashMap() {
-
         tables = new Node[defaultCapacity];
         threshold = (int) (loadFactor * tables.length);
     }
