@@ -1,20 +1,20 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_SIZE = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private int size;
     private int threshold;
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        table = new Node[DEFAULT_SIZE];
+        table = new Node[DEFAULT_CAPACITY];
         threshold = countThreshold();
     }
 
-
     @Override
     public void put(K key, V value) {
+
         int idx = getIndex(key);
         Node<K, V> bucket = table[idx];
         Node<K, V> existing = getNode(key);
