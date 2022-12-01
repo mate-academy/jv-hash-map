@@ -43,16 +43,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        V value = null;
         int index = getIndex(key, table);
         Node<K, V> nextPair = table[index];
         while (nextPair != null) {
             if (Objects.equals(nextPair.key, key)) {
-                value = nextPair.value;
+                return nextPair.value;
             }
             nextPair = nextPair.next;
         }
-        return value;
+        return null;
     }
 
     @Override
