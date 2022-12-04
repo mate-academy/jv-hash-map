@@ -19,14 +19,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > threshold) {
             resize();
         }
-        int hash = getIndex(key);
+        int indexOfBucket = getIndex(key);
         Node<K, V> newNode = new Node<>(key, value);
-        if (table[hash] == null) {
-            table[hash] = newNode;
+        if (table[indexOfBucket] == null) {
+            table[indexOfBucket] = newNode;
             size++;
             return;
         }
-        Node<K, V> currentNode = table[hash];
+        Node<K, V> currentNode = table[indexOfBucket];
         while (currentNode.next != null && !Objects.equals(key,currentNode.key)) {
             currentNode = currentNode.next;
         }
@@ -44,9 +44,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
                 return currentNode.value;
-            } else {
-                currentNode = currentNode.next;
             }
+                currentNode = currentNode.next;
+
         }
         return null;
     }
@@ -83,7 +83,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
+            //this.next = next;
         }
     }
 }
