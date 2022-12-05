@@ -16,8 +16,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (containsKey(key)) {
-            Node<K, V> currentNode = getNode(key);
+        Node<K, V> currentNode = getNode(key);
+        if (currentNode != null) {
             currentNode.value = value;
         } else {
             int index = getIndex(key);
@@ -25,23 +25,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 table[index] = new Node<>(key, value, null);
                 size++;
                 return;
-            } else {
-                Node<K, V> current = table[index];
-                while (current.next != null) {
-                    current = current.next;
-                }
-                current.next = new Node<>(key, value, null);
-                size++;
-                if (size == threshold) {
-                    resize();
-                }
+            }
+            currentNode = table[index];
+            while (currentNode.next != null) {
+                currentNode = currentNode.next;
+            }
+            currentNode.next = new Node<>(key, value, null);
+            size++;
+            if (size == threshold) {
+                resize();
             }
         }
     }
 
     @Override
     public V getValue(K key) {
-        return getNode(key) == null ? null : getNode(key).value;
+        Node<K, V> node = getNode(key);
+        return node == null ? null : node.value;
     }
 
     @Override
