@@ -6,12 +6,4 @@ public interface MyMap<K, V> {
     V getValue(K key);
 
     int getSize();
-
-    interface Entry<K, V> {
-        K getKey();
-
-        V getValue();
-
-        V setValue(V value);
-    }
 }

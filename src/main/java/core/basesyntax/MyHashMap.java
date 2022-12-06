@@ -6,7 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     
     private int size;
     private int threshold;
-    private Node<K ,V>[] table;
+    private Node<K, V>[] table;
 
     @Override
     public void put(K key, V value) {
@@ -25,8 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (table[index].key == key || (table[index].key != null 
                     && table[index].key.equals(key))) {
                 return table[index].value;
-            }
-            else {
+            } else {
                 if (table[index].next != null) {
                     Node<K, V> current = table[index];
                     while (current.next != null) {
@@ -47,7 +46,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    static class Node<K, V> implements MyMap.Entry<K, V> {
+    static class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
@@ -58,23 +57,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = null;
-        }
-
-        @Override
-        public K getKey() {
-            return key;
-        }
-
-        @Override
-        public V getValue() {
-            return value;
-        }
-
-        @Override
-        public V setValue(V value) {
-            V prevValue = this.value;
-            this.value = value;
-            return prevValue;
         }
     }
 
@@ -98,12 +80,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (oldCap != 0) {
             for (int i = 0; i < oldCap; i++) {
                 if (oldTable[i] != null) {
-                    putNode(new Node<K, V>(oldTable[i].hash, oldTable[i].key, oldTable[i].value), isResizing);
+                    putNode(new Node<K, V>(oldTable[i].hash, oldTable[i].key, 
+                            oldTable[i].value), isResizing);
                     if (oldTable[i].next != null) {
                         Node<K, V> current = oldTable[i];
                         while (current.next != null) {
                             current = current.next;
-                            putNode(new Node<K, V>(current.hash, current.key, current.value), isResizing);
+                            putNode(new Node<K, V>(current.hash, current.key, 
+                                    current.value), isResizing);
                         }
                     }
                 }                                       
@@ -125,14 +109,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         
         if (table[index] == null) {
             table[index] = node;
-        }
-        else {
+        } else {
             if (table[index].key == node.key || (table[index].key != null 
                     && table[index].key.equals(node.key))) {
                 table[index].value = node.value;                
                 size--;               
-            }  
-            else {
+            } else {
                 Node<K, V> current = table[index];
                 while (current.next != null) {
                     current = current.next;
