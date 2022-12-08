@@ -39,9 +39,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldBuckets = buckets;
         buckets = new Node[buckets.length * INCREASE_VALUE];
 
-        for (int i = 0; i < oldBuckets.length; i++) {
-            if (oldBuckets[i] != null) {
-                Node<K, V> node = oldBuckets[i];
+        for (Node<K, V> oldBucket : oldBuckets) {
+            if (oldBucket != null) {
+                Node<K, V> node = oldBucket;
                 while (node != null) {
                     doPut(node.key, node.value);
                     node = node.next;
@@ -72,7 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean doPut(K key, V value) {
-        Node<K, V> newNode = new Node<>(null, getHashcode(key), key, value);
+        Node<K, V> newNode = new Node<>(null, key, value);
         int index = getIndex(key);
         Node<K, V> currentNode = buckets[index];
 
@@ -98,15 +98,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return currentNode.key == key || currentNode.key != null && currentNode.key.equals(key);
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private Node<K, V> next;
-        private final int hash;
         private final K key;
         private V value;
 
-        public Node(Node<K, V> next, int hash, K key, V value) {
+        public Node(Node<K, V> next, K key, V value) {
             this.next = next;
-            this.hash = hash;
             this.key = key;
             this.value = value;
         }
