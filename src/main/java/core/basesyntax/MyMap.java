@@ -5,7 +5,7 @@ import java.util.Map;
 public interface MyMap<K, V> {
     void put(K key, V value);
 
-    void putAll(Map<? extends K, ? extends V> m);
+    void putAll(Map<K, V> m);
 
     V getValue(K key);
 
