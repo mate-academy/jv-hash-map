@@ -50,8 +50,20 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
 
     @Override
     public V getValue(K key) {
-        Node<K,V> e;
-        return (e = getNode(hash(key), key)) == null ? null : e.value;
+        Node<K,V>[] tab;
+        if ((tab = table) == null || tab.length == 0) {
+            return null;
+        }
+        int hashValue = hash(key);
+        int idx = indexFor(hashValue,tab.length);
+        K k;
+        for (Node<K,V> temp = tab[idx]; temp != null; temp = temp.next) {
+            if (temp.hash == hashValue && ((k = temp.key) == key
+                    || (key != null && key.equals(k)))) {
+                return (V) temp.value;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -128,30 +140,6 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
 
     Node<K,V> newNode(int hash, K key, V value, Node<K,V> next) {
         return new Node<>(hash, key, value, next);
-    }
-
-    private Node<K,V> getNode(int hash, Object key) {
-        Node<K, V>[] tab = table;
-        Node<K, V> tabNode;
-        Node<K, V> temp;
-        int n;
-        K k;
-        if ((tab != null) && ((n = tab.length) > 0)
-                && (tabNode = tab[(n - 1) & hash]) != null) {
-            if (tabNode.hash == hash && ((k = tabNode.key) == key
-                    || (key != null && key.equals(k)))) {
-                return tabNode;
-            }
-            if ((temp = tabNode.next) != null) {
-                do {
-                    if (temp.hash == hash && ((k = temp.key) == key
-                            || (key != null && key.equals(k)))) {
-                        return temp;
-                    }
-                } while ((temp = temp.next) != null);
-            }
-        }
-        return null;
     }
 
     private static int hash(Object key) {
