@@ -1,53 +1,11 @@
 package core.basesyntax;
 
-import java.util.Map;
-
 public class MyHashMap<K,V> implements MyMap<K,V> {
     private static final int INIT_SIZE = 16;
     private static final float INIT_LOAD_FACTOR = 0.75f;
     private Node<K,V>[] table;
     private int size;
     private int threshold;
-
-    private class Node<K,V> implements Map.Entry<K,V> {
-        private int hash;
-        private K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-
-        public final K getKey() {
-            return key;
-        }
-
-        public final V getValue() {
-            return value;
-        }
-
-        public final V setValue(V newValue) {
-            V oldValue = value;
-            value = newValue;
-            return oldValue;
-        }
-
-        public final int hashCode() {
-            hash = 31;
-            hash = hash * 17 + key.hashCode();
-            return hash;
-        }
-
-        @Override
-        public String toString() {
-            return "Node{" + "hash=" + hash + ", key=" + key
-                    + ", value=" + value + ", next=" + next + '}';
-        }
-    }
 
     @Override
     public void put(K key, V value) {
@@ -99,6 +57,32 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private class Node<K,V> implements Entry<K,V> {
+        private int hash;
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(int hash, K key, V value, Node<K, V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+
+        public final int hashCode() {
+            hash = 31;
+            hash = hash * 17 + key.hashCode();
+            return hash;
+        }
+
+        @Override
+        public String toString() {
+            return "Node{" + "hash=" + hash + ", key=" + key
+                    + ", value=" + value + ", next=" + next + '}';
+        }
     }
 
     private Node<K,V>[] resize() {
