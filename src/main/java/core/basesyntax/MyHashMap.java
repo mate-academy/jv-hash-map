@@ -81,7 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public boolean containsKey(K key) {
-        return containsValue(getValue(key));
+        return getValue(key) != null;
     }
 
     @Override
