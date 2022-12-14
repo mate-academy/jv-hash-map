@@ -7,7 +7,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static final float DEFAULT_LOAD_FACTOR = 0.75F;
     static final int MULTIPLIER_FOR_RESIZE = 2;
     private Node<K, V>[] bucket;
-    private int size = 0;
+    private int size;
     private int threshold;
 
     public MyHashMap() {
@@ -22,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int index = getIndex(key);
         if (bucket[index] == null) {
-            Node<K, V> node = new Node<>(key, value, null);
+            Node<K, V> node = new Node<>(key, value);
             bucket[index] = node;
             size++;
         } else {
@@ -33,7 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     return;
                 }
                 if (currentNode.next == null) {
-                    currentNode.next = new Node<>(key, value, null);
+                    currentNode.next = new Node<>(key, value);
                     size++;
                     return;
 
@@ -65,10 +65,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) ((bucket.length * MULTIPLIER_FOR_RESIZE) * DEFAULT_LOAD_FACTOR);
         Node<K, V>[] oldBucket = bucket;
         bucket = new Node[bucket.length * MULTIPLIER_FOR_RESIZE];
-        transfer(oldBucket);
-    }
-
-    public void transfer(Node<K, V>[] oldBucket) {
         size = 0;
         for (Node<K, V> bucketNode : oldBucket) {
             while (bucketNode != null) {
@@ -87,10 +83,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
