@@ -3,9 +3,9 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int MIN_INITIAL_CAPACITY = 16;
-    static final float DEFAULT_LOAD_FACTOR = 0.75F;
-    static final int MULTIPLIER_FOR_RESIZE = 2;
+    private static final int MIN_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75F;
+    private static final int MULTIPLIER_FOR_RESIZE = 2;
     private Node<K, V>[] bucket;
     private int size;
     private int threshold;
