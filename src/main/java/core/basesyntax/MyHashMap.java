@@ -8,29 +8,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final double LOAD_FACTOR = 0.75;
     private static final int DEFAULT_CAPACITY = 16;
-    private Node<K, V>[] table;
-
+    private int threshold = (int) (LOAD_FACTOR * DEFAULT_CAPACITY);
     private int size;
+    private Node<K, V>[] table;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
     }
 
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
-        if (size++ > table.length * LOAD_FACTOR) {
+        if (size++ > threshold) {
             resize();
         }
         int index = getIndex(key);
@@ -75,7 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public List<V> getValues() {
         Node<K, V>[] nodes = getAllNodes();
         List<V> values = new ArrayList<>();
-        for (Node<K, V> node: nodes) {
+        for (Node<K, V> node : nodes) {
             values.add(node.value);
         }
         return values;
@@ -84,7 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public List<K> getKeys() {
         Node<K, V>[] nodes = getAllNodes();
         List<K> keys = new ArrayList<>();
-        for (Node<K, V> node: nodes) {
+        for (Node<K, V> node : nodes) {
             keys.add(node.key);
         }
         return keys;
@@ -95,7 +83,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private Node<K,V>[] getAllNodes() {
+    private Node<K, V>[] getAllNodes() {
         Node<K, V>[] nodes = new Node[size];
         int index = 0;
         for (int i = 0; i < table.length; i++) {
@@ -116,15 +104,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] nodes = getAllNodes();
+        final Node<K, V>[] nodes = getAllNodes();
         table = new Node[table.length << 1];
+        threshold = (int) (table.length * LOAD_FACTOR);
         size = 0;
-        for (Node<K, V> node: nodes) {
+        for (Node<K, V> node : nodes) {
             if (node == null) {
                 size++;
                 break;
             }
             put(node.key, node.value);
+        }
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
         }
     }
 }
