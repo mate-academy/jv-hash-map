@@ -86,9 +86,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] getAllNodes() {
         Node<K, V>[] nodes = new Node[size];
         int index = 0;
-        for (int i = 0; i < table.length; i++) {
-            if (table[i] != null) {
-                nodes[index] = table[i];
+        for (Node<K, V> node : table) {
+            if (node != null) {
+                nodes[index] = node;
                 index++;
                 while (nodes[index - 1].next != null) {
                     nodes[index] = nodes[index - 1].next;
