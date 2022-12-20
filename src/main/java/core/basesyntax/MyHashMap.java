@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
@@ -51,11 +53,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> getNode(int index, K key) {
-        for (Node<K, V> currentNode = buckets[index];
-                currentNode != null; currentNode = currentNode.next) {
+        Node<K, V> currentNode = buckets[index];
+        while (currentNode != null) {
             if (keysEquals(currentNode.key, key)) {
                 return currentNode;
             }
+            currentNode = currentNode.next;
         }
         return null;
     }
@@ -79,26 +82,33 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (currentNode == null) {
             buckets[index] = newNode;
             size++;
-        } else {
-            while (currentNode != null) {
-                if (keysEquals(currentNode.key, key)) {
-                    currentNode.value = value;
-                    return;
-                }
-
-                if (currentNode.next == null) {
-                    currentNode.next = newNode;
-                    size++;
-                    return;
-                }
-                currentNode = currentNode.next;
-            }
-            size++;
+            return;
         }
+
+        while (currentNode.next != null) {
+            if (restoreValue(key, value, currentNode)) {
+                return;
+            }
+            currentNode = currentNode.next;
+        }
+
+        if (restoreValue(key, value, currentNode)) {
+            return;
+        }
+        currentNode.next = newNode;
+        size++;
+    }
+
+    private boolean restoreValue(K key, V value, Node<K, V> currentNode) {
+        if (keysEquals(currentNode.key, key)) {
+            currentNode.value = value;
+            return true;
+        }
+        return false;
     }
 
     private boolean keysEquals(K keyFirst, K keySecond) {
-        return keyFirst == keySecond || keyFirst != null && keyFirst.equals(keySecond);
+        return Objects.equals(keyFirst, keySecond);
     }
 
     private static class Node<K, V> {
