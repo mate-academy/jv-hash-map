@@ -1,14 +1,15 @@
 package core.basesyntax;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final double LOAD_FACTOR = 0.75;
     private static final int DEFAULT_CAPACITY = 16;
-    private int threshold = (int) (LOAD_FACTOR * DEFAULT_CAPACITY);
     private int size;
     private Node<K, V>[] table;
 
@@ -18,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size > threshold) {
+        if (size > checkThreshold()) {
             resize();
         }
         size++;
@@ -67,9 +68,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
-    public List<K> getKeys() {
+    public Set<K> getKeys() {
         Node<K, V>[] nodes = getAllNodes();
-        List<K> keys = new ArrayList<>();
+        Set<K> keys = new HashSet<>();
         for (Node<K, V> node : nodes) {
             keys.add(node.key);
         }
@@ -97,6 +98,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return nodes;
     }
 
+    private int checkThreshold() {
+        return (int) (LOAD_FACTOR * table.length);
+    }
+
     private int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
@@ -104,7 +109,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         final Node<K, V>[] nodes = getAllNodes();
         table = new Node[table.length << 1];
-        threshold = (int) (table.length * LOAD_FACTOR);
         size = 0;
         for (Node<K, V> node : nodes) {
             if (node == null) {

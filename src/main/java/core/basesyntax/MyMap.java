@@ -1,6 +1,7 @@
 package core.basesyntax;
 
 import java.util.List;
+import java.util.Set;
 
 public interface MyMap<K, V> {
 
@@ -10,7 +11,7 @@ public interface MyMap<K, V> {
 
     int getSize();
 
-    public List<K> getKeys();
+    public Set<K> getKeys();
 
     public List<V> getValues();
 }
