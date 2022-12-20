@@ -18,48 +18,45 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size++ > threshold) {
+        if (size > threshold) {
             resize();
         }
+        size++;
         int index = getIndex(key);
         Node<K, V> node = table[index];
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
-        } else {
-            while (true) {
-                if (Objects.equals(key, node.key)) {
-                    node.value = value;
-                    size--;
-                    return;
-                }
-                if (node.next == null) {
-                    break;
-                }
-                node = node.next;
-            }
-            node.next = new Node<>(key, value, null);
+            return;
         }
+        while (node != null) {
+            if (Objects.equals(key, node.key)) {
+                node.value = value;
+                size--;
+                return;
+            }
+            if (node.next == null) {
+                break;
+            }
+            node = node.next;
+        }
+        node.next = new Node<>(key, value, null);
+
     }
 
     @Override
     public V getValue(K key) {
         int index = getIndex(key);
-        if (table[index] == null) {
-            return null;
-        } else {
-            Node<K, V> node = table[index];
-            while (true) {
-                if (Objects.equals(key, node.key)) {
-                    return node.value;
-                }
-                if (node.next == null) {
-                    return null;
-                }
-                node = node.next;
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (Objects.equals(key, node.key)) {
+                return node.value;
             }
+            node = node.next;
         }
+        return null;
     }
 
+    @Override
     public List<V> getValues() {
         Node<K, V>[] nodes = getAllNodes();
         List<V> values = new ArrayList<>();
@@ -69,6 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return values;
     }
 
+    @Override
     public List<K> getKeys() {
         Node<K, V>[] nodes = getAllNodes();
         List<K> keys = new ArrayList<>();
@@ -110,7 +108,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         for (Node<K, V> node : nodes) {
             if (node == null) {
-                size++;
                 break;
             }
             put(node.key, node.value);
