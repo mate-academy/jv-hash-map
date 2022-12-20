@@ -4,6 +4,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
     private static final int INCREASE_VALUE = 2;
+    private static final int CLEAR_SIZE_VALUE = 0;
     private Node<K, V>[] buckets;
     private int size;
 
@@ -16,9 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= buckets.length * LOAD_FACTOR) {
             resize();
         }
-        if (doPut(key, value)) {
-            size++;
-        }
+        doPut(key, value);
     }
 
     @Override
@@ -36,6 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        size = CLEAR_SIZE_VALUE;
         Node<K, V>[] oldBuckets = buckets;
         buckets = new Node[buckets.length * INCREASE_VALUE];
 
@@ -53,7 +53,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V> getNode(int index, K key) {
         for (Node<K, V> currentNode = buckets[index];
                 currentNode != null; currentNode = currentNode.next) {
-            if (checkNode(currentNode, key)) {
+            if (keysEquals(currentNode.key, key)) {
                 return currentNode;
             }
         }
@@ -71,31 +71,34 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key.hashCode();
     }
 
-    private boolean doPut(K key, V value) {
+    private void doPut(K key, V value) {
         Node<K, V> newNode = new Node<>(null, key, value);
         int index = getIndex(key);
         Node<K, V> currentNode = buckets[index];
 
         if (currentNode == null) {
             buckets[index] = newNode;
+            size++;
         } else {
-            while (true) {
-                if (checkNode(currentNode, key)) {
+            while (currentNode != null) {
+                if (keysEquals(currentNode.key, key)) {
                     currentNode.value = value;
-                    return false;
-                } else if (currentNode.next != null) {
-                    currentNode = currentNode.next;
-                } else {
-                    currentNode.next = newNode;
-                    return true;
+                    return;
                 }
+
+                if (currentNode.next == null) {
+                    currentNode.next = newNode;
+                    size++;
+                    return;
+                }
+                currentNode = currentNode.next;
             }
+            size++;
         }
-        return true;
     }
 
-    private boolean checkNode(Node currentNode, K key) {
-        return currentNode.key == key || currentNode.key != null && currentNode.key.equals(key);
+    private boolean keysEquals(K keyFirst, K keySecond) {
+        return keyFirst == keySecond || keyFirst != null && keyFirst.equals(keySecond);
     }
 
     private static class Node<K, V> {
