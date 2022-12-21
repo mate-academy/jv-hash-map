@@ -45,24 +45,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putValue(int hash, K key, V value) {
-        Node<K, V> newNode;
         if (table[hash] == null) {
             table[hash] = new Node<>(key, value, null);
             return;
         }
-        newNode = table[hash];
-        while (newNode.next != null) {
-            if (Objects.equals(key, newNode.key)) {
+        Node<K, V> node = table[hash];
+        while (node.next != null) {
+            if (Objects.equals(key, node.key)) {
                 break;
             }
-            newNode = newNode.next;
+            node = node.next;
         }
-        if (Objects.equals(key, newNode.key)) {
-            newNode.value = value;
+        if (Objects.equals(key, node.key)) {
+            node.value = value;
             size--;
             return;
         }
-        newNode.next = new Node<>(key, value, null);
+        node.next = new Node<>(key, value, null);
     }
 
     private void resize() {
