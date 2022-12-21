@@ -97,7 +97,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void checkThreshold() {
-        if (size > ((int) (LOAD_FACTOR * table.length))) {
+        if (size > (int) (LOAD_FACTOR * table.length)) {
             resize();
         }
     }
@@ -108,13 +108,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         final Node<K, V>[] nodes = getAllNodes();
-        table = new Node[table.length << 1];
-        size = 0;
-        for (Node<K, V> node : nodes) {
-            if (node == null) {
-                break;
+        table = new Node[table.length * 2];
+        transfer(nodes);
+    }
+
+    private void transfer(Node<K,V>[] nodes) {
+        for (Node<K, V> currentNode : nodes) {
+            int index = getIndex(currentNode.key);
+            if (table[index] == null) {
+                table[index] = new Node<>(currentNode.key, currentNode.value, null);
+                continue;
             }
-            put(node.key, node.value);
+            Node<K, V> node = table[index];
+            while (node != null) {
+                if (node.next == null) {
+                    node.next = new Node<>(currentNode.key, currentNode.value, null);
+                    break;
+                }
+                node = node.next;
+            }
         }
     }
 
