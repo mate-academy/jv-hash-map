@@ -19,9 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size > checkThreshold()) {
-            resize();
-        }
+        checkThreshold();
         size++;
         int index = getIndex(key);
         Node<K, V> node = table[index];
@@ -98,8 +96,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return nodes;
     }
 
-    private int checkThreshold() {
-        return (int) (LOAD_FACTOR * table.length);
+    private void checkThreshold() {
+        if (size > ((int) (LOAD_FACTOR * table.length))) {
+            resize();
+        }
     }
 
     private int getIndex(K key) {
