@@ -107,7 +107,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        final Node<K, V>[] nodes = getAllNodes();
+        final Node<K, V>[] oldTable = table;
         table = new Node[table.length * 2];
         transfer(nodes);
     }
