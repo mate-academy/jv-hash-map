@@ -25,7 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
-            if (Objects.equals(key,node.key)) {
+            if (Objects.equals(key, node.key)) {
                 node.value = value;
                 return;
             }
@@ -41,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int index = getIndex(key);
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
-            if (Objects.equals(key,node.key)) {
+            if (Objects.equals(key, node.key)) {
                 return node.value;
             }
         }
