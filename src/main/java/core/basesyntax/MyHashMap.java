@@ -31,6 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
     }
+
     @Override
     public V getValue(K key) {
         int index = getHush(key) % table.length;
@@ -49,9 +50,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldTable = table;
-        table =  new Node[table.length * ARRAY_GROW_COEFFICIENT];
+        table = new Node[table.length * ARRAY_GROW_COEFFICIENT];
         size = 0;
-        for(Node<K, V> node : oldTable) {
+        for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
@@ -69,6 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
         }
     }
+
     private int getHush(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() + 17);
     }
