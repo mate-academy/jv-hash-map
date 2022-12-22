@@ -6,7 +6,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     Node<K, V>[] table;
     private int size;
-    //private float threshold = table.length * DEFAULT_LOAD_FACTOR;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
@@ -14,18 +13,35 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        //if (size + 1 > threshold) {
-        //    resize();
-        //}
-        int positionInTable = hash(key) % table.length;
-        Node<K, V> newNode = new Node<>(hash(key), key, value, null);
-        table[positionInTable] = newNode;
+        int bucketNumber = getBucketNumber(key);
+        if (table[bucketNumber] == null) {
+            Node<K, V> newNode = new Node<>(hash(key), key, value, null);
+            table[bucketNumber] = newNode;
+        } else if (table[bucketNumber].key.equals(key)){
+            table[bucketNumber].value = value;
+        } else if (key.hashCode() == table[bucketNumber].hashCode()
+                && !table[bucketNumber].key.equals(key)) {
+            Node<K, V> newNode = new Node<>(hash(key), key, value, null);
+            table[bucketNumber].next = newNode;
+        } else if (table[bucketNumber] != null) {
+            Node<K, V> currentNode = table[bucketNumber];
+            while (currentNode != null) {
+                if (key.equals(currentNode.key)) {
+                    currentNode.value = value;
+                    return;
+                } else if (currentNode.next == null) {
+                    currentNode.next = new Node<>(hash(key), key, value, null);
+                }
+                currentNode=  currentNode.next;
+            }
+        }
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        return null;
+        return (table[getBucketNumber(key)] == null) ? null
+                : table[getBucketNumber(key)].getNodeValue();
     }
 
     @Override
@@ -34,12 +50,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(Object key) {
-        //int hash = key.hashCode();
         return (key == null) ? 0 : key.hashCode();
     }
 
     private void resize() {
 
+    }
+
+    private int getBucketNumber(K key) {
+        return hash(key) % table.length;
+    }
+
+    private float getThreshold() {
+        return table.length * DEFAULT_LOAD_FACTOR;
     }
 
     private Node<K, V>[] expandTable() {
@@ -68,6 +91,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
+        }
+
+        public V getNodeValue() {
+            return value;
         }
 
         ////////////// DELETE TO STRING /////////////
