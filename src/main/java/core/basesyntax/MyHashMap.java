@@ -5,7 +5,6 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private int threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
     private Node<K, V>[] table;
     private int size;
 
@@ -15,9 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold) {
-            resize();
-        }
+        checkThreshold();
         putValue(hash(key), key, value);
         size++;
     }
@@ -66,12 +63,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         int newCapacity = table.length * 2;
-        if (size >= threshold) {
-            threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
-            Node<K, V>[] oldTable = table;
-            table = new Node[newCapacity];
-            transfer(oldTable);
-        }
+        Node<K, V>[] oldTable = table;
+        table = new Node[newCapacity];
+        transfer(oldTable);
     }
 
     private void transfer(Node<K, V>[] oldTable) {
@@ -81,6 +75,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 putValue(hash(newNode.key), newNode.key, newNode.value);
                 newNode = newNode.next;
             }
+        }
+    }
+
+    private void checkThreshold() {
+        int threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
+        if (size >= threshold) {
+            resize();
         }
     }
 
