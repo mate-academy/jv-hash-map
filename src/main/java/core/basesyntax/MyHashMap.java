@@ -2,9 +2,9 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    Node<K, V>[] table;
+    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
@@ -13,35 +13,35 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int bucketNumber = getBucketNumber(key);
-        if (table[bucketNumber] == null) {
-            Node<K, V> newNode = new Node<>(hash(key), key, value, null);
-            table[bucketNumber] = newNode;
-        } else if (table[bucketNumber].key.equals(key)){
-            table[bucketNumber].value = value;
-        } else if (key.hashCode() == table[bucketNumber].hashCode()
-                && !table[bucketNumber].key.equals(key)) {
-            Node<K, V> newNode = new Node<>(hash(key), key, value, null);
-            table[bucketNumber].next = newNode;
-        } else if (table[bucketNumber] != null) {
-            Node<K, V> currentNode = table[bucketNumber];
-            while (currentNode != null) {
-                if (key.equals(currentNode.key)) {
+        Node<K, V> currentNode = table[getBucketNumber(key)];
+        if (currentNode == null) {
+            table[getBucketNumber(key)] = new Node<>(hash(key), key, value, null);
+            size++;
+        } else {
+            while (true) {
+                if (key == null || key.equals(currentNode.key)) {
                     currentNode.value = value;
                     return;
                 } else if (currentNode.next == null) {
                     currentNode.next = new Node<>(hash(key), key, value, null);
+                    size++;
+                    return;
                 }
-                currentNode=  currentNode.next;
+                currentNode = currentNode.next;
             }
         }
-        size++;
     }
 
     @Override
     public V getValue(K key) {
-        return (table[getBucketNumber(key)] == null) ? null
-                : table[getBucketNumber(key)].getNodeValue();
+        Node<K, V> currentNode = table[getBucketNumber(key)];
+        while (currentNode != null) {
+            if (key == null || currentNode.key.equals(key)) {
+                return currentNode.value;
+            }
+            currentNode = currentNode.next;
+        }
+        return null;
     }
 
     @Override
@@ -58,6 +58,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucketNumber(K key) {
+        if (hash(key) < 0) {
+            return hash(key) % table.length * -1;
+        }
         return hash(key) % table.length;
     }
 
@@ -70,12 +73,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return expandTable;
     }
 
-    ///////////// DELETE TO PRINT ////////////////////
+    ///////////// DELETE PRINT ////////////////////
     public void print() {
         int position = 0;
         for (Node<K, V> node : table) {
             System.out.print(position + " ");
+            if (node == null || node.next == null) {
             System.out.println(node);
+            } else {
+                System.out.print(node);
+                System.out.println(" --> " + node.next);
+            }
             position++;
         }
     }
@@ -91,10 +99,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        public V getNodeValue() {
-            return value;
         }
 
         ////////////// DELETE TO STRING /////////////
