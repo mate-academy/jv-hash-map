@@ -45,15 +45,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         Node<K, V> currentNode = table[index];
-        while (currentNode.next != null && !Objects.equals(key,currentNode.key)) {
+        while (currentNode != null) {
+            if (Objects.equals(key, currentNode.key)) {
+                currentNode.value = value;
+                return;
+            }
+            if (currentNode.next == null) {
+                currentNode.next = newNode;
+                size++;
+                return;
+            }
             currentNode = currentNode.next;
         }
-        if (Objects.equals(key, currentNode.key)) {
-            currentNode.value = value;
-            return;
-        }
-        currentNode.next = newNode;
-        size++;
     }
 
     private int getIndex(Object key) {
