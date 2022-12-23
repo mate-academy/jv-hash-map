@@ -4,30 +4,35 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int size;
-    private Node<K, V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
+    private Node<K, V>[] table;
+
+    public MyHashMap() {
+        this.table = new Node[DEFAULT_INITIAL_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value, null);
-        Node<K, V> oldNode = table[getIndex(key)];
+        int index = getIndex(key);
+        Node<K, V> oldNode = table[index];
         if (oldNode == null) {
-            table[getIndex(key)] = newNode;
+            table[index] = newNode;
             size++;
-            resize();
+            return;
         } else {
             while (true) {
                 if (oldNode.key == newNode.key || oldNode.key
                         != null && oldNode.key.equals(newNode.key)) {
                     oldNode.value = newNode.value;
-                    break;
+                    return;
                 } else if (oldNode.next == null) {
                     oldNode.next = newNode;
-                    size++;
                     break;
                 }
                 oldNode = oldNode.next;
             }
         }
+        size++;
         resize();
     }
 
