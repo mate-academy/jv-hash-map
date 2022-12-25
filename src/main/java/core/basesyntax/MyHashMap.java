@@ -9,7 +9,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int capacity;
     private Node<K, V>[] table;
 
-
     public MyHashMap() {
         capacity = INITIAL_CAPACITY;
         table = new Node[INITIAL_CAPACITY];
@@ -82,14 +81,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        K key;
-        V value;
-        Node<K, V> nextNode;
-        int hashCode;
+        private K key;
+        private V value;
+        private Node<K, V> nextNode;
+        private int hashCode;
 
         public Node() {
 
         }
+
         public Node(K key, V value) {
             this.key = key;
             this.value = value;
