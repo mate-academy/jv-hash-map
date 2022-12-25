@@ -95,7 +95,7 @@ public class MyHashMapTest {
     public void putAndGetWithCollision() {
         MyMap<Plane, Integer> myHashMap = new MyHashMap<>();
         myHashMap.put(firstPlane, 3);
-            myHashMap.put(secondPlane, 5);
+        myHashMap.put(secondPlane, 5);
         myHashMap.put(thirdPlane, 1);
 
         Assert.assertEquals("Test failed! The size isn't correct. Expected 3 but was "
