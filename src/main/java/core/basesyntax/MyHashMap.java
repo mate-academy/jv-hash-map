@@ -22,13 +22,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> currentNode = new Node<>();
-            currentNode = table[getIndexFromHash(key)];
-            while (currentNode != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    return currentNode.value;
-                }
-                currentNode = currentNode.nextNode;
+        currentNode = table[getIndexFromHash(key)];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
             }
+            currentNode = currentNode.nextNode;
+        }
         return null;
     }
 
