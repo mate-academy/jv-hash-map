@@ -16,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         checkThreshold();
-        int hash = hash(key);
+        int hash = getIndex(key);
         Node<K, V> newNode = new Node<>(key, value);
         if (table[hash] == null) {
             table[hash] = newNode;
@@ -40,7 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key);
+        int hash = getIndex(key);
         Node<K, V> newNode = table[hash];
         while (newNode != null) {
             if (Objects.equals(key, newNode.key)) {
@@ -67,14 +67,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hash(Object key) {
+    private int getIndex(Object key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void resize() {
-        int newSize = 2 * table.length;
         Node<K, V>[] oldTable = table;
-        table = new Node[newSize];
+        table = new Node[2 * table.length];
         size = 0;
         transfer(oldTable);
     }
