@@ -3,8 +3,9 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int NULL_INDEX = 0;
     private int size;
     private Node<K, V>[] table;
 
@@ -19,11 +20,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K, V> newNode = new Node<>(Math.abs(Objects.hash(key)), key, value, null);
         int positionInArray = Math.abs(Objects.hash(key) % table.length);
-        if (positionInArray == 0 && table[0] == null) {
+        if (positionInArray == NULL_INDEX && table[NULL_INDEX] == null) {
             table[0] = newNode;
             size++;
-        } else if (positionInArray == 0 && table[0] != null) {
-            for (Node<K, V> nodeInZeroPosition = table[0]; nodeInZeroPosition != null;
+        } else if (positionInArray == NULL_INDEX && table[NULL_INDEX] != null) {
+            for (Node<K, V> nodeInZeroPosition = table[NULL_INDEX]; nodeInZeroPosition != null;
                     nodeInZeroPosition = nodeInZeroPosition.next) {
                 if (Objects.equals(key,nodeInZeroPosition.key)) {
                     nodeInZeroPosition.value = value;
