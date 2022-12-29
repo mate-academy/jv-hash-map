@@ -23,18 +23,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (index == NULL_INDEX && table[NULL_INDEX] == null) {
             table[0] = newNode;
             size++;
-        } else if (index == NULL_INDEX && table[NULL_INDEX] != null) {
-            for (Node<K, V> node = table[NULL_INDEX]; node != null; node = node.next) {
-                if (Objects.equals(key,node.key)) {
-                    node.value = value;
-                    break;
-                }
-                if (node.next == null) {
-                    node.next = newNode;
-                    size++;
-                    break;
-                }
-            }
         } else if (table[index] == null) {
             table[index] = newNode;
             size++;
