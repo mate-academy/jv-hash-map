@@ -62,14 +62,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public void resize() {
         size = 0;
-        Node<K, V>[] oldTable;
-        int oldCapacity = table.length;
-        int newCapacity = oldCapacity << 1;
-        int newThreshold = holder << 1;
-        Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
-        oldTable = table;
-        table = newTable;
-        holder = newThreshold;
+        Node<K, V>[] oldTable = table;
+        table = new Node[oldTable.length * 2];
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
