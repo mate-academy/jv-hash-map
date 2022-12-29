@@ -63,7 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void resize() {
@@ -79,7 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    class Node<K, V> {
+    private class Node<K, V> {
         private final K key;
         private V value;
         private Node<K,V> next;
