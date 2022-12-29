@@ -4,19 +4,19 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final double DEFAULT_LOADFACTOR = 0.75d;
+    private static final double LOAD_FACTOR = 0.75d;
     private int size;
     private Node<K, V>[] elements;
 
     public MyHashMap() {
-        this.elements = new Node[DEFAULT_CAPACITY];
+        elements = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         Node<K, V> node = new Node<>(key, value);
         int index = hash(node.key);
-        if (size > elements.length * DEFAULT_LOADFACTOR) {
+        if (size > elements.length * LOAD_FACTOR) {
             resize();
         }
         if (elements[index] == null) {
@@ -74,7 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : Math.abs(h = key.hashCode()) % elements.length;
     }
 
-    private Node<K, V>[] resize() {
+    private void resize() {
         Node<K, V>[] oldElements = elements;
         elements = new Node[elements.length * 2];
         size = 0;
@@ -84,6 +84,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node = node.next;
             }
         }
-        return elements;
     }
 }
