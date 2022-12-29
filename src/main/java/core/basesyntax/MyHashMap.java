@@ -95,19 +95,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] tableUp = new Node[table.length * 2];
         for (Node<K, V> node : table) {
             for (Node<K, V> nodeCopy = node; nodeCopy != null; nodeCopy = nodeCopy.next) {
-                Node<K, V> newNode = new Node<>(getHash(nodeCopy.key),
-                        nodeCopy.key, nodeCopy.value, null);
-                Node<K, V> temporaryNode = tableUp[Math.abs(nodeCopy.hash % tableUp.length)];
-                if (temporaryNode == null) {
-                    tableUp[Math.abs(nodeCopy.hash % tableUp.length)] = newNode;
-                    continue;
-                }
-                while (temporaryNode.next != null) {
-                    temporaryNode = temporaryNode.next;
-                }
-                temporaryNode.next = newNode;
+                add(tableUp, nodeCopy);
             }
         }
         table = tableUp;
+    }
+
+    private void add(Node<K, V>[] tableUp, Node<K, V> nodeCopy) {
+        Node<K, V> newNode = new Node<>(getHash(nodeCopy.key),
+                nodeCopy.key, nodeCopy.value, null);
+        Node<K, V> temporaryNode = tableUp[Math.abs(nodeCopy.hash % tableUp.length)];
+        if (temporaryNode == null) {
+            tableUp[Math.abs(nodeCopy.hash % tableUp.length)] = newNode;
+            return;
+        }
+        while (temporaryNode.next != null) {
+            temporaryNode = temporaryNode.next;
+        }
+        temporaryNode.next = newNode;
     }
 }
