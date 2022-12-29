@@ -5,7 +5,6 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private static final int NULL_INDEX = 0;
     private int size;
     private Node<K, V>[] table;
 
@@ -20,10 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K, V> newNode = new Node<>(getHash(key), key, value, null);
         int index = getIndex(key);
-        if (index == NULL_INDEX && table[NULL_INDEX] == null) {
-            table[0] = newNode;
-            size++;
-        } else if (table[index] == null) {
+        if (table[index] == null) {
             table[index] = newNode;
             size++;
         } else {
