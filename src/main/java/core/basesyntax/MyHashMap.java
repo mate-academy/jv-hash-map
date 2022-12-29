@@ -16,14 +16,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         checkThreshold();
-        int hash = getIndex(key);
+        int index = getIndex(key);
         Node<K, V> newNode = new Node<>(key, value);
-        if (table[hash] == null) {
-            table[hash] = newNode;
+        if (table[index] == null) {
+            table[index] = newNode;
             size++;
             return;
         }
-        Node<K, V> currentNode = table[hash];
+        Node<K, V> currentNode = table[index];
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
                 currentNode.value = value;
@@ -40,8 +40,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = getIndex(key);
-        Node<K, V> newNode = table[hash];
+        int index = getIndex(key);
+        Node<K, V> newNode = table[index];
         while (newNode != null) {
             if (Objects.equals(key, newNode.key)) {
                 return newNode.value;
