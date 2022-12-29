@@ -3,7 +3,7 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int NULL_INDEX = 0;
     private int size;
@@ -16,38 +16,36 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (size == table.length * DEFAULT_LOAD_FACTOR) {
-            sizeUp();
+            resize();
         }
-        Node<K, V> newNode = new Node<>(Math.abs(Objects.hash(key)), key, value, null);
-        int positionInArray = Math.abs(Objects.hash(key) % table.length);
-        if (positionInArray == NULL_INDEX && table[NULL_INDEX] == null) {
+        Node<K, V> newNode = new Node<>(getHash(key), key, value, null);
+        int index = getIndex(key);
+        if (index == NULL_INDEX && table[NULL_INDEX] == null) {
             table[0] = newNode;
             size++;
-        } else if (positionInArray == NULL_INDEX && table[NULL_INDEX] != null) {
-            for (Node<K, V> nodeInZeroPosition = table[NULL_INDEX]; nodeInZeroPosition != null;
-                    nodeInZeroPosition = nodeInZeroPosition.next) {
-                if (Objects.equals(key,nodeInZeroPosition.key)) {
-                    nodeInZeroPosition.value = value;
+        } else if (index == NULL_INDEX && table[NULL_INDEX] != null) {
+            for (Node<K, V> node = table[NULL_INDEX]; node != null; node = node.next) {
+                if (Objects.equals(key,node.key)) {
+                    node.value = value;
                     break;
                 }
-                if (nodeInZeroPosition.next == null) {
-                    nodeInZeroPosition.next = newNode;
+                if (node.next == null) {
+                    node.next = newNode;
                     size++;
                     break;
                 }
             }
-        } else if (table[positionInArray] == null) {
-            table[positionInArray] = newNode;
+        } else if (table[index] == null) {
+            table[index] = newNode;
             size++;
         } else {
-            for (Node<K, V> nodeInZeroPosition = table[positionInArray]; nodeInZeroPosition != null;
-                    nodeInZeroPosition = nodeInZeroPosition.next) {
-                if (Objects.equals(key,nodeInZeroPosition.key)) {
-                    nodeInZeroPosition.value = value;
+            for (Node<K, V> node = table[index]; node != null; node = node.next) {
+                if (Objects.equals(key,node.key)) {
+                    node.value = value;
                     break;
                 }
-                if (nodeInZeroPosition.next == null) {
-                    nodeInZeroPosition.next = newNode;
+                if (node.next == null) {
+                    node.next = newNode;
                     size++;
                     break;
                 }
@@ -55,10 +53,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private int getHash(K key) {
+        return Math.abs(Objects.hash(key));
+    }
+
+    private int getIndex(K key) {
+        return Math.abs(Objects.hash(key) % table.length);
+    }
+
     @Override
     public V getValue(K key) {
-        int positionInArray = Math.abs(Objects.hash(key) % table.length);
-        for (Node<K, V> node = table[positionInArray]; node != null; node = node.next) {
+        int index = getIndex(key);
+        for (Node<K, V> node = table[index]; node != null; node = node.next) {
             if (Objects.equals(key, node.key)) {
                 return node.value;
             }
@@ -85,11 +91,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void sizeUp() {
+    private void resize() {
         Node<K, V>[] tableUp = new Node[table.length * 2];
         for (Node<K, V> node : table) {
             for (Node<K, V> nodeCopy = node; nodeCopy != null; nodeCopy = nodeCopy.next) {
-                Node<K, V> newNode = new Node<>(Math.abs(Objects.hash(nodeCopy.key)),
+                Node<K, V> newNode = new Node<>(getHash(nodeCopy.key),
                         nodeCopy.key, nodeCopy.value, null);
                 Node<K, V> temporaryNode = tableUp[Math.abs(nodeCopy.hash % tableUp.length)];
                 if (temporaryNode == null) {
