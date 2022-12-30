@@ -17,7 +17,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > (int) (LOAD_FACTOR * table.length)) {
             resize();
         }
-        int hash = getHash(key);
         int index = getIndex(key);
         Node<K, V> newTable = new Node<>(key, value, null);
         Node<K,V> node = table[index];
