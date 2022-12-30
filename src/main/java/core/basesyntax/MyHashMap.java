@@ -3,52 +3,37 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static class Node<K, V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
-    private static final int START_CAPACITY = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int GROW_FACTOR = 2;
     private Node<K, V>[] hashTable;
-    private int load;
     private int size;
 
     public MyHashMap() {
-        this.hashTable = new Node[START_CAPACITY];
-        this.load = (int) (START_CAPACITY * LOAD_FACTOR);
+        this.hashTable = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        resize();
+        if (size > (int) (LOAD_FACTOR * hashTable.length)) {
+            resize();
+        }
         int hash = getHash(key);
         int index = getIndex(key);
-        Node<K, V> newHashTable = new Node<>(hash, key, value, null);
-        Node<K,V> table = hashTable[index];
-        if (table == null) {
+        Node<K, V> newHashTable = new Node<>(key, value, null);
+        Node<K,V> node = hashTable[index];
+        if (node == null) {
             hashTable[index] = newHashTable;
         }
-        while (table != null) {
-            if (isHashAndKeysEquals(table, hash, key)) {
-                table.value = value;
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
                 return;
             }
-            if (table.next == null) {
-                table.next = newHashTable;
+            if (node.next == null) {
+                node.next = newHashTable;
                 break;
             }
-            table = table.next;
+            node = node.next;
         }
         size++;
     }
@@ -57,12 +42,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int hash = getHash(key);
         int index = getIndex(key);
-        Node<K,V> table = hashTable[index];
-        while (table != null) {
-            if (isHashAndKeysEquals(table, hash, key)) {
-                return table.value;
+        Node<K,V> node = hashTable[index];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return node.value;
             }
-            table = table.next;
+            node = node.next;
         }
         return null;
     }
@@ -81,21 +66,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (load == size) {
-            size = 0;
-            Node<K, V>[] oldHashTable = hashTable;
-            hashTable = new Node[hashTable.length * GROW_FACTOR];
-            load *= GROW_FACTOR;
-            for (Node<K, V> table : oldHashTable) {
-                while (table != null) {
-                    put(table.key, table.value);
-                    table = table.next;
-                }
+        size = 0;
+        Node<K, V>[] oldHashTable = hashTable;
+        hashTable = new Node[hashTable.length * 2];
+        for (Node<K, V> table : oldHashTable) {
+            while (table != null) {
+                put(table.key, table.value);
+                table = table.next;
             }
         }
     }
 
-    private boolean isHashAndKeysEquals(Node<K,V> table, int hash, K key) {
-        return (table.hash == hash && Objects.equals(table.key, key));
+    private static class Node<K, V> {
+        private int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
+
