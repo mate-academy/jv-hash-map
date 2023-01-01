@@ -43,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
@@ -116,11 +116,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    Node<K, V> newNode(int hash, K key, V value, Node<K, V> next) {
+    private Node<K, V> newNode(int hash, K key, V value, Node<K, V> next) {
         return new Node<>(hash, key, value, next);
     }
 
-    final Node<K, V>[] resize() {
+    private Node<K, V>[] resize() {
         Node<K, V>[] oldTab = table;
         int oldCap = (oldTab == null) ? 0 : oldTab.length;
         int oldThreshold = threshold;
@@ -164,11 +164,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.abs(hash % newCap);
     }
 
-    static int hash(Object key) {
+    private static int hash(Object key) {
         return (key == null) ? 0 : key.hashCode();
     }
 
-    final Node<K, V> getNode(Object key) {
+    private Node<K, V> getNode(Object key) {
         Node<K, V>[] tab = table;
         if (tab == null) {
             return null;
