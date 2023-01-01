@@ -6,7 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
-    private int size = 0;
+    private int size;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
@@ -15,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int index = getIndex(key);
-        checkCapacity(size, table);
+        checkCapacity(size);
         putValue(key, value, index);
     }
 
@@ -59,26 +59,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[index] == null) {
             table[index] = newNode;
             size++;
+            return;
         }
-        if (table[index] != null) {
-            Node<K, V> node = table[index];
-            while (node.next != null) {
-                if (Objects.equals(node.key, key)) {
-                    node.value = value;
-                    return;
-                }
-                node = node.next;
-            }
+        Node<K, V> node = table[index];
+        for ( ;node.next != null; node = node.next) {
             if (Objects.equals(node.key, key)) {
                 node.value = value;
                 return;
             }
-            node.next = newNode;
-            size++;
         }
+        if (Objects.equals(node.key, key)) {
+            node.value = value;
+            return;
+        }
+        node.next = newNode;
+        size++;
     }
 
-    private void checkCapacity(int size, Node<K, V>[] table) {
+    private void checkCapacity(int size) {
         if (size + 1 > Math.abs(table.length * DEFAULT_LOAD_FACTOR)) {
             resize();
         }
