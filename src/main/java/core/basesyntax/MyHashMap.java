@@ -1,7 +1,6 @@
 package core.basesyntax;
 
 import java.util.Objects;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
@@ -9,9 +8,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
     private int threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
-
     public MyHashMap() {
-
         table = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
@@ -25,12 +22,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[getBucketNumber(key)] = new Node<>(hash(key), key, value, null);
             size++;
         } else {
-            while (true) {
-                if (key == null && currentNode.key == null
-                        || Objects.equals(key, currentNode.key)) {
+            while (currentNode != null) {
+                if (Objects.equals(key, currentNode.key)) {
                     currentNode.value = value;
                     return;
-                } else if (currentNode.next == null) {
+                }
+                if (currentNode.next == null) {
                     currentNode.next = new Node<>(hash(key), key, value, null);
                     size++;
                     return;
@@ -44,8 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         Node<K, V> currentNode = table[getBucketNumber(key)];
         while (currentNode != null) {
-            if (key == null && currentNode.key == null
-                    || Objects.equals(key, currentNode.key)) {
+            if (Objects.equals(key, currentNode.key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
@@ -54,26 +50,33 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public V remove(K key) {
-        int bucketNumberByKey = getBucketNumber(key);
-        Node<K, V> currentNode = table[bucketNumberByKey];
-        V removedValue = getValue(key);
-        if (currentNode.next == null) {
-            table[bucketNumberByKey] = null;
-        } else {
-            while (currentNode.next.key != key) {
-                currentNode = currentNode.next;
+        for (int i = 0; i < table.length; i++) {
+            if (table[i] != null && Objects.equals(table[i].key, key) && table[i].next == null) {
+                V removedValue = table[i].value;
+                table[i] = null;
+                size--;
+                return removedValue;
             }
-            currentNode.next = currentNode.next.next;
-        }
-        size--;
-        return removedValue;
+            if (table[i] != null && table[i].next != null) {
+                    while (table[i] != null) {
+                        if (Objects.equals(table[i].key, key)) {
+                            V removedValue = table[i].value;
+                            table[i] = table[i].next;
+                            size--;
+                            return removedValue;
+                        }
+                        table[i] = table[i].next;
+                    }
+                }
+            }
+        return null;
     }
 
     @Override
     public int getSize() {
         return size;
     }
-
+///////////////// vidalyti print() ///////////////////
     public void print() {
         int bucketNumber = 0;
         for (Node<K, V> node : table) {
@@ -119,36 +122,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucketNumber(K key) {
-        if (hash(key) < 0) {
-            return hash(key) % table.length * -1;
-        }
-        return hash(key) % table.length;
+        return Math.abs(hash(key)) % table.length;
     }
 
     private static class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
         private Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
             this.key = key;
             this.value = value;
             this.next = next;
         }
-
+//////////////////// Vidality toString() //////////////////
         @Override
         public String toString() {
             return "Node{"
-                    +
-                    "hash=" + hash
-                    +
-                    ", key=" + key
-                    +
-                    ", value=" + value
-                    +
-                    '}';
+                    + "key=" + key
+                    + ", value=" + value
+                    + '}';
         }
     }
 }
