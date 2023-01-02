@@ -1,6 +1,7 @@
 package core.basesyntax;
 
 import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
@@ -8,6 +9,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
     private int threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
+
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
     }
@@ -58,41 +60,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return removedValue;
             }
             if (table[i] != null && table[i].next != null) {
-                    while (table[i] != null) {
-                        if (Objects.equals(table[i].key, key)) {
-                            V removedValue = table[i].value;
-                            table[i] = table[i].next;
-                            size--;
-                            return removedValue;
-                        }
+                while (table[i] != null) {
+                    if (Objects.equals(table[i].key, key)) {
+                        V removedValue = table[i].value;
                         table[i] = table[i].next;
+                        size--;
+                        return removedValue;
                     }
+                    table[i] = table[i].next;
                 }
             }
+        }
         return null;
     }
 
     @Override
     public int getSize() {
         return size;
-    }
-///////////////// vidalyti print() ///////////////////
-    public void print() {
-        int bucketNumber = 0;
-        for (Node<K, V> node : table) {
-            System.out.print(bucketNumber + " ");
-            if (node == null || node.next == null) {
-                System.out.println(node);
-            } else {
-                System.out.print(node);
-                while (node.next != null) {
-                    System.out.print(" --> " + node.next);
-                    node = node.next;
-                }
-                System.out.println();
-            }
-            bucketNumber++;
-        }
     }
 
     private int hash(Object key) {
@@ -134,14 +118,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-//////////////////// Vidality toString() //////////////////
-        @Override
-        public String toString() {
-            return "Node{"
-                    + "key=" + key
-                    + ", value=" + value
-                    + '}';
         }
     }
 }
