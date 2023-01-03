@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K, V> currentNode = table[getBucketNumber(key)];
         if (currentNode == null) {
-            table[getBucketNumber(key)] = new Node<>(hash(key), key, value, null);
+            table[getBucketNumber(key)] = new Node<>(key, value);
             size++;
         } else {
             while (currentNode != null) {
@@ -30,7 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     return;
                 }
                 if (currentNode.next == null) {
-                    currentNode.next = new Node<>(hash(key), key, value, null);
+                    currentNode.next = new Node<>(key, value, null);
                     size++;
                     return;
                 }
@@ -60,14 +60,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return removedValue;
             }
             if (table[i] != null && table[i].next != null) {
-                while (table[i] != null) {
-                    if (Objects.equals(table[i].key, key)) {
-                        V removedValue = table[i].value;
-                        table[i] = table[i].next;
+                Node<K, V> currentNode = table[i];
+                while (currentNode != null) {
+                    if (Objects.equals(currentNode.next.key, key)) {
+                        V removedValue = currentNode.next.value;
+                        currentNode.next = currentNode.next.next;
                         size--;
                         return removedValue;
                     }
-                    table[i] = table[i].next;
+                    currentNode = currentNode.next;
                 }
             }
         }
@@ -114,10 +115,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        private Node(int hash, K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
+        }
+
+        private Node(K key, V value) {
+            this.key = key;
+            this.value = value;
         }
     }
 }
