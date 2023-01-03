@@ -12,6 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @SuppressWarnings({"unchecked"})
     public MyHashMap() {
         this.table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
+        this.threshold = (int) (DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
     }
 
     @Override
@@ -19,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > threshold) {
             resize();
         }
-        int indexBucket = getIndex(hash(key), table.length);
+        int indexBucket = getIndex(hash(key));
         Node<K, V> current = table[indexBucket];
         while (current != null) {
             if (Objects.equals(key, current.key)) {
@@ -39,7 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int indexBucket = getIndex(hash(key), table.length);
+        int indexBucket = getIndex(hash(key));
         Node<K, V> temp = table[indexBucket];
         while (temp != null) {
             if (Objects.equals(key, temp.key)) {
@@ -63,17 +64,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = null;
         }
     }
 
+    @SuppressWarnings({"unchecked"})
     private void resize() {
         Node<K, V>[] oldTable = table;
         int newCapacity = oldTable.length * 2;
         threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
-        @SuppressWarnings({"unchecked"})
-        Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
-        table = newTable;
+        table = (Node<K, V>[]) new Node[newCapacity];
         size = 0;
         for (Node<K, V> tempNode : oldTable) {
             while (tempNode != null) {
@@ -88,7 +87,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : key.hashCode();
     }
 
-    private int getIndex(int hash, int length) {
-        return Math.abs(hash % length);
+    private int getIndex(int hash) {
+        return Math.abs(hash % table.length);
     }
 }
