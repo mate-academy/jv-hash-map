@@ -3,11 +3,13 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        this.table = new Node[16];
+        this.table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -36,11 +38,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int index = getIndex(key);
         Node<K,V> node = table[index];
-        while (node != null) {
+        for ( ;node != null; node = node.next) {
             if (Objects.equals(key, node.key)) {
                 return node.value;
             }
-            node = node.next;
         }
         return null;
     }
@@ -51,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void checkThreshold() {
-        if (size > (int) (0.75f * table.length)) {
+        if (size > (int) (DEFAULT_LOAD_FACTOR * table.length)) {
             resize();
         }
     }
