@@ -36,37 +36,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(K key) {
+    private int getHash(K key) {
         return Math.abs(Objects.hashCode(key));
     }
 
     private int getIndex(K key) {
-        return hash(key) % table.length;
-    }
-
-    private void swapValues(Node<K, V>[] oldTable, Node<K, V>[] table) {
-        size = 0;
-        for (Node<K, V> currentNode: oldTable) {
-            while (currentNode != null) {
-                put(currentNode.key, currentNode.value);
-                currentNode = currentNode.next;
-            }
-        }
+        return getHash(key) % table.length;
     }
 
     private void putValue(K key, V value, int index) {
-        Node<K, V> newNode = new Node<>(key, value, hash(key));
+        Node<K, V> newNode = new Node<>(key, value, getHash(key));
         if (table[index] == null) {
             table[index] = newNode;
             size++;
             return;
         }
         Node<K, V> node = table[index];
-        for ( ;node.next != null; node = node.next) {
+        while (node.next != null) {
             if (Objects.equals(node.key, key)) {
                 node.value = value;
                 return;
             }
+            node = node.next;
         }
         if (Objects.equals(node.key, key)) {
             node.value = value;
@@ -77,7 +68,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void checkCapacity(int size) {
-        if (size + 1 > Math.abs(table.length * DEFAULT_LOAD_FACTOR)) {
+        if (size > table.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
     }
@@ -85,7 +76,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         Node<K, V>[] oldTable = table;
         table = new Node[table.length * 2];
-        swapValues(oldTable, table);
+        size = 0;
+        for (Node<K, V> currentNode: oldTable) {
+            while (currentNode != null) {
+                put(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
+            }
+        }
     }
 
     private static class Node<K, V> {
