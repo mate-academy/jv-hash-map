@@ -2,7 +2,6 @@ package core.basesyntax;
 
 import java.util.Objects;
 
-@SuppressWarnings("unchecked")
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
