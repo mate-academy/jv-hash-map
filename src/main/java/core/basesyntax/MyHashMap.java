@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         Node<K, V> newNode = new Node<>(key, value);
-        int index = newNode.hash % capacity;
+        int index = getIndex(key);
         Node<K, V> current = table[index];
         if (current == null) {
             table[index] = newNode;
@@ -31,9 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             current.next = newNode;
         }
-        if (++size > threshold) {
-            resizeTable();
-        }
+        checkThreshold();
     }
 
     @Override
@@ -47,9 +45,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public Node<K, V> getNode(K key) {
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
+    }
+
+    private Node<K, V> getNode(K key) {
         if (size != 0) {
-            Node<K, V> current = table[key == null ? 0 : Math.abs(key.hashCode()) % capacity];
+            Node<K, V> current = table[getIndex(key)];
             while (current != null) {
                 if (Objects.equals(current.key, key)) {
                     return current;
@@ -66,9 +68,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[capacity];
     }
 
+    private void checkThreshold() {
+        if (++size > threshold) {
+            resizeTable();
+        }
+    }
+
     private void resizeTable() {
         Node<K, V>[] oldTable = table;
         size = 0;
+        transfer(oldTable);
+    }
+
+    private void transfer(Node<K, V>[] oldTable) {
         for (Node<K, V> bucket : oldTable) {
             while (bucket != null) {
                 put(bucket.key, bucket.value);
@@ -78,13 +90,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K,V> next;
 
         private Node(K key, V value) {
-            this.hash = key == null ? 0 : Math.abs(key.hashCode());
             this.key = key;
             this.value = value;
         }
