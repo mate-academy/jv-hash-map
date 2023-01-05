@@ -10,18 +10,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private Node<K, V>[] table;
 
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        private Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     public MyHashMap() {
         this.table = new Node[DEFAULT_CAPACITY];
     }
@@ -82,17 +70,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        int index = getHashCode(key) % table.length;
-        if (index < 0) {
-            index = -index;
-        }
-        return index;
+        return key == null ? 0 : Math.abs(key.hashCode() % 16);
     }
 
-    private int getHashCode(K key) {
-        if (key == null) {
-            return 0;
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        private Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
         }
-        return (key.hashCode()) ^ (key.hashCode() >>> 16);
     }
 }
