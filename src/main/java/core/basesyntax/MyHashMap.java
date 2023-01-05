@@ -17,31 +17,34 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         checkThreshold();
         int index = getIndex(key);
         Node<K, V> node = table[index];
+        Node<K,V> newNode = new Node<>(key, value, null);
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
             size++;
             return;
         }
-        for ( ;node != null; node = node.next) {
+        while (node != null) {
             if (Objects.equals(key, node.key)) {
                 node.value = value;
                 return;
+            } else if (node.next == null) {
+                node.next = newNode;
+                break;
             }
-            if (node.next == null) {
-                node.next = new Node<>(key, value,null);
-                size++;
-            }
+            node = node.next;
         }
+        size++;
     }
 
     @Override
     public V getValue(K key) {
         int index = getIndex(key);
         Node<K,V> node = table[index];
-        for ( ;node != null; node = node.next) {
+        while (node != null) {
             if (Objects.equals(key, node.key)) {
                 return node.value;
             }
+            node = node.next;
         }
         return null;
     }
@@ -68,17 +71,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
     }
-
-    private int getHashcode(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return (key.hashCode()) ^ (key.hashCode() >>> 16); /*We need this impl due to possibility
-        of numbers of bucket collisions if we use default hash method*/
-    }
-
+    
     private int getIndex(K key) {
-        return Math.abs(getHashcode(key) % table.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private static class Node<K, V> {
