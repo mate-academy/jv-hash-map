@@ -6,7 +6,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
     private int size;
-    private int capacity;
     private int threshold;
     private Node<K, V>[] table;
 
@@ -15,28 +14,33 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == 0) {
             initializeTable();
         }
-        if (getNode(key) != null) {
-            getNode(key).value = value;
-            return;
-        }
         Node<K, V> newNode = new Node<>(key, value);
         int index = getIndex(key);
         Node<K, V> current = table[index];
         if (current == null) {
             table[index] = newNode;
-        } else {
-            while (current.next != null) {
-                current = current.next;
-            }
-            current.next = newNode;
+            checkThreshold();
         }
-        checkThreshold();
+        while (current != null) {
+            if (Objects.equals(key, current.key)) {
+                current.value = value;
+                return;
+            }
+            if (current.next == null) {
+                current.next = newNode;
+                checkThreshold();
+            }
+            current = current.next;
+        }
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> current = getNode(key);
-        return current == null ? null : current.value;
+        if (table != null) {
+            Node<K, V> current = getNode(key);
+            return current == null ? null : current.value;
+        }
+        return null;
     }
 
     @Override
@@ -45,26 +49,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private Node<K, V> getNode(K key) {
-        if (size != 0) {
-            Node<K, V> current = table[getIndex(key)];
-            while (current != null) {
-                if (Objects.equals(current.key, key)) {
-                    return current;
-                }
-                current = current.next;
+        Node<K, V> current = table[getIndex(key)];
+        while (current != null) {
+            if (Objects.equals(current.key, key)) {
+                return current;
             }
+            current = current.next;
         }
         return null;
     }
 
     private void initializeTable() {
-        capacity = capacity == 0 ? INITIAL_CAPACITY : capacity << 1;
-        threshold = (int) (capacity * LOAD_FACTOR);
-        table = new Node[capacity];
+        table = table == null ? new Node[INITIAL_CAPACITY] : new Node[table.length << 1];
+        threshold = (int) (table.length * LOAD_FACTOR);
     }
 
     private void checkThreshold() {
