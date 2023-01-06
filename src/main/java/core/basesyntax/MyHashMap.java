@@ -79,7 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public int getIndex(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private static class Node<K, V> {
