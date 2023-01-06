@@ -9,6 +9,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private Node<K, V>[] table;
 
+    public MyHashMap() {
+        table = new Node[INITIAL_CAPACITY];
+    }
+
     @Override
     public void put(K key, V value) {
         if (size == 0) {
@@ -36,11 +40,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (table != null) {
-            Node<K, V> current = getNode(key);
-            return current == null ? null : current.value;
-        }
-        return null;
+        Node<K, V> current = getNode(key);
+        return current == null ? null : current.value;
     }
 
     @Override
@@ -64,7 +65,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void initializeTable() {
-        table = table == null ? new Node[INITIAL_CAPACITY] : new Node[table.length << 1];
+        table = new Node[table.length << 1];
         threshold = (int) (table.length * LOAD_FACTOR);
     }
 
