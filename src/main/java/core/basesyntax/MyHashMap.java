@@ -20,7 +20,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-
     @Override
     public void put(K key, V value) {
         checkTable();
@@ -127,7 +126,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node.value = value;
                 return;
             }
-            // if there are the same keys - link new node to the end of linked list, stored at calculated index
+            // if there are no duplicate keys - link the new node to the end of the linked list,
+            // stored at the calculated index
             if (node.next == null) {
                 node.next = newNode;
                 if (!transformation) {
