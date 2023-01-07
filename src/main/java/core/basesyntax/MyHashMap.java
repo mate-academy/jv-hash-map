@@ -5,14 +5,13 @@ import java.util.Objects;
 @SuppressWarnings("unchecked")
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
+    private static final int GROW_FACTOR = 2;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
-    private int threshold;
     private int size;
 
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
-        threshold = (int) (DEFAULT_LOAD_FACTOR * table.length);
     }
 
     @Override
@@ -48,25 +47,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putVal(int hash, K key, V value) {
-        if (size > threshold) {
+        if (size > (table.length * DEFAULT_LOAD_FACTOR)) {
             resize();
         }
         int index = index(hash);
         Node<K, V> node = table[index];
         if (node == null) {
-            table[index] = new Node<>(hash, key, value, null);
+            table[index] = new Node<>(key, value, null);
             size++;
             return;
         }
         while (node != null) {
-            if (node.hash == hash
-                    && node.key == key
-                    || (node.key != null && node.key.equals(key))) {
+            if (Objects.equals(node.key, key)) {
                 node.value = value;
                 return;
             }
             if (node.next == null) {
-                node.next = new Node<>(hash, key, value, null);
+                node.next = new Node<>(key, value, null);
                 size++;
                 return;
             }
@@ -76,9 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldTable = table;
-        int newCapacity = table.length * 2;
-        threshold = threshold * 2;
-        table = (Node<K, V>[]) new Node[newCapacity];
+        table = (Node<K, V>[]) new Node[table.length * GROW_FACTOR];
         transfer(oldTable);
     }
 
@@ -93,13 +88,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
