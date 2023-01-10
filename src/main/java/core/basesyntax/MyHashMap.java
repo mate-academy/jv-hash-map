@@ -3,64 +3,56 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int size;
-    private Node[] buckets;
+    private Node<K, V>[] table;
 
     public MyHashMap() {
-        this.buckets = new Node[DEFAULT_INITIAL_CAPACITY];
+        this.table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size == (buckets.length * DEFAULT_LOAD_FACTOR)) {
-            resize();
-        }
+        checkThreshold();
         Node<K, V> newNode = new Node<>(key, value);
-        int bucketIndex = bucketIndex(key);
-        Node currentNode = buckets[bucketIndex];
+        int bucketIndex = getIndex(key);
+        Node currentNode = table[bucketIndex];
         if (currentNode == null) {
-            buckets[bucketIndex] = newNode;
+            table[bucketIndex] = newNode;
             size++;
         }
         while (currentNode != null) {
-            if (Objects.equals(currentNode.getKey(), key)) {
-                currentNode.setValue(value);
+            if (Objects.equals(currentNode.key, key)) {
+                currentNode.value = value;
                 break;
             }
-            if (currentNode.getNext() == null) {
-                currentNode.setNext(newNode);
+            if (currentNode.next == null) {
+                currentNode.next = newNode;
                 size++;
                 break;
             }
-            currentNode = currentNode.getNext();
+            currentNode = currentNode.next;
         }
     }
 
     private void resize() {
-        Node[] bufArray = buckets;
-        buckets = new Node[buckets.length * 2];
+        Node<K, V>[] oldTable = table;
+        table = new Node[table.length * 2];
         size = 0;
-        for (Node<K, V> node : bufArray) {
-            Node<K, V> newNode = node;
-            while (newNode != null) {
-                put(newNode.getKey(), newNode.getValue());
-                newNode = newNode.getNext();
-            }
-        }
+        transfer(oldTable);
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = buckets[bucketIndex(key)];
+        Node<K, V> node = table[getIndex(key)];
         while (node != null) {
-            if (node.getKey() == (key)) {
-                return node.getValue();
-            } else if (node.getKey() != null && node.getKey().equals(key)) {
-                return node.getValue();
+            if (node.key == (key)) {
+                return node.value;
+            } else if (node.key != null && node.key.equals(key)) {
+                return node.value;
             } else {
-                node = node.getNext();
+                node = node.next;
             }
         }
         return null;
@@ -71,7 +63,34 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public int bucketIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % buckets.length);
+    public int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
+    }
+
+    private void checkThreshold() {
+        if (size == (table.length * DEFAULT_LOAD_FACTOR)) {
+            resize();
+        }
+    }
+
+    private void transfer(Node<K, V>[] oldTable) {
+        for (Node<K, V> node : oldTable) {
+            Node<K, V> newNode = node;
+            while (newNode != null) {
+                put(newNode.key, newNode.value);
+                newNode = newNode.next;
+            }
+        }
+    }
+
+    private static class Node<K, V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 }
