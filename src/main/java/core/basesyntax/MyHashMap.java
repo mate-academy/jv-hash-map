@@ -6,7 +6,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
     private int size;
-    private int threshold;
     private Node<K, V>[] table;
 
     public MyHashMap() {
@@ -15,27 +14,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size == 0) {
-            initializeTable();
-        }
         Node<K, V> newNode = new Node<>(key, value);
         int index = getIndex(key);
         Node<K, V> current = table[index];
-        if (current == null) {
+        if (current != null) {
+            while (!current.equals(newNode)) {
+                if (Objects.equals(key, current.key)) {
+                    current.value = value;
+                    return;
+                }
+                if (current.next == null) {
+                    current.next = newNode;
+                }
+                current = current.next;
+            }
+        } else {
             table[index] = newNode;
-            checkThreshold();
         }
-        while (current != null) {
-            if (Objects.equals(key, current.key)) {
-                current.value = value;
-                return;
-            }
-            if (current.next == null) {
-                current.next = newNode;
-                checkThreshold();
-            }
-            current = current.next;
-        }
+        size++;
+        checkThreshold();
     }
 
     @Override
@@ -64,19 +61,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private void initializeTable() {
-        table = new Node[table.length << 1];
-        threshold = (int) (table.length * LOAD_FACTOR);
-    }
-
     private void checkThreshold() {
-        if (++size > threshold) {
+        int threshold = (int) (table.length * LOAD_FACTOR);
+        if (size > threshold) {
             resizeTable();
         }
     }
 
     private void resizeTable() {
         Node<K, V>[] oldTable = table;
+        table = new Node[table.length << 1];
         size = 0;
         transfer(oldTable);
     }
