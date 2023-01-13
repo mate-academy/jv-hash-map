@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
+    private static final int GROW_FACTOR = 2;
     private int threshold;
     private int size;
     private Node<K, V>[] table;
@@ -17,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         resize();
         int index = getIndex(key);
-        Node<K,V> inputNode = new Node<>(hashCode(), key, value, null);
+        Node<K,V> inputNode = new Node<>(key, value, null);
         Node<K,V> currentNode = table[index];
         if (currentNode == null) {
             table[index] = inputNode;
@@ -58,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             size = 0;
             Node<K,V>[] oldTable = table;
-            Node<K,V>[] newTable = new Node[table.length * 2];
+            Node<K,V>[] newTable = new Node[table.length * GROW_FACTOR];
             threshold = (int) (newTable.length * DEFAULT_LOAD_FACTOR);
             table = newTable;
             transfer(oldTable);
@@ -80,38 +81,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static class Node<K,V> {
         private final K key;
-        private int hash;
         private V value;
         private Node<K,V> next;
 
-        private Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            Node<?, ?> node = (Node<?, ?>) o;
-            return hash == node.hash
-                    && Objects.equals(key, node.key)
-                    && Objects.equals(value, node.value);
-        }
-
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            hash = 1;
-            hash = prime * hash + ((this.key == null) ? 0 : key.hashCode());
-            hash = prime * hash + ((this.value == null) ? 0 : value.hashCode());
-            return hash;
         }
     }
 }
