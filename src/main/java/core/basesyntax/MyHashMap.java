@@ -18,14 +18,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > threshold || hashTable == null) {
             resize();
         }
-        putValue(hash(key), key, value);
+        putValue(indexFromHash(key), key, value);
         size++;
     }
 
     @Override
     public V getValue(K key) {
         if (hashTable != null) {
-            int index = hash(key);
+            int index = indexFromHash(key);
             Node<K, V> currentNode = hashTable[index];
             while (currentNode != null) {
                 if (Objects.equals(key, currentNode.getKey())) {
@@ -65,11 +65,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void putValue(int hash, K key, V value) {
-        if (hashTable[hash] == null) {
-            hashTable[hash] = new Node<>(key, value);
+    private void putValue(int index, K key, V value) {
+        if (hashTable[index] == null) {
+            hashTable[index] = new Node<>(key, value);
         } else {
-            Node<K, V> currentNode = hashTable[hash];
+            Node<K, V> currentNode = hashTable[index];
             while (currentNode.next != null) {
                 if (Objects.equals(key, currentNode.getKey())) {
                     break;
@@ -100,13 +100,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> node : oldHashTable) {
             Node<K, V> newNode = node;
             while (newNode != null) {
-                putValue(hash(newNode.getKey()), newNode.getKey(), newNode.getValue());
+                putValue(indexFromHash(newNode.getKey()), newNode.getKey(), newNode.getValue());
                 newNode = newNode.next;
             }
         }
     }
 
-    private int hash(K key) {
+    private int indexFromHash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % hashTable.length);
     }
 }
