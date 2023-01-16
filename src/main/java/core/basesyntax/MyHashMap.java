@@ -3,27 +3,17 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private static final int INITIAL_CAPACITY = 16;
+    private static final int GROW_FACTOR = 2;
     private int size;
     private Node<K, V>[] nodes;
-    private int threshold;
 
-    private static class Node<K, V> {
-        private K key;
-        private V value;
-        private int hash;
-        private Node<K, V> next;
-
-        public Node(K key, V value, int hash) {
-            this.key = key;
-            this.value = value;
-            this.hash = hash;
-        }
+    public MyHashMap() {
+        nodes = new Node[INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        int hashCode = key != null ? key.hashCode() : 0;
-        Node<K, V> newNode = new Node<>(key, value, hashCode);
+        Node<K, V> newNode = new Node<>(key, value);
         if (!keyExists(newNode)) {
             addNewNodeToArray(newNode);
             size++;
@@ -34,15 +24,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (nodes != null) {
-            int position = getPositionByKey(key);
-            Node<K, V> current = nodes[position];
-            while (current != null) {
-                if (compareKeys(current.key, key)) {
-                    return current.value;
-                }
-                current = current.next;
+        int position = getPositionByKey(key);
+        Node<K, V> current = nodes[position];
+        while (current != null) {
+            if (compareKeys(current.key, key)) {
+                return current.value;
             }
+            current = current.next;
         }
         return null;
     }
@@ -52,22 +40,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resize() {
-        if (nodes == null) {
-            nodes = new Node[INITIAL_CAPACITY];
-        } else {
-            Node<K, V>[] oldNodes = nodes;
-            int newCapacity = oldNodes.length * 2;
-            nodes = new Node[newCapacity];
-            transferNodesToNewArray(oldNodes);
+    private static class Node<K, V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value) {
+            this.key = key;
+            this.value = value;
         }
-        threshold = (int) (nodes.length * LOAD_FACTOR);
+    }
+
+    private void resize() {
+        if (size != nodes.length * LOAD_FACTOR) {
+            return;
+        }
+        Node<K, V>[] oldNodes = nodes;
+        int newCapacity = oldNodes.length * GROW_FACTOR;
+        nodes = new Node[newCapacity];
+        transferNodesToNewArray(oldNodes);
     }
 
     private void addNewNodeToArray(Node<K, V> node) {
-        if (size == threshold) {
-            resize();
-        }
+        resize();
         putNode(node);
     }
 
