@@ -5,9 +5,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private static final short RESIZE_MULTIPlIER = 2;
 
-    private Node<K, V>[] table = new Node[INITIAL_CAPACITY];
-    private int threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
-    private int size = 0;
+    private Node<K, V>[] table;
+    private int threshold;
+    private int size;
+
+    public MyHashMap() {
+        table = new Node[INITIAL_CAPACITY];
+        threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
+    }
 
     @Override
     public void put(K key, V value) {
@@ -22,7 +27,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         int index = key == null ? 0 : Math.abs(key.hashCode()) % table.length;
-        putNodeByIndex(table, index, new Node<>(key, value));
+        putNodeByIndex(index, new Node<>(key, value));
     }
 
     @Override
@@ -73,28 +78,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         final int newSize = table.length * RESIZE_MULTIPlIER;
-        final Node<K, V>[] newTable = new Node[newSize];
-        threshold = (int) (newTable.length * LOAD_FACTOR);
+        Node<K, V>[] oldTable = table;
+        table = new Node[newSize];
+        threshold = (int) (table.length * LOAD_FACTOR);
 
-        for (Node<K, V> cell: table) {
+        for (Node<K, V> cell: oldTable) {
             Node<K, V> node = cell;
             while (node != null) {
                 Node<K, V> nextNode = node.next;
 
                 int arrayIndex = Math.abs(node.key.hashCode()) % newSize;
                 node.next = null;
-                putNodeByIndex(newTable, arrayIndex, node);
+                putNodeByIndex(arrayIndex, node);
                 node = nextNode;
             }
         }
-        table = newTable;
     }
 
-    private void putNodeByIndex(Node<K, V>[] targetTable, int index, Node<K, V> node) {
-        if (targetTable[index] == null) {
-            targetTable[index] = node;
+    private void putNodeByIndex(int index, Node<K, V> node) {
+        if (table[index] == null) {
+            table[index] = node;
         } else {
-            Node<K, V> nodeFromTable = targetTable[index];
+            Node<K, V> nodeFromTable = table[index];
             while (nodeFromTable.next != null) {
                 nodeFromTable = nodeFromTable.next;
             }
