@@ -19,18 +19,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > threshold) {
             transfer();
         }
-        int hash = getHash(key);
-        int index = getIndex(hash);
+        int index = getIndex(key);
         if (table[index] == null) {
-            table[index] = new Node<>(hash, key, value, null);
+            table[index] = new Node<>(key, value);
         } else {
             for (Node<K, V> node = table[index]; node != null; node = node.next) {
-                if (node.hash == hash && (node.key == key || key != null && key.equals(node.key))) {
+                if (node.key == key || key != null && key.equals(node.key)) {
                     node.value = value;
                     return;
                 }
                 if (node.next == null) {
-                    node.next = new Node<>(hash, key, value, null);
+                    node.next = new Node<>(key, value);
                     break;
                 }
             }
@@ -40,10 +39,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = getHash(key);
-        int index = getIndex(hash);
+        int index = getIndex(key);
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
-            if (node.hash == hash && (node.key == key || key != null && key.equals(node.key))) {
+            if (node.key == key || key != null && key.equals(node.key)) {
                 return node.value;
             }
         }
@@ -56,16 +54,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K,V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K,V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 
@@ -73,12 +68,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
-    private int getIndex(int hash) {
-        return hash % table.length;
+    private int getIndex(K key) {
+        return key == null ? 0 : getHash(key) % table.length;
     }
 
     private void transfer() {
-        threshold = threshold * GROW_FACTOR;
+        threshold *= GROW_FACTOR;
         Node<K,V>[] oldTable = table;
         table = new Node[table.length * GROW_FACTOR];
         size = 0;
