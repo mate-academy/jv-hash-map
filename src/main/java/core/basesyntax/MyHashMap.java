@@ -15,7 +15,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value);
         if (!keyExists(newNode)) {
-            addNewNodeToArray(newNode);
+            resize();
+            putNode(newNode);
             size++;
         } else {
             replaceValue(newNode);
@@ -24,8 +25,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int position = getPositionByKey(key);
-        Node<K, V> current = nodes[position];
+        int index = getIndex(key);
+        Node<K, V> current = nodes[index];
         while (current != null) {
             if (compareKeys(current.key, key)) {
                 return current.value;
@@ -58,61 +59,47 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldNodes = nodes;
         int newCapacity = oldNodes.length * GROW_FACTOR;
         nodes = new Node[newCapacity];
+        size = 0;
         transferNodesToNewArray(oldNodes);
     }
 
-    private void addNewNodeToArray(Node<K, V> node) {
-        resize();
-        putNode(node);
-    }
-
     private void putNode(Node<K, V> node) {
-        int position = getPositionByKey(node.key);
-        if (nodes[position] != null) {
-            Node<K, V> current = nodes[position];
+        int index = getIndex(node.key);
+        if (nodes[index] != null) {
+            Node<K, V> current = nodes[index];
             while (current.next != null) {
                 current = current.next;
             }
             current.next = node;
         } else {
-            nodes[position] = node;
+            nodes[index] = node;
         }
     }
 
     private void transferNodesToNewArray(Node<K, V>[] oldNodes) {
         for (Node<K, V> node : oldNodes) {
-            if (node != null) {
-                Node<K, V> current = node;
-                Node<K, V> next = current.next;
-                while (current != null) {
-                    current.next = null;
-                    putNode(current);
-                    current = next;
-                    if (current != null) {
-                        next = current.next;
-                    }
-                }
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
 
     private boolean keyExists(Node<K, V> node) {
-        if (nodes != null) {
-            int position = getPositionByKey(node.key);
-            Node<K, V> current = nodes[position];
-            while (current != null) {
-                if (compareKeys(current.key, node.key)) {
-                    return true;
-                }
-                current = current.next;
+        int index = getIndex(node.key);
+        Node<K, V> current = nodes[index];
+        while (current != null) {
+            if (compareKeys(current.key, node.key)) {
+                return true;
             }
+            current = current.next;
         }
         return false;
     }
 
     private void replaceValue(Node<K, V> node) {
-        int position = getPositionByKey(node.key);
-        Node<K, V> current = nodes[position];
+        int index = getIndex(node.key);
+        Node<K, V> current = nodes[index];
         while (current != null) {
             if (compareKeys(current.key, node.key)) {
                 current.value = node.value;
@@ -127,7 +114,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 || (firstKey == null && secondKey == null);
     }
 
-    private int getPositionByKey(K key) {
+    private int getIndex(K key) {
         return key != null ? Math.abs(key.hashCode()) % nodes.length : 0;
     }
 }
