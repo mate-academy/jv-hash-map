@@ -1,9 +1,7 @@
 package core.basesyntax;
 
-import com.sun.jdi.Value;
-import org.w3c.dom.Node;
-
 import java.util.Objects;
+import org.w3c.dom.Node;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
