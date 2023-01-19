@@ -20,12 +20,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold && size <= MAXIMUM_CAPACITY) {
             resize();
         }
-        putVal(hash(key), key, value);
-    }
-
-    private void putVal(int hash, K key, V value) {
         int bucket = getBucket(key);
-        Node<K, V> newNode = new Node<>(hash, key, value);
+        Node<K, V> newNode = new Node<>(hash(key), key, value);
         if (table[bucket] == null) {
             table[bucket] = newNode;
             size++;
@@ -35,7 +31,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 if (Objects.equals(currentNode.key, key)) {
                     currentNode.value = value;
                     return;
-                } else if (currentNode.next == null) {
+                }
+                if (currentNode.next == null) {
                     currentNode.next = newNode;
                     size++;
                     return;
@@ -58,7 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (table[i] != null) {
                 Node<K, V> movingNode = table[i];
                 while (movingNode != null) {
-                    putVal(movingNode.hash, movingNode.key, movingNode.value);
+                    put(movingNode.key, movingNode.value);
                     movingNode = movingNode.next;
                 }
             }
@@ -68,12 +65,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         if (table[getBucket(key)] != null) {
-            Node<K, V> kvNode = table[getBucket(key)];
-            while (kvNode != null) {
-                if (Objects.equals(kvNode.key, key)) {
-                    return kvNode.value;
+            Node<K, V> foundNode = table[getBucket(key)];
+            while (foundNode != null) {
+                if (Objects.equals(foundNode.key, key)) {
+                    return foundNode.value;
                 }
-                kvNode = kvNode.next;
+                foundNode = foundNode.next;
             }
         }
         return null;
