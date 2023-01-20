@@ -1,7 +1,6 @@
 package core.basesyntax;
 
 import java.util.Objects;
-import org.w3c.dom.Node;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -12,7 +11,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        threshold = DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR;
     }
 
     @Override
@@ -61,7 +59,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int newLength = table.length * 2;
+        final int GROW_FACTOR = 2;
+        int newLength = table.length * GROW_FACTOR;
         threshold = newLength * DEFAULT_LOAD_FACTOR;
         Node<K, V>[] oldTable = table;
         table = new Node[newLength];
