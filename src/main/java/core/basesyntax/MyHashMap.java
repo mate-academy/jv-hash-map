@@ -32,7 +32,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             currentNode = currentNode.next;
         }
         if (keyExists) {
-            currentNode.value =value;
+            currentNode.value = value;
         } else {
             if (previousNode == null) {
                 table[hash] = newNode;
