@@ -20,13 +20,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int hash = getIndex(key);
         Node<K, V> newNode = new Node<>(key, value);
-        if (table[hash] == null) {
-            table[hash] = newNode;
+        Node<K, V> currentNode = table[hash];
+        Node<K, V> previousNode = null;
+        boolean keyExists = false;
+        while (currentNode != null) {
+            if (Objects.equals(key, currentNode.key)) {
+                keyExists = true;
+                break;
+            }
+            previousNode = currentNode;
+            currentNode = currentNode.next;
+        }
+        if (keyExists) {
+            currentNode.value =value;
+        } else {
+            if (previousNode == null) {
+                table[hash] = newNode;
+            } else {
+                previousNode.next = newNode;
+            }
             size++;
-            return;
         }
 
-        Node<K, V> currentNode = table[hash];
+        currentNode = table[hash];
         while (currentNode.next != null && !Objects.equals(key,currentNode.key)) {
             currentNode = currentNode.next;
         }
@@ -60,8 +76,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        final int GrowFactor = 2;
-        int newLength = table.length * GrowFactor;
+        final int GROW_FACTOR = 2;
+        int newLength = table.length * GROW_FACTOR;
         threshold = newLength * DEFAULT_LOAD_FACTOR;
         Node<K, V>[] oldTable = table;
         table = new Node[newLength];
