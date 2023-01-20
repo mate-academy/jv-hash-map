@@ -1,5 +1,4 @@
 package core.basesyntax;
-
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -25,6 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
+
         Node<K, V> currentNode = table[hash];
         while (currentNode.next != null && !Objects.equals(key,currentNode.key)) {
             currentNode = currentNode.next;
@@ -59,8 +59,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        final int GROW_FACTOR = 2;
-        int newLength = table.length * GROW_FACTOR;
+        final int GrowFactor = 2;
+        int newLength = table.length * GrowFactor;
         threshold = newLength * DEFAULT_LOAD_FACTOR;
         Node<K, V>[] oldTable = table;
         table = new Node[newLength];
