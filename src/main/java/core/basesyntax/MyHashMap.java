@@ -9,6 +9,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
     private float threshold;
+    private Node<K,V> newNode;
+    private int bucket;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
@@ -19,40 +21,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > threshold) {
             resize();
         }
-        int hash = getIndex(key);
-        Node<K, V> newNode = new Node<>(key, value);
-        Node<K, V> currentNode = table[hash];
-        Node<K, V> previousNode = null;
-        boolean keyExists = false;
+
+        Node<K, V> currentNode = table[bucket];
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
-                keyExists = true;
-                break;
+                currentNode.value = value;
             }
-            previousNode = currentNode;
-            currentNode = currentNode.next;
-        }
-        if (keyExists) {
-            currentNode.value = value;
-        } else {
-            if (previousNode == null) {
-                table[hash] = newNode;
-            } else {
-                previousNode.next = newNode;
+            if (currentNode.next == null) {
+                currentNode.next = newNode;
+                size++;
             }
-            size++;
         }
-
-        currentNode = table[hash];
-        while (currentNode.next != null && !Objects.equals(key,currentNode.key)) {
-            currentNode = currentNode.next;
-        }
-        if (Objects.equals(key, currentNode.key)) {
-            currentNode.value = value;
-            return;
-        }
-        currentNode.next = newNode;
-        size++;
     }
 
     @Override
