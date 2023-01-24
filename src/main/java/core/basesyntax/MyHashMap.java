@@ -3,56 +3,52 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+    private static final double LOAD_FACTOR = 0.75;
     private Node<K, V>[] table;
-    private final double loadFactor;
     private int size;
     private int capacity;
-    private final int defaultInitialCapacity = 1 << 4;
-    private final double defaultLoadFactor = 0.75;
 
     public MyHashMap() {
-        this.loadFactor = defaultLoadFactor;
+        this.capacity = DEFAULT_INITIAL_CAPACITY;
+        this.table = (Node<K, V>[]) new Node[capacity];
     }
 
     @Override
     public void put(K key, V value) {
-        int hash = hash(key);
-        if (table == null) {
-            resize();
-        }
-        int pos = hash % capacity;
+        resize();
+        int pos = getIndexFromHash(hash(key));
         if (table[pos] == null) {
-            table[pos] = new Node<>(key, value, hash, null);
-            sizePlus();
-        } else if (table[pos].hash == hash && (Objects.equals(key, table[pos].key))) {
+            table[pos] = new Node<>(key, value);
+            size++;
+        } else if (Objects.equals(key, table[pos].key)) {
             table[pos].value = value;
         } else {
-            Node<K, V> tempX;
-            Node<K, V> tempY = table[pos];
-            while (true) {
-                if ((tempX = tempY.next) == null) {
-                    tempY.next = new Node<>(key, value, hash, null);
-                    sizePlus();
+            Node<K, V> bucketNode = table[pos];
+            while (bucketNode != null) {
+                if (bucketNode.next == null) {
+                    bucketNode.next = new Node<>(key, value);
+                    size++;
                     break;
                 }
-                if (tempX.hash == hash && (Objects.equals(key, tempX.key))) {
-                    tempX.value = value;
+                if (Objects.equals(key, bucketNode.next.key)) {
+                    bucketNode.next.value = value;
                     break;
                 }
-                tempY = tempX;
+                bucketNode = bucketNode.next;
             }
         }
     }
 
+    private int getIndexFromHash(int hash) {
+        return hash % capacity;
+    }
+
     @Override
     public V getValue(K key) {
-        if (table == null) {
-            return null;
-        }
-        int hash = hash(key);
-        int pos = hash % capacity;
+        int pos = getIndexFromHash(hash(key));
         for (Node<K, V> x = table[pos]; x != null; x = x.next) {
-            if (x.hash == hash && Objects.equals(key, x.key)) {
+            if (Objects.equals(key, x.key)) {
                 return x.value;
             }
         }
@@ -67,14 +63,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Node<K, V> {
         private final K key;
         private V value;
-        private final int hash;
         private Node<K, V> next;
 
-        private Node(K key, V value, int hash, Node<K, V> next) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.hash = hash;
-            this.next = next;
+            this.next = null;
         }
     }
 
@@ -83,29 +77,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (table == null) {
-            capacity = defaultInitialCapacity;
-            table = (Node<K, V>[]) new Node[capacity];
-            return;
+        if (size == LOAD_FACTOR * capacity) {
+            Node<K, V>[] oldTable = table;
+            table = (Node<K, V>[]) new Node[capacity = capacity << 1];
+            putAll(oldTable);
         }
-        Node<K, V>[] oldTable = table;
-        table = (Node<K, V>[]) new Node[capacity = capacity << 1];
-        putAll(oldTable);
     }
 
     private void putAll(Node<K, V>[] oldTable) {
         size = 0;
         for (Node<K, V> bucket : oldTable) {
-            for (Node<K, V> x = bucket; x != null; x = x.next) {
-                put(x.key, x.value);
+            for (Node<K, V> node = bucket; node != null; node = node.next) {
+                put(node.key, node.value);
             }
         }
     }
-
-    private void sizePlus() {
-        if (++size > loadFactor * capacity) {
-            resize();
-        }
-    }
 }
-
