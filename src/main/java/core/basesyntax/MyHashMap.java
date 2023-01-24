@@ -21,18 +21,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[pos] == null) {
             table[pos] = new Node<>(key, value);
             size++;
-        } else if (Objects.equals(key, table[pos].key)) {
-            table[pos].value = value;
         } else {
             Node<K, V> bucketNode = table[pos];
             while (bucketNode != null) {
+                if (Objects.equals(key, bucketNode.key)) {
+                    bucketNode.value = value;
+                    return;
+                }
                 if (bucketNode.next == null) {
                     bucketNode.next = new Node<>(key, value);
                     size++;
-                    return;
-                }
-                if (Objects.equals(key, bucketNode.next.key)) {
-                    bucketNode.next.value = value;
                     return;
                 }
                 bucketNode = bucketNode.next;
