@@ -67,17 +67,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public int getIndex(K key) {
+    int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
-    public void checkThreshold() {
+    void checkThreshold() {
         if (size >= table.length * LOAD_FACTOR) {
             resize();
         }
     }
 
-    public Node[] resize() {
+    Node[] resize() {
         Node[] movedTable = table;
         table = new Node[table.length * 2];
         size = 0;
