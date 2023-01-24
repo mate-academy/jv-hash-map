@@ -1,5 +1,7 @@
 package core.basesyntax;
+
 import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
@@ -72,6 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         return Math.abs(key.hashCode()) % table.length;
     }
+
     private void resize(int newCapacity) {
         Entry<K, V>[] newTable = new Entry[newCapacity];
         transfer(newTable);
@@ -94,6 +97,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private final K key;
         private V value;
         private Entry<K, V> next;
+
         public Entry(K key, V value) {
             this.key = key;
             this.value = value;
