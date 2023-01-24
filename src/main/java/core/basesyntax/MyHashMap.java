@@ -1,8 +1,11 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
     static final float LOAD_FACTOR = 0.75f;
+    private static final int MAGNIFICATION_FACTOR = 2;
     private int size;
     private Node<K,V>[] table;
     private int threshold;
@@ -22,7 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[bucketIndex] = new Node<>(key, value, null);
         } else {
             for (Node<K, V> node = table[bucketIndex]; node != null; node = node.next) {
-                if (node.key == key || key != null && key.equals(node.key)) {
+                if (Objects.equals(node.key, key)) {
                     node.value = value;
                     return;
                 }
@@ -41,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K,V> node;
         node = table[bucketIndex];
         while (node != null) {
-            if (key == node.key || key != null && key.equals(node.key)) {
+            if (Objects.equals(node.key, key)) {
                 return node.value;
             }
             node = node.next;
@@ -54,18 +57,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static class Node<K,V> {
-        private final K key;
-        private V value;
-        private Node<K,V> next;
-
-        Node(K key, V value, Node<K,V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     private int getHash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
@@ -75,18 +66,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K,V>[] oldTab = table;
-        int oldCapacity = oldTab.length;
+        Node<K,V>[] oldTable = table;
+        int oldCapacity = oldTable.length;
         int oldThreshold = threshold;
-        int newCap = oldCapacity * 2;
-        threshold = oldThreshold * 2;
+        int newCap = oldCapacity * MAGNIFICATION_FACTOR;
+        threshold = oldThreshold * MAGNIFICATION_FACTOR;
         size = 0;
         table = (Node<K,V>[]) new Node[newCap];
-        for (Node<K,V> transfringNode : oldTab) {
-            while (transfringNode != null) {
-                put(transfringNode.key,transfringNode.value);
-                transfringNode = transfringNode.next;
+        for (Node<K,V> transferingNode : oldTable) {
+            while (transferingNode != null) {
+                put(transferingNode.key,transferingNode.value);
+                transferingNode = transferingNode.next;
             }
+        }
+    }
+
+    private static class Node<K,V> {
+        private final K key;
+        private V value;
+        private Node<K,V> next;
+
+        private Node(K key, V value, Node<K,V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
         }
     }
 }
