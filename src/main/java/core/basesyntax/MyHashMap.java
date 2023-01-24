@@ -29,11 +29,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 if (bucketNode.next == null) {
                     bucketNode.next = new Node<>(key, value);
                     size++;
-                    break;
+                    return;
                 }
                 if (Objects.equals(key, bucketNode.next.key)) {
                     bucketNode.next.value = value;
-                    break;
+                    return;
                 }
                 bucketNode = bucketNode.next;
             }
@@ -47,10 +47,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int pos = getIndexFromHash(hash(key));
-        for (Node<K, V> x = table[pos]; x != null; x = x.next) {
-            if (Objects.equals(key, x.key)) {
-                return x.value;
+        Node<K, V> node = table[pos];
+        while (node != null) {
+            if (Objects.equals(key, node.key)) {
+                return node.value;
             }
+            node = node.next;
         }
         return null;
     }
@@ -68,7 +70,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = null;
         }
     }
 
