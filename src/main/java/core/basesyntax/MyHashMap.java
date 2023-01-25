@@ -3,24 +3,20 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
-    static final float LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+    private static final float LOAD_FACTOR = 0.75f;
     private static final int MAGNIFICATION_FACTOR = 2;
     private int size;
     private Node<K,V>[] table;
-    private int threshold;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        threshold = (int) (DEFAULT_INITIAL_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
         int bucketIndex = getIndex(key);
-        if (size > threshold) {
-            resize();
-        }
+        resize();
         if (table[bucketIndex] == null) {
             table[bucketIndex] = new Node<>(key, value, null);
         } else {
@@ -66,17 +62,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K,V>[] oldTable = table;
-        int oldCapacity = oldTable.length;
-        int oldThreshold = threshold;
-        int newCap = oldCapacity * MAGNIFICATION_FACTOR;
-        threshold = oldThreshold * MAGNIFICATION_FACTOR;
-        size = 0;
-        table = (Node<K,V>[]) new Node[newCap];
-        for (Node<K,V> transferingNode : oldTable) {
-            while (transferingNode != null) {
-                put(transferingNode.key,transferingNode.value);
-                transferingNode = transferingNode.next;
+        if (size == (table.length * LOAD_FACTOR)) {
+            Node<K,V>[] oldTable = table;
+            size = 0;
+            table = new Node[table.length * MAGNIFICATION_FACTOR];
+            for (Node<K,V> transferingNode : oldTable) {
+                while (transferingNode != null) {
+                    put(transferingNode.key,transferingNode.value);
+                    transferingNode = transferingNode.next;
+                }
             }
         }
     }
@@ -89,7 +83,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private Node(K key, V value, Node<K,V> next) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
