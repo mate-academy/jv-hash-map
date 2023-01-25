@@ -44,9 +44,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
                 return currentNode.value;
-            } else {
+            } 
                 currentNode = currentNode.next;
-            }
         }
         return null;
     }
