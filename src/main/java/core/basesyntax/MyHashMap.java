@@ -56,7 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public class Node<K, V> {
+    private class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -67,17 +67,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    int getIndex(K key) {
+    private int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
-    void checkThreshold() {
+    private void checkThreshold() {
         if (size >= table.length * LOAD_FACTOR) {
             resize();
         }
     }
 
-    Node[] resize() {
+    private Node[] resize() {
         Node[] movedTable = table;
         table = new Node[table.length * 2];
         size = 0;
