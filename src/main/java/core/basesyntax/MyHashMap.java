@@ -4,20 +4,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_SIZE = 16;
     private static final int RELOAD_INDEX = 2;
     private static final float RESIZE_COEFFICIENT = 0.75f;
-    private Node<K, V>[] buckets;
-    private int currentLoad;
     private int size;
+    private Node<K, V>[] buckets;
 
     public MyHashMap() {
         buckets = new Node[DEFAULT_SIZE];
-        currentLoad = (int) (DEFAULT_SIZE * RESIZE_COEFFICIENT);
     }
 
     @Override
     public void put(K key, V value) {
         resize();
         int index = getIndex(key);
-        Node<K, V> newElement = new Node<>(key, value, null);
+        Node<K, V> newElement = new Node<>(key, value);
         Node<K, V> element = buckets[index];
         if (element == null) {
             buckets[index] = newElement;
@@ -57,11 +55,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (currentLoad == size) {
+        if (size > buckets.length * RESIZE_COEFFICIENT) {
             size = 0;
             Node<K, V>[] oldBuckets = buckets;
             buckets = new Node[buckets.length * RELOAD_INDEX];
-            currentLoad *= RELOAD_INDEX;
             for (Node<K, V> node : oldBuckets) {
                 while (node != null) {
                     put(node.key, node.value);
@@ -80,10 +77,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
