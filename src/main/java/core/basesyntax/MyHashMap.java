@@ -9,7 +9,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
     private int threshold;
-    public double index = 0.0;
+    private double index = 0.0;
 
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
