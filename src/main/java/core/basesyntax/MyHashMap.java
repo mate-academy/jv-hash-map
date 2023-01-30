@@ -12,29 +12,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         this.table = new Node[DEFAULT_CAPACITY];
         this.threshold = DEFAULT_LOAD_FACTOR * DEFAULT_CAPACITY;
-        size = 0;
     }
 
     @Override
     public void put(K key, V value) {
-        int nodeIndex = getIndex(key);
+        int index = getIndex(key);
         if (size == threshold) {
             resize();
         }
-        Node<K, V> node = findNode(key, nodeIndex);
+        Node<K, V> node = findNode(key);
         if (node != null) {
             node.value = value;
         } else {
-            Node<K, V> newNode = new Node<>(key, value, table[nodeIndex]);
-            table[nodeIndex] = newNode;
+            Node<K, V> newNode = new Node<>(key, value, table[index]);
+            table[index] = newNode;
             size++;
         }
     }
 
     @Override
     public V getValue(K key) {
-        int getIndex = getIndex(key);
-        Node<K, V> node = findNode(key, getIndex);
+        Node<K, V> node = findNode(key);
         return node == null ? null : node.value;
     }
 
@@ -61,8 +59,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
-    private Node findNode(K key, int nodeIndex) {
-        Node<K, V> node = table[nodeIndex];
+    private Node findNode(K key) {
+        Node<K, V> node = table[getIndex(key)];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
                 return node;
