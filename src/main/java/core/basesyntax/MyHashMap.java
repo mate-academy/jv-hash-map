@@ -6,33 +6,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 1 << 4;
     private static final double LOAD_FACTOR = 0.75;
     private int size = 0;
-    private MyEntry<K, V>[] buckets;
+    private Node<K, V>[] buckets;
 
     public MyHashMap() {
-        this.buckets = new MyEntry[DEFAULT_CAPACITY];
+        this.buckets = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        MyEntry<K, V> myEntry = new MyEntry<>(key, value, null);
+        Node<K, V> node = new Node<>(key, value, null);
         int index = index(key);
-
         if (buckets[index] == null) {
-            buckets[index] = myEntry;
+            buckets[index] = node;
             size++;
         } else {
-            MyEntry<K, V> previousNode = null;
-            MyEntry<K, V> currentNode = buckets[index];
+            Node<K, V> previousNode = null;
+            Node<K, V> currentNode = buckets[index];
             while (currentNode != null) {
-                if (myEntry.getKey() == null && key == null || currentNode.getKey().equals(key)) {
-                    currentNode.setValue(value);
+                if (node.key == null && key == null || currentNode.key.equals(key)) {
+                    currentNode.value = value;
                     return;
                 }
                 previousNode = currentNode;
-                currentNode = currentNode.getNext();
+                currentNode = currentNode.next;
             }
             if (previousNode != null) {
-                previousNode.setNext(myEntry);
+                previousNode.next = node;
                 size++;
             }
             if (size > buckets.length * LOAD_FACTOR) {
@@ -45,13 +44,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         V value = null;
         int index = index(key);
-        MyEntry<K, V> myEntry = buckets[index];
+        Node<K, V> myEntry = buckets[index];
         while (myEntry != null) {
-            if (myEntry.getKey() == null && key == null || myEntry.getKey().equals(key)) {
-                value = myEntry.getValue();
+            if (myEntry.key == null && key == null || myEntry.key.equals(key)) {
+                value = myEntry.value;
                 break;
             }
-            myEntry = myEntry.getNext();
+            myEntry = myEntry.next;
         }
         return value;
     }
@@ -63,15 +62,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         int tableSize = 2 * buckets.length;
-        MyEntry<K, V>[] oldBuckets = buckets;
-        buckets = new MyEntry[tableSize];
+        Node<K, V>[] oldBuckets = buckets;
+        buckets = new Node[tableSize];
         size = 0;
-        for (int i = 0; i < oldBuckets.length; i++) {
-            if (oldBuckets[i] != null) {
-                MyEntry<K, V> currentNode = oldBuckets[i];
+        for (Node<K, V> oldBucket : oldBuckets) {
+            if (oldBucket != null) {
+                Node<K, V> currentNode = oldBucket;
                 while (currentNode != null) {
-                    put(currentNode.getKey(), currentNode.getValue());
-                    currentNode = currentNode.getNext();
+                    put(currentNode.key, currentNode.value);
+                    currentNode = currentNode.next;
                 }
             }
         }
@@ -84,35 +83,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.abs(Objects.hash(key) % buckets.length);
     }
 
-    private static class MyEntry<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
-        private MyEntry<K, V> next;
+        private Node<K, V> next;
 
-        public MyEntry(K key, V value, MyEntry<K, V> next) {
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
-        }
-
-        public void setNext(MyEntry<K, V> next) {
-            this.next = next;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public MyEntry<K, V> getNext() {
-            return next;
         }
     }
 }
