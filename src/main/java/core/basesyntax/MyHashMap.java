@@ -59,10 +59,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putOll(Node<K, V>[] table) {
-        for (Node<K, V> backet : table) {
-            while (backet != null) {
-                put(backet.key, backet.value);
-                backet = backet.next;
+        for (Node<K, V> bucket : table) {
+            while (bucket != null) {
+                put(bucket.key, bucket.value);
+                bucket = bucket.next;
             }
         }
     }
