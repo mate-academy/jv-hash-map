@@ -83,7 +83,7 @@ public class MyHashMapTest {
                 + " but was " + firstActualValue, Integer.valueOf(3), firstActualValue);
         Assert.assertEquals("Test failed! The size isn't correct. Expected 1 but was "
                 + myHashMap.getSize(), 1, myHashMap.getSize());
-        myHashMap.put(null, 5);
+         myHashMap.put(null, 5);
         Integer secondActualValue = myHashMap.getValue(null);
         Assert.assertEquals("Test failed! HashMap expects to contain value 5  for null key,"
                 + " but was " + secondActualValue, Integer.valueOf(5), secondActualValue);
