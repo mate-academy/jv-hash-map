@@ -8,7 +8,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
-    private int threshold;
 
     public MyHashMap() {
         table = new Node[INITIAL_CAPACITY];
@@ -56,11 +55,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (threshold == size) {
+        if (size == table.length * LOAD_FACTOR) {
             size = 0;
             Node<K, V>[] oldTable = table;
             table = new Node[table.length * GROWTH_COEFFICIENT];
-            threshold = (int) (table.length * LOAD_FACTOR);
             for (Node<K, V> node : oldTable) {
                 while (node != null) {
                     put(node.key, node.value);
