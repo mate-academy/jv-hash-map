@@ -39,9 +39,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (Node<K, V> x = table[getIndex(key)]; x != null; x = x.next) {
-            if (Objects.equals(x.key, key)) {
-                return x.value;
+        for (Node<K, V> node = table[getIndex(key)]; node != null; node = node.next) {
+            if (Objects.equals(node.key, key)) {
+                return node.value;
             }
         }
         return null;
@@ -70,20 +70,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         Node<K, V>[] oldTable = table;
         int oldCap = oldTable.length;
-        if (oldCap > 0) {
-            int newCap = oldCap << 1;
-            threshold = threshold << 1;
-            size = 0;
-            Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCap];
-            table = newTable;
-            transfer(oldTable);
-        }
+        int newCap = oldCap << 1;
+        threshold = threshold << 1;
+        size = 0;
+        Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCap];
+        table = newTable;
+        transfer(oldTable);
     }
 
     private void transfer(Node<K, V>[] oldTable) {
         for (Node<K, V> node : oldTable) {
-            for (Node<K, V> first = node; first != null; first = first.next) {
-                put(first.key, first.value);
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
