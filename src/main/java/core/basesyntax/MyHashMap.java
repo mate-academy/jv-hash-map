@@ -3,12 +3,17 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
-    private Node<K, V>[] table = new Node[DEFAULT_CAPACITY];
+    private Node<K, V>[] table;
     private int size;
+
+    public MyHashMap() {
+        table = new Node[DEFAULT_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
-        final Node<K, V> newNode = new Node<>(key, value, null);
+        checkSize();
+        final Node<K, V> newNode = new Node<>(key, value);
         int index = getIndex(key);
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
@@ -27,7 +32,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = newNode;
             size++;
         }
-        resize();
     }
 
     @Override
@@ -48,23 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
-    private int getIndex(K key) {
-        return Math.abs((key == null) ? 0 : key.hashCode() % table.length);
-    }
-
-    private void resize() {
+    private void checkSize() {
         if (size > table.length * LOAD_FACTOR) {
             Node<K, V>[] oldTable = table;;
             size = 0;
@@ -77,4 +65,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
     }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+
+    private int getIndex(K key) {
+        return Math.abs((key == null) ? 0 : key.hashCode() % table.length);
+    }
 }
+
+
