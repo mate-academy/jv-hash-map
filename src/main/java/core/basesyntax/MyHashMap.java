@@ -3,7 +3,6 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    // final int hash - it's a Object.hashCode() of key
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final int MAXIMUM_CAPACITY = 1 << 30;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -12,7 +11,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        this.table = (Node<K,V>[])new Node[DEFAULT_INITIAL_CAPACITY];
+        this.table = (Node<K,V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
         this.threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
         this.size = 0;
     }
@@ -32,7 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K,V> nextNode = currentNode.next;
             if (Objects.hashCode(currentNode.key) == inputKeyHash
                     && (currentNode.key == key || (key != null && key.equals(currentNode.key)))) {
-                currentNode.setValue(value);
+                currentNode.value = value;
                 return;
             } else if (nextNode == null) {
                 currentNode.next = inputNode;
@@ -69,31 +68,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public void resize() {
-        Node<K,V>[] oldTab = table;
-        int oldCapacity = (oldTab == null) ? 0 : oldTab.length;
-        int oldThr = (oldTab == null) ? 0 : (int) (oldTab.length * DEFAULT_LOAD_FACTOR);
-        int newCap = 0;
-        int newThr = 0;
-
-        if (oldCapacity > 0) {
-            if (oldCapacity >= MAXIMUM_CAPACITY) {
-                threshold = Integer.MAX_VALUE;
-                return;
-            } else if (((newCap = oldCapacity << 1) < MAXIMUM_CAPACITY)
-                    && (oldCapacity >= DEFAULT_INITIAL_CAPACITY)) {
-                newThr = oldThr << 1;
-            }
-        }
-
-        if ((newCap = oldCapacity << 1) == 0) {
-            newCap = DEFAULT_INITIAL_CAPACITY;
-            newThr = (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
-        }
-
-        threshold = newThr;
-        Node<K,V>[] newTab = (Node<K,V>[]) new Node[newCap];
-        table = newTab;
+        final Node<K,V>[] oldTab = table;
+        table = (Node<K,V>[]) new Node[(table.length << 1)];
+        threshold *= 2;
         size = 0;
+
         transfer(oldTab);
     }
 
@@ -119,26 +98,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public String toString() {
-            return key + "=" + value;
-        }
-
-        public int hashCode() {
-            return Objects.hashCode(key) ^ Objects.hashCode(value);
-        }
-
-        public void setValue(V newValue) {
-            value = newValue;
         }
     }
 }
