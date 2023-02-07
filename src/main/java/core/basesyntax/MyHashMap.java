@@ -11,6 +11,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if (((double) size / entryset.length) >= CAPACITY_FACTOR) {
+            resize();
+        }
+
         int bucket = getBucket(key);
         if (entryset[bucket] == null) {
             entryset[bucket] = new Node<>(key, value);
@@ -34,9 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             entry.next = new Node<>(key, value);
             size++;
         }
-        if (((double) size / entryset.length) > CAPACITY_FACTOR) {
-            resize();
-        }
+
     }
 
     @Override
