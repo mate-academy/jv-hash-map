@@ -5,7 +5,8 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final double CAPACITY_FACTOR = 0.75;
-    private Node<K, V>[] entryset = new Node[16];
+    private static final int DEFAULT_CAPACITY = 16;
+    private Node<K, V>[] entryset = new Node[DEFAULT_CAPACITY];
     private int size;
 
     @Override
