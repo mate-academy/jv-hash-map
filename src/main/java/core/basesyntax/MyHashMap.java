@@ -1,12 +1,11 @@
 package core.basesyntax;
 
-import java.util.LinkedList;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    private Node<K,V>[] entryset = new Node[16];
-    private double capacityFactor = 0.75;
+    private static final double CAPACITY_FACTOR = 0.75;
+    private Node<K, V>[] entryset = new Node[16];
     private int size;
 
     @Override
@@ -34,6 +33,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             entry.next = new Node<>(key, value);
             size++;
         }
+        if (((double) size / entryset.length) > CAPACITY_FACTOR) {
+            resize();
+        }
     }
 
     @Override
@@ -50,7 +52,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucket(K key) {
-        return key == null ? 0: Math.abs(key.hashCode() % entryset.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % entryset.length);
+    }
+
+    private int getBucket(K key, int capacity) {
+        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
     @Override
@@ -59,24 +65,38 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        Node<K, V>[] newEntrySet = new Node[entryset.length * 2];
+        for (Node<K, V> node : entryset) {
+            if (node == null) {
+                continue;
+            }
+            while (node != null) {
+                int bucket = getBucket(node.key, newEntrySet.length);
 
+                if (newEntrySet[bucket] == null) {
+                    newEntrySet[bucket] = new Node<>(node.key, node.value);
+                } else {
+                    Node<K, V> entry = newEntrySet[bucket];
+
+                    while (entry.next != null) {
+                        entry = entry.next;
+                    }
+
+                    entry.next = new Node<>(node.key, node.value);
+                }
+                node = node.next;
+            }
+        }
+        entryset = newEntrySet;
     }
 
-    private static class Node<K,V> {
-        Node<K,V> next;
+    private static class Node<K, V> {
+        private Node<K, V> next;
         private K key;
         private V value;
 
         public Node(K key, V value) {
             this.key = key;
-            this.value = value;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public void setValue(V value) {
             this.value = value;
         }
     }
