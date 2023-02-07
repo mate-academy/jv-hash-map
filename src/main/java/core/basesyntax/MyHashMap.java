@@ -22,18 +22,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> entry = entryset[bucket];
 
-            if (Objects.equals(entry.key, key)) {
-                entry.value = value;
-                return;
-            }
-
-            while (entry.next != null) {
-                entry = entry.next;
+            do {
                 if (Objects.equals(entry.key, key)) {
                     entry.value = value;
                     return;
                 }
-            }
+                if (entry.next == null) {
+                    break;
+                }
+            } while ((entry = entry.next) != null);
 
             entry.next = new Node<>(key, value);
             size++;
