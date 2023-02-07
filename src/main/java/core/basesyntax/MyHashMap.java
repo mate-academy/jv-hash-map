@@ -4,7 +4,6 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
-    private static final int MAXIMUM_CAPACITY = 1 << 30;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K,V>[] table;
     private int threshold;
@@ -18,8 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int index = getIndex(key);
-        int inputKeyHash = Objects.hashCode(key);
-        Node<K,V> inputNode = new Node<>(key, value, null);
+        Node<K,V> inputNode = new Node<>(key, value);
         Node<K,V> currentNode = table[index];
 
         if (currentNode == null) {
@@ -28,8 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         while (currentNode != null) {
             Node<K,V> nextNode = currentNode.next;
-            if (Objects.hashCode(currentNode.key) == inputKeyHash
-                    && (currentNode.key == key || (key != null && key.equals(currentNode.key)))) {
+            if (currentNode.key == key || key != null && key.equals(currentNode.key)) {
                 currentNode.value = value;
                 return;
             } else if (nextNode == null) {
@@ -46,13 +43,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         final int index = getIndex(key);
-        final int inputKeyHash = Objects.hashCode(key);
         Node<K,V> currentNode = table[index];
 
         while (currentNode != null) {
-            if (Objects.hashCode(currentNode.key) == inputKeyHash
-                        && currentNode.key == key
-                        || (key != null && key.equals(currentNode.key))) {
+            if (currentNode.key == key || key != null && key.equals(currentNode.key)) {
                 return currentNode.value;
             } else {
                 currentNode = currentNode.next;
@@ -93,10 +87,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K,V> next;
 
-        Node(K key, V value, Node<K,V> next) {
+        Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
