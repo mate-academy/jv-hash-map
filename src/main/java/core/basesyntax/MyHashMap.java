@@ -15,38 +15,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        resize();
+        resizeIfFull();
         putInSize(key, value);
-    }
-
-    private void putInSize(K key, V value) {
-        int bucketNumber = getBucketNumber(key);
-        Node<K, V> newNode = new Node<>(key, value);
-        Node<K, V> currentNode = table[bucketNumber];
-        if (table[bucketNumber] == null) {
-            table[bucketNumber] = newNode;
-            size++;
-        } else {
-            while (currentNode != null) {
-                if ((currentNode.key == null && key == null)
-                        || (currentNode.key != null && currentNode.key.equals(key))) {
-                    currentNode.value = value;
-                    return;
-                }
-                currentNode = currentNode.next;
-            }
-            newNode.next = table[bucketNumber].next;
-            table[bucketNumber].next = newNode;
-            size++;
-        }
     }
 
     @Override
     public V getValue(K key) {
         int bucketNumber = getBucketNumber(key);
-        if (table[bucketNumber] == null) {
-            return null;
-        }
         Node node = table[bucketNumber];
         while (node != null) {
             if (node.key == null && key == null || node.key
@@ -68,17 +43,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return super.hashCode();
     }
 
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        private Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-    }
-
     private int getBucketNumber(K key) {
         int bucketNumber = 0;
         if (key != null) {
@@ -87,7 +51,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return bucketNumber;
     }
 
-    private void resize() {
+    private void resizeIfFull() {
         if (table.length * LOAD_FACTOR > size) {
             return;
         }
@@ -99,6 +63,39 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 putInSize(node.key, node.value);
                 node = node.next;
             }
+        }
+    }
+
+    private void putInSize(K key, V value) {
+        int bucketNumber = getBucketNumber(key);
+        Node<K, V> newNode = new Node<>(key, value);
+        if (table[bucketNumber] == null) {
+            table[bucketNumber] = newNode;
+        } else {
+            Node<K, V> currentNode = table[bucketNumber];
+            while (currentNode != null) {
+                if ((currentNode.key == null && key == null)
+                        || (currentNode.key != null && currentNode.key.equals(key))) {
+                    currentNode.value = value;
+                    return;
+                }
+                currentNode = currentNode.next;
+            }
+            newNode.next = table[bucketNumber].next;
+            table[bucketNumber].next = newNode;
+
+        }
+        size++;
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        private Node(K key, V value) {
+            this.key = key;
+            this.value = value;
         }
     }
 }
