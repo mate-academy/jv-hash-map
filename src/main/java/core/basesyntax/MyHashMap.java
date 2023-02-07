@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import java.util.HashMap;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -9,7 +7,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private int size;
 
-    public MyHashMap(){
+    public MyHashMap() {
         this.threshold = 12;
         this.table = new Node[DEFAULT_INITIAL_CAPACITY];
     }
@@ -68,11 +66,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] oldTable = table;
-
+        final Node<K, V>[] oldTable = table;
         threshold = (int) (DEFAULT_LOAD_FACTOR * (table.length << 1));
         table = (Node<K, V>[]) new Node[table.length << 1];
-
         size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
