@@ -1,6 +1,7 @@
 package core.basesyntax;
 
 import java.util.LinkedList;
+import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
@@ -10,34 +11,46 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int bucket = key == null ? 0: key.hashCode() % entryset.length;
+        int bucket = getBucket(key);
         if (entryset[bucket] == null) {
             entryset[bucket] = new Node<>(key, value);
             size++;
         } else {
-            Node<K, V> lastEntry = entryset[bucket];
-            if (key == null && lastEntry.key == null) {
-                Node<K, V> insertedNode = new Node<>(key, value);
-                insertedNode.next = lastEntry.next;
+            Node<K, V> entry = entryset[bucket];
+
+            if (Objects.equals(entry.key, key)) {
+                entry.value = value;
                 return;
-            } else {
-                while (lastEntry.next != null) {
-                    if (lastEntry.key.equals(key)) {
-                        lastEntry.value = value;
-                        return;
-                    } else {
-                        lastEntry = lastEntry.next;
-                    }
-                }
-                lastEntry.next = new Node<>(key, value);
             }
+
+            while (entry.next != null) {
+                entry = entry.next;
+                if (Objects.equals(entry.key, key)) {
+                    entry.value = value;
+                    return;
+                }
+            }
+
+            entry.next = new Node<>(key, value);
             size++;
         }
     }
 
     @Override
     public V getValue(K key) {
+        int bucket = getBucket(key);
+        Node<K, V> entry = entryset[bucket];
+        if (entryset[bucket] != null) {
+            while (!Objects.equals(entry.key, key) && entry.next != null) {
+                entry = entry.next;
+            }
+            return entry.value;
+        }
         return null;
+    }
+
+    private int getBucket(K key) {
+        return key == null ? 0: Math.abs(key.hashCode() % entryset.length);
     }
 
     @Override
