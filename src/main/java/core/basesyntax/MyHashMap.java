@@ -42,7 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int bucket = getBucket(key);
         Node<K, V> entry = entryset[bucket];
-        if (entryset[bucket] != null) {
+        if (entry != null) {
             while (!Objects.equals(entry.key, key) && entry.next != null) {
                 entry = entry.next;
             }
