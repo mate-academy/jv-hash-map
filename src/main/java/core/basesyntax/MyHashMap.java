@@ -1,19 +1,17 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int CAPACITY = 16;
-    private static final int CAPACITY_EXPAND = 8;
-    private static final float LOAD_FACTOR = 0.75F;
-    private Node<K, V>[] bucket = new Node[CAPACITY];
     private int size;
 
-    private static class Node<K, V> {
+    public static class Node<K, V> {
         private int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
+        public Node(K key, V value) {
             this.hash = hash;
             this.key = key;
             this.value = value;
@@ -21,12 +19,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int indexCalculation(K key) {
+    private Node<K, V>[] bucket = new Node[16];
+
+    public int getIndex(K key) {
         if (key != null) {
-            if (key.hashCode() < 0) {
-                return key.hashCode() % CAPACITY + CAPACITY_EXPAND;
-            }
-            return key.hashCode() % CAPACITY;
+            return Math.abs(key.hashCode()) % 16;
         } else {
             return 0;
         }
@@ -34,44 +31,58 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int arraySize = indexCalculation(key);
-        Node<K, V> tempNode;
-        Node<K, V> newNode = new Node<>(key != null ? key.hashCode() : 0, key, value, null);
-        tempNode = bucket[arraySize];
-        while (true) {
-            if (tempNode == null) {
-                bucket[arraySize] = newNode;
-                size++;
-                break;
-            }
+        int index = getIndex(key);
+        Node<K, V> newNode = new Node<>(key, value);
+        Node tempNode = bucket[getIndex(key)];
+
+        if (tempNode == null) {
+            bucket[index] = newNode;
+            size++;
+            return;
+        }
+
+        int x = size;
+        for (int i = 0; i < x; i++) {
             if (newNode.key == null && tempNode.key == null) {
                 tempNode.value = newNode.value;
-                break;
+                return;
             }
             if (newNode.key == null && tempNode.next == null) {
                 tempNode.next = newNode;
                 size++;
-                break;
+                if (size == bucket.length * 0.75F) {
+                    resize();
+                }
+                return;
             }
             if (tempNode.key != null && tempNode.key.equals(newNode.key)) {
                 tempNode.value = newNode.value;
-                break;
+                return;
             }
             if (tempNode.next == null) {
                 tempNode.next = newNode;
                 size++;
-                break;
+                if (size == bucket.length * 0.75F) {
+                    resize();
+                }
+                return;
             }
             tempNode = tempNode.next;
-        }
-        if (size == bucket.length * LOAD_FACTOR) {
-            resize();
         }
     }
 
     @Override
     public V getValue(K key) {
-        return getRemove(key);
+        int arrayIndex = getIndex(key);
+        Node<K, V> tempNode;
+        tempNode = bucket[arrayIndex];
+        while (tempNode != null) {
+            if (Objects.equals(key, tempNode.key)) {
+                return tempNode.value;
+            }
+            tempNode = tempNode.next;
+        }
+        return null;
     }
 
     @Override
@@ -79,33 +90,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private V getRemove(K key) {
-        int arrayIndex = indexCalculation(key);
-        Node<K, V> tempNode;
-        tempNode = bucket[arrayIndex];
-        while (tempNode != null) {
-            if ((tempNode.key == null && key == null)
-                    || (key != null && key.equals(tempNode.key))) {
-                return tempNode.value;
-            } else {
-                tempNode = tempNode.next;
-            }
-        }
-        return null;
-    }
-
     private void resize() {
         size = 0;
-        Node<K, V>[] oldBucket;
-        oldBucket = bucket;
+        Node<K, V>[] oldBucket = bucket;
         bucket = new Node[bucket.length << 1];
         for (Node<K, V> tempNode : oldBucket) {
-            do {
-                if (tempNode != null) {
+            if (tempNode != null) {
+                do {
                     put(tempNode.key, tempNode.value);
                     tempNode = tempNode.next;
-                }
-            } while (tempNode != null);
+                } while (tempNode != null);
+            }
         }
     }
 }
