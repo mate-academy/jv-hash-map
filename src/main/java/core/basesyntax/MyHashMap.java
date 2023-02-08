@@ -55,39 +55,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode() % entryset.length);
     }
 
-    private int getBucket(K key, int capacity) {
-        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
-    }
-
     @Override
     public int getSize() {
         return size;
     }
 
     private void resize() {
-        Node<K, V>[] newEntrySet = new Node[entryset.length * 2];
-        for (Node<K, V> node : entryset) {
+        Node<K, V>[] oldEntrySet = entryset;
+        entryset = new Node[entryset.length * 2];
+        size = 0;
+        for (Node<K, V> node : oldEntrySet) {
             if (node == null) {
                 continue;
             }
-            while (node != null) {
-                int bucket = getBucket(node.key, newEntrySet.length);
-
-                if (newEntrySet[bucket] == null) {
-                    newEntrySet[bucket] = new Node<>(node.key, node.value);
-                } else {
-                    Node<K, V> entry = newEntrySet[bucket];
-
-                    while (entry.next != null) {
-                        entry = entry.next;
-                    }
-
-                    entry.next = new Node<>(node.key, node.value);
-                }
-                node = node.next;
-            }
+            do {
+                put(node.key, node.value);
+            } while ((node = node.next) != null);
         }
-        entryset = newEntrySet;
     }
 
     private static class Node<K, V> {
