@@ -26,17 +26,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> entry = entryset[bucket];
 
-            do {
+            while (entry != null) {
                 if (Objects.equals(entry.key, key)) {
                     entry.value = value;
                     return;
                 }
-                if (entry.next == null) {
-                    break;
-                }
-            } while ((entry = entry.next) != null);
+                entry = entry.next;
+            }
 
-            entry.next = new Node<>(key, value);
+            entryset[bucket] = new Node<>(key, value, entryset[bucket]);
             size++;
         }
 
@@ -69,12 +67,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         entryset = new Node[entryset.length * 2];
         size = 0;
         for (Node<K, V> node : oldEntrySet) {
-            if (node == null) {
-                continue;
-            }
-            do {
+            while (node != null) {
                 put(node.key, node.value);
-            } while ((node = node.next) != null);
+                node = node.next;
+            }
         }
     }
 
@@ -86,6 +82,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public Node(K key, V value) {
             this.key = key;
             this.value = value;
+        }
+
+        public Node(K key, V value, Node<K, V> node) {
+            this.key = key;
+            this.value = value;
+            this.next = node;
         }
     }
 }
