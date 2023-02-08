@@ -6,8 +6,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final double CAPACITY_FACTOR = 0.75;
     private static final int DEFAULT_CAPACITY = 16;
-    private Node<K, V>[] entryset = new Node[DEFAULT_CAPACITY];
+    private Node<K, V>[] entryset;
     private int size;
+
+    public MyHashMap() {
+        this.entryset = new Node[DEFAULT_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
