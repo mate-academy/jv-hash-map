@@ -4,10 +4,14 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
+    private static final double LOAD_FACTOR = 0.75;
 
-    private Node<K, V>[] table = new Node[DEFAULT_CAPACITY];
-    private double loadFactor = 0.75;
-    private int size = 0;
+    private Node<K, V>[] table;
+    private int size;
+
+    public MyHashMap() {
+        table = new Node[DEFAULT_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
@@ -15,11 +19,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = Math.abs(hash(key) % table.length);
         Node<K, V> pointer = table[index];
         if (table[index] == null) {
+            checkSize();
             table[index] = node;
             size++;
-            if (size > table.length * loadFactor) {
-                resize(table);
-            }
         } else {
             while (pointer.next != null) {
                 if (Objects.equals(pointer.key, key)) {
@@ -34,9 +36,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             pointer.next = node;
             size++;
-            if (size > table.length * loadFactor) {
-                resize(table);
-            }
+            checkSize();
         }
     }
 
@@ -58,7 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void putOll(Node<K, V>[] table) {
+    private void putAll(Node<K, V>[] table) {
         for (Node<K, V> bucket : table) {
             while (bucket != null) {
                 put(bucket.key, bucket.value);
@@ -73,7 +73,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = this.table;
         this.table = arrayGrow;
         size = 0;
-        putOll(oldTable);
+        putAll(oldTable);
+    }
+
+    private void checkSize() {
+        if (size > table.length * LOAD_FACTOR) {
+            resize(table);
+        }
     }
 
     private int hash(Object key) {
