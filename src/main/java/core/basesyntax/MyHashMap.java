@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import java.util.Map;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 16;
     static final int GROW_FACTOR = 2;
@@ -59,11 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucketIndex(K key, int tableLength) {
-        int index = key == null ? 0 : key.hashCode() % tableLength;
-        if (index < 0) {
-            index = -index;
-        }
-        return index;
+        return Math.abs(key == null ? 0 : key.hashCode() % tableLength);
     }
 
     private void grow() {
@@ -85,7 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return newKey == oldKey || newKey != null && newKey.equals(oldKey);
     }
 
-    static class Node<K, V> implements Map.Entry<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -95,21 +89,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
         }
 
-        @Override
-        public K getKey() {
-            return key;
-        }
-
-        @Override
-        public V getValue() {
-            return value;
-        }
-
-        @Override
-        public V setValue(V value) {
-            V oldValue = this.value;
+        public void setValue(V value) {
             this.value = value;
-            return oldValue;
+        }
+
+        public V getValue() {
+            return this.value;
         }
     }
 }
