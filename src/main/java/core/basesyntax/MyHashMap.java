@@ -71,15 +71,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int oldCapacity = oldData.length;
         int newCapacity = oldCapacity * 2;
         threshold = (int) (newCapacity * LOAD_FACTOR);
-        
-        size = 0;
-        data = (Node<K, V>[]) new Node[newCapacity];
+
+        Node<K, V>[] newTab = (Node<K, V>[]) new Node[newCapacity];
+        data = newTab;
         for (int i = 0; i < oldCapacity; i++) {
-            Node<K, V> pointer = oldData[i];
-            while (pointer != null) {
-                put(pointer.key, pointer.value);
-            }
-        }
+            Node<K, V> node;
             if ((node = oldData[i]) != null) {
                 oldData[i] = null;
                 if (node.next == null) {
