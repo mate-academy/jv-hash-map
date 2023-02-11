@@ -72,49 +72,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int newCapacity = oldCapacity * 2;
         threshold = (int) (newCapacity * LOAD_FACTOR);
 
-        Node<K, V>[] newTab = (Node<K, V>[]) new Node[newCapacity];
-        data = newTab;
+        size = 0;
+        data = (Node<K, V>[]) new Node[newCapacity];
         for (int i = 0; i < oldCapacity; i++) {
-            Node<K, V> node;
-            if ((node = oldData[i]) != null) {
-                oldData[i] = null;
-                if (node.next == null) {
-                    newTab[node.hash & (newCapacity - 1)] = node;
-                } else {
-                    Node<K, V> lowHead = null;
-                    Node<K,V> lowTail = null;
-                    Node<K, V> highHead = null;
-                    Node<K,V> highTail = null;
-                    Node<K, V> next;
-                    do {
-                        next = node.next;
-                        if ((node.hash & oldCapacity) == 0) {
-                            if (lowTail == null) {
-                                lowHead = node;
-                            } else {
-                                lowTail.next = node;
-                            }
-
-                            lowTail = node;
-                        } else {
-                            if (highTail == null) {
-                                highHead = node;
-                            } else {
-                                highTail.next = node;
-                            }
-
-                            highTail = node;
-                        }
-                    } while ((node = next) != null);
-                    if (lowTail != null) {
-                        lowTail.next = null;
-                        newTab[i] = lowHead;
-                    }
-                    if (highTail != null) {
-                        highTail.next = null;
-                        newTab[i + oldCapacity] = highHead;
-                    }
-                }
+            Node<K, V> pointer = oldData[i];
+            while (pointer != null) {
+                put(pointer.key, pointer.value);
+                pointer = pointer.next;
             }
         }
     }
