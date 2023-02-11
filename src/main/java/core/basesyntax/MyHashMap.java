@@ -7,14 +7,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
     private Node<K, V>[] data;
     private int size;
+    private int threshold;
 
     public MyHashMap() {
         data = new Node[DEFAULT_INITIAL_CAPACITY];
+        threshold = (int) (data.length * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> newNode = new Node<K, V>(calculateHash(key), key, value, null);
+        if (size > threshold) {
+            resize();
+        }
+
+        Node<K, V> newNode = new Node<>(calculateHash(key), key, value, null);
         int index = getIndexByKey(key);
 
         Node<K, V> node = data[index];
@@ -61,7 +67,56 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        Node<K, V>[] oldData = data;
+        int oldCapacity = oldData.length;
+        int newCapacity = oldCapacity * 2;
+        threshold = (int) (newCapacity * LOAD_FACTOR);
 
+        Node<K, V>[] newTab = (Node<K, V>[]) new Node[newCapacity];
+        data = newTab;
+        for (int i = 0; i < oldCapacity; i++) {
+            Node<K, V> node;
+            if ((node = oldData[i]) != null) {
+                oldData[i] = null;
+                if (node.next == null) {
+                    newTab[node.hash & (newCapacity - 1)] = node;
+                } else {
+                    Node<K, V> lowHead = null;
+                    Node<K,V> lowTail = null;
+                    Node<K, V> highHead = null;
+                    Node<K,V> highTail = null;
+                    Node<K, V> next;
+                    do {
+                        next = node.next;
+                        if ((node.hash & oldCapacity) == 0) {
+                            if (lowTail == null) {
+                                lowHead = node;
+                            } else {
+                                lowTail.next = node;
+                            }
+
+                            lowTail = node;
+                        } else {
+                            if (highTail == null) {
+                                highHead = node;
+                            } else {
+                                highTail.next = node;
+                            }
+
+                            highTail = node;
+                        }
+                    } while ((node = next) != null);
+                    if (lowTail != null) {
+                        lowTail.next = null;
+                        newTab[i] = lowHead;
+                    }
+                    if (highTail != null) {
+                        highTail.next = null;
+                        newTab[i + oldCapacity] = highHead;
+                    }
+                }
+            }
+        }
     }
 
     private int calculateHash(K key) {
@@ -73,10 +128,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         public Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
