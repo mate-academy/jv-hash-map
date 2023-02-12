@@ -1,40 +1,24 @@
 package core.basesyntax;
 
-import java.util.Arrays;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
-    private int capacity;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        capacity = DEFAULT_CAPACITY;
     }
 
-    private int findIndex(K key) {
-        return (key == null) ? 0 : (Math.abs(key.hashCode()) % table.length);
-    }
+    private static class Node<K, V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
 
-    private Node<K, V>[] resize() {
-        capacity = table.length << 1;
-        Node<K, V>[] oldTable = table;
-        table = new Node[capacity];
-        size = 0;
-        for (Node<K, V> node : oldTable) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
-            }
-        }
-        return table;
-    }
-
-    private void checkTableSize(int size) {
-        if (size >= (int) (capacity * LOAD_FACTOR)) {
-            resize();
+        public Node(K key, V value, Node next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
         }
     }
 
@@ -48,12 +32,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             while (tempNode != null) {
-                if (key == null && tempNode.getKey() == null) {
-                    tempNode.setValue(value);
+                if (key == null && tempNode.key == null) {
+                    tempNode.value = value;
                     break;
-                } else if (key == tempNode.getKey()
-                        || key != null && key.equals(tempNode.getKey())) {
-                    tempNode.setValue(value);
+                } else if (key == tempNode.key
+                        || key != null && key.equals(tempNode.key)) {
+                    tempNode.value = value;
                     break;
                 } else if (tempNode.next == null) {
                     tempNode.next = node;
@@ -69,8 +53,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         Node<K, V> tempNode = table[findIndex(key)];
         while (tempNode != null) {
-            if (key == tempNode.getKey() || key != null && key.equals(tempNode.getKey())) {
-                return tempNode.getValue();
+            if (key == tempNode.key || key != null && key.equals(tempNode.key)) {
+                return tempNode.value;
             }
             tempNode = tempNode.next;
         }
@@ -82,42 +66,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static class Node<K, V> {
-        private int hash;
-        private K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value, Node next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
-        }
+    private int findIndex(K key) {
+        return (key == null) ? 0 : (Math.abs(key.hashCode()) % table.length);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+    private Node<K, V>[] resize() {
+        Node<K, V>[] oldTable = table;
+        table = new Node[table.length << 1];
+        size = 0;
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
         }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
+        return table;
+    }
+
+    private void checkTableSize(int size) {
+        if (size >= (int) (table.length * LOAD_FACTOR)) {
+            resize();
         }
-        MyHashMap<?, ?> myHashMap = (MyHashMap<?, ?>) o;
-        return capacity == myHashMap.capacity && size == myHashMap.size
-                && Arrays.equals(table, myHashMap.table);
     }
 }
