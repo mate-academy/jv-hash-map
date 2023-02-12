@@ -2,13 +2,12 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_SIZE = 16;
+    private static final float LOAD_FACTOR = 0.75f;
+    private static final int GROW_FACTOR = 2;
     private Node<K, V>[] table;
     private int size;
-    private int threshold;
-    private int capacity;
 
     public MyHashMap() {
-        capacity = INITIAL_SIZE;
         table = new Node[INITIAL_SIZE];
     }
 
@@ -31,6 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        int threshold = (int) (table.length * LOAD_FACTOR);
         if (size + 1 > threshold) {
             resize();
         }
@@ -63,13 +63,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node[] oldTable = table;
-        table = new Node[table.length * 2];
+        table = new Node[table.length * GROW_FACTOR];
         size = 0;
         transfer(oldTable);
-        int newCapacity = capacity * 2;
-        threshold = (int) (capacity * 0.75f);
-        threshold = threshold * 2;
-        capacity = newCapacity;
     }
 
     private void transfer(Node<K,V> [] oldTable) {
@@ -87,7 +83,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private K key;
+        private final K key;
         private V value;
         private Node<K, V> next;
 
