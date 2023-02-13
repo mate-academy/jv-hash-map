@@ -81,7 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getIndex(K key) {
         if (key != null) {
-            return Math.abs(key.hashCode()) % 16;
+            return Math.abs(key.hashCode()) % bucket.length;
         } else {
             return 0;
         }
