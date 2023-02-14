@@ -5,16 +5,14 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 16;
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private int capacity;
     private int threshold;
     private final float loadFactor;
     private int size;
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        this.capacity = DEFAULT_INITIAL_CAPACITY;
         this.loadFactor = DEFAULT_LOAD_FACTOR;
-        this.table = new Node[16];
+        this.table = new Node[DEFAULT_INITIAL_CAPACITY];
         this.size = 0;
     }
 
@@ -28,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 bucket *= -1;
             }
             if (size > (threshold = (int) (DEFAULT_LOAD_FACTOR
-                    * capacity))) {
+                    * table.length))) {
                 table = resize();
             }
             if (table[bucket] != null) {
@@ -63,7 +61,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public int getCapacity() {
-        return capacity;
+        return table.length;
     }
 
     public int getTableLength() {
@@ -71,12 +69,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V>[] resize() {
-        int newCapacity = capacity * 2;
+        int newCapacity = table.length * 2;
         Node<K, V>[] newTable = new Node[newCapacity];
-        for (int i = 0; i < capacity; i++) {
+        for (int i = 0; i < table.length; i++) {
             newTable[i] = table[i];
         }
-        capacity = newCapacity;
         return newTable;
     }
 
