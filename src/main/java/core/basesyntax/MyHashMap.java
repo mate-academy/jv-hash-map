@@ -25,17 +25,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         checkTableSize(size);
+        int index = findIndex(key);
         Node<K, V> node = new Node<>(key, value, null);
-        Node<K, V> tempNode = table[findIndex(key)];
+        Node<K, V> tempNode = table[index];
         if (tempNode == null) {
-            table[findIndex(key)] = node;
+            table[index] = node;
             size++;
         } else {
             while (tempNode != null) {
-                if (key == null && tempNode.key == null) {
-                    tempNode.value = value;
-                    break;
-                } else if (key == tempNode.key
+                if (key == null && tempNode.key == null
+                        || key == tempNode.key
                         || key != null && key.equals(tempNode.key)) {
                     tempNode.value = value;
                     break;
