@@ -4,41 +4,39 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    static class Node<K, V> {
-        private K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-            this.next = null;
-        }
-    }
-
     private static final int DEFAULT_SIZE_OF_ARRAY = 16;
     private static final double LOAD_FACTOR = 0.75;
-    private static final int INCREASING_T = 2;
-    private Node<K, V> [] table = new Node[DEFAULT_SIZE_OF_ARRAY];
-    private Node<K, V> node;
+    private static final int INCREASING_TABLE = 2;
+    private Node<K, V> [] table;
     private int size;
-    private int threshold;
+
+    public MyHashMap() {
+        this.table = new Node[DEFAULT_SIZE_OF_ARRAY];
+    }
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> exsitNode = getNode(key);
-        if (exsitNode != null) {
-            exsitNode.value = value;
+        checkSize();
+        Node<K, V> insertNode = new Node<>(key, value);
+        int index = getIndex(key);
+        Node<K, V> node = table[index];
+        if (table[index] == null) {
+            table[index] = insertNode;
+            size++;
             return;
         }
-        checkSize();
-        int index = getIndexOfArray(key);
-        Node<K, V> node = new Node<>(key, value);
-        if (table[index] != null) {
-            node.next = table[index];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
+                return;
+            }
+            if (node.next == null) {
+                node.next = insertNode;
+                size++;
+                return;
+            }
+            node = node.next;
         }
-        table[index] = node;
-        size++;
     }
 
     @Override
@@ -52,47 +50,53 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return this.size;
     }
 
-    public int getIndexOfArray(K key) {
+    private int getIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
-    public void checkSize() {
+    private void checkSize() {
         if (size > table.length * LOAD_FACTOR) {
             resize();
         }
     }
 
     public Node<K, V> getNode(K key) {
-        int index = getIndexOfArray(key);
+        int index = getIndex(key);
         Node<K, V> node = table[index];
-        if (node != null) {
+        for (; node != null; node = node.next) {
             if (Objects.equals(node.key, key)) {
                 return node;
-            }
-            while (node.next != null) {
-                node = node.next;
-                if (Objects.equals(node.key, key)) {
-                    return node;
-                }
             }
         }
         return null;
     }
 
-    public void resize() {
-        int newSizeOfHashMap = table.length * INCREASING_T;
-        Node<K, V>[] oldValue = table;
+    private boolean checkEquals(Node<K, V> enterData, K keyValue) {
+        return Objects.equals(enterData.key, keyValue);
+    }
+
+    private void resize() {
+        int newSizeOfHashMap = table.length * INCREASING_TABLE;
+        Node<K, V>[] oldTable = table;
         table = new Node[newSizeOfHashMap];
         size = 0;
-        for (int i = 0; i < oldValue.length; i++) {
-            Node<K, V> node = oldValue[i];
-            if (node != null) {
+        for (int i = 0; i < oldTable.length; i++) {
+            Node<K, V> node = oldTable[i];
+            while (node != null) {
                 put(node.key, node.value);
-                while (node.next != null) {
-                    node = node.next;
-                    put(node.key, node.value);
-                }
+                node = node.next;
             }
+        }
+    }
+
+    private static class Node<K, V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value) {
+            this.key = key;
+            this.value = value;
         }
     }
 }
