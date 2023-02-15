@@ -12,50 +12,41 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int threshold = getThreshold(table.length);
+        int threshold = getThreshold();
         if (size > threshold) {
             resize();
         }
 
         int indexOfBucket = getIndex(key);
-        Node<K, V> pointer = table[indexOfBucket];
-
-        if (table[indexOfBucket] == null) {
-            table[indexOfBucket] = new Node(key, value);
-            size++;
-        } else {
-            pointer = foundNode(pointer, key);
-            if (pointer.key == key || key != null && key.equals(pointer.key)) {
-                pointer.value = value;
-            } else {
-                pointer.next = new Node<>(key, value);
-                size++;
-            }
+        Node<K, V> pointer = findNode(table[indexOfBucket], key);
+        if (pointer != null) {
+            pointer.value = value;
+            return;
         }
+        Node<K, V> newNode = new Node<>(key, value);
+        newNode.next = table[indexOfBucket];
+        table[indexOfBucket] = newNode;
+        size++;
     }
 
     @Override
     public V getValue(K key) {
         int indexOfBucket = getIndex(key);
-        Node<K, V> pointer = table[indexOfBucket];
+        Node<K, V> pointer = findNode(table[indexOfBucket], key);
         if (pointer != null) {
-            pointer = foundNode(pointer, key);
             return pointer.value;
-        } else {
-            return null;
         }
+        return null;
     }
 
-    public Node<K, V> foundNode(Node<K, V> pointer, K key) {
+    public Node<K, V> findNode(Node<K, V> pointer, K key) {
         while (pointer != null) {
             if (pointer.key == key || key != null && key.equals(pointer.key)) {
-                return pointer;
-            } else if (pointer.next == null) {
                 return pointer;
             }
             pointer = pointer.next;
         }
-        return pointer;
+        return null;
     }
 
     @Override
@@ -69,7 +60,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         final Node<K, V>[] oldTable = table;
-        int threshold = getThreshold(table.length);
         table = (Node<K, V>[]) new Node[table.length << 1];
         size = 0;
         for (Node<K, V> node : oldTable) {
@@ -80,12 +70,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getThreshold(int length) {
-        if (length == 16) {
-            return (int) (DEFAULT_LOAD_FACTOR * (table.length));
-        } else {
-            return (int) (DEFAULT_LOAD_FACTOR * (table.length << 1));
-        }
+    private int getThreshold() {
+        return (int) (DEFAULT_LOAD_FACTOR * (table.length));
     }
 
     public static class Node<K, V> {
