@@ -4,14 +4,14 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    private static final int DEFAULT_SIZE_OF_ARRAY = 16;
+    private static final int DEFAULT_TABLE_LENGTH = 16;
     private static final double LOAD_FACTOR = 0.75;
     private static final int INCREASING_TABLE = 2;
     private Node<K, V> [] table;
     private int size;
 
     public MyHashMap() {
-        this.table = new Node[DEFAULT_SIZE_OF_ARRAY];
+        this.table = new Node[DEFAULT_TABLE_LENGTH];
     }
 
     @Override
@@ -60,10 +60,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public Node<K, V> getNode(K key) {
+    private Node<K, V> getNode(K key) {
         int index = getIndex(key);
-        Node<K, V> node = table[index];
-        for (; node != null; node = node.next) {
+        for (Node<K, V> node = table[index]; node != null; node = node.next) {
             if (Objects.equals(node.key, key)) {
                 return node;
             }
@@ -71,14 +70,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private boolean checkEquals(Node<K, V> enterData, K keyValue) {
-        return Objects.equals(enterData.key, keyValue);
-    }
-
     private void resize() {
-        int newSizeOfHashMap = table.length * INCREASING_TABLE;
+        int newTableLength = table.length * INCREASING_TABLE;
         Node<K, V>[] oldTable = table;
-        table = new Node[newSizeOfHashMap];
+        table = new Node[newTableLength];
         size = 0;
         for (int i = 0; i < oldTable.length; i++) {
             Node<K, V> node = oldTable[i];
