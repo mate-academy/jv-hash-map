@@ -17,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
-    public V put(K key, V value) {
+    public void put(K key, V value) {
         resize();
         int hashKey = hash(key);
         Node<K, V> node = new Node<>(key, value);
@@ -43,7 +43,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 nodeCurrent = nodeCurrent.next;
             }
         }
-        return value;
     }
 
     @Override
