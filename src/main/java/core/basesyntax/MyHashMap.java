@@ -82,7 +82,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     static class Node<K, V> {
-        private int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -90,25 +89,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private Node(K key, V value) {
             this.key = key;
             this.value = value;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof Node)) {
-                return false;
-            }
-            Node<?, ?> node = (Node<?, ?>) o;
-            return hash == node.hash
-                    && Objects.equals(key, node.key)
-                    && Objects.equals(value, node.value);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(hash, key);
         }
     }
 }
