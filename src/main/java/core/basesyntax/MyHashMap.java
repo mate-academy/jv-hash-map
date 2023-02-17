@@ -50,10 +50,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table = new Node[table.length * GROW_FACTOR];
             size = 0;
             for (Node<K, V> kvNode : oldTable) {
-                if (kvNode != null) {
-                    for (Node<K, V> j = kvNode; j != null; j = j.next) {
-                        put(j.key, j.value);
-                    }
+                while (kvNode != null) {
+                    put(kvNode.key, kvNode.value);
+                    kvNode = kvNode.next;
                 }
             }
         }
