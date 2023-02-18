@@ -19,23 +19,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        Node<K, V> kvNode = findNode(index, key);
-        if (kvNode != null) {
-            kvNode.value = value;
-            return;
-        }
-        for (Node<K,V> i = table[index]; i != null; i = i.next) {
-            if (i.next == null) {
-                i.next = node;
-                size++;
-                return;
-            }
+        Node<K, V> foundNode = findNode(index, key, value);
+        if (foundNode != null) {
+            foundNode.value = value;
         }
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = findNode(getIndex(key), key);
+        Node<K, V> node = findNode(getIndex(key), key, null);
         return node == null ? null : node.value;
     }
 
@@ -49,10 +41,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V>[] oldTable = table;
             table = new Node[table.length * GROW_FACTOR];
             size = 0;
-            for (Node<K, V> kvNode : oldTable) {
-                while (kvNode != null) {
-                    put(kvNode.key, kvNode.value);
-                    kvNode = kvNode.next;
+            for (Node<K, V> node : oldTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
                 }
             }
         }
@@ -62,12 +54,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.abs(Objects.hashCode(key) % table.length);
     }
 
-    private Node<K,V> findNode(int index, K key) {
-        Node<K,V> node = new Node<>(key, null);
+    private Node<K,V> findNode(int index, K key, V value) {
+        Node<K,V> node = new Node<>(key, value);
         for (Node<K,V> i = table[index]; i != null; i = i.next) {
             if (i.key == null && key == null || node.key != null && i.key != null
                     && node.key.hashCode() == i.key.hashCode() && node.key.equals(i.key)) {
                 return i;
+            }
+            if (i.next == null) {
+                i.next = node;
+                size++;
             }
         }
         return null;
