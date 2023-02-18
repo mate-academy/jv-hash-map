@@ -13,22 +13,37 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         resizeCheck();
         int index = getIndex(key);
-        Node<K, V> node = new Node<>(key, value);
+        Node<K,V> node = table[index];
+        Node<K, V> newNode = new Node<>(key, value);
         if (table[index] == null) {
-            table[index] = node;
+            table[index] = newNode;
             size++;
             return;
         }
-        Node<K, V> foundNode = findNode(index, key, value);
-        if (foundNode != null) {
-            foundNode.value = value;
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
+                return;
+            }
+            if (node.next == null) {
+                node.next = newNode;
+                size++;
+                return;
+            }
+            node = node.next;
         }
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = findNode(getIndex(key), key, null);
-        return node == null ? null : node.value;
+        Node<K,V> node = table[getIndex(key)];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return node.value;
+            }
+            node = node.next;
+        }
+        return null;
     }
 
     @Override
@@ -52,21 +67,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getIndex(K key) {
         return Math.abs(Objects.hashCode(key) % table.length);
-    }
-
-    private Node<K,V> findNode(int index, K key, V value) {
-        Node<K,V> node = new Node<>(key, value);
-        for (Node<K,V> i = table[index]; i != null; i = i.next) {
-            if (i.key == null && key == null || node.key != null && i.key != null
-                    && node.key.hashCode() == i.key.hashCode() && node.key.equals(i.key)) {
-                return i;
-            }
-            if (i.next == null) {
-                i.next = node;
-                size++;
-            }
-        }
-        return null;
     }
 
     private static class Node<K, V> {
