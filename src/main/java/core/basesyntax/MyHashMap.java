@@ -19,14 +19,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size + 1 > threshold) {
             resize();
         }
-        if (key == null || key.hashCode() % table.length == 0) {
-            zeroIndexPutHandler(key, value);
-        } else if (table[getIndexFromKey(key)] != null) {
-            nonEmptyBucketPutHandler(key, value);
-        } else {
-            table[getIndexFromKey(key)] = new Node<K, V>(key, value, null);
+        if (table[getIndexFromKey(key)] != null) {
+            Node<K, V> localCurrent = table[getIndexFromKey(key)];
+            while (localCurrent != null) {
+                if (Objects.equals(localCurrent.key, key)) {
+                    localCurrent.value = value;
+                    return;
+                } else if (localCurrent.next == null) {
+                    break;
+                }
+                localCurrent = localCurrent.next;
+            }
+            localCurrent.next = new Node<K, V>(key, value, null);
             size++;
+            return;
         }
+        table[getIndexFromKey(key)] = new Node<K, V>(key, value, null);
+        size++;
     }
 
     @Override
@@ -44,45 +53,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
-    }
-
-    private void zeroIndexPutHandler(K key, V value) {
-        Node<K, V> localCurrent = table[0];
-        if (localCurrent == null) {
-            table[0] = new Node<K, V>(key, value, null);
-            size++;
-            return;
-        }
-        if (localCurrent.key == key) {
-            localCurrent.value = value;
-            return;
-        }
-        while (localCurrent.next != null) {
-            if (localCurrent.key == key) {
-                localCurrent.value = value;
-                return;
-            }
-            localCurrent = localCurrent.next;
-        }
-        localCurrent.next = new Node<K, V>(key, value, null);
-        size++;
-    }
-
-    private void nonEmptyBucketPutHandler(K key, V value) {
-        Node<K, V> current = table[getIndexFromKey(key)];
-        if (Objects.equals(current.key, key)) {
-            current.value = value;
-            return;
-        }
-        while (current.next != null) {
-            current = current.next;
-            if (Objects.equals(current.key, key)) {
-                current.value = value;
-                return;
-            }
-        }
-        current.next = new Node<K, V>(key, value, null);
-        size++;
     }
 
     private int getIndexFromKey(K key) {
