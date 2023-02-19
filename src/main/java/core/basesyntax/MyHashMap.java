@@ -31,21 +31,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (key == null && table[0] != null) {
-            return zeroIndexReadHandler();
-        }
-        if (table[getIndexFromKey(key)] != null) {
-            return nonEmptyBucketReadHandler(key);
-        }
-        return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
-    }
-
-    private V nonEmptyBucketReadHandler(K key) {
         Node<K, V> current = table[getIndexFromKey(key)];
         while (current != null) {
             if (Objects.equals(current.key, key)) {
@@ -56,15 +41,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private V zeroIndexReadHandler() {
-        Node<K, V> current = table[0];
-        while (current != null) {
-            if (current.key == null) {
-                return current.value;
-            }
-            current = current.next;
-        }
-        return null;
+    @Override
+    public int getSize() {
+        return size;
     }
 
     private void zeroIndexPutHandler(K key, V value) {
@@ -107,7 +86,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndexFromKey(K key) {
-        int currentIndex = key.hashCode() % table.length;
+        int currentIndex = key == null ? 0 : key.hashCode() % table.length;
         return currentIndex < 0 ? -1 * currentIndex : currentIndex;
     }
 
