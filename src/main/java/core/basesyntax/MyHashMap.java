@@ -35,7 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         size = 0;
         Node<K, V>[] tempTable = table;
-        capacity = capacity * 2;
+        capacity *= 2;
         table = new Node[capacity];
         for (Node<K, V> e : tempTable) {
             while (e != null) {
