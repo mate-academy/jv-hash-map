@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_CAPACITY = 16;
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    static final int INCREASE_INDEX = 2;
     private Node<K, V>[] table;
     private int currentCapacity = DEFAULT_CAPACITY;
     private int size;
@@ -55,7 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         Node<K, V>[] oldArray = table;
         if (currentCapacity * DEFAULT_LOAD_FACTOR == size) {
-            currentCapacity = currentCapacity * 2;
+            currentCapacity = currentCapacity * INCREASE_INDEX;
             table = (Node<K, V>[]) new Node[currentCapacity];
             size = 0;
             for (Node<K, V> node : oldArray) {
