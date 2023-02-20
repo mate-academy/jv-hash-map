@@ -55,7 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldArray = table;
-        if (currentCapacity * DEFAULT_LOAD_FACTOR == size) {
+        if (currentCapacity * DEFAULT_LOAD_FACTOR <= size) {
             currentCapacity = currentCapacity * INCREASE_INDEX;
             table = (Node<K, V>[]) new Node[currentCapacity];
             size = 0;
