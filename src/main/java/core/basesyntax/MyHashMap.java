@@ -14,20 +14,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         capacity = DEFAULT_INITIAL_CAPACITY;
     }
 
-    static class Node<K,V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(int hash, K key, V value, Node<K,V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     private int hash(Object key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
     }
@@ -89,5 +75,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private static class Node<K,V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(int hash, K key, V value, Node<K,V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
