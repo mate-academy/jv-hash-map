@@ -42,21 +42,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (current == null) {
             table[index] = nodeToPut;
             size++;
-        } else {
-            while (current != null) {
-                if ((current.key == key)
-                        || (current.hash == index && (Objects.equals(key, current.key)))) {
-                    current.value = value;
-                    return;
-                }
-                if (current.next == null) {
-                    break;
-                }
-                current = current.next;
-            }
-            current.next = nodeToPut;
-            size++;
+            return;
         }
+        while (current != null) {
+            if ((current.key == key)
+                    || (current.hash == index && (Objects.equals(key, current.key)))) {
+                current.value = value;
+                return;
+            }
+            if (current.next == null) {
+                break;
+            }
+            current = current.next;
+        }
+        current.next = nodeToPut;
+        size++;
+
     }
 
     @Override
