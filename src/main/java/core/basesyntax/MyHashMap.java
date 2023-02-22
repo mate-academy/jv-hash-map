@@ -35,24 +35,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         current = fieldOfMap[position];
-        do {
+        while (current != null) {
             if (Objects.equals(current.key, key)) {
                 current.value = node.value;
                 return;
-            } else if (current.next == null) {
+            }
+            if (current.next == null) {
                 current.next = node;
                 size++;
                 return;
             }
             current = current.next;
-        } while (current != null);
-        current.next = node;
-        size++;
+        }
     }
 
     @Override
     public V getValue(K key) {
-        return getNode(key) == null ? null : getNode(key).value;
+        Node<K, V> current = getNode(key);
+        return current == null ? null : current.value;
     }
 
     @Override
