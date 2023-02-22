@@ -58,7 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             while (current != null) {
-                if ((current.key == null && key == null)
+                if ((current.key == key)
                         || (current.hash == index && (Objects.equals(key, current.key)))) {
                     current.value = value;
                     return;
