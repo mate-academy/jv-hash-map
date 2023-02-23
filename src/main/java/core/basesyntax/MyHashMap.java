@@ -28,7 +28,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         while (node != null) {
-            if (areEqualKeyAndHash(key, hash, node)) {
+            if (Objects.equals(key, node.key)) {
                 node.value = value;
                 return;
             }
@@ -44,10 +44,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key);
-        Node<K, V> node = table[hash];
+        Node<K, V> node = table[hash(key)];
         while (node != null) {
-            if (areEqualKeyAndHash(key, hash, node)) {
+            if (Objects.equals(key, node.key)) {
                 return node.value;
             }
             node = node.next;
@@ -66,8 +65,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        Node<K, V>[] tempTable = new Node[table.length];
-        System.arraycopy(table, 0, tempTable, 0, tempTable.length);
+        Node<K, V>[] tempTable = table;
         capacity = capacity << 1;
         table = new Node[capacity];
         for (Node<K, V> element : tempTable) {
@@ -78,14 +76,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private boolean areEqualKeyAndHash(K key, int hash, Node<K, V> node) {
-        return (node.key == key)
-                || node.hash == hash && (Objects.equals(key, node.key));
-    }
-
     private int hash(K key) {
-        int prevHash = (key == null) ? 0 : (key.hashCode() % capacity);
-        return prevHash < 0 ? -prevHash : prevHash;
+        return (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
     private static class Node<K, V> {
@@ -99,22 +91,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        public boolean equals(Node<K, V> o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-
-            Node<K, V> node = (Node<K, V>) o;
-
-            return this.key == o.key
-                    || this.key != null && this.key.equals(o.key)
-                    && this.value == o.value
-                    || this.value != null && this.value.equals(o.value);
         }
     }
 }
