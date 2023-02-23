@@ -26,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             current = current.next;
         }
-        table[bucket] = new Node<>(hash(key), key, value, table[bucket]);
+        table[bucket] = new Node<>(key, value, table[bucket]);
         size++;
     }
 
