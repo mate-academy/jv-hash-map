@@ -12,17 +12,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.fieldOfMap = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
     }
 
-    static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         checkCapacity();
@@ -102,5 +91,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int hash(Object key, int length) {
         return Math.abs(key == null ? 0 : key.hashCode() % length);
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 }
