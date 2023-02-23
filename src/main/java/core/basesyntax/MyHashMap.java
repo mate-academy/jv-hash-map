@@ -7,20 +7,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public static final double DEFAULT_LOAD_FACTOR = 0.75;
     private Node<K, V>[] table;
     private int size;
-    private int threshold;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        threshold = (int) Math.round(DEFAULT_LOAD_FACTOR * DEFAULT_CAPACITY);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size + 1 > threshold) {
-            resize();
-        }
-        if (table[getIndexFromKey(key)] != null) {
-            Node<K, V> localCurrent = table[getIndexFromKey(key)];
+        resize();
+        int index = getIndexFromKey(key);
+        if (table[index] != null) {
+            Node<K, V> localCurrent = table[index];
             while (localCurrent != null) {
                 if (Objects.equals(localCurrent.key, key)) {
                     localCurrent.value = value;
@@ -34,7 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        table[getIndexFromKey(key)] = new Node<K, V>(key, value, null);
+        table[index] = new Node<K, V>(key, value, null);
         size++;
     }
 
@@ -60,14 +57,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        size = 0;
-        threshold = threshold << 1;
-        Node<K, V>[] temp = table;
-        table = (Node<K, V>[]) new Node[table.length << 1];
-        for (Node<K, V> kvNode : temp) {
-            while (kvNode != null) {
-                put(kvNode.key, kvNode.value);
-                kvNode = kvNode.next;
+        if (size + 1 > table.length * DEFAULT_LOAD_FACTOR) {
+            size = 0;
+            Node<K, V>[] temp = table;
+            table = (Node<K, V>[]) new Node[table.length << 1];
+            for (Node<K, V> kvNode : temp) {
+                while (kvNode != null) {
+                    put(kvNode.key, kvNode.value);
+                    kvNode = kvNode.next;
+                }
             }
         }
     }
