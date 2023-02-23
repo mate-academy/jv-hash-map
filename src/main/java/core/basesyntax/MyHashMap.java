@@ -22,15 +22,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (isKeyPresent(key, table)) {
-            int index = getIndex(key);
-            Node<K, V> curentNode = table[index];
-            while (true) {
-                if (keyCompare(curentNode.key, key)) {
-                    return curentNode.value;
-                }
-                curentNode = curentNode.next;
+        Node<K, V> curentNode = table[getIndex(key)];
+        while (curentNode != null) {
+            if (keyCompare(curentNode.key, key)) {
+                return curentNode.value;
             }
+            curentNode = curentNode.next;
         }
         return null;
     }
@@ -45,12 +42,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         capasity = capasity << 1;
         size = 0;
         for (int i = 0; i < table.length; i++) {
-            if (table[i] != null) {
-                Node<K, V> curentNode = table[i];
-                while (curentNode != null) {
-                    newTable = putElement(curentNode.key, curentNode.value, newTable);
-                    curentNode = curentNode.next;
-                }
+            if (table[i] == null) {
+                continue;
+            }
+            Node<K, V> curentNode = table[i];
+            while (curentNode != null) {
+                newTable = putElement(curentNode.key, curentNode.value, newTable);
+                curentNode = curentNode.next;
             }
         }
         table = newTable;
@@ -62,14 +60,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[index] != null) {
             if (isKeyPresent(key, table)) {
                 changeElementInNodeList(table[index], newElement);
-            } else {
-                putToNodeList(table[index], newElement);
-                size++;
+                return table;
             }
-        } else {
-            table[index] = newElement;
+            putToNodeList(table[index], newElement);
             size++;
+            return table;
         }
+        table[index] = newElement;
+        size++;
         return table;
     }
 
@@ -86,7 +84,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         while (node != null) {
             if (keyCompare(node.key, addNode.key)) {
                 node.value = addNode.value;
-                break;
+                return;
             }
             node = node.next;
         }
@@ -119,7 +117,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size == (double)capasity * LOAD_FACTOR;
     }
 
-    public class Node<K, V> {
+    private class Node<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
