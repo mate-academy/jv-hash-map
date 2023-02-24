@@ -44,22 +44,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> resultNode = new Node<>(key, null);
+        V value = null;
         Node<K, V> currentNode = storage[getPosition(key)];
         if (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
-                resultNode = currentNode;
+                value = currentNode.value;
             } else {
                 while (currentNode != null) {
                     if (Objects.equals(currentNode.key, key)) {
-                        resultNode = currentNode;
+                        value = currentNode.value;
                         break;
                     }
                     currentNode = currentNode.nextNode;
                 }
             }
         }
-        return resultNode.value;
+        return value;
     }
 
     @Override
