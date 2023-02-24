@@ -7,7 +7,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int size;
     private int threshold;
-    Node<K, V>[] table;
+    private Node<K, V>[] table;
 
     public MyHashMap() {
     }
@@ -41,8 +41,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> currentNode;
         if ((currentNode = table[i]) != null) {
             do {
-                if ((currentNode.hash == currentKeyHash) && ((currentNode.key == key) ||
-                        ((key != null) && key.equals(currentNode.key)))) {
+                if ((currentNode.hash == currentKeyHash) && ((currentNode.key == key)
+                        || ((key != null) && key.equals(currentNode.key)))) {
                     return currentNode.value;
                 }
                 currentNode = currentNode.next;
@@ -57,8 +57,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putValueInTree(Node<K, V> rootNode, Node<K, V> growNode) {
-        if ((rootNode.hash == growNode.hash) && ((growNode.key == rootNode.key) ||
-                ((growNode.key != null) && growNode.key.equals(rootNode.key)))) {
+        if ((rootNode.hash == growNode.hash) && ((growNode.key == rootNode.key)
+                || ((growNode.key != null) && growNode.key.equals(rootNode.key)))) {
             rootNode.value = growNode.value;
             return;
         }
@@ -101,10 +101,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
