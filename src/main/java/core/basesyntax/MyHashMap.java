@@ -6,12 +6,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int size;
-    private int capacity;
     private Node<K, V>[] table;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        capacity = DEFAULT_INITIAL_CAPACITY;
     }
 
     @Override
@@ -20,26 +18,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int hash = hash(key);
-        Node<K, V> nodeToPut = new Node<K, V>(hash, key, value, null);
+        Node<K, V> nodeToPut = new Node<K, V>(key, value, null);
         Node<K, V> node = table[hash];
         if (node == null) {
             table[hash] = nodeToPut;
             ++size;
             return;
-        }
-        while (node != null) {
-            if (Objects.equals(key, node.key)) {
-                node.value = value;
-                return;
+        } else {
+            while (node != null) {
+                if (Objects.equals(key, node.key)) {
+                    node.value = value;
+                    return;
+                }
+                if (node.next == null) {
+                    break;
+                }
+                node = node.next;
             }
-            if (node.next == null) {
-                break;
-            }
-            node = node.next;
+            node.next = nodeToPut;
         }
-        node.next = nodeToPut;
         ++size;
-
     }
 
     @Override
@@ -59,12 +57,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
     private void resize() {
         size = 0;
+        int capacity = table.length;
         Node<K, V>[] tempTable = table;
         capacity = capacity << 1;
         table = new Node[capacity];
@@ -77,17 +72,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
+        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private static class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        private Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
