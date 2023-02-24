@@ -11,12 +11,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @SuppressWarnings("unchecked")
     public MyHashMap() {
         this.table = new Node[INITIAL_CAPACITY];
-        this.size = 0;
     }
 
     @Override
     public void put(K key, V value) {
-        int index = hash(key, table.length);
+        int index = hashIndex(key, table.length);
         Node<K, V> node = table[index];
         if (node == null) {
             table[index] = new Node<>(key, value, null);
@@ -39,7 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = hash(key, table.length);
+        int index = hashIndex(key, table.length);
         Node<K, V> node = table[index];
         while (node != null) {
             if (Objects.equals(node.key,key)) {
@@ -67,13 +66,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hash(K key, int length) {
+    private int hashIndex(K key, int length) {
         return key == null ? 0 : Math.abs(key.hashCode()) % length;
     }
 
     @SuppressWarnings("unchecked")
     private void resizeIfNeeded() {
-        if ((float)size / table.length > LOAD_FACTOR) {
+        if (size > table.length * LOAD_FACTOR) {
             int newCapacity = table.length << 1;
             Node<K, V>[] newTable = new Node[newCapacity];
             for (Node<K, V> kvNode : table) {
@@ -81,7 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 while (node != null) {
                     K key = node.key;
                     V value = node.value;
-                    int newIndex = hash(key, newCapacity);
+                    int newIndex = hashIndex(key, newCapacity);
                     Node<K, V> newNode = new Node<>(key, value, newTable[newIndex]);
                     newTable[newIndex] = newNode;
                     node = node.next;
