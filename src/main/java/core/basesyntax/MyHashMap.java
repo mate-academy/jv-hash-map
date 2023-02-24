@@ -4,33 +4,31 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
-    private static final float LOAD_OF_MAP = 0.75f;
-    private Node<K, V>[] fieldOfMap;
+    private static final float LOAD_FACTOR = 0.75f;
+    private Node<K, V>[] field;
     private int size;
 
     public MyHashMap() {
-        this.fieldOfMap = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
+        field = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         checkCapacity();
-        int position = hash(key, fieldOfMap.length);
-        Node<K, V> node = new Node<>(key, value);
-        Node<K, V> current;
-        if (fieldOfMap[position] == null) {
-            fieldOfMap[position] = node;
+        int position = hash(key, field.length);
+        if (field[position] == null) {
+            field[position] = new Node<>(key, value);
             size++;
             return;
         }
-        current = fieldOfMap[position];
+        Node<K, V> current = field[position];
         while (current != null) {
             if (Objects.equals(current.key, key)) {
-                current.value = node.value;
+                current.value = value;
                 return;
             }
             if (current.next == null) {
-                current.next = node;
+                current.next = new Node<>(key, value);
                 size++;
                 return;
             }
@@ -50,16 +48,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void checkCapacity() {
-        int loadFactor = (int) (fieldOfMap.length * LOAD_OF_MAP);
+        int loadFactor = (int) (field.length * LOAD_FACTOR);
         if (size > loadFactor) {
             grow();
         }
     }
 
     private void grow() {
-        int newCapacity = fieldOfMap.length << 1;
+        int newCapacity = field.length << 1;
         Node<K, V>[] biggerFieldOfMap = (Node<K, V>[]) new Node[newCapacity];
-        for (Node<K, V> kvNode : fieldOfMap) {
+        for (Node<K, V> kvNode : field) {
             Node<K, V> current = kvNode;
             while (current != null) {
                 do {
@@ -71,22 +69,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 } while (current != null);
             }
         }
-        fieldOfMap = biggerFieldOfMap;
+        field = biggerFieldOfMap;
     }
 
     private Node<K, V> getNode(K key) {
-        int position = hash(key, fieldOfMap.length);
-        Node<K, V> current = fieldOfMap[position];
-        if (current == null) {
-            return null;
-        }
-        while (current.next != null) {
+        int position = hash(key, field.length);
+        Node<K, V> current = field[position];
+        while (current != null) {
             if (Objects.equals(current.key, key)) {
                 return current;
             }
             current = current.next;
         }
-        return current;
+        return null;
     }
 
     private int hash(Object key, int length) {
@@ -98,7 +93,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
         }
