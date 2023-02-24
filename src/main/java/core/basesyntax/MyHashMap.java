@@ -3,17 +3,20 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
-    private static final int RESIZE_MULTIPLIER = 2;
+    private static final int RESIZE_FACTOR = 2;
+    private Node<K, V>[] table;
     private int size;
 
-    private Entry<K, V>[] table = new Entry[DEFAULT_CAPACITY];
+    public MyHashMap() {
+        this.table = new Node[DEFAULT_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
-        Entry<K, V> newNode = new Entry<>(key, value, null);
-        Entry<K, V> oldNode = table[hashingIndex(key)];
+        Node<K, V> newNode = new Node<>(key, value);
+        Node<K, V> oldNode = table[getIndexFromHash(key)];
         if (oldNode == null) {
-            table[hashingIndex(key)] = newNode;
+            table[getIndexFromHash(key)] = newNode;
             size++;
             resize();
         } else {
@@ -35,13 +38,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Entry<K, V> node = table[hashingIndex(key)];
+        Node<K, V> node = table[getIndexFromHash(key)];
         while (node != null) {
             if (node.key == key || node.key != null && node.key.equals(key)) {
                 return node.value;
-            } else {
-                node = node.next;
             }
+            node = node.next;
         }
         return null;
     }
@@ -51,16 +53,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public int hashingIndex(K key) {
+    public int getIndexFromHash(K key) {
         return Math.abs((key == null) ? 0 : key.hashCode() % table.length);
     }
 
     public void resize() {
         if (size > table.length * LOAD_FACTOR) {
-            Entry<K, V>[] oldTable = table;
+            Node<K, V>[] oldTable = table;
             size = 0;
-            table = new Entry[oldTable.length * RESIZE_MULTIPLIER];
-            for (Entry<K, V> node : oldTable) {
+            table = new Node[oldTable.length * RESIZE_FACTOR];
+            for (Node<K, V> node : oldTable) {
                 while (node != null) {
                     put(node.key, node.value);
                     node = node.next;
@@ -69,15 +71,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public class Entry<K, V> {
-        private K key;
+    private static class Node<K, V> {
+        private final K key;
         private V value;
-        private Entry<K, V> next;
+        private Node<K, V> next;
 
-        public Entry(K key, V value, Entry<K, V> next) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
