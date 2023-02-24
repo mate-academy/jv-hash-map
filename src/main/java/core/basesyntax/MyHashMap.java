@@ -21,21 +21,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         resizeIfNeed();
         int position = getPosition(key);
         Node<K, V> oldNode = storage[position];
-        Node<K, V> newNode = new Node<>(key, value, null);
         if (oldNode == null) {
-            storage[position] = newNode;
+            storage[position] = new Node<>(key, value);
             size++;
         } else {
             Node<K, V> nextNode = oldNode;
             while (nextNode != null) {
-                if (Objects.equals(nextNode.key, newNode.key)) {
-                    nextNode.value = newNode.value;
+                if (Objects.equals(nextNode.key, key)) {
+                    nextNode.value = value;
                     break;
                 }
                 if (nextNode.nextNode == null) {
-                    nextNode.nextNode = newNode;
+                    nextNode.nextNode = new Node<>(key, value);
                     size++;
-                    break;
+                    return;
                 } else {
                     nextNode = nextNode.nextNode;
                 }
@@ -45,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> resultNode = new Node<>(key, null, null);
+        Node<K, V> resultNode = new Node<>(key, null);
         Node<K, V> currentNode = storage[getPosition(key)];
         if (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
@@ -93,16 +92,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        private final int hashCode;
         private final K key;
         private V value;
         private Node<K, V> nextNode;
 
-        public Node(K key, V value, Node<K, V> node) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.nextNode = node;
-            this.hashCode = key == null ? 0 : key.hashCode();
         }
     }
 }
