@@ -58,17 +58,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        private Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-    }
-
     private int getIndex(K key) {
         return getHash(key) % innerArray.length;
     }
@@ -78,15 +67,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return 0;
         }
         int hash = key.hashCode();
-        return hash < 0 ? -hash : hash;
+        return Math.abs(hash);
     }
 
     private void grow() {
         int length = innerArray.length;
         if (size >= length * DEFAULT_LOAD) {
             size = 0;
-            Node<K, V>[] tempArray = new Node[length];
-            System.arraycopy(innerArray, 0, tempArray, 0, length);
+            Node<K, V>[] tempArray = innerArray;
             innerArray = new Node[length << 1];
             for (Node<K, V> node : tempArray) {
                 while (node != null) {
@@ -94,6 +82,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     node = node.next;
                 }
             }
+        }
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        private Node(K key, V value) {
+            this.key = key;
+            this.value = value;
         }
     }
 }
