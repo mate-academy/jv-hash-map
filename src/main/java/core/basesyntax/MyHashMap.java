@@ -11,6 +11,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private int threshold;
 
+    @SuppressWarnings("unchecked")
     public MyHashMap() {
         this.table = new Node[DEFAULT_INITIAL_CAPACITY];
         threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
@@ -55,6 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    @SuppressWarnings("unchecked")
     private void resize() {
         if (size < threshold) {
             return;
@@ -63,7 +65,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> node : table) {
             while (node != null) {
                 Node<K, V> next = node.next;
-                node.next = null;
                 addNodeToTable(node, newTable);
                 node = next;
             }
@@ -74,27 +75,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void addNodeToTable(Node<K, V> newNode, Node<K, V>[] givenTable) {
         int bucket = newNode.hash % givenTable.length;
-        if (givenTable[bucket] != null) {
-            Node<K, V> node = givenTable[bucket];
-            while (node.next != null) {
-                node = node.next;
-            }
-            node.next = newNode;
-        } else {
-            givenTable[bucket] = newNode;
-        }
+        newNode.next = givenTable[bucket];
+        givenTable[bucket] = newNode;
     }
 
     private Node<K, V> getNodeByKey(K key) {
         int bucket = getAbsHash(key) % table.length;
-        if (table[bucket] != null) {
-            Node<K, V> node = table[bucket];
-            while (node != null) {
-                if (Objects.equals(node.key, key)) {
-                    return node;
-                }
-                node = node.next;
+        Node<K, V> node = table[bucket];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return node;
             }
+            node = node.next;
         }
         return null;
     }
