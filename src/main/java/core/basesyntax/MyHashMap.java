@@ -35,10 +35,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         if (size == threshold) {
-            Node<K,V>[] tmpNodeArray = nodeArray;
-            nodeArray = new Node[nodeArray.length * 2];
             threshold = (int)(nodeArray.length * DEFAULT_LOAD_FACTOR);
             size = 0;
+            Node<K,V>[] tmpNodeArray = nodeArray;
+            nodeArray = new Node[nodeArray.length * 2];
             for (Node<K,V> oldNode :tmpNodeArray) {
                 while (oldNode != null) {
                     addNode(oldNode.key, oldNode.value);
