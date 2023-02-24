@@ -18,14 +18,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndexFromKey(key);
         if (table[index] != null) {
             Node<K, V> localCurrent = table[index];
-            while (localCurrent != null) {
+            if (Objects.equals(localCurrent.key, key)) {
+                localCurrent.value = value;
+                return;
+            }
+            while (localCurrent.next != null) {
+                localCurrent = localCurrent.next;
                 if (Objects.equals(localCurrent.key, key)) {
                     localCurrent.value = value;
                     return;
-                } else if (localCurrent.next == null) {
-                    break;
                 }
-                localCurrent = localCurrent.next;
             }
             localCurrent.next = new Node<K, V>(key, value, null);
             size++;
