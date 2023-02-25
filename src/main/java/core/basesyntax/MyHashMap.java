@@ -13,7 +13,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         currentCapacity = DEFAULT_INITIAL_CAPACITY;
         currentLoadFactor = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
-        storage = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
+        storage = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
     @Override
@@ -35,9 +35,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     nextNode.nextNode = new Node<>(key, value);
                     size++;
                     return;
-                } else {
-                    nextNode = nextNode.nextNode;
                 }
+                nextNode = nextNode.nextNode;
             }
         }
     }
@@ -77,15 +76,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             currentCapacity = currentCapacity << 1;
             currentLoadFactor = (int) (currentCapacity * DEFAULT_LOAD_FACTOR);
             Node<K, V>[] oldStorage = storage;
-            storage = (Node<K, V>[]) new Node[currentCapacity];
+            storage = new Node[currentCapacity];
             size = 0;
             for (Node<K, V> node : oldStorage) {
-                if (node != null) {
-                    Node<K, V> nextNode = node;
-                    while (nextNode != null) {
-                        put(nextNode.key, nextNode.value);
-                        nextNode = nextNode.nextNode;
-                    }
+                Node<K, V> nextNode = node;
+                while (nextNode != null) {
+                    put(nextNode.key, nextNode.value);
+                    nextNode = nextNode.nextNode;
                 }
             }
         }
