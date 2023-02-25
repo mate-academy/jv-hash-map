@@ -10,12 +10,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
     private float loadFactor;
-    private float threshold;
+    private int threshold;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
         loadFactor = DEFAULT_LOAD_FACTORY;
-        threshold = table.length * loadFactor;
+        threshold = (int) (table.length * loadFactor);
     }
 
     @Override
@@ -26,10 +26,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (Node<K, V> node : nodes()) {
-            if (Objects.equals(key, node.key)) {
-                return node.value;
+        int hash = hash(key, table);
+        Node<K, V> currentNode = table[hash];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
             }
+            currentNode = currentNode.next;
         }
         return null;
     }
