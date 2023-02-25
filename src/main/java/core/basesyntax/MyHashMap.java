@@ -53,11 +53,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public int getIndexFromHash(K key) {
+    private int getIndexFromHash(K key) {
         return Math.abs((key == null) ? 0 : key.hashCode() % table.length);
     }
 
-    public void resize() {
+    private void resize() {
         if (size > table.length * LOAD_FACTOR) {
             Node<K, V>[] oldTable = table;
             size = 0;
