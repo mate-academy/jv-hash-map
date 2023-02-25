@@ -5,11 +5,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
     private Node<K, V>[] table;
     private int size;
-    private int capasity;
 
     public MyHashMap() {
         table = new Node[INITIAL_CAPACITY];
-        capasity = INITIAL_CAPACITY;
     }
 
     @Override
@@ -38,17 +36,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] newTable = new Node[table.length << 1];
-        capasity = capasity << 1;
+        Node<K, V>[] oldTable = table;
+        table = new Node[table.length << 1];
         size = 0;
-        for (int i = 0; i < table.length; i++) {
-            Node<K, V> curentNode = table[i];
+        for (int i = 0; i < oldTable.length; i++) {
+            Node<K, V> curentNode = oldTable[i];
             while (curentNode != null) {
-                newTable = putElement(curentNode.key, curentNode.value, newTable);
+                table = putElement(curentNode.key, curentNode.value, table);
                 curentNode = curentNode.next;
             }
         }
-        table = newTable;
     }
 
     private Node<K, V>[] putElement(K key, V value, Node<K, V>[] table) {
@@ -88,7 +85,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % capasity);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private boolean isKeyPresent(K key, Node<K, V>[] table) {
