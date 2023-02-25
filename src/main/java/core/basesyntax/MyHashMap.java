@@ -77,19 +77,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    public void print() {
-        for (int i = 0; i < table.length; i++) {
-            if (table[i] != null) {
-                System.out.println(table[i].toString());
-                Node<K, V> currentNode = table[i];
-                while (currentNode.next != null) {
-                    System.out.println(currentNode.next);
-                    currentNode = currentNode.next;
-                }
-            }
-        }
-    }
-
     private int hash(final K key, Node<K, V>[] table) {
         return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
