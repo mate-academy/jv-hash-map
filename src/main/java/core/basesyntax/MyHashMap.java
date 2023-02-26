@@ -21,12 +21,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     current.value = value;
                     return;
                 } else if (current.next == null) {
+                    current.next = new Node<>(key, value, null);
                     break;
                 }
                 current = current.next;
-            }
-            if (current != null) {
-                current.next = new Node<>(key, value, null);
             }
             size++;
             return;
