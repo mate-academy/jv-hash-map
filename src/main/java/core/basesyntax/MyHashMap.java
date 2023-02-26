@@ -63,7 +63,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = (Node<K,V>[]) new Node[newCapacity];
         threshold = (int)(LOAD_FACTOR * newCapacity);
         transferAllNodesToTable(oldTable);
-        oldTable = null;
     }
 
     private void transferAllNodesToTable(Node<K, V>[] oldTable) {
