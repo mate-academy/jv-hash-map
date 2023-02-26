@@ -57,7 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private K key;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -70,7 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void grow() {
         Node<K, V>[] oldTable = table;
-        table = new Node[table.length * 2];
+        table = new Node[table.length << 1];
         size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
