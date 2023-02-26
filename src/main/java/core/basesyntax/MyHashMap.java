@@ -28,7 +28,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public V getValue(K key) {
         if (key == null) {
-            return getNullKeyNodeValue();
+            return getNullKey();
         }
         int index = hash(key) % table.length;
         Node<K, V> node = getKeyNode(key, index);
@@ -44,13 +44,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void addNode(int index, K key, V value) {
+        if (size >= table.length * LOAD_FACTOR) {
+            resizeTable();
+        }
         Node<K, V> node = new Node<>(key, value);
         node.next = table[index];
         table[index] = node;
         size++;
-        if (size >= table.length * LOAD_FACTOR) {
-            resizeTable();
-        }
     }
 
     private void resizeTable() {
@@ -90,7 +90,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private V getNullKeyNodeValue() {
+    private V getNullKey() {
         Node<K, V> node = getNullKeyNode();
         return node != null ? node.value : null;
     }
