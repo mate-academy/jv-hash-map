@@ -16,7 +16,7 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K,V> bucket = table[Math.abs(hash(key)) % table.length];
+        Node<K,V> bucket = table[getBucketIndex(hash(key))];
         Node<K,V> newNode = new Node<>(key, value, null);
         if (bucket != null) {
             while (bucket != null) {
@@ -62,16 +62,14 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
     }
 
     private void resize() {
-        if (size > threshold) {
-            size = 0;
-            Node<K, V>[] temp = table;
-            table = (Node<K, V>[]) new Node[table.length << 1];
-            threshold = (int) (table.length * LOAD_FACTOR);
-            for (Node<K, V> bucket : temp) {
-                while (bucket != null) {
-                    put(bucket.key, bucket.value);
-                    bucket = bucket.next;
-                }
+        size = 0;
+        Node<K, V>[] temp = table;
+        table = (Node<K, V>[]) new Node[table.length << 1];
+        threshold = (int) (table.length * LOAD_FACTOR);
+        for (Node<K, V> bucket : temp) {
+            while (bucket != null) {
+                put(bucket.key, bucket.value);
+                bucket = bucket.next;
             }
         }
     }
