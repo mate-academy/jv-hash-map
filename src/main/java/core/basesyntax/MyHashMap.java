@@ -3,9 +3,9 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private final static int DEFAULT_CAPACITY = 16;
-    private final static int LENGTH_MULTIPLIER = 2;
-    private final static double LOAD_FACTOR = 0.75;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final int LENGTH_MULTIPLIER = 2;
+    private static final double LOAD_FACTOR = 0.75;
     private int size;
     private Node<K, V>[] currentHashMap;
 
@@ -41,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> currentNode = currentHashMap[hashCode(key)];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
-                return  currentNode.value;
+                return currentNode.value;
             }
             currentNode = currentNode.next;
         }
@@ -67,12 +67,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hashCode (K key) {
+    private int hashCode(K key) {
         return (key == null) ? 0 : Math.abs(hashCode() % currentHashMap.length);
     }
 
     private class Node<K, V> {
-            private Node<K, V> next;
+        private Node<K, V> next;
         private K key;
         private V value;
 
