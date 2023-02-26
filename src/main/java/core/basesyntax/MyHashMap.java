@@ -6,7 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
     private int size;
-    private Node[] buckets;
+    private Node<K, V>[] buckets;
 
     public MyHashMap() {
         buckets = new Node[DEFAULT_INITIAL_CAPACITY];
@@ -79,7 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K,V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
+        private Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
             this.key = key;
             this.value = value;
