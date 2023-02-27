@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final int INCREASE_FACTOR = 2;
@@ -16,34 +18,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         checkStorageSize();
         Node<K,V> currentNode;
         Node<K,V> lastNode;
-        int hashCode = getHashCode(key);
         int index = getIndex(key);
         if (table[index] != null) {
             currentNode = table[index];
             lastNode = table[index];
             while (currentNode != null) {
-                if (hashCode == currentNode.hashCode && (currentNode.key == key
-                        || (currentNode.key != null && currentNode.key.equals(key)))) {
+                if (Objects.equals(currentNode.key, key)) {
                     currentNode.value = value;
                     return;
                 }
                 lastNode = currentNode;
                 currentNode = currentNode.next;
             }
-            lastNode.next = new Node<>(key, value, hashCode);
+            lastNode.next = new Node<>(key, value);
             size++;
             return;
         }
-        table[index] = new Node<>(key, value, hashCode);
+        table[index] = new Node<>(key, value);
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = table[getIndex(key)];
+        Node<K,V> node = table[getIndex(key)];
         while (node != null) {
-            if (getHashCode(key) == node.hashCode
-                    && (node.key == key || (node.key != null && node.key.equals(key)))) {
+            if (Objects.equals(node.key, key)) {
                 return node.value;
             }
             node = node.next;
@@ -76,20 +75,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
-    private int getHashCode(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode());
-    }
-
-    private static class Node<K, V> {
+    private static class Node<K,V> {
         private K key;
         private V value;
-        private int hashCode;
         private Node<K,V> next;
 
-        public Node(K key, V value, int hashCode) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.hashCode = hashCode;
         }
     }
 }
