@@ -6,13 +6,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
     private int size;
-    private int currentCapacity;
-    private int currentLoadFactor;
     private Node<K, V>[] storage;
 
     public MyHashMap() {
-        currentCapacity = DEFAULT_INITIAL_CAPACITY;
-        currentLoadFactor = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
         storage = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
@@ -20,45 +16,40 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         resizeIfNeed();
         int position = getPosition(key);
-        Node<K, V> oldNode = storage[position];
-        if (oldNode == null) {
+        Node<K, V> node = storage[position];
+        if (node == null) {
             storage[position] = new Node<>(key, value);
             size++;
         } else {
-            Node<K, V> nextNode = oldNode;
-            while (nextNode != null) {
-                if (Objects.equals(nextNode.key, key)) {
-                    nextNode.value = value;
-                    break;
+            while (node != null) {
+                if (Objects.equals(node.key, key)) {
+                    node.value = value;
+                    return;
                 }
-                if (nextNode.nextNode == null) {
-                    nextNode.nextNode = new Node<>(key, value);
+                if (node.nextNode == null) {
+                    node.nextNode = new Node<>(key, value);
                     size++;
                     return;
                 }
-                nextNode = nextNode.nextNode;
+                node = node.nextNode;
             }
         }
     }
 
     @Override
     public V getValue(K key) {
-        V value = null;
         Node<K, V> currentNode = storage[getPosition(key)];
-        if (currentNode != null) {
-            if (Objects.equals(currentNode.key, key)) {
-                value = currentNode.value;
-            } else {
-                while (currentNode != null) {
-                    if (Objects.equals(currentNode.key, key)) {
-                        value = currentNode.value;
-                        break;
-                    }
-                    currentNode = currentNode.nextNode;
+        if (currentNode != null && Objects.equals(currentNode.key, key)) {
+            return currentNode.value;
+        } else {
+            while (currentNode != null) {
+                if (Objects.equals(currentNode.key, key)) {
+                    return currentNode.value;
                 }
+                currentNode = currentNode.nextNode;
             }
         }
-        return value;
+        return null;
     }
 
     @Override
@@ -67,16 +58,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getPosition(K key) {
-        int position = key == null ? 0 : key.hashCode() % currentCapacity;
-        return position >= 0 ? position : position * -1;
+        int position = key == null ? 0 : key.hashCode() % storage.length;
+        return Math.abs(position);
     }
 
     private void resizeIfNeed() {
-        if (currentLoadFactor == size) {
-            currentCapacity = currentCapacity << 1;
-            currentLoadFactor = (int) (currentCapacity * DEFAULT_LOAD_FACTOR);
+        if (size >= storage.length * DEFAULT_LOAD_FACTOR) {
             Node<K, V>[] oldStorage = storage;
-            storage = new Node[currentCapacity];
+            storage = new Node[storage.length << 1];
             size = 0;
             for (Node<K, V> node : oldStorage) {
                 Node<K, V> nextNode = node;
