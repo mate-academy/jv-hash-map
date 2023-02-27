@@ -3,24 +3,31 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_CAPACITY = 16;
-    private static final int GROW_FACTOR = 2;
-    private static final float LOAD_FACTOR = 0.75F;
-    private int threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
-    private Node<K, V>[] table = new Node[DEFAULT_CAPACITY];
+    private int defaultCapacity;
+    private int growFactor;
+    private float loadFactor;
+    private int threshold;
+    private Node<K, V>[] table;
     private int size;
+
+    public MyHashMap() {
+        this.defaultCapacity = 16;
+        this.growFactor = 2;
+        this.loadFactor = 0.75F;
+        this.threshold = (int) (defaultCapacity * loadFactor);
+        this.table = new Node[defaultCapacity];
+    }
 
     @Override
     public void put(K key, V value) {
         if (size >= threshold) {
-            size = 0;
-            threshold *= GROW_FACTOR;
             resize();
         }
-        if (table[getIndex(key)] == null) {
-            table[getIndex(key)] = new Node<>(key, value, null);
+        int index = getIndex(key);
+        if (table[index] == null) {
+            table[index] = new Node<>(key, value, null);
         } else {
-            Node<K, V> temp = table[getIndex(key)];
+            Node<K, V> temp = table[index];
             while (temp != null) {
                 if (Objects.equals(temp.key, key)) {
                     temp.value = value;
@@ -58,8 +65,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        size = 0;
+        threshold *= growFactor;
         Node<K, V>[] oldArr = table;
-        table = new Node[oldArr.length * GROW_FACTOR];
+        table = new Node[oldArr.length * growFactor];
         for (Node<K, V> node : oldArr) {
             if (node != null) {
                 Node<K, V> temp = node;
@@ -72,8 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHashCode(Object key) {
-        int h;
-        return key == null ? 0 : Math.abs((h = key.hashCode()) ^ (h >>> 16));
+        return key == null ? 0 : Math.abs(key.hashCode());
     }
 
     private class Node<K, V> {
