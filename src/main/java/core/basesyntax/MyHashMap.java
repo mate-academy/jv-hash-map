@@ -24,9 +24,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > threshold) {
             capacity *= DEFAULT_RESIZE_MULTIPLIER;
             threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
-            Node<K,V>[] newTable = (Node<K, V>[]) new Node[capacity];
             Node<K,V>[] oldTable = table;
-            table = newTable;
+            table = new Node[capacity];
             for (Node<K, V> node : oldTable) {
                 while (node != null) {
                     put(node.key, node.value);
