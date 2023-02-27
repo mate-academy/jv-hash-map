@@ -15,25 +15,42 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         ensureCapacity();
         Node<K, V> node = new Node<>(key, value);
-        int position = position(node);
+        int position = position(node.key);
         if (values[position] == null) {
             values[position] = node;
-            size++;
+        } else if (key == values[position].key
+                        || key != null && key.equals(values[position].key)) {
+            values[position].value = value;
+            return;
         } else {
-            if (values[position].put(node)) {
-                size++;
+            Node<K, V> current = values[position];
+            while (current.next != null) {
+                current = current.next;
+                if (key == current.key
+                        || key != null && key.equals(current.key)) {
+                    current.value = value;
+                    return;
+                }
             }
+            current.next = new Node<>(key, value);
         }
+        size++;
     }
 
     @Override
     public V getValue(K key) {
         int position = position(key);
-        if (values[position] == null) {
-            return null;
-        } else {
-            return values[position].get(key);
+        if (values[position] != null) {
+            Node<K, V> node = values[position];
+            while (node != null) {
+                if (node.key == key
+                        || key != null && key.equals(node.key)) {
+                    return node.value;
+                }
+                node = node.next;
+            }
         }
+        return null;
     }
 
     @Override
@@ -42,20 +59,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void insertNode(Node<K, V> node) {
-        int position = position(node);
+        int position = position(node.key);
         if (values[position] == null) {
             values[position] = node;
         } else {
-            values[position].put(node);
+            Node<K, V> current = values[position];
+            while (current.next != null) {
+                current = current.next;
+            }
+            current.next = new Node<>(node.key, node.value);
         }
     }
 
     private int position(K key) {
         return Math.abs(key == null ? 0 : key.hashCode()) % values.length;
-    }
-
-    private int position(Node<K, V> node) {
-        return node.hash % values.length;
     }
 
     private void ensureCapacity() {
@@ -74,36 +91,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static class Node<K, V> {
         private final K key;
-        private final int hash;
         private V value;
         private Node<K, V> next;
 
         private Node(K key, V value) {
             this.key = key;
-            hash = Math.abs((key == null ? 0 : key.hashCode()));
             this.value = value;
-        }
-
-        private boolean put(Node<K, V> node) {
-            if (key == node.key || key != null && key.equals(node.key)) {
-                value = node.value;
-                return false;
-            } else if (next != null) {
-                return next.put(node);
-            } else {
-                next = node;
-                return true;
-            }
-        }
-
-        private V get(K key) {
-            if (key == this.key || key != null && key.equals(this.key)) {
-                return value;
-            } else if (next != null) {
-                return next.get(key);
-            } else {
-                return null;
-            }
         }
     }
 }
