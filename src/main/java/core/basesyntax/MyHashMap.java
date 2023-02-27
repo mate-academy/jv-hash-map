@@ -39,13 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getPosition(K key) {
-        int position;
-        if (key == null) {
-            position = 0;
-        } else {
-            position = Math.abs(key.hashCode() % table.length);
-        }
-        return position;
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void checkCapacity() {
@@ -71,15 +65,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int position;
         position = getPosition(key);
         Bucket<K, V> bucket = table[position];
-        if (bucket == null) {
-            return null;
-        } else {
-            while (bucket != null) {
-                if (Objects.equals(key, bucket.key)) {
-                    return bucket.value;
-                }
-                bucket = bucket.next;
+        while (bucket != null) {
+            if (Objects.equals(key, bucket.key)) {
+                return bucket.value;
             }
+            bucket = bucket.next;
         }
         return null;
     }
@@ -94,7 +84,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Bucket<K, V> next;
 
-        public Bucket(K key, V value) {
+        private Bucket(K key, V value) {
             this.key = key;
             this.value = value;
         }
