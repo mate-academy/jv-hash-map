@@ -6,18 +6,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private int size;
-    private int capacity;
     private float loadFactor;
     private Node<K, V>[] buckets;
 
     public MyHashMap() {
-        this(DEFAULT_CAPACITY, LOAD_FACTOR);
-    }
-
-    public MyHashMap(int capacity, float loadFactor) {
-        this.capacity = capacity;
-        this.loadFactor = loadFactor;
-        this.buckets = new Node[capacity];
+        this.loadFactor = LOAD_FACTOR;
+        this.buckets = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -58,15 +52,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucketIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
+        return key == null ? 0 : Math.abs(key.hashCode() % buckets.length);
     }
 
     private boolean needsResize() {
-        return (float) size / capacity > LOAD_FACTOR;
+        return (float) size / buckets.length > LOAD_FACTOR;
     }
 
     private void resize() {
-        if (size + 1 > buckets.length * LOAD_FACTOR) {
+        if (needsResize()) {
             size = 0;
             Node<K, V>[] temp = buckets;
             buckets = (Node<K, V>[]) new Node[buckets.length << 1];
