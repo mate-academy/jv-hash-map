@@ -58,7 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void grow() {
-        if (size >= (table.length * LOAD_FACTOR)) {
+        if (size >= table.length * LOAD_FACTOR) {
             size = 0;
             int newLength = table.length << 1;
             Node<K, V>[] oldTable = table;
