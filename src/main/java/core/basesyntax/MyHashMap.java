@@ -4,7 +4,8 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final int loadFactor = 75;
+    private static final int LOAD_FACTOR = 75;
+    private static final int MULTIPLAYER_OF_GROWTH = 2;
     private Node<K, V>[] table;
     private int size;
     private int threshold;
@@ -13,18 +14,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
         initialCapacity = DEFAULT_CAPACITY;
-    }
-
-    private static class Node<K, V> {
-        private Node<K, V> next;
-        private K key;
-        private V value;
-
-        public Node(Node<K, V> next, K key, V value) {
-            this.next = next;
-            this.key = key;
-            this.value = value;
-        }
     }
 
     @Override
@@ -69,7 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void checkThreshold() {
-        if ((initialCapacity * loadFactor) / 100 >= size) {
+        if ((initialCapacity * LOAD_FACTOR) / 100 >= size) {
             resize();
         }
     }
@@ -81,12 +70,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         size = 0;
         Node<K, V>[] newTable = table;
-        table = (Node<K, V>[]) new Node[initialCapacity * 2];
+        table = (Node<K, V>[]) new Node[initialCapacity * MULTIPLAYER_OF_GROWTH];
         for (Node<K, V> node : newTable) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
             }
+        }
+    }
+
+    private static class Node<K, V> {
+        private Node<K, V> next;
+        private K key;
+        private V value;
+
+        public Node(Node<K, V> next, K key, V value) {
+            this.next = next;
+            this.key = key;
+            this.value = value;
         }
     }
 }
