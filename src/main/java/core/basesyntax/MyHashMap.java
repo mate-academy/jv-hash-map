@@ -59,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldArr = table;
-        table = new Node[oldArr.length * 2];
+        table = new Node[oldArr.length * GROW_FACTOR];
         for (Node<K, V> node : oldArr) {
             if (node != null) {
                 Node<K, V> temp = node;
