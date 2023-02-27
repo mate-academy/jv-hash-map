@@ -23,20 +23,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> currentNode = nodesArray[index];
         if (currentNode == null) {
             nodesArray[index] = nodeToPut;
-            size++;
-            return;
-        }
-        while (currentNode != null) {
-            if (currentNode.key == key
-                    || currentNode.hash == index && Objects.equals(key, currentNode.key)) {
-                currentNode.value = value;
-                return;
+        } else {
+            while (currentNode != null) {
+                if (currentNode.key == key
+                        || currentNode.hash == index && Objects.equals(key, currentNode.key)) {
+                    currentNode.value = value;
+                    return;
+                }
+                if (currentNode.next == null) {
+                    currentNode.next = nodeToPut;
+                    break;
+                }
+                currentNode = currentNode.next;
             }
-            if (currentNode.next == null) {
-                currentNode.next = nodeToPut;
-                break;
-            }
-            currentNode = currentNode.next;
         }
         size++;
     }
