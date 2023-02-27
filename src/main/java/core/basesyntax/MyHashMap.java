@@ -16,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        int index = hashCode(key);
+        int index = getIndex(key);
         Node<K, V> checkNode = table[index];
         Node<K, V> newNode = new Node<>(key, value, null);
         if (checkNode == null) {
@@ -24,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = newNode;
             return;
         }
-        for (; ; ) {
+        while (newNode != null) {
             if (Objects.equals(checkNode.key, key)) {
                 checkNode.value = value;
                 return;
@@ -40,7 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = table[hashCode(key)];
+        Node<K, V> node = table[getIndex(key)];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
                 return node.value;
@@ -61,17 +61,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table = new Node[table.length << 1];
             size = 0;
             for (Node<K, V> node : newTable) {
-                if (node != null) {
-                    while (node != null) {
-                        put(node.key, node.value);
-                        node = node.next;
-                    }
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
                 }
             }
         }
     }
 
-    private int hashCode(K key) {
+    private int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
