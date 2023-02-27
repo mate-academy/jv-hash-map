@@ -24,8 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         resize();
-        int keyHash = getAbsHash(key);
-        Node<K, V> newNode = new Node<>(keyHash, key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, null);
         addNodeToTable(newNode, nodesTable);
         size++;
     }
@@ -58,13 +57,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void addNodeToTable(Node<K, V> newNode, Node<K, V>[] givenTable) {
-        int bucket = newNode.hash % givenTable.length;
+        int bucket = getBucketIndex(newNode.key, givenTable.length);
         newNode.next = givenTable[bucket];
         givenTable[bucket] = newNode;
     }
 
     private Node<K, V> getNodeByKey(K key) {
-        int bucket = getAbsHash(key) % nodesTable.length;
+        int bucket = getBucketIndex(key, nodesTable.length);
         Node<K, V> node = nodesTable[bucket];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
@@ -75,18 +74,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private int getAbsHash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode());
+    private int getBucketIndex(K key, int tableLength) {
+        int absHash = key == null ? 0 : Math.abs(key.hashCode());
+        return absHash % tableLength;
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
