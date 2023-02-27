@@ -61,7 +61,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getHash(Object key) {
+    private int getHash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
