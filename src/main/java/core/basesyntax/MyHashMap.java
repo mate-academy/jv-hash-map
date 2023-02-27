@@ -16,25 +16,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         resize();
         int index = getIndexKey(key);
-        if (table[index] != null) {
-            Node<K, V> current = table[index];
+        Node<K, V> current = table[index];
+        if (table[index] == null) {
+            table[index] = new Node<K, V>(key, value, null);
+            size++;
+            return;
+        }
+        while (current != null) {
             if (Objects.equals(current.key, key)) {
                 current.value = value;
                 return;
             }
-            while (current.next != null) {
-                current = current.next;
-                if (Objects.equals(current.key, key)) {
-                    current.value = value;
-                    return;
-                }
+            if (current.next == null) {
+                current.next = new Node<>(key, value,null);
+                size++;
+                return;
             }
-            current.next = new Node<K, V>(key,value,null);
-            size++;
-            return;
+            current = current.next;
         }
-        table[index] = new Node<K, V>(key,value,null);
-        size++;
     }
 
     @Override
