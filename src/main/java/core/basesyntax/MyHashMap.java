@@ -39,15 +39,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> currentNode = storage[getPosition(key)];
-        if (currentNode != null && Objects.equals(currentNode.key, key)) {
-            return currentNode.value;
-        } else {
-            while (currentNode != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    return currentNode.value;
-                }
-                currentNode = currentNode.nextNode;
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
             }
+            currentNode = currentNode.nextNode;
         }
         return null;
     }
@@ -68,10 +64,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             storage = new Node[storage.length << 1];
             size = 0;
             for (Node<K, V> node : oldStorage) {
-                Node<K, V> nextNode = node;
-                while (nextNode != null) {
-                    put(nextNode.key, nextNode.value);
-                    nextNode = nextNode.nextNode;
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.nextNode;
                 }
             }
         }
@@ -82,7 +77,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> nextNode;
 
-        public Node(K key, V value) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
         }
