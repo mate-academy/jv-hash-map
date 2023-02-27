@@ -38,8 +38,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = table[hash(key)];
-        for (int i = 0; i < size; i++) {
+        int index = hash(key);
+        Node<K, V> currentNode = table[index];
+        while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
             }
@@ -53,7 +54,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    @Override
     public boolean isEmpty() {
         return size == 0;
     }
