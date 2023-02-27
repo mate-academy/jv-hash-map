@@ -16,6 +16,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         final Node<K, V> newNode = new Node<>(key, value);
         int index = getIndex(key);
         Node<K, V> currentNode = table[index];
+        if (currentNode == null) {
+            table[index] = newNode;
+            size++;
+        }
         while (currentNode != null) {
             if (currentNode.key == newNode.key || currentNode.key != null
                     && currentNode.key.equals(newNode.key)) {
@@ -27,10 +31,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 break;
             }
             currentNode = currentNode.next;
-        }
-        if (currentNode == null) {
-            table[index] = newNode;
-            size++;
         }
     }
 
