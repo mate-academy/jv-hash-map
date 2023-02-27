@@ -13,29 +13,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[INITIAL_CAPACITY];
     }
 
-    public V getValue(K key) {
-        Node<K, V> node = getNodeByKey(key);
-        return node != null ? node.value : null;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    private int hash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode());
-    }
-
-    private void checkCapacity() {
-        if (size >= table.length * LOAD_FACTOR) {
-            resizeTable();
-        }
-    }
-
-    private int getIndex(K key) {
-        return hash(key) % table.length;
-    }
-
     public void put(K key, V value) {
         checkCapacity();
         int position = getIndex(key);
@@ -57,6 +34,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             current = current.next;
         }
+    }
+
+    public V getValue(K key) {
+        Node<K, V> node = getNodeByKey(key);
+        return node != null ? node.value : null;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    private int hash(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode());
+    }
+
+    private void checkCapacity() {
+        if (size >= table.length * LOAD_FACTOR) {
+            resizeTable();
+        }
+    }
+
+    private int getIndex(K key) {
+        return hash(key) % table.length;
     }
 
     private void resizeTable() {
