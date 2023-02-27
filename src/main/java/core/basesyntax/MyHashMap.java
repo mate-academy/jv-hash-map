@@ -3,19 +3,16 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private final int defaultCapacity;
-    private final int growFactor;
-    private final float loadFactor;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final int GROW_FACTOR = 2;
+    private static final float LOAD_FACTOR = 0.74F;
     private int threshold;
     private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        this.defaultCapacity = 16;
-        this.growFactor = 2;
-        this.loadFactor = 0.75F;
-        this.threshold = (int) (defaultCapacity * loadFactor);
-        this.table = new Node[defaultCapacity];
+        this.threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
+        this.table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -66,14 +63,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        threshold *= growFactor;
+        threshold *= GROW_FACTOR;
         Node<K, V>[] oldArray = table;
-        table = new Node[oldArray.length * growFactor];
+        table = new Node[oldArray.length * GROW_FACTOR];
         for (Node<K, V> node : oldArray) {
-            Node<K, V> temp = node;
-            while (temp != null) {
-                put(temp.key, temp.value);
-                temp = temp.next;
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
