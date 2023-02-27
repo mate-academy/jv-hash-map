@@ -7,28 +7,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int RESIZE_MULTIPLIER = 2;
 
-    private Node<K, V>[] table;
+    private Node<K, V>[] nodesTable;
     private int size;
     private int threshold;
 
-    @SuppressWarnings("unchecked")
     public MyHashMap() {
-        this.table = new Node[DEFAULT_INITIAL_CAPACITY];
+        this.nodesTable = new Node[DEFAULT_INITIAL_CAPACITY];
         threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
-    }
-
-    private static class Node<K, V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
     }
 
     @Override
@@ -41,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         resize();
         int keyHash = getAbsHash(key);
         Node<K, V> newNode = new Node<>(keyHash, key, value, null);
-        addNodeToTable(newNode, table);
+        addNodeToTable(newNode, nodesTable);
         size++;
     }
 
@@ -56,20 +41,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    @SuppressWarnings("unchecked")
     private void resize() {
         if (size < threshold) {
             return;
         }
-        Node<K, V>[] newTable = new Node[table.length * RESIZE_MULTIPLIER];
-        for (Node<K, V> node : table) {
+        Node<K, V>[] newTable = new Node[nodesTable.length * RESIZE_MULTIPLIER];
+        for (Node<K, V> node : nodesTable) {
             while (node != null) {
                 Node<K, V> next = node.next;
                 addNodeToTable(node, newTable);
                 node = next;
             }
         }
-        table = newTable;
+        nodesTable = newTable;
         threshold = threshold * RESIZE_MULTIPLIER;
     }
 
@@ -80,8 +64,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> getNodeByKey(K key) {
-        int bucket = getAbsHash(key) % table.length;
-        Node<K, V> node = table[bucket];
+        int bucket = getAbsHash(key) % nodesTable.length;
+        Node<K, V> node = nodesTable[bucket];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
                 return node;
@@ -93,5 +77,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getAbsHash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
+    }
+
+    private static class Node<K, V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(int hash, K key, V value, Node<K, V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
