@@ -17,24 +17,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         isResize();
         int index = getIndex(key);
-        if (table[index] != null) {
-            Node<K, V> node = table[index];
+        Node<K, V> node = table[index];
+        while (node != null) {
             if (Objects.equals(node.key, key)) {
                 node.currentValue = value;
                 return;
             }
-            while (node.next != null) {
-                node = node.next;
-                if (Objects.equals(node.key, key)) {
-                    node.currentValue = value;
-                    return;
-                }
-            }
-            node.next = new Node<K, V>(key, value);
-            size++;
-            return;
+            node = node.next;
         }
-        table[index] = new Node<K, V>(key, value);
+        table[index] = new Node<K, V>(key, value, table[index]);
         size++;
     }
 
@@ -56,11 +47,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return (key != null) ? Math.abs(key.hashCode()) % table.length : 0;
+        return key != null ? Math.abs(key.hashCode()) % table.length : 0;
     }
 
     private boolean isResize() {
-        if (size + 1 > table.length * LOAD_FACTOR) {
+        if (size >= table.length * LOAD_FACTOR) {
             transfer();
         }
         return true;
@@ -83,9 +74,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V currentValue;
         private Node<K, V> next;
 
-        private Node(K key, V currentValue) {
+        private Node(K key, V currentValue, Node<K, V> next) {
             this.key = key;
             this.currentValue = currentValue;
+            this.next = next;
         }
     }
 }
