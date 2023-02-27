@@ -15,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        int position = hashCode(key);
+        int position = getBucketIndex(key);
         Node<K, V> currentNode = table[position];
         if (currentNode == null) {
             table[position] = new Node(key, value, null);
@@ -36,7 +36,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int position = hashCode(key);
+        int position = getBucketIndex(key);
         Node<K, V> nodeByKey = table[position];
         while (nodeByKey != null) {
             if (Objects.equals(nodeByKey.key, key)) {
@@ -52,16 +52,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hashCode(Object key) {
+    private int getBucketIndex(Object key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private void resize() {
         if (size > LOAD_FACTOR * table.length) {
-            Node<K, V>[] newTable = table;
+            Node<K, V>[] oldTable = table;
             int newCapacity = table.length << 1;
             table = new Node[newCapacity];
-            for (Node<K, V> oldNode : newTable) {
+            for (Node<K, V> oldNode : oldTable) {
                 while (oldNode != null) {
                     put(oldNode.key, oldNode.value);
                     oldNode = oldNode.next;
