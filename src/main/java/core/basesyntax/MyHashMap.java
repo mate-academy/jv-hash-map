@@ -7,40 +7,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
-    private int newTableCapacity;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        newTableCapacity = DEFAULT_INITIAL_CAPACITY;
-    }
-
-    private int getBucketIndexOnHash(K key) {
-        return (key == null) ? 0 : (Math.abs(key.hashCode() % newTableCapacity));
-    }
-
-    private int resizeThreshold() {
-        return (int) (newTableCapacity * LOAD_FACTOR);
-    }
-
-    private void resize() {
-        if (size == resizeThreshold()) {
-            Node<K, V>[] toRedistribute = table;
-            size = 0;
-            table = new Node[newTableCapacity << 1];
-            for (Node<K, V> node : toRedistribute) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
-            }
-        }
     }
 
     @Override
     public void put(K key, V value) {
         resize();
         int index = getBucketIndexOnHash(key);
-        Node<K, V> lastInChain = new Node<>(index, key, value, null);
+        Node<K, V> lastInChain = new Node<>(key, value, null);
         if (table[index] != null) {
             Node<K, V> currentNode = table[index];
             if (Objects.equals(key, currentNode.key)) {
@@ -66,8 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         Node<K, V> current = table[getBucketIndexOnHash(key)];
         while (current != null) {
-            if (Objects.equals(current.hash, getBucketIndexOnHash(key))
-                    && Objects.equals(current.key, key)) {
+            if (Objects.equals(current.key, key)) {
                 return current.value;
             }
             current = current.next;
@@ -80,14 +55,34 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private int getBucketIndexOnHash(K key) {
+        return (key == null) ? 0 : (Math.abs(key.hashCode() % DEFAULT_INITIAL_CAPACITY));
+    }
+
+    private int getResizeThreshold() {
+        return (int) (DEFAULT_INITIAL_CAPACITY * LOAD_FACTOR);
+    }
+
+    private void resize() {
+        if (size == getResizeThreshold()) {
+            Node<K, V>[] toRedistribute = table;
+            size = 0;
+            table = new Node[DEFAULT_INITIAL_CAPACITY << 1];
+            for (Node<K, V> node : toRedistribute) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
+            }
+        }
+    }
+
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        private Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
