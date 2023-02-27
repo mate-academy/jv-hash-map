@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final int LOAD_FACTOR = 75;
+    private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
 
@@ -54,7 +54,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void checkThreshold() {
-        if ((table.length * LOAD_FACTOR) / 100 < size) {
+        if ((table.length * LOAD_FACTOR) < size) {
             resize();
         }
     }
