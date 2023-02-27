@@ -60,9 +60,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void growCapacity() {
         if (size >= (nodeArray.length * DEFAULT_LOAD_FACTOR)) {
             size = 0;
-            int newCapacity = nodeArray.length << 1;
             Node<K, V>[] oldArray = nodeArray;
-            nodeArray = new Node[newCapacity];
+            nodeArray = new Node[nodeArray.length << 1];
             for (Node<K, V> element : oldArray) {
                 while (element != null) {
                     put(element.key, element.value);
