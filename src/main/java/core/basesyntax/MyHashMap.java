@@ -15,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        isResize();
+        resize();
         int index = getIndex(key);
         Node<K, V> node = table[index];
         while (node != null) {
@@ -50,11 +50,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key != null ? Math.abs(key.hashCode()) % table.length : 0;
     }
 
-    private boolean isResize() {
+    private void resize() {
         if (size >= table.length * LOAD_FACTOR) {
             transfer();
         }
-        return true;
     }
 
     private void transfer() {
