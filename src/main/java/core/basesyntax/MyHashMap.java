@@ -32,7 +32,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K,V> newNode = new Node<>(key,value,table[index]);
         table[index] = newNode;
         size++;
-        checkForResize();
     }
 
     @Override
@@ -57,16 +56,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K,V>[] oldTable = table;
             table = new Node[table.length << 1];
             size = 0;
-            int i = 0;
-            Node<K,V> value = oldTable[i];
-            do {
-                if (value == null) {
-                    value = oldTable[i++];
-                } else {
-                    put(value.key, value.value);
-                    value = value.next;
+            for (Node<K,V> node : oldTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
                 }
-            } while (oldTable.length > i);
+            }
         }
     }
 
