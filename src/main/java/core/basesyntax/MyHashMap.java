@@ -3,9 +3,9 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private int defaultCapacity;
-    private int growFactor;
-    private float loadFactor;
+    private final int defaultCapacity;
+    private final int growFactor;
+    private final float loadFactor;
     private int threshold;
     private Node<K, V>[] table;
     private int size;
@@ -67,15 +67,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         size = 0;
         threshold *= growFactor;
-        Node<K, V>[] oldArr = table;
-        table = new Node[oldArr.length * growFactor];
-        for (Node<K, V> node : oldArr) {
-            if (node != null) {
-                Node<K, V> temp = node;
-                while (temp != null) {
-                    put(temp.key, temp.value);
-                    temp = temp.next;
-                }
+        Node<K, V>[] oldArray = table;
+        table = new Node[oldArray.length * growFactor];
+        for (Node<K, V> node : oldArray) {
+            Node<K, V> temp = node;
+            while (temp != null) {
+                put(temp.key, temp.value);
+                temp = temp.next;
             }
         }
     }
