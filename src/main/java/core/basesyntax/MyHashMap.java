@@ -13,8 +13,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
+    public int getSize() {
+        return size;
+    }
+
+    @Override
     public void put(K key, V value) {
-        Node<K, V> existingNode = getNodeAt(key);
+        Node<K, V> existingNode = getNodeByKey(key);
         if (existingNode != null) {
             existingNode.value = value;
             return;
@@ -26,32 +31,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        final Node<K, V> existingNode = getNodeAt(key);
-        if (existingNode == null) {
-            return null;
-        }
-        return existingNode.value;
+        final Node<K, V> existingNode = getNodeByKey(key);
+        return existingNode == null ? null : existingNode.value;
     }
 
-    private Node<K, V> getNodeAt(K key) {
-        Node<K, V> starterNode = storage[getBucket(key)];
-        if (starterNode == null) {
-            return null;
-        }
-        for (Node<K, V> current = starterNode; current != null; current = current.next) {
-            if (Objects.equals(current.key, key)) {
+    private Node<K, V> getNodeByKey(K key) {
+        Node<K, V> current = storage[getBucketIndex(key)];
+        do {
+            if (current == null || Objects.equals(current.key, key)) {
                 return current;
             }
-        }
-        return null;
+            current = current.next;
+        } while (true);
     }
 
-    @Override
-    public int getSize() {
-        return size;
-    }
-
-    private int getBucket(K key) {
+    private int getBucketIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % storage.length;
     }
 
@@ -59,23 +53,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size / (double) storage.length > RESIZE_FACTOR) {
             Node<K, V>[] oldData = storage;
             storage = (Node<K, V>[]) new Node[storage.length << 1];
+            size = 0;
             for (Node<K, V> rootNode : oldData) {
                 for (Node<K, V> innerNode = rootNode;
                         innerNode != null;
                         innerNode = innerNode.next) {
-                    insertNode(innerNode.clone(), storage);
+                    put(innerNode.key, innerNode.value);
                 }
             }
         }
     }
 
     private void insertNode(Node<K, V> node, Node<K, V>[] storage) {
-        int bucket = getBucket(node.key);
+        int bucket = getBucketIndex(node.key);
         node.next = storage[bucket];
         storage[bucket] = node;
     }
 
-    private static class Node<K, V> implements Cloneable {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -83,11 +78,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private Node(K key, V value) {
             this.key = key;
             this.value = value;
-        }
-
-        @Override
-        protected Node<K, V> clone() {
-            return new Node<K, V>(key, value);
         }
     }
 }
