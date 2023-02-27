@@ -22,11 +22,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int bucketIndex = getBucketIndex(key);
-        Node<K, V> node = buckets[bucketIndex];
         if (needsResize()) {
             resize();
         }
+        int bucketIndex = getBucketIndex(key);
+        Node<K, V> node = buckets[bucketIndex];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
                 node.value = value;
@@ -58,15 +58,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucketIndex(K key) {
-        int hash = Objects.hashCode(key);
-        hash = hash < 0 ? -hash : hash;
-        int index = hash % capacity;
-        return index < 0 ? index + capacity : index;
+        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
     private boolean needsResize() {
-        float currentLoadFactor = (float) size / capacity;
-        return currentLoadFactor > LOAD_FACTOR;
+        return (float) size / capacity > LOAD_FACTOR;
     }
 
     private void resize() {
@@ -88,7 +84,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
