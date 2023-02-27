@@ -5,7 +5,6 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int GROWTH_RATE = 2;
     private int size;
     private Node<K, V>[] table;
 
@@ -60,8 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         int capacity = table.length;
         Node<K, V>[] tempTable = table;
-        capacity = capacity * GROWTH_RATE;
-        table = new Node[capacity];
+        table = new Node[capacity << 1];
         for (Node<K, V> element : tempTable) {
             while (element != null) {
                 put(element.key, element.value);
@@ -71,11 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucketIndex(K key) {
-        int hash = 0;
-        if (key != null) {
-            hash = Math.abs(key.hashCode() % table.length);
-        }
-        return hash;
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private static class Node<K, V> {
