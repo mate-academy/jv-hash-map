@@ -3,7 +3,7 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int CAPACITY = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
 
     private int size;
@@ -12,7 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] buckets;
 
     public MyHashMap() {
-        this(CAPACITY, LOAD_FACTOR);
+        this(DEFAULT_CAPACITY, LOAD_FACTOR);
     }
 
     public MyHashMap(int capacity, float loadFactor) {
