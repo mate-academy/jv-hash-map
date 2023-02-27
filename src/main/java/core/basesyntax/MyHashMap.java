@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75F;
@@ -12,17 +14,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        checkForResize();
         int index = hash(key, table.length);
         Node<K,V> node = table[index];
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
             size++;
-            checkForResize();
             return;
         }
         while (node != null) {
-            if (node.key == key || (node.key != null
-                    && node.key.equals(key))) {
+            if (Objects.equals(node.key, key)) {
                 node.value = value;
                 return;
             }
@@ -38,8 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         Node<K,V> value = table[hash(key,table.length)];
         while (value != null) {
-            if (value.key == key || (value.key != null
-                    && value.key.equals(key))) {
+            if (Objects.equals(value.key, key)) {
                 return value.value;
             }
             value = value.next;
@@ -54,17 +54,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void checkForResize() {
         if (size > table.length * LOAD_FACTOR) {
-            int newCapacity = table.length << 1;
-            Node[] newTable = new Node[newCapacity];
-            for (Node<K,V> kvNode : table) {
-                Node<K,V> node = kvNode;
-                while (node != null) {
-                    int index = hash(node.key, newCapacity);
-                    newTable[index] = new Node(node.key, node.value, newTable[index]);
-                    node = node.next;
+            Node<K,V>[] oldTable = table;
+            table = new Node[table.length << 1];
+            size = 0;
+            int i = 0;
+            Node<K,V> value = oldTable[i];
+            do {
+                if (value == null) {
+                    value = oldTable[i++];
+                } else {
+                    put(value.key, value.value);
+                    value = value.next;
                 }
-            }
-            table = newTable;
+            } while (oldTable.length > i);
         }
     }
 
