@@ -2,6 +2,7 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_VOLUME = 16;
+    private static final double LOAD_FACTOR = 0.75f;
     private Node<K, V>[] vector;
     private int volume;
     private int size;
@@ -15,12 +16,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         Node<K, V> point = findByKey(key);
         if (point == null) {
-            if (isFilled()) {
+            if ((volume * LOAD_FACTOR) <= size) {
                 resizeHashesVector();
             }
             int index = calculateIndex(key);
             Node<K, V> entry = vector[index];
-            Node<K, V> newNode = new Node<>(key, value, index);
+            Node<K, V> newNode = new Node<>(key, value);
             if (entry == null) {
                 vector[index] = newNode;
             } else {
@@ -50,17 +51,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resizeHashesVector() {
-        Node<K, V>[] tempVector = new Node[volume << 1];
-        System.arraycopy(vector,0,tempVector,0,vector.length);
-        vector = tempVector;
-    }
-
-    private boolean isFilled() {
-        return (volume * 3 >> 2) < size;
+        volume <<= 1;
+        Node<K, V>[] tempVector = vector;
+        vector = new Node[volume];
+        size = 0;
+        for (Node<K, V> entry : tempVector) {
+            while (entry != null) {
+                put(entry.key,entry.value);
+                entry = entry.next;
+            }
+        }
     }
 
     private int calculateIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % volume);
+        return key == null ? 0 : Math.abs(key.hashCode() % vector.length);
     }
 
     private Node<K, V> findByKey(K key) {
@@ -82,12 +86,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
-        private int hash;
 
-        private Node(K key, V value, int hash) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.hash = hash;
         }
     }
 }
