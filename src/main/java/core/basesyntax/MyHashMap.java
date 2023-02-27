@@ -13,7 +13,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[DEFAULT_CAPACITY];
     }
 
-    public class Node<K, V> {
+    private class Node<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
@@ -71,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= (table.length * LOAD_FACTOR)) {
             size = 0;
             Node<K, V>[] oldTable = table;
-            table = (Node<K, V>[]) new Node[table.length * SCALING_CONSTANT];
+            table = new Node[table.length * SCALING_CONSTANT];
             for (Node<K, V> nodes : oldTable) {
                 while (nodes != null) {
                     put(nodes.key, nodes.value);
