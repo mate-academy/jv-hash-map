@@ -15,11 +15,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         growCapacity();
-        int hash = hash(key);
         Node<K, V> inputNode = new Node<>(key, value, null);
-        Node<K, V> node = nodeArray[hash];
+        Node<K, V> node = nodeArray[hash(key)];
         if (node == null) {
-            nodeArray[hash] = inputNode;
+            nodeArray[hash(key)] = inputNode;
         } else {
             while (node != null) {
                 if (Objects.equals(key, node.key)) {
