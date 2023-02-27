@@ -25,9 +25,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         if (size == resizeThreshold()) {
             Node<K, V>[] toRedistribute = table;
-            newTableCapacity = newTableCapacity << 1;
             size = 0;
-            table = new Node[newTableCapacity];
+            table = new Node[newTableCapacity << 1];
             for (Node<K, V> node : toRedistribute) {
                 while (node != null) {
                     put(node.key, node.value);
