@@ -3,9 +3,8 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
-    private static final int INCREASE_INDEX = 2;
-    private float loadFactor = 0.75f;
+    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+    private static final float LOAD_FACTOR = 0.75f;
     private int size;
     private int currentCapacity = DEFAULT_INITIAL_CAPACITY;
     private Node<K,V>[] table;
@@ -60,8 +59,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldArray = table;
-        if (currentCapacity * loadFactor <= size) {
-            currentCapacity = currentCapacity * INCREASE_INDEX;
+        if (currentCapacity * LOAD_FACTOR <= size) {
+            currentCapacity <<= 1;
             table = (Node<K, V>[]) new Node[currentCapacity];
             size = 0;
             for (Node<K, V> node : oldArray) {
