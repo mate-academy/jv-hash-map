@@ -6,11 +6,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private int size;
-    private float loadFactor;
     private Node<K, V>[] buckets;
 
     public MyHashMap() {
-        this.loadFactor = LOAD_FACTOR;
         this.buckets = new Node[DEFAULT_CAPACITY];
     }
 
@@ -60,15 +58,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (needsResize()) {
-            size = 0;
-            Node<K, V>[] temp = buckets;
-            buckets = (Node<K, V>[]) new Node[buckets.length << 1];
-            for (Node<K, V> kvNode : temp) {
-                while (kvNode != null) {
-                    put(kvNode.key, kvNode.value);
-                    kvNode = kvNode.next;
-                }
+        size = 0;
+        Node<K, V>[] temp = buckets;
+        buckets = (Node<K, V>[]) new Node[buckets.length << 1];
+        for (Node<K, V> kvNode : temp) {
+            while (kvNode != null) {
+                put(kvNode.key, kvNode.value);
+                kvNode = kvNode.next;
             }
         }
     }
