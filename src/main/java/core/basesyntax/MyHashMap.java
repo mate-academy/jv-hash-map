@@ -8,7 +8,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
     private int threshold;
-    private int capacity;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
@@ -19,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         resize();
         int hash = getHash(key);
-        Node<K,V> newNode = new Node<>(hash, key, value, null);
+        Node<K,V> newNode = new Node<>(key, value, null);
         if (table[hash] == null) {
             table[hash] = newNode;
             size++;
@@ -32,12 +31,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             if (currentNode.next == null) {
-                break;
+                currentNode.next = newNode;
+                size++;
+                return;
             }
             currentNode = currentNode.next;
         }
-        currentNode.next = newNode;
-        size++;
     }
 
     @Override
@@ -78,13 +77,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K,V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
