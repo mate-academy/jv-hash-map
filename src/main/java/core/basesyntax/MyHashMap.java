@@ -7,17 +7,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private static final int CAPACITY_MULTIPLIER = 2;
     private Node<K, V>[] nodesArray;
-    private int capacity;
     private int size;
 
     public MyHashMap() {
         nodesArray = new Node[DEFAULT_CAPACITY];
-        capacity = DEFAULT_CAPACITY;
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= capacity * LOAD_FACTOR) {
+        if (size >= nodesArray.length * LOAD_FACTOR) {
             resize();
         }
         int index = getHash(key);
@@ -62,14 +60,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
+        return key == null ? 0 : Math.abs(key.hashCode() % nodesArray.length);
     }
 
     private void resize() {
         size = 0;
         Node<K, V>[] tempNodesArray = nodesArray;
-        capacity *= CAPACITY_MULTIPLIER;
-        nodesArray = new Node[capacity];
+        nodesArray = new Node[nodesArray.length * CAPACITY_MULTIPLIER];
         for (Node<K, V> node: tempNodesArray) {
             while (node != null) {
                 put(node.key, node.value);
