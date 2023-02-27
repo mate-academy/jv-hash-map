@@ -68,6 +68,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
+    }
+
     private static class Node<K,V> {
         private final K key;
         private V value;
@@ -78,9 +82,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-    }
-
-    private int getIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 }
