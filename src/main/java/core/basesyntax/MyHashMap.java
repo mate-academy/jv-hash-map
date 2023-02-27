@@ -1,7 +1,6 @@
 package core.basesyntax;
 
 import java.util.Objects;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
