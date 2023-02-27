@@ -14,26 +14,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        resize();
+        resizeIfNeeded();
         int index = getIndexFromHash(key);
-        if (table[index] != null) {
+        if (table[index] == null) {
+            table[index] = new Node<>(key, value, null);
+        } else {
             Node<K, V> currentNode = table[index];
             while (currentNode != null) {
                 if (Objects.equals(currentNode.key, key)) {
                     currentNode.value = value;
                     return;
-                } else if (currentNode.next == null) {
+                }
+                if (currentNode.next == null) {
                     break;
                 }
                 currentNode = currentNode.next;
             }
-            if (currentNode != null) {
-                currentNode.next = new Node<>(key, value, null);
-            }
-            size++;
-            return;
+            currentNode.next = new Node<>(key, value, null);
         }
-        table[index] = new Node<>(key, value, null);
         size++;
     }
 
@@ -54,15 +52,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resize() {
+    private void resizeIfNeeded() {
         if (size >= table.length * LOAD_FACTOR) {
             size = 0;
             Node<K, V>[] oldTable = table;
             table = (Node<K, V>[]) new Node[table.length * 2];
-            for (Node<K, V> allNodes : oldTable) {
-                while (allNodes != null) {
-                    put(allNodes.key, allNodes.value);
-                    allNodes = allNodes.next;
+            for (Node<K, V> node : oldTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
                 }
             }
         }
