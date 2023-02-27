@@ -15,10 +15,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         growCapacity();
+        int hash = hash(key);
         Node<K, V> inputNode = new Node<>(key, value, null);
-        Node<K, V> node = nodeArray[hash(key)];
+        Node<K, V> node = nodeArray[hash];
         if (node == null) {
-            nodeArray[hash(key)] = inputNode;
+            nodeArray[hash] = inputNode;
         } else {
             while (node != null) {
                 if (Objects.equals(key, node.key)) {
@@ -57,7 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void growCapacity() {
-        if (size >= (nodeArray.length * DEFAULT_LOAD_FACTOR)) {
+        if (size >= nodeArray.length * DEFAULT_LOAD_FACTOR) {
             size = 0;
             Node<K, V>[] oldArray = nodeArray;
             nodeArray = new Node[nodeArray.length << 1];
@@ -75,7 +76,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
