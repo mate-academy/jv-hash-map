@@ -3,7 +3,7 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int INITIAL_LENGTH = 1 << 4;
+    private static final int INITIAL_LENGTH = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
@@ -17,23 +17,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         resize();
         int index = getIndexKey(key);
         Node<K, V> current = table[index];
-        if (table[index] == null) {
+        if (current == null) {
             table[index] = new Node<K, V>(key, value, null);
             size++;
             return;
         }
-        while (current != null) {
+        while (true) {
             if (Objects.equals(current.key, key)) {
                 current.value = value;
                 return;
             }
             if (current.next == null) {
-                current.next = new Node<>(key, value,null);
-                size++;
-                return;
+                break;
             }
             current = current.next;
         }
+        current.next = new Node<>(key, value,null);
+        size++;
     }
 
     @Override
@@ -58,10 +58,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (size + 1 > table.length * LOAD_FACTOR) {
+        if (size >= table.length * LOAD_FACTOR) {
             size = 0;
             Node<K, V>[] temp = table;
-            table = (Node<K, V>[]) new Node[table.length << 1];
+            table = (Node<K, V>[]) new Node[table.length * 2];
             for (Node<K, V> kvNode : temp) {
                 while (kvNode != null) {
                     put(kvNode.key, kvNode.value);
