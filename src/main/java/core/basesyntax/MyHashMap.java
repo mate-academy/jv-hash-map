@@ -15,12 +15,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K,V> element = getNode(key);
+        resize();
         if (element == null) {
-            int keyHash = hash(key);
-            int bucketNumber = getBucketNumber(keyHash);
-            buckets[bucketNumber] = new Node<>(keyHash, key, value, buckets[bucketNumber]);
+            int bucketNumber = getBucketNumber(key);
+            buckets[bucketNumber] = new Node<>(key, value, buckets[bucketNumber]);
             size++;
-            resize();
         } else {
             element.value = value;
         }
@@ -38,8 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> getNode(K key) {
-        int keyHash = hash(key);
-        int bucketNumber = getBucketNumber(keyHash);
+        int bucketNumber = getBucketNumber(key);
         Node<K,V> currentNode = buckets[bucketNumber];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
@@ -50,12 +48,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private final int hash(Object key) {
+    private final int hash(K key) {
         return (key == null) ? 0 : (Math.abs(key.hashCode()));
     }
 
-    private final int getBucketNumber(int hash) {
-        return hash % buckets.length;
+    private final int getBucketNumber(K key) {
+        return hash(key) % buckets.length;
     }
 
     private void resize() {
@@ -74,13 +72,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K,V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K,V> next;
 
-        private Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
