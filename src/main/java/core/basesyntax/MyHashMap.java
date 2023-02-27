@@ -5,7 +5,6 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-
     private int size;
     private int capacity;
     private float loadFactor;
@@ -25,6 +24,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         int bucketIndex = getBucketIndex(key);
         Node<K, V> node = buckets[bucketIndex];
+        if (needsResize()) {
+            resize();
+        }
         while (node != null) {
             if (Objects.equals(node.key, key)) {
                 node.value = value;
@@ -35,9 +37,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> newNode = new Node<>(key, value, buckets[bucketIndex]);
         buckets[bucketIndex] = newNode;
         size++;
-        if (needsResize()) {
-            resize();
-        }
     }
 
     @Override
@@ -67,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private boolean needsResize() {
         float currentLoadFactor = (float) size / capacity;
-        return currentLoadFactor > loadFactor;
+        return currentLoadFactor > LOAD_FACTOR;
     }
 
     private void resize() {
