@@ -12,7 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (isMapLoad()) {
+        if (checkThreshold()) {
             resize();
         }
         table = putElement(key, value, table);
@@ -52,12 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> newElement = new Node<>(key, value);
         int index = getIndex(key);
         if (table[index] != null) {
-            if (isKeyPresent(key, table)) {
-                changeElementInNodeList(table[index], newElement);
-                return table;
-            }
             putToNodeList(table[index], newElement);
-            size++;
             return table;
         }
         table[index] = newElement;
@@ -68,47 +63,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void putToNodeList(Node<K, V> curentNode, Node<K, V> addNode) {
         Node<K, V> node = curentNode;
         while (node.next != null) {
-            node = node.next;
-        }
-        node.next = addNode;
-    }
-
-    private void changeElementInNodeList(Node<K, V> curentNode, Node<K, V> addNode) {
-        Node<K, V> node = curentNode;
-        while (node != null) {
             if (campareKeys(node.key, addNode.key)) {
                 node.value = addNode.value;
                 return;
             }
             node = node.next;
         }
+        if (campareKeys(node.key, addNode.key)) {
+            node.value = addNode.value;
+            return;
+        }
+        node.next = addNode;
+        size++;
     }
 
     private int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
-    private boolean isKeyPresent(K key, Node<K, V>[] table) {
-        for (int i = 0; i < table.length; i++) {
-            if (table[i] != null) {
-                Node<K, V> curentNode = table[i];
-                while (curentNode != null) {
-                    if (campareKeys(curentNode.key, key)) {
-                        return true;
-                    }
-                    curentNode = curentNode.next;
-                }
-            }
-        }
-        return false;
-    }
-
     private boolean campareKeys(K firstKey, K secondKey) {
         return (firstKey == secondKey) || (firstKey != null) && firstKey.equals(secondKey);
     }
 
-    private boolean isMapLoad() {
-        return size == (double)table.length * LOAD_FACTOR;
+    private boolean checkThreshold() {
+        return size > table.length * LOAD_FACTOR;
     }
 
     private class Node<K, V> {
