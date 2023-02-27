@@ -1,32 +1,26 @@
 package core.basesyntax;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final float DEFAULT_LOAD_FACTORY = 0.75F;
+    private static final float LOAD_FACTORY = 0.75F;
     private Node<K, V>[] table;
     private int size;
-    private float loadFactor;
-    private int threshold;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        loadFactor = DEFAULT_LOAD_FACTORY;
-        threshold = (int) (table.length * loadFactor);
     }
 
     @Override
     public void put(K key, V value) {
         resize();
-        putNode(key, value, table);
+        putNode(key, value);
     }
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key, table);
+        int hash = getIndex(key);
         Node<K, V> currentNode = table[hash];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
@@ -42,28 +36,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private List<Node<K, V>> nodes() {
-        List<Node<K, V>> nodes = new ArrayList<>(size);
-        for (int i = 0; i < table.length; i++) {
-            if (table[i] != null) {
-                nodes.add(table[i]);
-                Node<K, V> currentNode = table[i];
-                while (currentNode.next != null) {
-                    nodes.add(currentNode.next);
-                    currentNode = currentNode.next;
-                }
-            }
-        }
-        return nodes;
-    }
-
-    private void putNode(K key, V value, Node<K, V>[] newTable) {
-        int hash = hash(key, newTable);
-        Node<K, V> newNode = new Node<>(hash, key, value, null);
-        if (newTable[hash] == null) {
-            newTable[hash] = newNode;
+    private void putNode(K key, V value) {
+        int index = getIndex(key);
+        Node<K, V> newNode = new Node<>(key, value, null);
+        if (table[index] == null) {
+            table[index] = newNode;
         } else {
-            Node<K, V> currentNode = newTable[hash];
+            Node<K, V> currentNode = table[index];
             while (currentNode.next != null) {
                 if (Objects.equals(key, currentNode.key)) {
                     currentNode.value = value;
@@ -80,38 +59,38 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private int hash(final K key, Node<K, V>[] table) {
+    private int getIndex(final K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private void resize() {
-        if (threshold == size) {
+        if (size >= table.length * LOAD_FACTORY) {
             size = 0;
             int newCapacity = table.length << 1;
-            Node<K, V>[] newTable = new Node[newCapacity];
-            for (Node<K, V> node : nodes()) {
-                putNode(node.key, node.value, newTable);
+            Node<K, V>[] tmpTable = table;
+            table = new Node[newCapacity];
+            for (Node<K, V> node : tmpTable) {
+                if (node != null) {
+                    putNode(node.key, node.value);
+                    Node<K, V> currentNode = node;
+                    while (currentNode.next != null) {
+                        putNode(currentNode.next.key, currentNode.next.value);
+                        currentNode = currentNode.next;
+                    }
+                }
             }
-            table = newTable;
         }
     }
 
     private static class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        @Override
-        public final String toString() {
-            return key + "=" + value;
         }
     }
 }
