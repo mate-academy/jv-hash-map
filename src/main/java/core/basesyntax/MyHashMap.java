@@ -53,24 +53,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static class Node<K, V> {
-        private K key;
-        private V value;
-        private Node<K, V> next;
-
-        private Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     private int hash(K key) {
-        if (key == null) {
-            return 0;
-        } else {
-            return Math.abs(key.hashCode() % table.length);
-        }
+        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void grow() {
@@ -85,6 +69,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     element = element.next;
                 }
             }
+        }
+    }
+
+    private static class Node<K, V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        private Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
         }
     }
 }
