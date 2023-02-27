@@ -5,15 +5,11 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final int LOAD_FACTOR = 75;
-    private static final int MULTIPLAYER_OF_GROWTH = 2;
     private Node<K, V>[] table;
     private int size;
-    private int threshold;
-    private int initialCapacity;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        initialCapacity = DEFAULT_CAPACITY;
     }
 
     @Override
@@ -58,19 +54,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void checkThreshold() {
-        if ((initialCapacity * LOAD_FACTOR) / 100 >= size) {
+        if ((table.length * LOAD_FACTOR) / 100 < size) {
             resize();
         }
     }
 
     private int hash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % initialCapacity;
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private void resize() {
-        size = 0;
         Node<K, V>[] newTable = table;
-        table = (Node<K, V>[]) new Node[initialCapacity * MULTIPLAYER_OF_GROWTH];
+        table = new Node[table.length << 1];
+        size = 0;
         for (Node<K, V> node : newTable) {
             while (node != null) {
                 put(node.key, node.value);
