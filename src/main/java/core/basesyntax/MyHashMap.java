@@ -38,12 +38,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> tempNode = innerArray[getIndex(key)];
-        if (tempNode == null) {
-            return null;
-        }
-        if (Objects.equals(tempNode.key, key)) {
-            return tempNode.value;
-        }
         while (tempNode != null) {
             if (Objects.equals(tempNode.key, key)) {
                 return tempNode.value;
