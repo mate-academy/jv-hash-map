@@ -5,18 +5,15 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75F;
-    private int threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     private Node<K, V>[] table = new Node[DEFAULT_CAPACITY];
     private int size;
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold) {
-            size = 0;
-            threshold *= 2;
+        if (size >= table.length * LOAD_FACTOR) {
             resize();
         }
-        int index = hash(key) % table.length;
+        int index = getIndex(key);
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
         } else {
@@ -38,7 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> temp = table[hash(key) % table.length];
+        Node<K, V> temp = table[getIndex(key)];
         while (temp != null) {
             if (Objects.equals(temp.key, key)) {
                 return temp.value;
@@ -54,21 +51,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        size = 0;
         Node<K, V>[] oldTable = table;
-        table = new Node[oldTable.length * 2];
+        int newLength = oldTable.length * 2;
+        table = new Node[newLength];
         for (Node<K, V> element : oldTable) {
-            if (element != null) {
-                Node<K, V> temp = element;
-                while (temp != null) {
-                    put(temp.key, temp.value);
-                    temp = temp.next;
-                }
+            while (element != null) {
+                put(element.key, element.value);
+                element = element.next;
             }
         }
     }
 
-    private int hash(Object key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode());
+    private int getIndex(Object key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private class Node<K, V> {
