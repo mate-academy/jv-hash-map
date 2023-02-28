@@ -15,11 +15,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         checkCapacity();
-        int position = getPosition(key);
-        Bucket<K, V> bucket = table[position];
+        Bucket<K, V> bucket = table[getPosition(key)];
         Bucket<K, V> newBucket = new Bucket<>(key, value);
-        if (table[position] == null) {
-            table[position] = newBucket;
+        if (table[getPosition(key)] == null) {
+            table[getPosition(key)] = newBucket;
         } else {
             if (Objects.equals(bucket.key, newBucket.key)) {
                 bucket.value = newBucket.value;
@@ -62,9 +61,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int position;
-        position = getPosition(key);
-        Bucket<K, V> bucket = table[position];
+        Bucket<K, V> bucket = table[getPosition(key)];
         while (bucket != null) {
             if (Objects.equals(key, bucket.key)) {
                 return bucket.value;
