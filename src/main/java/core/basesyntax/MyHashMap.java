@@ -14,12 +14,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        putValue(hash(key), key, value);
+        putValue(getIndexBucket(key), key, value);
     }
 
     @Override
     public V getValue(K key) {
-        int position = hash(key);
+        int position = getIndexBucket(key);
         Node<K, V> node = table[position];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
@@ -65,13 +65,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         for (Node<K, V> node : oldTab) {
             while (node != null) {
-                put(node.key, node.value);
+                putValue(getIndexBucket(node.key), node.key, node.value);
                 node = node.next;
             }
         }
     }
 
-    private int hash(K key) {
+    private int getIndexBucket(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
