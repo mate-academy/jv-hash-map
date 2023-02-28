@@ -13,11 +13,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
-    public int getSize() {
-        return size;
-    }
-
-    @Override
     public void put(K key, V value) {
         Node<K, V> existingNode = getNodeByKey(key);
         if (existingNode != null) {
@@ -35,6 +30,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return existingNode == null ? null : existingNode.value;
     }
 
+    @Override
+    public int getSize() {
+        return size;
+    }
+
     private Node<K, V> getNodeByKey(K key) {
         Node<K, V> current = storage[getBucketIndex(key)];
         do {
@@ -50,7 +50,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void ensureCapacity() {
-        if (size / (double) storage.length > RESIZE_FACTOR) {
+        if (size > storage.length * RESIZE_FACTOR) {
             Node<K, V>[] oldData = storage;
             storage = (Node<K, V>[]) new Node[storage.length << 1];
             size = 0;
