@@ -50,7 +50,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void ensureCapacity() {
-        if (size > storage.length * RESIZE_FACTOR) {
+        if (size > RESIZE_FACTOR * storage.length) {
             Node<K, V>[] oldData = storage;
             storage = (Node<K, V>[]) new Node[storage.length << 1];
             size = 0;
