@@ -70,13 +70,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V>[] tmpTable = table;
             table = new Node[newCapacity];
             for (Node<K, V> node : tmpTable) {
-                if (node != null) {
+                while (node != null) {
                     putNode(node.key, node.value);
-                    Node<K, V> currentNode = node;
-                    while (currentNode.next != null) {
-                        putNode(currentNode.next.key, currentNode.next.value);
-                        currentNode = currentNode.next;
-                    }
+                    node = node.next;
                 }
             }
         }
