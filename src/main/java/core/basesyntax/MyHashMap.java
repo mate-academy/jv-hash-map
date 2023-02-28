@@ -2,47 +2,58 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_VOLUME = 16;
-    private static final double LOAD_FACTOR = 0.75f;
-    private Node<K, V>[] vector;
-    private int volume;
+    private static final float LOAD_FACTOR = 0.75f;
+    private Node<K, V>[] table;
+    private int capacity;
     private int size;
 
     public MyHashMap() {
-        vector = new Node[INITIAL_VOLUME];
-        volume = INITIAL_VOLUME;
+        table = new Node[INITIAL_VOLUME];
+        capacity = INITIAL_VOLUME;
     }
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> point = findByKey(key);
-        if (point == null) {
-            if ((volume * LOAD_FACTOR) <= size) {
-                resizeHashesVector();
-            }
-            int index = calculateIndex(key);
-            Node<K, V> entry = vector[index];
-            Node<K, V> newNode = new Node<>(key, value);
-            if (entry == null) {
-                vector[index] = newNode;
-            } else {
-                while (entry != null) {
-                    if (entry.next == null) {
-                        entry.next = newNode;
-                        break;
-                    }
-                    entry = entry.next;
-                }
-            }
+        if ((capacity * LOAD_FACTOR) <= size) {
+            resize();
+        }
+        int index = calculateIndex(key);
+        Node<K, V> node = table[index];
+        Node<K, V> newNode = new Node<>(key, value);
+        if (node == null) {
+            table[index] = newNode;
             size++;
         } else {
-            point.value = value;
+            while (node != null) {
+                if (node.key == key
+                        || (key != null && key.equals(node.key))) {
+                    node.value = value;
+                    break;
+                }
+                if (node.next == null) {
+                    node.next = newNode;
+                    size++;
+                    break;
+                }
+                node = node.next;
+            }
         }
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> entry = findByKey(key);
-        return entry != null ? entry.value : null;
+        int index = calculateIndex(key);
+        if (table[index] != null) {
+            Node<K, V> node = table[index];
+            while (node != null) {
+                if (node.key == key
+                        || (key != null && key.equals(node.key))) {
+                    return node.value;
+                }
+                node = node.next;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -50,36 +61,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resizeHashesVector() {
-        volume <<= 1;
-        Node<K, V>[] tempVector = vector;
-        vector = new Node[volume];
+    private void resize() {
+        capacity <<= 1;
+        Node<K, V>[] tempTable = table;
+        table = new Node[capacity];
         size = 0;
-        for (Node<K, V> entry : tempVector) {
-            while (entry != null) {
-                put(entry.key,entry.value);
-                entry = entry.next;
+        for (Node<K, V> node : tempTable) {
+            while (node != null) {
+                put(node.key,node.value);
+                node = node.next;
             }
         }
     }
 
     private int calculateIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % vector.length);
-    }
-
-    private Node<K, V> findByKey(K key) {
-        int index = calculateIndex(key);
-        if (vector[index] != null) {
-            Node<K, V> entry = vector[index];
-            while (entry != null) {
-                if ((key == null && entry.key == key)
-                        || (key != null && (key == entry.key || key.equals(entry.key)))) {
-                    return entry;
-                }
-                entry = entry.next;
-            }
-        }
-        return null;
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private class Node<K, V> {
