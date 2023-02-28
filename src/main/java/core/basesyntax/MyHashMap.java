@@ -6,14 +6,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int RESIZE_MULTIPLIER = 2;
-
     private Node<K, V>[] nodesTable;
     private int size;
-    private int threshold;
 
     public MyHashMap() {
         this.nodesTable = new Node[DEFAULT_INITIAL_CAPACITY];
-        threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
@@ -41,7 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (size < threshold) {
+        if (size < nodesTable.length * DEFAULT_LOAD_FACTOR) {
             return;
         }
         Node<K, V>[] newTable = new Node[nodesTable.length * RESIZE_MULTIPLIER];
@@ -53,7 +50,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         nodesTable = newTable;
-        threshold = threshold * RESIZE_MULTIPLIER;
     }
 
     private void addNodeToTable(Node<K, V> newNode, Node<K, V>[] givenTable) {
@@ -75,8 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucketIndex(K key, int tableLength) {
-        int absHash = key == null ? 0 : Math.abs(key.hashCode());
-        return absHash % tableLength;
+        return key == null ? 0 : Math.abs(key.hashCode() % tableLength);
     }
 
     private static class Node<K, V> {
