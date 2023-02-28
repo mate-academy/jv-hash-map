@@ -14,14 +14,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= LOAD_FACTOR * table.length) {
-            resize();
-        }
-        int hash = hash(key);
-        Node<K, V> newNode = new Node(hash, key, value, null);
-        Node<K, V> node = table[hash];
+        resize();
+        int index = getIndex(key);
+        Node<K, V> newNode = new Node(key, value, null);
+        Node<K, V> node = table[index];
         if (node == null) {
-            table[hash] = newNode;
+            table[index] = newNode;
         } else {
             while (node != null) {
                 if (Objects.equals(key, node.key)) {
@@ -40,7 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = table[hash(key)];
+        Node<K, V> node = table[getIndex(key)];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
                 return node.value;
@@ -56,30 +54,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        size = 0;
-        int newSize = table.length * 2;
-        Node<K, V>[] oldTable = table;
-        table = (Node<K, V>[]) new Node[newSize];
-        for (Node<K, V> node : oldTable) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+        if (size >= LOAD_FACTOR * table.length) {
+            size = 0;
+            int newSize = table.length * 2;
+            Node<K, V>[] oldTable = table;
+            table = (Node<K, V>[]) new Node[newSize];
+            for (Node<K, V> node : oldTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
             }
         }
     }
 
-    private int hash(K key) {
+    private int getIndex(K key) {
         return Math.abs(key == null ? 0 : key.hashCode() % table.length);
     }
 
     private static class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
