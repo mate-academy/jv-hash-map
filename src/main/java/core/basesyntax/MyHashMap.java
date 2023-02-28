@@ -24,8 +24,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             existingNode.value = value;
             return;
         }
-        resize();
-        insertNode(new Node<>(key, value), storage);
+        ensureCapacity();
+        insertNode(new Node<>(key, value));
         size++;
     }
 
@@ -49,22 +49,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode()) % storage.length;
     }
 
-    private void resize() {
+    private void ensureCapacity() {
         if (size / (double) storage.length > RESIZE_FACTOR) {
             Node<K, V>[] oldData = storage;
             storage = (Node<K, V>[]) new Node[storage.length << 1];
             size = 0;
-            for (Node<K, V> rootNode : oldData) {
-                Node<K,V> current = rootNode;
-                while (current != null) {
-                    put(current.key, current.value);
-                    current = current.next;
+            for (Node<K, V> node : oldData) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
                 }
             }
         }
     }
 
-    private void insertNode(Node<K, V> node, Node<K, V>[] storage) {
+    private void insertNode(Node<K, V> node) {
         int bucket = getBucketIndex(node.key);
         node.next = storage[bucket];
         storage[bucket] = node;
