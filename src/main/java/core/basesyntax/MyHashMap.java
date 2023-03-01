@@ -19,9 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size > elements.length * LOAD_FACTOR) {
-            resize();
-        }
+        resize();
         putValue(key, value, elements);
     }
 
@@ -92,10 +90,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] elementsNew = (Node<K,V>[])new Node[elements.length * 2];
-        for (K key : keyList) {
-            putValue(key, getValue(key), elementsNew);
+        if (size > elements.length * LOAD_FACTOR) {
+            Node<K, V>[] elementsNew = (Node<K, V>[]) new Node[elements.length * 2];
+            for (K key : keyList) {
+                putValue(key, getValue(key), elementsNew);
+            }
+            elements = elementsNew;
         }
-        elements = elementsNew;
     }
 }
