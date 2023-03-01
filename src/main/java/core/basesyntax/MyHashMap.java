@@ -1,33 +1,39 @@
 package core.basesyntax;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_ARRAY_SIZE = 16;
     private static final float LOAD_FACTOR = 0.75f;
-
-    private List<K> keyList;
     private Node<K, V>[] elements;
     private int size;
 
     public MyHashMap() {
         elements = new Node[DEFAULT_ARRAY_SIZE];
-        keyList = new ArrayList<>();
     }
 
     @Override
     public void put(K key, V value) {
-        if (size > elements.length * LOAD_FACTOR) {
-            Node<K, V>[] elementsNew = (Node<K, V>[]) new Node[elements.length * 2];
-            for (K keyListKey : keyList) {
-                putValue(keyListKey, getValue(keyListKey), elementsNew);
-            }
-            elements = elementsNew;
+        resize();
+        int bucket = getBucket(key, elements);
+        Node<K, V> node = checkBucket(elements[bucket], key);
+        if (node != null) {
+            node.value = value;
+            return;
         }
-        putValue(key, value, elements);
+        if (elements == this.elements) {
+            size++;
+        }
+        Node<K, V> currentNode = elements[bucket];
+        while (currentNode != null) {
+            if (currentNode.next == null) {
+                currentNode.next = new Node<>(key, value);
+                return;
+            }
+            currentNode = currentNode.next;
+        }
+        elements[bucket] = new Node<>(key, value);
     }
 
     @Override
@@ -43,28 +49,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
-    }
-
-    private void putValue(K key, V value, Node<K, V>[] elements) {
-        int bucket = getBucket(key, elements);
-        Node<K, V> node = checkBucket(elements[bucket], key);
-        if (node != null) {
-            node.value = value;
-            return;
-        }
-        if (elements == this.elements) {
-            size++;
-            keyList.add(key);
-        }
-        Node<K, V> currentNode = elements[bucket];
-        while (currentNode != null) {
-            if (currentNode.next == null) {
-                currentNode.next = new Node<>(key, value);
-                return;
-            }
-            currentNode = currentNode.next;
-        }
-        elements[bucket] = new Node<>(key, value);
     }
 
     private Node<K, V> checkBucket(Node<K, V> node, K key) {
@@ -90,6 +74,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private Node(K k, V v) {
             key = k;
             value = v;
+        }
+    }
+
+    private void resize() {
+        if (size > elements.length * LOAD_FACTOR) {
+            Node<K, V>[] temp = elements;
+            elements = new Node[elements.length * 2];
+            size = 0;
+            for (Node<K, V> node : temp) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
+            }
         }
     }
 }
