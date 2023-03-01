@@ -2,6 +2,7 @@ package core.basesyntax;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
@@ -13,13 +14,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        elements = (Node<K,V>[])new Node[DEFAULT_ARRAY_SIZE];
+        elements = new Node[DEFAULT_ARRAY_SIZE];
         keyList = new ArrayList<>();
     }
 
     @Override
     public void put(K key, V value) {
-        resize();
+        if (size > elements.length * LOAD_FACTOR) {
+            Node<K, V>[] elementsNew = (Node<K, V>[]) new Node[elements.length * 2];
+            for (K keyListKey : keyList) {
+                putValue(keyListKey, getValue(keyListKey), elementsNew);
+            }
+            elements = elementsNew;
+        }
         putValue(key, value, elements);
     }
 
@@ -63,8 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V> checkBucket(Node<K, V> node, K key) {
         Node<K, V> currentNode = node;
         while (currentNode != null) {
-            if (currentNode.key == key
-                    || (currentNode.key != null && currentNode.key.equals(key))) {
+            if (Objects.equals(currentNode.key, key)) {
                 return currentNode;
             }
             currentNode = currentNode.next;
@@ -73,9 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucket(K key, Node<K, V>[] list) {
-        return key == null ? 0 :
-                key.hashCode() >= 0 ? key.hashCode() % list.length
-                        : -key.hashCode() % list.length;
+        return (key == null) ? 0 : Math.abs(key.hashCode() % list.length);
     }
 
     private static class Node<K, V> {
@@ -86,16 +90,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private Node(K k, V v) {
             key = k;
             value = v;
-        }
-    }
-
-    private void resize() {
-        if (size > elements.length * LOAD_FACTOR) {
-            Node<K, V>[] elementsNew = (Node<K, V>[]) new Node[elements.length * 2];
-            for (K key : keyList) {
-                putValue(key, getValue(key), elementsNew);
-            }
-            elements = elementsNew;
         }
     }
 }
