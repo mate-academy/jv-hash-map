@@ -5,11 +5,14 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_NUMBER_OF_BUCKETS = 16;
     static final float DEFAULT_LOADER_FACTOR = 0.75f;
+    static final int INCREASE_RATE = 2;
     private int numberOfBuckets = DEFAULT_NUMBER_OF_BUCKETS;
     private int size;
-    private int index;
+    private Node<K,V>[] buckets;
 
-    private Node[] buckets = new Node[DEFAULT_NUMBER_OF_BUCKETS];
+    public MyHashMap() {
+        this.buckets = new Node[DEFAULT_NUMBER_OF_BUCKETS];
+    }
 
     private class Node<K, V> {
         private int hash;
@@ -27,13 +30,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size + 1 > buckets.length * DEFAULT_LOADER_FACTOR) {
+        if (size >= buckets.length * DEFAULT_LOADER_FACTOR) {
             resize();
         }
-        index = hashCode(key) % buckets.length;
+        int hashCode = hashCode(key);
+        int index = hashCode % buckets.length;
         Node<K, V> currentNode = buckets[index];
         if (buckets[index] == null) {
-            buckets[index] = new Node(hashCode(key), key, value, null);
+            buckets[index] = new Node(hashCode, key, value, null);
         } else {
             while ((currentNode.key != key && !currentNode.key.equals(key))
                     && currentNode.next != null) {
@@ -43,11 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode.value = value;
                 return;
             }
-            if (key == null) {
-                currentNode.next = new Node(0, key, value, null);
-            } else {
-                currentNode.next = new Node(hashCode(key), key, value, null);
-            }
+            currentNode.next = new Node(hashCode, key, value, null);
         }
         size++;
     }
@@ -58,27 +58,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        index = hashCode(key) % buckets.length;
+        int index = hashCode(key) % buckets.length;
         Node<K, V> currentNode = buckets[index];
-        if (currentNode == null) {
-            return null;
+        while (currentNode != null) {
+            if (currentNode.key == key || key != null && key.equals(currentNode.key)) {
+                return currentNode.value;
+            }
+            currentNode = currentNode.next;
         }
-        if (key == null) {
-            while (currentNode.key != key && currentNode.next != null) {
-                currentNode = currentNode.next;
-            }
-            if (currentNode.next == null && currentNode.key != null) {
-                return null;
-            }
-        } else {
-            while ((!currentNode.key.equals(key)) && currentNode.next != null) {
-                currentNode = currentNode.next;
-            }
-            if (currentNode.next == null && !currentNode.key.equals(key)) {
-                return null;
-            }
-        }
-        return (V) currentNode.value;
+        return null;
     }
 
     @Override
@@ -88,24 +76,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V> currentNode;
-        Node[] rewriteBuckets = new Node[size];
-        int i = 0;
-        for (Node<K, V> oneBucket:buckets) {
-            if (oneBucket != null) {
-                rewriteBuckets[i] = oneBucket;
-                i++;
-            }
-        }
-        numberOfBuckets = buckets.length * 2;
+        numberOfBuckets = buckets.length * INCREASE_RATE;
+        Node[] rewriteBuckets = buckets;
         buckets = new Node[numberOfBuckets];
+        size = 0;
         for (Node<K, V> oneBucket:rewriteBuckets) {
-            if (oneBucket != null) {
-                currentNode = oneBucket;
-                while (currentNode != null) {
-                    put(currentNode.key, currentNode.value);
-                    currentNode = currentNode.next;
-                    size--;
-                }
+            currentNode = oneBucket;
+            while (oneBucket != null) {
+                put(oneBucket.key, oneBucket.value);
+                oneBucket = oneBucket.next;
             }
         }
     }
