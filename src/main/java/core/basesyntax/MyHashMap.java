@@ -70,10 +70,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K,V>[] putValue(K key, V value, Node<K, V>[] table ) {
-        Node<K, V> newNode;
         int length = table.length;
+        Node<K, V> newNode = table[index(length, hash(key))];;
         if (table[index(length, hash(key))] != null) {
-            newNode = table[index(length, hash(key))];
+            if (hash(key) == newNode.hash) {
+                newNode.value = value;
+                size--;
+            }
             while (newNode.next != null) {
                 newNode = newNode.next;
             }
