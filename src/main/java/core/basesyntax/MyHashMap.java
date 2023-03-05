@@ -8,7 +8,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-
+        if (size != 0) {
+            checkCapacity();
+            table = putValue(key, value, table);
+        } else {
+            table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+            Node<K, V> newNode = new Node(hash(key), key, value, null);
+            table[index(table.length, newNode.hash)] = newNode;
+        }
+        size++;
     }
 
     @Override
