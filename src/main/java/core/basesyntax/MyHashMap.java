@@ -21,6 +21,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return 0;
     }
 
+    private void checkCapacity() {
+        if (size >= table.length * LOAD_FOLDER) {
+            Node<K,V>[] newTable = (Node<K, V>[]) new Node[table.length * 2];
+            Node<K, V> currentNode;
+            for (int i = 0; i < table.length; i++) {
+                if (table[i] != null) {
+                    currentNode = table[i];
+                    if (currentNode.next != null) {
+                        while (currentNode != null) {
+                            newTable = putValue(currentNode.key, currentNode.value, newTable);
+                            currentNode = currentNode.next;
+                        }
+                    } else {
+                        newTable = putValue(currentNode.key, currentNode.value, newTable);
+                    }
+                }
+            }
+            table = newTable;
+        }
+    }
+
     private static class Node<K, V> {
         private Node next;
         private final int hash;
