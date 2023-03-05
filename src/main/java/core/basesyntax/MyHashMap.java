@@ -42,6 +42,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private int hash(K key) {
+        return key == null ? 0 : key.hashCode() * 31;
+    }
+
     private static class Node<K, V> {
         private Node next;
         private final int hash;
