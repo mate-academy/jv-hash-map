@@ -69,7 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return length - 1 & hash;
     }
 
-    private Node<K,V>[] putValue(K key, V value, Node<K, V>[] table ) {
+    private Node<K,V>[] putValue(K key, V value, Node<K, V>[] table) {
         int length = table.length;
         Node<K, V> newNode = table[index(length, hash(key))];;
         if (table[index(length, hash(key))] != null) {
