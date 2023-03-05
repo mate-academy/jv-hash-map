@@ -20,4 +20,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public int getSize() {
         return 0;
     }
+
+    private static class Node<K, V> {
+        private Node next;
+        private final int hash;
+        private V value;
+        private final K key;
+
+        public Node(int hash, K key, V value, Node<K, V> next) {
+            this.hash = hash;
+            this.value = value;
+            this.key = key;
+            this.next = next;
+        }
+    }
 }
