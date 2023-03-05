@@ -1,8 +1,8 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private final int DEFAULT_CAPACITY = 16;
-    private final float LOAD_FOLDER = 0.75f;
+    private final int defaultCapacity = 16;
+    private final float loadFolder = 0.75f;
     private int size = 0;
     private Node<K,V>[] table;
 
@@ -12,7 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             checkCapacity();
             table = putValue(key, value, table);
         } else {
-            table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+            table = (Node<K, V>[]) new Node[defaultCapacity];
             Node<K, V> newNode = new Node(hash(key), key, value, null);
             table[index(table.length, newNode.hash)] = newNode;
         }
@@ -41,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void checkCapacity() {
-        if (size >= table.length * LOAD_FOLDER) {
+        if (size >= table.length * loadFolder) {
             Node<K,V>[] newTable = (Node<K, V>[]) new Node[table.length * 2];
             Node<K, V> currentNode;
             for (int i = 0; i < table.length; i++) {
