@@ -13,6 +13,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
+        Node<K, V> currentNode = table[index(table.length, hash(key))];
+        if (key.equals(currentNode.key)) {
+            return currentNode.value;
+        } else {
+            while (currentNode.next != null) {
+                currentNode = currentNode.next;
+                if (key.equals(currentNode.key)) {
+                    return currentNode.value;
+                }
+            }
+        }
         return null;
     }
 
