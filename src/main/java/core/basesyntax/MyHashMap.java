@@ -50,6 +50,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return length - 1 & hash;
     }
 
+    private Node<K,V>[] putValue(K key, V value, Node<K, V>[] table ) {
+        Node<K, V> newNode;
+        int length = table.length;
+        if (table[index(length, hash(key))] != null) {
+            newNode = table[index(length, hash(key))];
+            while (newNode.next != null) {
+                newNode = newNode.next;
+            }
+            newNode.next = new Node(hash(key), key, value, null);
+        } else {
+            newNode = new Node(hash(key), key, value, null);
+            table[index(length, newNode.hash)] = newNode;
+        }
+        return table;
+    }
+
     private static class Node<K, V> {
         private Node next;
         private final int hash;
