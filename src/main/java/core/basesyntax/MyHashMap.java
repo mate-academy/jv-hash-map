@@ -83,7 +83,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             while (newNode.next != null) {
                 newNode = newNode.next;
-                if (null == key && null == newNode.key || (null != key && key.equals(newNode.key))) {
+                if (null == key && null == newNode.key
+                        || (null != key && key.equals(newNode.key))) {
                     newNode.value = value;
                     size--;
                     return table;
