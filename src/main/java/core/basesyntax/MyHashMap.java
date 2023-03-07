@@ -71,16 +71,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K,V>[] putValue(K key, V value, Node<K, V>[] table) {
         int length = table.length;
+        boolean isKey = true;
         Node<K, V> newNode = table[index(length, hash(key))];;
-        if (table[index(length, hash(key))] != null) {
-            if (hash(key) == newNode.hash) {
-                newNode.value = value;
-                size--;
-            }
+        if (newNode != null) {
             while (newNode.next != null) {
+                if (null == key && null == newNode.key || (null != key && key.equals(newNode.key))) {
+                    newNode.value = value;
+                    isKey = false;
+                    size--;
+                }
                 newNode = newNode.next;
             }
-            newNode.next = new Node(hash(key), key, value, null);
+            if (isKey) {
+                newNode.next = new Node(hash(key), key, value, null);
+            }
         } else {
             newNode = new Node(hash(key), key, value, null);
             table[index(length, newNode.hash)] = newNode;
