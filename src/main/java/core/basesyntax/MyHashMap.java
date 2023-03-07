@@ -1,14 +1,13 @@
 package core.basesyntax;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final int DEFAULT_THRESHOLD = 12;
+    private static final float LOAD_FACTOR = 0.75f;
 
     private int arrayCapacity = DEFAULT_CAPACITY;
-    private int threshold = DEFAULT_THRESHOLD;
+    private int threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     private int size;
     private Node[] hashMapArray = new Node[arrayCapacity];
 
@@ -17,18 +16,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        int hash;
-        if (key == null) {
-            hash = 0;
-        } else {
-            hash = key.hashCode();
-        }
-        int elementPosition = hash % arrayCapacity;
-        if (elementPosition < 0) {
-            elementPosition /= -1;
-        }
+        int elementPosition = findElementPosition(key);
         if (hashMapArray[elementPosition] == null) {
-            hashMapArray[elementPosition] = new Node(hash, key, value, null);
+            hashMapArray[elementPosition] = new Node(key, value, null);
             size++;
         } else {
             Node node = hashMapArray[elementPosition];
@@ -45,7 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     }
                 }
                 if (node.next == null) {
-                    node.next = new Node(hash, key, value, null);
+                    node.next = new Node(key, value, null);
                     size++;
                     break;
                 }
@@ -56,22 +46,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int elementPosition;
-        if (key == null) {
-            elementPosition = 0;
-        } else {
-            elementPosition = key.hashCode() % arrayCapacity;
-        }
-        if (elementPosition < 0) {
-            elementPosition /= -1;
-        }
+        int elementPosition = findElementPosition(key);
         Node node = hashMapArray[elementPosition];
         while (true) {
             if (node == null) {
                 return null;
             }
-            if (Objects.equals(key, node.key)) {
-                return (V) node.value;
+            if (key == null || node.key == null) {
+                if (key == null && node.key == null) {
+                    return (V) node.value;
+                }
+            } else {
+                if (node.key.equals(key)) {
+                    return (V) node.value;
+                }
             }
             node = node.next;
         }
@@ -82,24 +70,33 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private int findElementPosition(K key) {
+        int elementPosition;
+        if (key == null) {
+            elementPosition = 0;
+        } else {
+            elementPosition = key.hashCode() % arrayCapacity > 0
+                    ? key.hashCode() % arrayCapacity
+                    : -1 * (key.hashCode() % arrayCapacity);
+        }
+        return elementPosition;
+    }
+
     private void resize() {
         arrayCapacity *= 2;
-        threshold *= 2;
+        threshold = (int) (arrayCapacity * LOAD_FACTOR);
         Node[] oldArray = Arrays.copyOf(hashMapArray, hashMapArray.length);
         hashMapArray = new Node[arrayCapacity];
         for (Node node : oldArray) {
             while (node != null) {
-                int elementPosition = node.hash % arrayCapacity;
-                if (elementPosition < 0) {
-                    elementPosition /= -1;
-                }
+                int elementPosition = findElementPosition((K) node.key);
                 if (hashMapArray[elementPosition] == null) {
-                    hashMapArray[elementPosition] = new Node(node.hash, node.key, node.value, null);
+                    hashMapArray[elementPosition] = new Node(node.key, node.value, null);
                 } else {
                     Node tmpNode = hashMapArray[elementPosition];
                     while (true) {
                         if (tmpNode.next == null) {
-                            tmpNode.next = new Node(node.hash, node.key, node.value, null);
+                            tmpNode.next = new Node(node.key, node.value, null);
                             break;
                         }
                         tmpNode = tmpNode.next;
@@ -110,17 +107,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    static class Node<K, V> {
-        private final int hash;
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        Node(int hash, K key, V value, Node<K, V> next) {
+        Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
-            this.hash = hash;
         }
     }
 }
