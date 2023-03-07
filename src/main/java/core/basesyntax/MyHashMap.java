@@ -6,13 +6,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size = 0;
     private Node<K,V>[] table;
 
+    public MyHashMap() {
+        table = (Node<K, V>[]) new Node[defaultCapacity];
+    }
+
     @Override
     public void put(K key, V value) {
         if (size != 0) {
             checkCapacity();
             table = putValue(key, value, table);
         } else {
-            table = (Node<K, V>[]) new Node[defaultCapacity];
             Node<K, V> newNode = new Node(hash(key), key, value, null);
             table[index(table.length, newNode.hash)] = newNode;
         }
