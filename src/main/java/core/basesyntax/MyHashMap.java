@@ -24,16 +24,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (initialCapacity <= 0 || loadFactor <= 0) {
             throw new IllegalArgumentException();
         }
-
         this.table = new Node[initialCapacity];
         this.loadFactor = loadFactor;
         this.threshold = (int) (initialCapacity * loadFactor);
         this.size = 0;
     }
 
+    @Override
     public void put(K key, V value) {
-        int hash = hash(key);
-        int index = indexFor(hash, table.length);
+        int hash = getHash(key);
+        int index = getIndex(hash, table.length);
 
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
             if (node.hash == hash && (Objects.equals(key, node.key))) {
@@ -44,9 +44,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         addNode(hash, key, value, index);
     }
 
+    @Override
     public V getValue(K key) {
-        int hash = hash(key);
-        int index = indexFor(hash, table.length);
+        int hash = getHash(key);
+        int index = getIndex(hash, table.length);
 
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
             if (node.hash == hash && (Objects.equals(key, node.key))) {
@@ -57,6 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
+    @Override
     public int getSize() {
         return size;
     }
@@ -83,22 +85,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             for (Node<K, V> node = oldTable[i]; node != null; ) {
                 Node<K, V> next = node.next;
 
-                int index = indexFor(node.hash, newCapacity);
+                int index = getIndex(node.hash, newCapacity);
                 node.next = newTable[index];
                 newTable[index] = node;
 
                 node = next;
             }
         }
-
         table = newTable;
     }
 
-    private int hash(K key) {
+    private int getHash(K key) {
         return key == null ? 0 : key.hashCode();
     }
 
-    private int indexFor(int hash, int length) {
+    private int getIndex(int hash, int length) {
         return hash & (length - 1);
     }
 
@@ -112,30 +113,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.hash = hash;
             this.key = key;
             this.value = value;
-            this.next = next;
-        }
-
-        public int getHash() {
-            return hash;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
-        }
-
-        public Node<K, V> getNext() {
-            return next;
-        }
-
-        public void setNext(Node<K, V> next) {
             this.next = next;
         }
     }
