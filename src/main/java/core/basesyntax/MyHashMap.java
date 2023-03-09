@@ -16,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        putValue(hashCode(key), key, value, false);
+        putValue(hashCode(key), key, value);
     }
 
     @Override
@@ -30,12 +30,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    static int hashCode(Object key) {
+    private int hashCode(Object key) {
         int hash;
         return key == null ? 0 : (hash = key.hashCode()) ^ (hash >>> 16);
     }
 
-    public void putValue(int hash, K key, V value, boolean ifAbsent) {
+    private void putValue(int hash, K key, V value) {
         Node<K, V>[] table;
         Node<K, V> specificNode;
         int resizeTableLength;
@@ -67,10 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
             if (tempNode != null) {
-                V oldValue = tempNode.value;
-                if (!ifAbsent || oldValue == null) {
-                    tempNode.value = value;
-                }
+                tempNode.value = value;
                 return;
             }
         }
@@ -79,7 +76,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    Node<K, V>[] resize() {
+    private Node<K, V>[] resize() {
         Node<K, V>[] oldTable = mapTable;
         int oldLength = (oldTable == null) ? 0 : oldTable.length;
         int oldThreshold = threshold;
@@ -154,7 +151,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return newTable;
     }
 
-    Node<K, V> getNode(K key) {
+    private Node<K, V> getNode(K key) {
         Node<K, V>[] newTable = mapTable;
         Node<K, V> firstNode;
         Node<K,V> firstNodeNext;
@@ -181,7 +178,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
