@@ -25,12 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node node = hashMapArray[elementPosition];
         while (true) {
-            if (key == null || node.key == null) {
-                if (key == null && node.key == null) {
-                    node.value = value;
-                    return;
-                }
-            } else if (node.key.equals(key)) {
+            if (key == node.key || key != null && key.equals(node.key)) {
                 node.value = value;
                 return;
             }
@@ -48,14 +43,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int elementPosition = findElementPosition(key);
         Node node = hashMapArray[elementPosition];
         while (node != null) {
-            if (key == null || node.key == null) {
-                if (key == null && node.key == null) {
-                    return (V) node.value;
-                }
-            } else {
-                if (node.key.equals(key)) {
-                    return (V) node.value;
-                }
+            if (key == node.key || key != null && key.equals(node.key)) {
+                return (V) node.value;
             }
             node = node.next;
         }
