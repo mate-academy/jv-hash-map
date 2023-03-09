@@ -5,6 +5,7 @@ import java.util.Arrays;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
+    private static final int ARRAY_EXTEND_COEFFICIENT = 2;
 
     private int arrayCapacity = DEFAULT_CAPACITY;
     private int threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
@@ -20,27 +21,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (hashMapArray[elementPosition] == null) {
             hashMapArray[elementPosition] = new Node(key, value, null);
             size++;
-        } else {
-            Node node = hashMapArray[elementPosition];
-            while (true) {
-                if (key == null || node.key == null) {
-                    if (key == null && node.key == null) {
-                        node.value = value;
-                        break;
-                    }
-                } else {
-                    if (node.key.equals(key)) {
-                        node.value = value;
-                        break;
-                    }
+            return;
+        }
+        Node node = hashMapArray[elementPosition];
+        while (true) {
+            if (key == null || node.key == null) {
+                if (key == null && node.key == null) {
+                    node.value = value;
+                    return;
                 }
-                if (node.next == null) {
-                    node.next = new Node(key, value, null);
-                    size++;
-                    break;
-                }
-                node = node.next;
+            } else if (node.key.equals(key)) {
+                node.value = value;
+                return;
             }
+            if (node.next == null) {
+                node.next = new Node(key, value, null);
+                size++;
+                return;
+            }
+            node = node.next;
         }
     }
 
@@ -48,10 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int elementPosition = findElementPosition(key);
         Node node = hashMapArray[elementPosition];
-        while (true) {
-            if (node == null) {
-                return null;
-            }
+        while (node != null) {
             if (key == null || node.key == null) {
                 if (key == null && node.key == null) {
                     return (V) node.value;
@@ -63,6 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node = node.next;
         }
+        return null;
     }
 
     @Override
@@ -75,15 +72,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             elementPosition = 0;
         } else {
-            elementPosition = key.hashCode() % arrayCapacity > 0
-                    ? key.hashCode() % arrayCapacity
-                    : -1 * (key.hashCode() % arrayCapacity);
+            elementPosition = Math.abs(key.hashCode() % arrayCapacity);
         }
         return elementPosition;
     }
 
     private void resize() {
-        arrayCapacity *= 2;
+        arrayCapacity *= ARRAY_EXTEND_COEFFICIENT;
         threshold = (int) (arrayCapacity * LOAD_FACTOR);
         Node[] oldArray = Arrays.copyOf(hashMapArray, hashMapArray.length);
         hashMapArray = new Node[arrayCapacity];
@@ -94,13 +89,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     hashMapArray[elementPosition] = new Node(node.key, node.value, null);
                 } else {
                     Node tmpNode = hashMapArray[elementPosition];
-                    while (true) {
-                        if (tmpNode.next == null) {
-                            tmpNode.next = new Node(node.key, node.value, null);
-                            break;
-                        }
+                    while (tmpNode.next != null) {
                         tmpNode = tmpNode.next;
                     }
+                    tmpNode.next = new Node(node.key, node.value, null);
                 }
                 node = node.next;
             }
