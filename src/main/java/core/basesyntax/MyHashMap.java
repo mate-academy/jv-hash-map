@@ -6,7 +6,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private static final int MAXIMUM_CAPACITY = 1 << 30;
 
     private Node<K, V>[] table;
     private int size;
@@ -25,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (initialCapacity <= 0 || loadFactor <= 0) {
             throw new IllegalArgumentException();
         }
-        this.table = new Node[initialCapacity];
+        this.table = (Node<K, V>[]) new Node[initialCapacity];
         this.loadFactor = loadFactor;
         this.threshold = (int) (initialCapacity * loadFactor);
     }
@@ -100,7 +99,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(int hash, int length) {
-        return hash % (length - 1);
+        return hash & (length - 1);
     }
 
     private static class Node<K, V> {
