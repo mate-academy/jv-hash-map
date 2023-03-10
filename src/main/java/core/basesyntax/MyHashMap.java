@@ -24,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         Node node = hashMapArray[elementPosition];
-        while (true) {
+        while (node != null) {
             if (key == node.key || key != null && key.equals(node.key)) {
                 node.value = value;
                 return;
