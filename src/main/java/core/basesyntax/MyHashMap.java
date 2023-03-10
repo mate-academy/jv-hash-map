@@ -25,20 +25,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> currentNode = table[table.length - 1 & hash(key)];
-        if (null == currentNode) {
-            return null;
-        }
-        if ((null == key && null == currentNode.key)
-                || null != key && key.equals(currentNode.key)) {
-            return currentNode.value;
-        } else {
-            while (currentNode.next != null) {
-                currentNode = currentNode.next;
-                if ((null == key && null == currentNode.key)
-                        || null != key && key.equals(currentNode.key)) {
-                    return currentNode.value;
-                }
+        while (currentNode != null) {
+            if (currentNode.key == key || key != null && key.equals(currentNode.key)) {
+                return currentNode.value;
             }
+            currentNode = currentNode.next;
         }
         return null;
     }
