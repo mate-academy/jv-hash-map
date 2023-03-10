@@ -22,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[length - 1 & hash(key)] = new Node(hash(key), key, value, null);
             size++;
         } else {
-            while (newNode != null) {
+            while (newNode.next != null) {
                 if (key == newNode.key || (key != null && key.equals(newNode.key))) {
                     newNode.value = value;
                     checkSize++;
