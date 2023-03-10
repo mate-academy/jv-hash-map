@@ -14,11 +14,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         if (size >= table.length * loadFolder) {
             resize();
-            table = putValue(key, value, table);
-        } else {
-            Node<K, V> newNode = new Node(hash(key), key, value, null);
-            table[table.length - 1 & newNode.hash] = newNode;
         }
+        table = putValue(key, value, table);
         size++;
     }
 
