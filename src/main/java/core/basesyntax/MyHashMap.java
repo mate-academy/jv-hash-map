@@ -12,8 +12,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size != 0) {
-            checkCapacity();
+        if (size >= table.length * loadFolder) {
+            resize();
             table = putValue(key, value, table);
         } else {
             Node<K, V> newNode = new Node(hash(key), key, value, null);
@@ -39,25 +39,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void checkCapacity() {
-        if (size >= table.length * loadFolder) {
-            Node<K,V>[] newTable = (Node<K, V>[]) new Node[table.length * 2];
-            Node<K, V> currentNode;
-            for (int i = 0; i < table.length; i++) {
-                if (table[i] != null) {
-                    currentNode = table[i];
-                    if (currentNode.next != null) {
-                        while (currentNode != null) {
-                            newTable = putValue(currentNode.key, currentNode.value, newTable);
-                            currentNode = currentNode.next;
-                        }
-                    } else {
-                        newTable = putValue(currentNode.key, currentNode.value, newTable);
-                    }
-                }
+    private void resize() {
+        Node<K,V>[] newTable = (Node<K, V>[]) new Node[table.length * 2];
+        size = 0;
+        Node<K, V> currentNode = null;
+        for (int i = 0; i < table.length; i++) {
+            if (table[i] != null) {
+                put(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
             }
-            table = newTable;
         }
+        table = newTable;
     }
 
     private int hash(K key) {
