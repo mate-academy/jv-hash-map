@@ -17,14 +17,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table = putValue(key, value, table);
         } else {
             Node<K, V> newNode = new Node(hash(key), key, value, null);
-            table[index(table.length, newNode.hash)] = newNode;
+            table[table.length - 1 & newNode.hash] = newNode;
         }
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = table[index(table.length, hash(key))];
+        Node<K, V> currentNode = table[table.length - 1 & hash(key)];
         if (null == currentNode) {
             return null;
         }
@@ -73,16 +73,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : key.hashCode() * 31;
     }
 
-    private int index(int length, int hash) {
-        return length - 1 & hash;
-    }
-
     private Node<K,V>[] putValue(K key, V value, Node<K, V>[] table) {
         int length = table.length;
-        Node<K, V> newNode = table[index(length, hash(key))];;
+        Node<K, V> newNode = table[length - 1 & hash(key)];;
         if (newNode == null) {
             newNode = new Node(hash(key), key, value, null);
-            table[index(length, newNode.hash)] = newNode;
+            table[length - 1 & newNode.hash] = newNode;
         } else if (null == key && null == newNode.key || (null != key && key.equals(newNode.key))) {
             newNode.value = value;
             size--;
