@@ -21,6 +21,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (newNode == null) {
             table[length - 1 & hash(key)] = new Node(hash(key), key, value, null);
             size++;
+        } else if (key == newNode.key || (key != null && key.equals(newNode.key))) {
+            newNode.value = value;
+            checkSize++;
         } else {
             while (newNode.next != null) {
                 if (key == newNode.key || (key != null && key.equals(newNode.key))) {
