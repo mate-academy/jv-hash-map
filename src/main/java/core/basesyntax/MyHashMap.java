@@ -12,11 +12,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= table.length * loadFolder) {
+        int length = table.length;
+        int checkSize = size;
+        if (size >= length * loadFolder) {
             resize();
         }
-        table = putValue(key, value, table);
-        size++;
+        Node newNode = table[length - 1 & hash(key)];
+        if (newNode == null) {
+            table[length - 1 & hash(key)] = new Node(hash(key), key, value, null);
+            size++;
+        } else {
+            while (newNode != null) {
+                if (key == newNode.key || (key != null && key.equals(newNode.key))) {
+                    newNode.value = value;
+                    checkSize++;
+                }
+                newNode = newNode.next;
+            }
+            if (checkSize == size) {
+                newNode.next = new Node(hash(key), key, value, null);
+                size++;
+            }
+        }
     }
 
     @Override
@@ -37,44 +54,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K,V>[] newTable = (Node<K, V>[]) new Node[table.length * 2];
+        Node<K,V>[] newTable = table;
         size = 0;
-        Node<K, V> currentNode = null;
-        for (int i = 0; i < table.length; i++) {
-            if (table[i] != null) {
+        table = new Node[newTable.length * 2];
+        Node<K, V> currentNode;
+        for (int i = 0; i < newTable.length; i++) {
+            if (newTable[i] != null) {
+                currentNode = newTable[i];
                 put(currentNode.key, currentNode.value);
-                currentNode = currentNode.next;
             }
         }
-        table = newTable;
     }
 
     private int hash(K key) {
         return key == null ? 0 : key.hashCode() * 31;
-    }
-
-    private Node<K,V>[] putValue(K key, V value, Node<K, V>[] table) {
-        int length = table.length;
-        Node<K, V> newNode = table[length - 1 & hash(key)];;
-        if (newNode == null) {
-            newNode = new Node(hash(key), key, value, null);
-            table[length - 1 & newNode.hash] = newNode;
-        } else if (null == key && null == newNode.key || (null != key && key.equals(newNode.key))) {
-            newNode.value = value;
-            size--;
-        } else {
-            while (newNode.next != null) {
-                newNode = newNode.next;
-                if (null == key && null == newNode.key
-                        || (null != key && key.equals(newNode.key))) {
-                    newNode.value = value;
-                    size--;
-                    return table;
-                }
-            }
-            newNode.next = new Node(hash(key), key, value, null);
-        }
-        return table;
     }
 
     private static class Node<K, V> {
