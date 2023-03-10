@@ -61,10 +61,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resizeTable() {
-        Node<K, V>[] oldTable = table;
-        currentCapacity *= 2;
-        table = (Node<K, V>[]) new Node[currentCapacity];
         size = 0;
+        currentCapacity *= 2;
+        Node<K, V>[] oldTable = table;
+        table = (Node<K, V>[]) new Node[currentCapacity];
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
@@ -79,10 +79,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         public Node(K key, V value) {
             this.hash = key == null ? 0 : Math.abs(Objects.hash(key));
