@@ -76,6 +76,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : key.hashCode() * 31;
     }
 
+    private boolean isKey(K key, Node node) {
+        return (key == node.key || (key != null && key.equals(node.key)));
+    }
+
     private static class Node<K, V> {
         private Node next;
         private final int hash;
