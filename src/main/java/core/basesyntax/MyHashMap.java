@@ -28,7 +28,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 newNode = newNode.next;
             }
-            if (checkKey){
+            if (checkKey) {
                 newNode.next = new Node(hash(key), key, value, null);
                 size++;
             }
