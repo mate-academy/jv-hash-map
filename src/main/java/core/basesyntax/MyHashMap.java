@@ -12,27 +12,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int length = table.length;
-        int checkSize = size;
-        if (size >= length * loadFolder) {
+        boolean checkKey = true;
+        if (size >= table.length * loadFolder) {
             resize();
         }
-        Node newNode = table[length - 1 & hash(key)];
+        Node newNode = table[table.length - 1 & hash(key)];
         if (newNode == null) {
-            table[length - 1 & hash(key)] = new Node(hash(key), key, value, null);
+            table[table.length - 1 & hash(key)] = new Node(hash(key), key, value, null);
             size++;
-        } else if (key == newNode.key || (key != null && key.equals(newNode.key))) {
-            newNode.value = value;
-            checkSize++;
         } else {
             while (newNode.next != null) {
-                if (key == newNode.key || (key != null && key.equals(newNode.key))) {
+                if (isKey(key, newNode)) {
                     newNode.value = value;
-                    checkSize++;
+                    checkKey = false;
                 }
                 newNode = newNode.next;
             }
-            if (checkSize == size) {
+            if (checkKey){
                 newNode.next = new Node(hash(key), key, value, null);
                 size++;
             }
