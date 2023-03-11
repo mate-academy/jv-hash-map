@@ -39,7 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         Node<K, V> currentNode = table[table.length - 1 & hash(key)];
         while (currentNode != null) {
-            if (currentNode.key == key || key != null && key.equals(currentNode.key)) {
+            if (isKey(key, currentNode)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
