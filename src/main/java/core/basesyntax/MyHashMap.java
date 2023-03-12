@@ -7,10 +7,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private static final int ARRAY_EXTEND_COEFFICIENT = 2;
 
-    private int arrayCapacity = DEFAULT_CAPACITY;
-    private int threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
+    private int threshold;
     private int size;
-    private Node[] hashMapArray = new Node[arrayCapacity];
+    private Node[] values;
+
+    public MyHashMap() {
+        values = new Node[DEFAULT_CAPACITY];
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
+    }
 
     @Override
     public void put(K key, V value) {
@@ -18,12 +22,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int elementPosition = findElementPosition(key);
-        if (hashMapArray[elementPosition] == null) {
-            hashMapArray[elementPosition] = new Node(key, value, null);
+        if (values[elementPosition] == null) {
+            values[elementPosition] = new Node(key, value, null);
             size++;
             return;
         }
-        Node node = hashMapArray[elementPosition];
+        Node node = values[elementPosition];
         while (node != null) {
             if (key == node.key || key != null && key.equals(node.key)) {
                 node.value = value;
@@ -41,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int elementPosition = findElementPosition(key);
-        Node node = hashMapArray[elementPosition];
+        Node node = values[elementPosition];
         while (node != null) {
             if (key == node.key || key != null && key.equals(node.key)) {
                 return (V) node.value;
@@ -61,23 +65,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             elementPosition = 0;
         } else {
-            elementPosition = Math.abs(key.hashCode() % arrayCapacity);
+            elementPosition = Math.abs(key.hashCode() % values.length);
         }
         return elementPosition;
     }
 
     private void resize() {
-        arrayCapacity *= ARRAY_EXTEND_COEFFICIENT;
-        threshold = (int) (arrayCapacity * LOAD_FACTOR);
-        Node[] oldArray = Arrays.copyOf(hashMapArray, hashMapArray.length);
-        hashMapArray = new Node[arrayCapacity];
+        threshold = (int) (values.length * LOAD_FACTOR);
+        Node[] oldArray = Arrays.copyOf(values, values.length);
+        values = new Node[values.length * ARRAY_EXTEND_COEFFICIENT];
         for (Node node : oldArray) {
             while (node != null) {
                 int elementPosition = findElementPosition((K) node.key);
-                if (hashMapArray[elementPosition] == null) {
-                    hashMapArray[elementPosition] = new Node(node.key, node.value, null);
+                if (values[elementPosition] == null) {
+                    values[elementPosition] = new Node(node.key, node.value, null);
                 } else {
-                    Node tmpNode = hashMapArray[elementPosition];
+                    Node tmpNode = values[elementPosition];
                     while (tmpNode.next != null) {
                         tmpNode = tmpNode.next;
                     }
