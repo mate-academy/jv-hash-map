@@ -3,22 +3,19 @@ package core.basesyntax;
 import java.util.Arrays;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private static final int ARRAY_EXTEND_COEFFICIENT = 2;
 
-    private int threshold;
     private int size;
     private Node[] values;
 
     public MyHashMap() {
-        values = new Node[DEFAULT_CAPACITY];
-        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
+        values = new Node[16];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size == threshold) {
+        if (size == (int) (values.length * LOAD_FACTOR)) {
             resize();
         }
         int elementPosition = findElementPosition(key);
@@ -71,7 +68,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        threshold = (int) (values.length * LOAD_FACTOR);
         Node[] oldArray = Arrays.copyOf(values, values.length);
         values = new Node[values.length * ARRAY_EXTEND_COEFFICIENT];
         for (Node node : oldArray) {
