@@ -1,5 +1,6 @@
 package core.basesyntax;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -9,6 +10,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold = (int) (DEFAULT_INITIAL_CAPACITY * THRESHOLD_COEFFICIENT);
     private int capacity = DEFAULT_INITIAL_CAPACITY;
     private int size;
+    private Node<K, V> tail;
 
     public MyHashMap() {
     }
@@ -37,14 +39,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                             newTable[hash] = tempNodeNext;
                             newTable[hash].next = null;
                             tempNodeNext = tempNodeNext.next;
-                        }else {
+                        } else {
                             Node<K, V> nodeTail = newTable[hash];
                             while (nodeTail.next != null) {
                                 nodeTail = nodeTail.next;
                             }
                             nodeTail.next = tempNode;
                         }
-                    }while (tempNodeNext != null);
+                    } while (tempNodeNext != null);
                 }
             }
         }
@@ -62,19 +64,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 || (key != null && key.equals(newKey));
     }
 
-    private Node<K, V> checkKeyIntoCell(int keyHash, K key, Node<K, V> node) {
-        boolean isKey = false;
-        isKey = isSameKey(node.key, key);
+    private Node<K, V> checkKeyIntoCell(K key) {
+        Node<K, V> node = table[hash(key)];
+        Node<K, V> temp = null;
 
-        while(!isKey) {
-            if (node.next != null) {
-                node = node.next;
-                isKey = isSameKey(node.key, key);
-            } else {
+        while (node != null) {
+            if (isSameKey(node.key, key)) {
                 return node;
+            } else {
+                temp = node;
+                node = node.next;
             }
-        }
-        return node;
+        } 
+        tail = temp;
+        return null;
     }
 
     @Override
@@ -87,15 +90,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             checkOnResize();
             table[hash] = newNode;
         } else {
-            Node<K, V> node = table[hash];
-            node = checkKeyIntoCell(hash, key, node);
+            Node<K, V> node = checkKeyIntoCell(key);
 
-//            if (isKey) {
-//                node.value = value;
-//            }else {
-//                size++;
-//                node.next = newNode;
-//            }
+            if (node != null) {
+                node.value = value;
+            } else {
+                size++;
+                tail.next = newNode;
+                tail = newNode;
+            }
         }
     }
 
@@ -105,8 +108,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[hash] == null) {
             System.out.println("the key is absent in the map");
         } else {
-            Node<K, V> node = table[hash];
-            node = checkKeyIntoCell(hash, key, node);
+            Node<K, V> node = checkKeyIntoCell(key);
+
+            if (node != null) {
+                return node.value;
+            } else {
+                throw new RuntimeException("the key is absent: " + key);
+            }
         }
 
         return null;
@@ -131,8 +139,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         public int hashCode() {
-            return Objects.hashCode(this.key);
+            return Objects.hashCode(this.key) ^ Objects.hashCode(this.value);
         }
-
     }
 }
