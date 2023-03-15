@@ -5,23 +5,26 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float THRESHOLD_COEFFICIENT = 0.75f;
-    private Node<K, V>[] table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
-    private int threshold = (int) (DEFAULT_INITIAL_CAPACITY * THRESHOLD_COEFFICIENT);
-    private int capacity = DEFAULT_INITIAL_CAPACITY;
+    private Node<K, V>[] table;
+    private int threshold;
     private int size;
     private Node<K, V> tail;
 
     public MyHashMap() {
+        this.table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
+        this.threshold = (int) (DEFAULT_INITIAL_CAPACITY * THRESHOLD_COEFFICIENT);
+        this.size = 0;
+        this.tail = null;
     }
 
     @Override
     public void put(K key, V value) {
-        int hash = hash(key);
+        int hash = getIndexFromKey(key);
         Node<K, V> newNode = new Node<>(key, value, null);
 
         if (table[hash] == null) {
             size++;
-            checkOnResize();
+            resizeIfNeeded();
             table[hash] = newNode;
         } else {
             Node<K, V> node = checkKeyIntoCell(key);
@@ -32,14 +35,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 size++;
                 tail.next = newNode;
                 tail = newNode;
-                checkOnResize();
+                resizeIfNeeded();
             }
         }
     }
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key);
+        int hash = getIndexFromKey(key);
         if (table[hash] == null) {
             System.out.println("the key is absent in the map");
         } else {
@@ -59,15 +62,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(Object key) {
-        return (key == null) ? 0 : Math.abs(Objects.hashCode(key)) % capacity;
+    private int getIndexFromKey(Object key) {
+        return (key == null) ? 0 : Math.abs(Objects.hashCode(key)) % table.length;
     }
 
-    private Node<K, V>[] resize() {
-        capacity = capacity << 1;
-        threshold = threshold << 1;
+    private void resize() {
         Node<K, V>[] oldTable = table;
-        Node<K, V>[] newTable = (Node<K, V>[]) new Node[capacity];
+        table = (Node<K, V>[]) new Node[table.length << 1];
+        threshold = threshold << 1;
         for (int i = 0; i < oldTable.length; i++) {
             Node<K, V> tempNode;
             int hash;
@@ -76,12 +78,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
                 while (tempNode != null) {
                     Node<K, V> nodeForSaveNext = tempNode.next;
-                    hash = hash(tempNode.key);
-                    if (newTable[hash] == null) {
-                        newTable[hash] = tempNode;
-                        newTable[hash].next = null;
+                    hash = getIndexFromKey(tempNode.key);
+                    if (table[hash] == null) {
+                        table[hash] = tempNode;
+                        table[hash].next = null;
                     } else {
-                        Node<K, V> next = newTable[hash];
+                        Node<K, V> next = table[hash];
                         while (next.next != null) {
                             next = next.next;
                         }
@@ -92,22 +94,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-        return newTable;
     }
 
-    private void checkOnResize() {
+    private void resizeIfNeeded() {
         if (size > threshold) {
-            table = resize();
+            resize();
         }
     }
 
     private boolean isSameKey(K key, K newKey) {
-        return (hash(key) == hash(newKey) && key == newKey)
+        return (getIndexFromKey(key) == getIndexFromKey(newKey) && key == newKey)
                 || (key != null && key.equals(newKey));
     }
 
     private Node<K, V> checkKeyIntoCell(K key) {
-        Node<K, V> node = table[hash(key)];
+        Node<K, V> node = table[getIndexFromKey(key)];
         Node<K, V> temp = null;
 
         while (node != null) {
