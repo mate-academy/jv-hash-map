@@ -72,23 +72,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = threshold << 1;
         for (int i = 0; i < oldTable.length; i++) {
             Node<K, V> tempNode;
+            Node<K, V> nodeForSaveNext;
             int hash;
             if ((tempNode = oldTable[i]) != null) {
                 oldTable[i] = null;
-
                 while (tempNode != null) {
-                    Node<K, V> nodeForSaveNext = tempNode.next;
+                    nodeForSaveNext = tempNode.next;
+                    tempNode.next = null;
                     hash = getIndexFromKey(tempNode.key);
                     if (table[hash] == null) {
                         table[hash] = tempNode;
-                        table[hash].next = null;
                     } else {
                         Node<K, V> next = table[hash];
                         while (next.next != null) {
                             next = next.next;
                         }
                         next.next = tempNode;
-                        next.next.next = null;
                     }
                     tempNode = nodeForSaveNext;
                 }
