@@ -8,24 +8,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int threshold;
     private int size;
-    private Node<K, V> tail;
 
     public MyHashMap() {
         this.table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
         this.threshold = (int) (DEFAULT_INITIAL_CAPACITY * THRESHOLD_COEFFICIENT);
         this.size = 0;
-        this.tail = null;
     }
 
     @Override
     public void put(K key, V value) {
         int hash = getIndexFromKey(key);
-        Node<K, V> newNode = new Node<>(key, value, null);
+        Node<K, V> newNode;
 
         if (table[hash] == null) {
             size++;
             resizeIfNeeded();
-            table[hash] = newNode;
+            table[hash] = new Node<>(key, value, null);
         } else {
             Node<K, V> node = checkKeyIntoCell(key);
 
@@ -33,9 +31,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node.value = value;
             } else {
                 size++;
-                tail.next = newNode;
-                tail = newNode;
                 resizeIfNeeded();
+                newNode = table[hash];
+                table[hash] = new Node<>(key, value, newNode);
             }
         }
     }
@@ -78,16 +76,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 oldTable[i] = null;
                 while (tempNode != null) {
                     nodeForSaveNext = tempNode.next;
-                    tempNode.next = null;
                     hash = getIndexFromKey(tempNode.key);
                     if (table[hash] == null) {
                         table[hash] = tempNode;
+                        tempNode.next = null;
                     } else {
                         Node<K, V> next = table[hash];
-                        while (next.next != null) {
-                            next = next.next;
-                        }
-                        next.next = tempNode;
+                        table[hash] = tempNode;
+                        table[hash].next = next;
                     }
                     tempNode = nodeForSaveNext;
                 }
@@ -103,17 +99,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V> checkKeyIntoCell(K key) {
         Node<K, V> node = table[getIndexFromKey(key)];
-        Node<K, V> temp = null;
 
         while (node != null) {
             if (Objects.equals(node.key, key)) {
                 return node;
             } else {
-                temp = node;
                 node = node.next;
             }
         }
-        tail = temp;
         return null;
     }
 
