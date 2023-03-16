@@ -101,17 +101,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private boolean isSameKey(K key, K newKey) {
-        return (getIndexFromKey(key) == getIndexFromKey(newKey) && key == newKey)
-                || (key != null && key.equals(newKey));
-    }
-
     private Node<K, V> checkKeyIntoCell(K key) {
         Node<K, V> node = table[getIndexFromKey(key)];
         Node<K, V> temp = null;
 
         while (node != null) {
-            if (isSameKey(node.key, key)) {
+            if (Objects.equals(node.key, key)) {
                 return node;
             } else {
                 temp = node;
