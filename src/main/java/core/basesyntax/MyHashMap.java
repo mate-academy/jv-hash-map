@@ -7,39 +7,39 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int LENGTH_MULTIPLIER = 2;
     private static final double LOAD_FACTOR = 0.75;
     private int size;
-    private Node<K, V>[] currentHashMap;
+    private Node<K, V>[] table;
 
     public MyHashMap() {
-        currentHashMap = new Node[DEFAULT_CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
 
-        increaseLength();
-        int bucket = hashCode(key);
-        if (currentHashMap[bucket] == null) {
-            currentHashMap[bucket] = new Node<>(key, value, null);
+        resize();
+        int index = hashCode(key);
+        if (table[index] == null) {
+            table[index] = new Node<>(key, value, null);
             size++;
         }
-        Node<K, V> newNode = currentHashMap[bucket];
-        while (newNode != null) {
-            if (Objects.equals(newNode.key, key)) {
-                newNode.value = value;
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
                 return;
             }
-            if (newNode.next == null) {
-                newNode.next = new Node<>(key, value, null);
+            if (node.next == null) {
+                node.next = new Node<>(key, value, null);
                 size++;
                 return;
             }
-            newNode = newNode.next;
+            node = node.next;
         }
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = currentHashMap[hashCode(key)];
+        Node<K, V> currentNode = table[hashCode(key)];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
@@ -54,22 +54,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void increaseLength() {
-        if (size >= currentHashMap.length * LOAD_FACTOR) {
+    private void resize() {
+        if (size >= table.length * LOAD_FACTOR) {
             size = 0;
-            Node<K, V>[] oldTable = currentHashMap;
-            currentHashMap = (Node<K, V>[]) new Node[currentHashMap.length * LENGTH_MULTIPLIER];
-            for (Node<K, V> check : oldTable) {
-                while (check != null) {
-                    put(check.key, check.value);
-                    check = check.next;
+            Node<K, V>[] oldTable = table;
+            table = (Node<K, V>[]) new Node[table.length * LENGTH_MULTIPLIER];
+            for (Node<K, V> node : oldTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
                 }
             }
         }
     }
 
     private int hashCode(K key) {
-        return (key == null) ? 0 : Math.abs(hashCode() % currentHashMap.length);
+        return (key == null) ? 0 : Math.abs(hashCode() % table.length);
     }
 
     private class Node<K, V> {
