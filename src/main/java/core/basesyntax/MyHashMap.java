@@ -65,9 +65,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
     
     private void resize() {
-        Node<K, V>[] previousTable = table;
         newCapacity = newCapacity << 1;
         trashold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
+        Node<K, V>[] previousTable = table;
         table = new Node[newCapacity];
         size = 0;
         
