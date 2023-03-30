@@ -6,7 +6,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float THRESHOLD_COEFFICIENT = 0.75f;
     private Node<K, V>[] table;
-    private int threshold;
     private int size;
 
     public MyHashMap() {
@@ -21,7 +20,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[index] == null) {
             table[index] = node;
             size++;
-        } else {
+            return;
+        }
             Node<K, V> newNode = table[index];
             while (newNode != null) {
                 if (Objects.equals(node.key, newNode.key)) {
@@ -34,13 +34,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     return;
                 }
                 newNode = newNode.next;
-            }
-        }
-    }
 
-    public void checkSize() {
-        if (size > threshold) {
-            resize();
         }
     }
 
@@ -66,11 +60,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
+    private void checkSize() {
+        if (size > (int) (table.length * THRESHOLD_COEFFICIENT)) {
+            resize();
+        }
+    }
+
     private void resize() {
-        int newCapacity = table.length << 1;
-        threshold = (int) (newCapacity * THRESHOLD_COEFFICIENT);
         Node<K, V>[] previousTable = table;
-        table = new Node[newCapacity];
+        table = new Node[table.length << 1];
         size = 0;
 
         for (Node<K, V> node : previousTable) {
