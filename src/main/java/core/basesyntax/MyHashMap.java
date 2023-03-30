@@ -22,18 +22,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-            Node<K, V> newNode = table[index];
-            while (newNode != null) {
-                if (Objects.equals(node.key, newNode.key)) {
-                    newNode.value = value;
-                    return;
-                }
-                if (newNode.next == null) {
-                    newNode.next = node;
-                    size++;
-                    return;
-                }
-                newNode = newNode.next;
+        Node<K, V> newNode = table[index];
+        while (newNode != null) {
+            if (Objects.equals(node.key, newNode.key)) {
+                newNode.value = value;
+                return;
+            }
+            if (newNode.next == null) {
+                newNode.next = node;
+                size++;
+                return;
+            }
+            newNode = newNode.next;
 
         }
     }
