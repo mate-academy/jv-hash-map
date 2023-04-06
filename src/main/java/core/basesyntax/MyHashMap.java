@@ -1,9 +1,7 @@
 package core.basesyntax;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -13,9 +11,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private float loadFactor;
     private Node<K, V>[] table;
 
-
     public MyHashMap() {
-        table =  new Node[DEFAULT_CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
         loadFactor = DEFAULT_LOADFACTOR;
     }
 
@@ -26,26 +23,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-         int hashPosition = hash(key) % table.length;
+        int hashPosition = hash(key) % table.length;
         if (size < getThreshold()) {
-            if (table[hashPosition] == null){
+            if (table[hashPosition] == null) {
                 table[hashPosition] = new Node<>(key, value, null);
                 ++size;
             } else {
                 Node<K, V> node = table[hashPosition];
-                    while (node != null){
-                        if (checkNodeForSameKey(node, key)) {
-                            node.value = value;
-                            return;
-                        }
-                        if (node.next == null) {
-                            break;
-                        } else {
-                            node = node.next;
-                        }
+                while (node != null) {
+                    if (checkNodeForSameKey(node, key)) {
+                        node.value = value;
+                        return;
                     }
-                    node.next = new Node<>(key, value, null);
-                    size++;
+                    if (node.next == null) {
+                        break;
+                    } else {
+                        node = node.next;
+                    }
+                }
+                node.next = new Node<>(key, value, null);
+                size++;
             }
         } else {
             resize();
@@ -58,7 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = hash(key) % table.length;
         Node<K, V> node = table[hash];
         while (node != null) {
-            if (Objects.equals(node.key, key)){
+            if (Objects.equals(node.key, key)) {
                 return node.value;
             }
             node = node.next;
@@ -71,7 +68,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private boolean checkNodeForSameKey(Node<K, V> node, K key){
+    private boolean checkNodeForSameKey(Node<K, V> node, K key) {
         if (Objects.equals(node.key, key)) {
             return true;
         } else {
@@ -79,22 +76,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void resize(){
+    private void resize() {
         List<Node<K,V>> nodes = getAllNodes();
         table = new Node[table.length * 2];
         int tempSize = size;
         size = 0;
-        for (int i = 0; i < tempSize; i++){
+        for (int i = 0; i < tempSize; i++) {
             Node<K, V> tempNode = nodes.get(i);
             put(tempNode.key, tempNode.value);
         }
     }
-    private List<Node<K, V>> getAllNodes(){
+
+    private List<Node<K, V>> getAllNodes() {
         List<Node<K,V>> nodes = new ArrayList<>(size);
-        for (int i = 0; i < table.length; i++){
-            if (table[i] != null){
+        for (int i = 0; i < table.length; i++) {
+            if (table[i] != null) {
                 Node<K, V> node = table[i];
-                while (node != null){
+                while (node != null) {
                     nodes.add(node);
                     node = node.next;
                 }
@@ -102,15 +100,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         return nodes;
     }
-    private int hash(K key){
+
+    private int hash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
-    private int getThreshold(){
+    private int getThreshold() {
         return (int) (loadFactor * table.length);
     }
 
-    private static class Node<K, V>{
+    private static class Node<K, V> {
         private K key;
         private V value;
         private int hash;
@@ -123,7 +122,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             hash = hash(key);
 
         }
-        private int hash(K key){
+
+        private int hash(K key) {
             return key == null ? 0 : key.hashCode();
         }
     }
