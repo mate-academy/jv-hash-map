@@ -7,25 +7,27 @@ import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float DEFAULT_LOADFACTOR = 0.75f;
     private int size;
-    private float loadFactor = 0.75f;
-    private int capacity = 16;
-    private int threshold = (int) (loadFactor * capacity);
-    private Node<K, V>[] table = new Node[capacity];
+    private float loadFactor;
+    private Node<K, V>[] table;
 
 
     public MyHashMap() {
+        table =  new Node[DEFAULT_CAPACITY];
+        loadFactor = DEFAULT_LOADFACTOR;
     }
 
     public MyHashMap(int capacity, float loadFactor) {
-        this.capacity = capacity;
+        table = new Node[capacity];
         this.loadFactor = loadFactor;
     }
 
     @Override
     public void put(K key, V value) {
-         int hashPosition = hash(key) % capacity;
-        if (size < threshold) {
+         int hashPosition = hash(key) % table.length;
+        if (size < getThreshold()) {
             if (table[hashPosition] == null){
                 table[hashPosition] = new Node<>(key, value, null);
                 ++size;
@@ -53,7 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key) % capacity;
+        int hash = hash(key) % table.length;
         Node<K, V> node = table[hash];
         while (node != null) {
             if (Objects.equals(node.key, key)){
@@ -78,19 +80,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize(){
-        Node<K, V>[] newTable = new Node[capacity * 2];
-        MyHashMap<K,V> newMap = new MyHashMap<>(capacity * 2, loadFactor);
-        newMap.table = newTable;
-        capacity *= 2;
-        threshold *= 2;
-         // todo ?
         List<Node<K,V>> nodes = getAllNodes();
-        for (int i = 0; i < size; i++){
+        table = new Node[table.length * 2];
+        int tempSize = size;
+        size = 0;
+        for (int i = 0; i < tempSize; i++){
             Node<K, V> tempNode = nodes.get(i);
-            newMap.put(tempNode.key, tempNode.value);
+            put(tempNode.key, tempNode.value);
         }
-
-        table = newMap.table;
     }
     private List<Node<K, V>> getAllNodes(){
         List<Node<K,V>> nodes = new ArrayList<>(size);
@@ -107,6 +104,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
     private int hash(K key){
         return key == null ? 0 : Math.abs(key.hashCode());
+    }
+
+    private int getThreshold(){
+        return (int) (loadFactor * table.length);
     }
 
     private static class Node<K, V>{
