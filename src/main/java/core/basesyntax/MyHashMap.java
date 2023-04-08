@@ -27,26 +27,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hashPosition = getHashPosition(key);
         if (size > getThreshold()) {
             resize();
-            put(key, value);
-        } else if (table[hashPosition] == null) {
-            table[hashPosition] = new Node<>(key, value, null);
-            ++size;
-        } else {
-            Node<K, V> node = table[hashPosition];
-            while (node != null) {
-                if (Objects.equals(node.key, key)) {
-                    node.value = value;
-                    return;
-                }
-                if (node.next == null) {
-                    break;
-                } else {
-                    node = node.next;
-                }
-            }
-            node.next = new Node<>(key, value, null);
-            size++;
         }
+        Node<K, V> node = table[hashPosition];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
+                return;
+            }
+            if (node.next == null) {
+                break;
+            }
+            node = node.next;
+        }
+        if (table[hashPosition] == null) {
+            table[hashPosition] = new Node<>(key, value, null);
+        } else {
+            node.next = new Node<>(key, value, null);
+        }
+        size++;
     }
 
     @Override
