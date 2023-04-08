@@ -25,29 +25,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int hashPosition = getHashPosition(key);
-        if (size < getThreshold()) {
-            if (table[hashPosition] == null) {
-                table[hashPosition] = new Node<>(key, value, null);
-                ++size;
-            } else {
-                Node<K, V> node = table[hashPosition];
-                while (node != null) {
-                    if (checkNodeForSameKey(node, key)) {
-                        node.value = value;
-                        return;
-                    }
-                    if (node.next == null) {
-                        break;
-                    } else {
-                        node = node.next;
-                    }
-                }
-                node.next = new Node<>(key, value, null);
-                size++;
-            }
-        } else {
+        if (size > getThreshold()) {
             resize();
             put(key, value);
+        } else if (table[hashPosition] == null) {
+            table[hashPosition] = new Node<>(key, value, null);
+            ++size;
+        } else {
+            Node<K, V> node = table[hashPosition];
+            while (node != null) {
+                if (Objects.equals(node.key, key)) {
+                    node.value = value;
+                    return;
+                }
+                if (node.next == null) {
+                    break;
+                } else {
+                    node = node.next;
+                }
+            }
+            node.next = new Node<>(key, value, null);
+            size++;
         }
     }
 
@@ -67,14 +65,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
-    }
-
-    private boolean checkNodeForSameKey(Node<K, V> node, K key) {
-        if (Objects.equals(node.key, key)) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     private void resize() {
@@ -123,7 +113,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-
         }
     }
 }
