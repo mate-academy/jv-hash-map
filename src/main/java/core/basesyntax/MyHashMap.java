@@ -6,6 +6,7 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
+    private static final int INCREASING_NUMBER = 2;
     private static final float DEFAULT_LOADFACTOR = 0.75f;
     private int size;
     private float loadFactor;
@@ -23,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int hashPosition = hash(key) % table.length;
+        int hashPosition = getHashPosition(key);
         if (size < getThreshold()) {
             if (table[hashPosition] == null) {
                 table[hashPosition] = new Node<>(key, value, null);
@@ -52,8 +53,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key) % table.length;
-        Node<K, V> node = table[hash];
+        int hashPosition = getHashPosition(key);
+        Node<K, V> node = table[hashPosition];
         while (node != null) {
             if (Objects.equals(node.key, key)) {
                 return node.value;
@@ -78,7 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         List<Node<K,V>> nodes = getAllNodes();
-        table = new Node[table.length * 2];
+        table = new Node[table.length * INCREASING_NUMBER];
         int tempSize = size;
         size = 0;
         for (int i = 0; i < tempSize; i++) {
@@ -101,12 +102,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return nodes;
     }
 
-    private int hash(K key) {
+    private int getHash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
     private int getThreshold() {
         return (int) (loadFactor * table.length);
+    }
+
+    private int getHashPosition(K key) {
+        return getHash(key) % table.length;
     }
 
     private static class Node<K, V> {
@@ -119,12 +124,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-            hash = hash(key);
 
-        }
-
-        private int hash(K key) {
-            return key == null ? 0 : key.hashCode();
         }
     }
 }
