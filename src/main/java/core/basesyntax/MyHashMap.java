@@ -7,49 +7,46 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final int GROW_COEFFICIENT = 2;
     private Node<K, V>[] elements;
-    private int threshold;
     private int size;
 
     public MyHashMap() {
         elements = new Node[DEFAULT_CAPACITY];
-        threshold = (int) (elements.length * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
+        if (size >= elements.length * DEFAULT_LOAD_FACTOR) {
+            resize();
+        }
         int index = getIndex(key);
         Node<K, V> existingNode = elements[index];
-        Node<K, V> newNode = new Node<>(getHash(key), key, value, null);
-        if (Objects.isNull(existingNode)) {
+        Node<K, V> newNode = new Node<>(key, value, null);
+        if (existingNode == null) {
             elements[index] = newNode;
+            size++;
         }
-        while (Objects.nonNull(existingNode)) {
+        while (existingNode != null) {
             if (Objects.equals(existingNode.key, key)) {
                 existingNode.value = value;
                 return;
             }
-            if (Objects.isNull(existingNode.next)) {
+            if (existingNode.next == null) {
                 existingNode.next = newNode;
+                size++;
                 break;
             }
             existingNode = existingNode.next;
-        }
-        if (++size > threshold) {
-            resize();
         }
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> resultNode;
-        for (Node<K, V> element : elements) {
-            resultNode = element;
-            while (Objects.nonNull(resultNode)) {
-                if (Objects.equals(resultNode.key, key)) {
-                    return resultNode.getValue();
-                }
-                resultNode = resultNode.next;
+        Node<K, V> resultNode = elements[getIndex(key)];
+        while (resultNode != null) {
+            if (Objects.equals(resultNode.key, key)) {
+                return resultNode.getValue();
             }
+            resultNode = resultNode.next;
         }
         return null;
     }
@@ -63,17 +60,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(Objects.hash(key) % elements.length);
     }
 
-    private int getHash(K key) {
-        return key == null ? 0 : key.hashCode();
-    }
-
     private void resize() {
         final Node<K, V>[] oldElements = elements;
         elements = new Node[elements.length * GROW_COEFFICIENT];
-        threshold = (int) (elements.length * DEFAULT_LOAD_FACTOR);
         size = 0;
         for (Node<K, V> oldElement : oldElements) {
-            while (Objects.nonNull(oldElement)) {
+            while (oldElement != null) {
                 put(oldElement.getKey(), oldElement.getValue());
                 oldElement = oldElement.next;
             }
@@ -81,13 +73,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        private Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
