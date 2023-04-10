@@ -57,7 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return key == null ? 0 : Math.abs(Objects.hash(key) % elements.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % elements.length);
     }
 
     private void resize() {
