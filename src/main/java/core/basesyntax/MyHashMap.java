@@ -19,30 +19,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int indexOfBucket = getIndexOfBucketByKey(key);
         if (table[indexOfBucket] == null) {
-            table[indexOfBucket] = new Node<>(key, value, null);
+            table[indexOfBucket] = new Node<>(key, value);
             size++;
         } else {
-            putIfBucketByIndexExist(key, value, indexOfBucket);
+            putIfNodeInBucketExist(key, value, indexOfBucket);
         }
     }
 
     @Override
     public V getValue(K key) {
-        if (size > 0) {
-            int indexOfBucket = getIndexOfBucketByKey(key);
-            if (table[indexOfBucket].next == null) {
-                return table[indexOfBucket].value;
-            } else {
-                Node<K, V> currentNode = table[indexOfBucket];
-                if (currentNode != null) {
-                    while (currentNode != null) {
-                        if (currentNode.key != null && currentNode.key.equals(key)
-                                || currentNode.key == key) {
-                            return currentNode.value;
-                        }
-                        currentNode = currentNode.next;
-                    }
+        int indexOfBucket = getIndexOfBucketByKey(key);
+        if (table[indexOfBucket] != null && table[indexOfBucket].next == null) {
+            return table[indexOfBucket].value;
+        } else {
+            Node<K, V> currentNode = table[indexOfBucket];
+            while (currentNode != null) {
+                if (currentNode.key != null && currentNode.key.equals(key)
+                        || currentNode.key == key) {
+                    return currentNode.value;
                 }
+                currentNode = currentNode.next;
             }
         }
         return null;
@@ -58,7 +54,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.abs(keyHash % capacity);
     }
 
-    private void putIfBucketByIndexExist(K key, V value, int indexOfBucket) {
+    private void putIfNodeInBucketExist(K key, V value, int indexOfBucket) {
         Node<K, V> currentNode = table[indexOfBucket];
         while (currentNode.next != null) {
             if (currentNode.key != null && currentNode.key.equals(key) || currentNode.key == key) {
@@ -70,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if ((currentNode.key != null && currentNode.key.equals(key)) || currentNode.key == key) {
             currentNode.value = value;
         } else {
-            currentNode.next = new Node<>(key, value, null);
+            currentNode.next = new Node<>(key, value);
             size++;
         }
     }
@@ -93,17 +89,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    static class Node<K, V> {
-        private int hash;
+    private static class Node<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
-            this.hash = (key == null) ? 0 : key.hashCode();
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
