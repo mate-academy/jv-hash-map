@@ -9,11 +9,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        this(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR);
-    }
-
-    public MyHashMap(int initialCapacity, float defaultLoadFactor) {
-        this.buckets = new Node[initialCapacity];
+        buckets = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -21,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == buckets.length * DEFAULT_LOAD_FACTOR) {
             resizeIfNeeded();
         }
-        int index = (key == null) ? 0 : getIndex(key);
+        int index = getIndex(key);
         Node<K, V> currentNode = buckets[index];
         while (currentNode != null) {
             if ((currentNode.key == null && key == null) || Objects.equals(currentNode.key, key)) {
