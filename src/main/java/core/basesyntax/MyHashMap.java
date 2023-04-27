@@ -3,12 +3,13 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    int size;
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private int size;
     private int newCapacity = DEFAULT_INITIAL_CAPACITY;
 
-    Node<K, V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
+    private Node<K, V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
+
     @Override
     public void put(K key, V value) {
         Node<K, V> node = new Node<>(key, value, null);
@@ -27,26 +28,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         Node<K, V> newNode = table[index];
-            while (newNode.next != null) {
-                if (newNode.next.key != null && newNode.next.key.equals(key)) {
-                    newNode.next.value = value;
-                    size--;
-                    return;
-                }
-                newNode = newNode.next;
-                if (newNode.key != null && newNode.key.equals(key)) {
-                    newNode.value = value;
-                }
-                if (newNode.key == null && newNode.key == key) {
-                    newNode.value = value;
-                    size--;
-                }
-            }
-        if (newNode.key == null && newNode.key == key) {
-            newNode.value = value;
-            size--;
-        }
-            newNode.next = node;
+       while (newNode.next != null) {
+           if (newNode.next.key != null && newNode.next.key.equals(key)) {
+               newNode.next.value = value;
+               size--;
+               return;
+           }
+           newNode = newNode.next;
+           if (newNode.key != null && newNode.key.equals(key)) {
+               newNode.value = value;
+           }
+           if (newNode.key == null && newNode.key == key) {
+               newNode.value = value;
+               size--;
+           }
+       }
+       if (newNode.key == null && newNode.key == key) {
+           newNode.value = value;
+           size--;
+       }
+       newNode.next = node;
     }
 
     @Override
@@ -91,9 +92,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        K key;
-        V value;
-        Node<K, V> next;
+        private K key;
+        private V value;
+        private Node<K, V> next;
 
         private Node(K key, V value, Node<K, V> next) {
             this.key = key;
