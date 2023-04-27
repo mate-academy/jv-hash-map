@@ -28,26 +28,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         Node<K, V> newNode = table[index];
-       while (newNode.next != null) {
-           if (newNode.next.key != null && newNode.next.key.equals(key)) {
-               newNode.next.value = value;
-               size--;
-               return;
-           }
-           newNode = newNode.next;
-           if (newNode.key != null && newNode.key.equals(key)) {
-               newNode.value = value;
-           }
-           if (newNode.key == null && newNode.key == key) {
-               newNode.value = value;
-               size--;
-           }
-       }
-       if (newNode.key == null && newNode.key == key) {
-           newNode.value = value;
-           size--;
-       }
-       newNode.next = node;
+        while (newNode.next != null) {
+            if (newNode.next.key != null && newNode.next.key.equals(key)) {
+                newNode.next.value = value;
+                size--;
+                return;
+            }
+            newNode = newNode.next;
+            if (newNode.key != null && newNode.key.equals(key)) {
+                newNode.value = value;
+            }
+            if (newNode.key == null && newNode.key == key) {
+                newNode.value = value;
+                size--;
+            }
+        }
+        if (newNode.key == null && newNode.key == key) {
+            newNode.value = value;
+            size--;
+        }
+        newNode.next = node;
     }
 
     @Override
