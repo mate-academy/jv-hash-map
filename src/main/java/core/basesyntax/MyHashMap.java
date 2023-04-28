@@ -82,19 +82,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] resize() {
         int newLength = table.length * 2;
         Node<K, V>[] newTable = new Node[newLength];
-        for (int i = 0; i < table.length; i++) {
-            if (table[i] == null) {
-                continue;
-            }
-            Node<K, V> nextNode = table[i];
-            while (nextNode.next != null) {
-                int newHash = (nextNode.key == null
-                        ? 0 : Math.abs(nextNode.hashCode()) % newLength);
-                newTable[newHash] = nextNode;
-                nextNode.next = null;
+        for (Node<K, V> node : table) {
+            while (node != null) {
+                int newHash = (node.key == null)
+                        ? 0 : Math.abs(node.key.hashCode()) % newLength;
+                Node<K, V> next = node.next;
+                node.next = newTable[newHash];
+                newTable[newHash] = node;
+                node = next;
             }
         }
-        threshold = (int) (DEFAULT_LOAD_FACTOR * newLength);
+        threshold = (int) (newLength * DEFAULT_LOAD_FACTOR);
         return newTable;
     }
 
