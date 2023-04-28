@@ -8,7 +8,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int RESIZE_TABLE = 2;
     private int size;
 
-
     private Node<K, V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
 
     @Override
