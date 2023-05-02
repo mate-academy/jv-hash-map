@@ -40,7 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] oldTable = table;
+        final Node<K, V>[] oldTable = table;
         int newCapacity = table.length << 1;
         threshold = (int) (newCapacity * LOAD_FACTOR);
         table = new Node[newCapacity];
