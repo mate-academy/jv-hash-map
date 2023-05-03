@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
@@ -23,8 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> prevNode = null;
             Node<K, V> curNode = table[index];
             while (curNode != null) {
-                if ((key == null && curNode.key == null)
-                        || (curNode.key != null && curNode.key.equals(key))) {
+                if (Objects.equals(key, curNode.key)) {
                     curNode.value = value;
                     return;
                 }
@@ -44,8 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K, V> findNode = table[index];
         while (findNode != null) {
-            if ((findNode.key == null && key == null)
-                    || (findNode.key != null && findNode.key.equals(key))) {
+            if (Objects.equals(findNode.key, key)) {
                 return findNode.value;
             }
             findNode = findNode.next;
@@ -62,13 +62,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return keyObject == null ? 0 : Math.abs(keyObject.hashCode() % table.length);
     }
 
+    private int hash(K keyObject, int divider) {
+        return keyObject == null ? 0 : Math.abs(keyObject.hashCode() % divider);
+    }
+
     private void isNeedToResize() {
         if (size == threshold) {
-            Node<K, V>[] newTable = new Node[table.length * 2];
+            int newCapacity = table.length * 2;
+            Node<K, V>[] newTable = new Node[newCapacity];
             for (int i = 0; i < table.length; i++) {
                 while (table[i] != null) {
-                    int index = (table[i].key == null)
-                            ? 0 : Math.abs(table[i].key.hashCode()) % newTable.length;
+                    int index = hash(table[i].key, newCapacity);
                     Node<K, V> next = table[i].next;
                     table[i].next = newTable[index];
                     newTable[index] = table[i];
