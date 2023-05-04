@@ -35,7 +35,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private V searchedValue(K key) {
-        int index = (key.hashCode()>=0)?key.hashCode() % table.length:-key.hashCode() % table.length;
+//        int index = (key.hashCode()>=0)?key.hashCode() % table.length:-key.hashCode() % table.length;
+        int index = resize(hash(key.hashCode()));
         if (table[index] != null) {
             Entry<K, V> currentNode = table[index];
             do {
@@ -58,18 +59,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = resize(hash(key.hashCode()));
         if (table[index] == null) {
             putInEmptyBucket(index, key, value);
+            size++;
         } else {
             putInOccupiedBucket(index, key, value);
         }
-        size++;
     }
 
     private void putInOccupiedBucket(int index, K key, V value) {
         Entry<K, V> currentNode = table[index];
-        while (currentNode.hasNext()) {
-            currentNode = currentNode.next;
+
+        while (currentNode != null){
+            if (key.equals(currentNode.key)){
+                currentNode = new Entry<>(key, value, index, currentNode.next);
+                return;
+            }
+            if(currentNode.hasNext()) {
+                currentNode = currentNode.next;
+            }else{
+                currentNode.next = new Entry<>(key, value, index, null);
+                size++;
+                return;
+            }
         }
-        currentNode.next = new Entry<>(key, value, index, null);
     }
 
     private void putInEmptyBucket(int index, K key, V value) {
@@ -108,6 +119,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void putNullKey(V value) {
         createTableIfNeed();
+        if(table[0] == null) {
+            size++;
+        }
         table[0] = new Entry<>(null, value, 0, null);
     }
 
