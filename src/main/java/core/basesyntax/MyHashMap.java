@@ -1,3 +1,4 @@
+
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -34,10 +35,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
+    @Override
+    public int getSize() {
+        return size;
+    }
+
     private V searchedNullKeyValue() {
-        Entry<K,V> currentNode = table[0];
-        while (currentNode != null){
-            if(currentNode.key == null){
+        Entry<K, V> currentNode = table[0];
+        while (currentNode != null) {
+            if (currentNode.key == null) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
@@ -46,9 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private V searchedValue(K key) {
-//        int index = (key.hashCode()>=0)?key.hashCode() % table.length:-key.hashCode() % table.length;
-
-        int index = resize(hash(key.hashCode()));
+        int index = hash(key.hashCode());
         if (table[index] != null) {
             Entry<K, V> currentNode = table[index];
             do {
@@ -61,14 +65,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    @Override
-    public int getSize() {
-        return size;
-    }
-
     private void putNewKey(K key, V value) {
         createTableIfNeed();
-        int index = resize(hash(key.hashCode()));
+        resize();
+        int index = hash(key.hashCode());
         if (table[index] == null) {
             putInEmptyBucket(index, key, value);
             size++;
@@ -79,15 +79,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void putInOccupiedBucket(int index, K key, V value) {
         Entry<K, V> currentNode = table[index];
-
-        while (currentNode != null){
-            if (key.equals(currentNode.key)){
+        while (currentNode != null) {
+            if (key.equals(currentNode.key)) {
                 currentNode.value = value;
                 return;
             }
-            if(currentNode.hasNext()) {
+            if (currentNode.hasNext()) {
                 currentNode = currentNode.next;
-            }else{
+            } else {
                 currentNode.next = new Entry<>(key, value, index, null);
                 size++;
                 return;
@@ -99,12 +98,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table[index] = new Entry<>(key, value, index, null);
     }
 
-    private int resize(int index) {
-        if (index > threshold) {
+    private void resize() {
+        if (size >= threshold) {
             transfer();
-            return hash(index);
         }
-        return index;
     }
 
     @SuppressWarnings("unchecked")
@@ -115,44 +112,55 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (tableLength * LOAD_FACTORY);
         for (Entry<K, V> bucket : oldTable) {
             if (bucket != null) {
-                moveToNew(bucket);
+                putInNewBranch(bucket);
             }
         }
     }
 
-    private void moveToNew(Entry<K, V> bucket) {
-        Entry<K, V> currentNode = bucket;
-        do {
-            int newHash = resize(currentNode.hash % table.length);
-            currentNode.hash = newHash;
-            table[newHash] = currentNode;
-            currentNode = currentNode.next;
-        } while (currentNode != null);
+    private void putInNewBranch(Entry<K, V> currentNode) {
+        while (currentNode != null) {
+            int index = hash(currentNode.hash);
+            currentNode.hash = index;
+            Entry<K, V> nextNode = currentNode.next;
+            currentNode.next = null;
+            if (table[index] == null) {
+                table[index] = currentNode;
+            } else {
+                Entry<K, V> newTableNode = table[index];
+                while (newTableNode.hasNext()) {
+                    newTableNode = newTableNode.next;
+                }
+                newTableNode.next = currentNode;
+            }
+            currentNode = nextNode;
+        }
     }
 
     private void putNullKey(V value) {
         createTableIfNeed();
-        if(table[0] != null) {
-            Entry<K,V> currentNode = table[0];
-            if (currentNode.key == null) {
-                currentNode.value = value;
-                //= new Entry<>(null, value, 0, currentNode.next);
-                return;
-            }
-            while (currentNode.hasNext()) {
-                if (currentNode.key == null) {
-                    currentNode.value = value;
-                            //= new Entry<>(null, value, 0, currentNode.next);
-                    return;
-                } else {
-                    currentNode = currentNode.next;
-                }
-            }
-            currentNode.next = new Entry<>(null, value, 0, null);
-            size++;
+        if (table[0] != null) {
+            putInOccupiedZeroBucket(value);
             return;
         }
         table[0] = new Entry<>(null, value, 0, null);
+        size++;
+    }
+
+    private void putInOccupiedZeroBucket(V value) {
+        Entry<K, V> currentNode = table[0];
+        if (currentNode.key == null) {
+            currentNode.value = value;
+            return;
+        }
+        while (currentNode.hasNext()) {
+            if (currentNode.key == null) {
+                currentNode.value = value;
+                return;
+            } else {
+                currentNode = currentNode.next;
+            }
+        }
+        currentNode.next = new Entry<>(null, value, 0, null);
         size++;
     }
 
