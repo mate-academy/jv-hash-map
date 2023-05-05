@@ -87,7 +87,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (currentNode.hasNext()) {
                 currentNode = currentNode.next;
             } else {
-                currentNode.next = new Entry<>(key, value, index, null);
+                currentNode.next = new Entry<>(key, value, key.hashCode(), null);
                 size++;
                 return;
             }
@@ -95,7 +95,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putInEmptyBucket(int index, K key, V value) {
-        table[index] = new Entry<>(key, value, index, null);
+        table[index] = new Entry<>(key, value, key.hashCode(), null);
     }
 
     private void resize() {
@@ -120,7 +120,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void putInNewBranch(Entry<K, V> currentNode) {
         while (currentNode != null) {
             int index = hash(currentNode.hash);
-            currentNode.hash = index;
             Entry<K, V> nextNode = currentNode.next;
             currentNode.next = null;
             if (table[index] == null) {
@@ -184,17 +183,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Entry<K, V> {
         private final K key;
         private V value;
-        private int hash;
+        private final int hash;
         private Entry<K, V> next;
 
-        Entry(K key, V value, int hash, Entry<K, V> next) {
+        private Entry(K key, V value, int hash, Entry<K, V> next) {
             this.key = key;
             this.value = value;
             this.hash = hash;
             this.next = next;
         }
 
-        boolean hasNext() {
+        private boolean hasNext() {
             return next != null;
         }
     }
