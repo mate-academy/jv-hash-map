@@ -17,10 +17,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value);
         int index = getIndex(key);
-        Node<K, V> node = table[index];
         if (size == table.length * THRESHOLD) {
             resize();
         }
+        Node<K, V> node = table[index];
         if (node == null) {
             table[index] = newNode;
             size++;
@@ -30,7 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     node.value = value;
                     return;
                 }
-                if (node.next == null){
+                if (node.next == null) {
                     node.next = newNode;
                     size++;
                     return;
@@ -43,12 +43,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> node = table[getIndex(key)];
-            while (node != null) {
-                if (Objects.equals(node.key, key)) {
-                    return node.value;
-                }
-                node = node.next;
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return node.value;
             }
+            node = node.next;
+        }
         return null;
     }
 
@@ -74,13 +74,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        K key;
-        V value;
-        Node<K, V> next;
+        private K key;
+        private V value;
+        private Node<K, V> next;
 
         public Node(K key, V value) {
             this.key = key;
             this.value = value;
+            this.next = next;
         }
     }
 }
