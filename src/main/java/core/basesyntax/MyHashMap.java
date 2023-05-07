@@ -170,7 +170,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(int hash) {
-        hash = (hash >= 0) ? hash : -hash;
+        hash = Math.abs(hash);
         return hash % table.length;
     }
 
