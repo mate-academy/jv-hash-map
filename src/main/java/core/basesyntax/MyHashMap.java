@@ -9,12 +9,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private int size;
 
-    public MyHashMap() {
-        table = null;
-        threshold = 0;
-        size = 0;
-    }
-
     @Override
     public void put(K key, V value) {
         if (isNullKey(key)) {
