@@ -3,8 +3,6 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int PRIME_NUMBER_17 = 17;
-    private static final int PRIME_NUMBER_31 = 31;
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
@@ -19,14 +17,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (size >= threshold) {
-            resizeCountOfBuckets();
+            resize();
         }
         int indexOfBucket = getIndexOfBucket(key);
+        Node<K, V> newNode = new Node<>(key, value);
         if (table[indexOfBucket] == null) {
-            table[indexOfBucket] = new Node<>(key, value, null);
+            table[indexOfBucket] = newNode;
             size++;
         } else {
-            checkingOfTheBucket(table[indexOfBucket], key, value);
+            putNotEmptyBucket(table[indexOfBucket], newNode);
         }
     }
 
@@ -48,26 +47,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getHash(K key) {
-        return PRIME_NUMBER_31 * PRIME_NUMBER_17 + Math.abs(key == null ? 0 : key.hashCode());
-    }
-
-    private void checkingOfTheBucket(Node<K, V> entry, K key, V value) {
-        while (entry != null) {
-            if (Objects.equals(entry.key, key)) {
-                entry.value = value;
+    private void putNotEmptyBucket(Node<K, V> existEntry, Node<K, V> newEntry) {
+        while (existEntry != null) {
+            if (Objects.equals(existEntry.key, newEntry.key)) {
+                existEntry.value = newEntry.value;
                 return;
             }
-            if (entry.next == null) {
-                entry.next = new Node<>(key, value, null);
+            if (existEntry.next == null) {
+                existEntry.next = newEntry;
                 size++;
                 return;
             }
-            entry = entry.next;
+            existEntry = existEntry.next;
         }
     }
 
-    private void resizeCountOfBuckets() {
+    private void resize() {
         size = 0;
         Node<K, V>[] oldTable = table;
         table = new Node[table.length << 1];
@@ -89,6 +84,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return getHash(key) % table.length;
     }
 
+    private int getHash(K key) {
+        return Math.abs(key == null ? 0 : key.hashCode());
+    }
+
     private static class Node<K, V> {
         private final K key;
         private V value;
@@ -99,6 +98,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
+
+        Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 }
-
