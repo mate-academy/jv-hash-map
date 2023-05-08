@@ -3,15 +3,15 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final double LOAD_FACTOR = 0.75;
+    private static final float LOAD_FACTOR = 0.75f;
     private static final int INITIAL_CAPACITY = 16;
     private Node<K, V>[] table;
-
-    private int threshold = (int) (LOAD_FACTOR * INITIAL_CAPACITY);
+    private int threshold;
     private int size;
 
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
+        threshold = (int) (LOAD_FACTOR * INITIAL_CAPACITY);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (current == null) {
             table[index] = newNode;
         } else {
-            for (; ; ) {
+            while (true) {
                 if (Objects.equals(key, current.key)) {
                     current.value = value;
                     return;
@@ -107,7 +107,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.hash = hash;
             this.key = key;
             this.value = value;
-            this.next = null;
         }
     }
 }
