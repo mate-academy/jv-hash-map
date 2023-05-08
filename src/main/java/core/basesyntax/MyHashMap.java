@@ -7,13 +7,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int GROW_FACTOR = 2;
     private Node<K, V>[] table;
-    private int tableLength;
     private int size;
     private int threshold;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        tableLength = table.length;
         threshold = getDefaultThreshold();
     }
 
@@ -59,14 +57,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int index(K key) {
-        return (key == null ? 0 : Math.abs(key.hashCode()) % tableLength);
+        return (key == null ? 0 : Math.abs(key.hashCode()) % table.length);
     }
 
     private Node<K, V>[] resize() {
-        int newLength = tableLength * GROW_FACTOR;
+        int newLength = table.length * GROW_FACTOR;
         Node<K, V>[] newTable = new Node[newLength];
-        tableLength = newLength;
-        for (Node<K, V> node : table) {
+        Node<K, V>[] oldTable = table;
+        table = newTable;
+        for (Node<K, V> node : oldTable) {
             while (node != null) {
                 int newIndex = index(node.key);
                 Node<K, V> next = node.next;
@@ -80,7 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getDefaultThreshold() {
-        return threshold = (int) (DEFAULT_LOAD_FACTOR * tableLength);
+        return threshold = (int) (DEFAULT_LOAD_FACTOR * table.length);
     }
 
     private void resizeIfNeeded() {
