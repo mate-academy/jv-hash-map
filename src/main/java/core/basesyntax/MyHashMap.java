@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int index = getIndex(key, table.length);
-        Node<K, V> node = new Node<>(key, value, null);
+        Node<K, V> node = new Node<>(key, value);
         if (table[index] == null) {
             table[index] = node;
             size++;
@@ -48,13 +48,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(K key) {
-        int h;
-        return (key == null) ? 0 : Math.abs((h = key.hashCode()) ^ (h >>> 16));
-    }
-
     private int getIndex(K key, int length) {
-        return hash(key) % length;
+        return (key == null) ? 0 : Math.abs(key.hashCode() % length);
     }
 
     private void resize() {
@@ -93,10 +88,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K,V> next;
 
-        private Node(K key, V value, Node<K,V> next) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
