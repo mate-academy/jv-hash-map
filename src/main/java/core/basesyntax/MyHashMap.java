@@ -5,8 +5,13 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private Node<K,V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
+    private static final int GROW_FACTOR = 2;
+    private Node<K,V>[] table;
     private int size;
+
+    public MyHashMap() {
+        this.table = new Node[DEFAULT_INITIAL_CAPACITY];;
+    }
 
     @Override
     public void put(K key, V value) {
@@ -14,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int hash = hash(key);
-        Node<K, V> nodeToPut = new Node<K, V>(key, value);
+        Node<K, V> nodeToPut = new Node(key, value);
         Node<K, V> node = table[hash];
         if (node == null) {
             table[hash] = nodeToPut;
@@ -57,9 +62,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        int capacity = table.length;
+        int capacity = table.length * GROW_FACTOR;
         Node<K, V>[] tempTable = table;
-        capacity *= 2;
         table = new Node[capacity];
         for (Node<K, V> element : tempTable) {
             while (element != null) {
