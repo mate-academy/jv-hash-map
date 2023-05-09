@@ -16,9 +16,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        isNeedToResize();
-        int index = hash(key);
-        Node<K, V> newNode = new Node<>(key, value, null);
+        resizeIfNeeded();
+        int index = getIndexOfBucket(key);
+        Node<K, V> newNode = new Node<>(key, value);
         if (table[index] == null) {
             table[index] = newNode;
         } else {
@@ -39,10 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = hash(key);
-        if (table[index] == null) {
-            return null;
-        }
+        int index = getIndexOfBucket(key);
         Node<K, V> findNode = table[index];
         while (findNode != null) {
             if (Objects.equals(findNode.key, key)) {
@@ -58,21 +55,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(K keyObject) {
-        return keyObject == null ? 0 : Math.abs(keyObject.hashCode() % table.length);
+    private int getIndexOfBucket(K key) {
+        if (key == null) {
+            return 0;
+        }
+        return getHash(key) % table.length;
     }
 
-    private int hash(K keyObject, int divider) {
-        return keyObject == null ? 0 : Math.abs(keyObject.hashCode() % divider);
+    private int getIndexOfBucket(K key, int divider) {
+        return key == null ? 0 : Math.abs(key.hashCode() % divider);
     }
 
-    private void isNeedToResize() {
+    private int getHash(K key) {
+        return Math.abs(key == null ? 0 : key.hashCode());
+    }
+
+    private void resizeIfNeeded() {
         if (size == threshold) {
             int newCapacity = table.length * 2;
             Node<K, V>[] newTable = new Node[newCapacity];
             for (int i = 0; i < table.length; i++) {
                 while (table[i] != null) {
-                    int index = hash(table[i].key, newCapacity);
+                    int index = getIndexOfBucket(table[i].key, newCapacity);
                     Node<K, V> next = table[i].next;
                     table[i].next = newTable[index];
                     newTable[index] = table[i];
@@ -93,6 +97,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
+        }
+
+        Node(K key, V value) {
+            this.key = key;
+            this.value = value;
         }
     }
 }
