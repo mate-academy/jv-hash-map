@@ -23,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
-        } else  {
+        } else {
             Node<K,V> curNode = table[index];
             while (curNode != null) {
                 if (Objects.equals(curNode.key, key)) {
@@ -61,11 +61,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return 0;
         } else {
-           return Math.abs(key.hashCode());
+            return Math.abs(key.hashCode());
         }
     }
 
-    private int getIndex (K key) {
+    private int getIndex(K key) {
         return getHashCode(key) % table.length;
     }
 
