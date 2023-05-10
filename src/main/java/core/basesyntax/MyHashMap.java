@@ -6,7 +6,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 16;
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int size;
-    private Node<K,V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
+    private Node<K,V>[] table;
+
+    public MyHashMap() {
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
@@ -14,21 +18,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int hash = hash(key);
-        Node<K, V> temporaryNode = table[hash];
+        Node<K, V> tempNode = table[hash];
         Node<K, V> newNode = new Node<K, V>(key, value);
-        if (temporaryNode == null) {
+        if (tempNode == null) {
             table[hash] = newNode;
         } else {
-            while (temporaryNode != null) {
-                if (Objects.equals(key, temporaryNode.key)) {
-                    temporaryNode.value = value;
+            while (tempNode != null) {
+                if (Objects.equals(key, tempNode.key)) {
+                    tempNode.value = value;
                     return;
                 }
-                if (temporaryNode.next == null) {
-                    temporaryNode.next = newNode;
+                if (tempNode.next == null) {
+                    tempNode.next = newNode;
                     break;
                 }
-                temporaryNode = temporaryNode.next;
+                tempNode = tempNode.next;
             }
         }
         size++;
@@ -36,16 +40,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> temporaryNode = table[hash(key)];
-        if (temporaryNode == null) {
-            return null;
-        }
-        while (temporaryNode != null) {
-            if ((Objects.equals(key, temporaryNode.key))) {
-                return temporaryNode.value;
-            } else {
-                temporaryNode = temporaryNode.next;
+        Node<K, V> tempNode = table[hash(key)];
+        while (tempNode != null) {
+            if ((Objects.equals(key, tempNode.key))) {
+                return tempNode.value;
             }
+            tempNode = tempNode.next;
         }
         return null;
     }
