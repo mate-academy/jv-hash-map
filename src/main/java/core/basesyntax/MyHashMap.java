@@ -7,7 +7,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private float loadFactor;
     private int size;
     private Node<K, V>[] table;
-
     private Node<K, V> nullKeyNode;
 
     public MyHashMap() {
