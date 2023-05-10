@@ -5,7 +5,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
     private static final int MULTIPLIER = 2;
     private Node<K, V>[] table;
-    private int size;
+    private int size = 0;
 
     public MyHashMap(int initialCapacity) {
         if (initialCapacity <= 0) {
