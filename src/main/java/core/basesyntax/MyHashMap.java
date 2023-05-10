@@ -21,22 +21,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = getIndex(key);
         Node<K, V> nodeToPut = new Node(key, value);
         Node<K, V> node = table[hash];
-        if (node == null) {
+        if (table[hash] == null) {
             table[hash] = nodeToPut;
+            size++;
         } else {
             while (node != null) {
-                if (Objects.equals(key, node.key)) {
+                if (Objects.equals(node.key, key)) {
                     node.value = value;
                     return;
                 }
                 if (node.next == null) {
-                    break;
+                    node.next = nodeToPut;
+                    size++;
+                    return;
                 }
                 node = node.next;
             }
-            node.next = nodeToPut;
         }
-        ++size;
     }
 
     @Override
