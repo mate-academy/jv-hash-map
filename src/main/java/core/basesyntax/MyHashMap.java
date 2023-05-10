@@ -15,10 +15,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= (table.length * DEFAULT_LOAD_FACTOR)) {
+        if (size >= table.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
-        int hash = hash(key);
+        int hash = getIndex(key);
         Node<K, V> nodeToPut = new Node(key, value);
         Node<K, V> node = table[hash];
         if (node == null) {
@@ -41,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = table[hash(key)];
+        Node<K, V> node = table[getIndex(key)];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
                 return node.value;
@@ -56,7 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(Object key) {
+    private int getIndex(Object key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
