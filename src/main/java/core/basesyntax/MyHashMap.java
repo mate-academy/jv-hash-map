@@ -17,20 +17,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        int index = getIndex(key);
+        int bucketIndex = getIndex(key);
         Node<K, V> newNode = new Node<>(key, value);
-        if (table[index] == null) {
-            table[index] = newNode;
+        if (table[bucketIndex] == null) {
+            table[bucketIndex] = newNode;
             size++;
         } else {
-            putNewBucket(table[index], newNode);
+            putNewBucket(table[bucketIndex], newNode);
         }
     }
 
     @Override
     public V getValue(K key) {
-        int index = getIndex(key);
-        Node<K, V> entry = table[index];
+        int bucketIndex = getIndex(key);
+        Node<K, V> entry = table[bucketIndex];
         while (entry != null) {
             if (areKeysEqual(entry.key, key)) {
                 return entry.value;
