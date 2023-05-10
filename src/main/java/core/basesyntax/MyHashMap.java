@@ -17,9 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold) {
-            resize();
-        }
+        resize();
         int index = getIndex(key);
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
@@ -58,11 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHashCode(Object key) {
-        if (key == null) {
-            return 0;
-        } else {
-            return Math.abs(key.hashCode());
-        }
+        return (key == null) ? 0 : Math.abs(key.hashCode());
     }
 
     private int getIndex(K key) {
@@ -70,6 +64,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        if (size < threshold) {
+            return;
+        }
         size = 0;
         threshold *= GROW_NUMBER;
         Node<K, V>[] oldArray = table;
