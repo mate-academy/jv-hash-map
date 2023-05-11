@@ -15,9 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         createTableOrExpend();
         int index = getIndexByKeyHash(key);
-        if (key == null) {
-            putNullKey(key,value);
-        } else if (table[index] == null) {
+        if (table[index] == null) {
             table[index] = new Node<>(key,value);
             size++;
         } else if (Objects.equals(table[index].key,key)) {
@@ -67,27 +65,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private void putNullKey(K key, V value) {
-        if (table[0] == null) {
-            table[0] = new Node<>(key, value);
-        } else {
-            Node<K,V> tail = table[0];
-            if (tail.key == null) {
-                tail.value = value;
-                return;
-            }
-            while (tail.next != null) {
-                if (tail.key == null) {
-                    tail.value = value;
-                    return;
-                }
-                tail = tail.next;
-            }
-            tail.next = new Node<>(key, value);
-        }
-        size++;
-    }
-
     private void createTableOrExpend() {
         if (table == null) {
             table = new Node[DEFAULT_INITIAL_CAPACITY];
@@ -95,21 +72,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K,V>[] oldTable = table;
             table = new Node[table.length * MAGNIFICATION_TABLE];
             for (Node<K,V> node: oldTable) {
-                if (node != null) {
-                    while (node != null) {
-                        Node<K, V> nextNode = node.next;
-                        node.next = null;
-                        if (table[getIndexByKeyHash(node.key)] == null) {
-                            table[getIndexByKeyHash(node.key)] = node;
-                        } else {
-                            Node<K,V> tail = table[getIndexByKeyHash(node.key)];
-                            while (tail.next != null) {
-                                tail = tail.next;
-                            }
-                            tail.next = node;
+                while (node != null) {
+                    Node<K, V> nextNode = node.next;
+                    node.next = null;
+                    if (table[getIndexByKeyHash(node.key)] == null) {
+                        table[getIndexByKeyHash(node.key)] = node;
+                    } else {
+                        Node<K,V> tail = table[getIndexByKeyHash(node.key)];
+                        while (tail.next != null) {
+                            tail = tail.next;
                         }
-                        node = nextNode;
+                        tail.next = node;
                     }
+                    node = nextNode;
                 }
             }
         }
