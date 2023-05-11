@@ -64,12 +64,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[table.length << 1];
         size = 0;
         for (Node<K,V> node : oldTab) {
-            if (node != null) {
+            while (node != null) {
                 put(node.key, node.value);
-                while (node.next != null) {
-                    put(node.next.key, node.next.value);
-                    node = node.next;
-                }
+                node = node.next;
             }
         }
     }
