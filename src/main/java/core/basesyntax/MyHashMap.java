@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_SIZE = 16;
-    private static final int RESIZE = 2;
-    private static final double THRESHOLD = 0.75;
+    private static final int RESIZE_MULTIPLIER = 2;
+    private static final double LOAD_FACTOR = 0.75;
     private int size;
     private Node<K, V>[] table;
 
@@ -15,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        checkForResize();
+        resize();
         Node<K, V> newNode = new Node<>(key, value);
         int index = getIndex(key);
         Node<K, V> node = table[index];
@@ -39,8 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = getIndex(key);
-        Node<K, V> node = table[index];
+        Node<K, V> node = table[getIndex(key)];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
                 return node.value;
@@ -59,20 +58,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
-    private void checkForResize() {
-        if (size == THRESHOLD * table.length) {
-            resize();
-        }
-    }
-
     private void resize() {
-        size = 0;
-        Node<K, V>[] oldTable = table;
-        table = new Node[table.length * RESIZE];
-        for (Node<K, V> node : oldTable) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+        if (size > LOAD_FACTOR * table.length) {
+            size = 0;
+            Node<K, V>[] oldTable = table;
+            table = new Node[table.length * RESIZE_MULTIPLIER];
+            for (Node<K, V> node : oldTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
             }
         }
     }
