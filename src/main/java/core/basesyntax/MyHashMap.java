@@ -18,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K, V> node = new Node<>(key, value);
-        int index = getIndexFromHash(node.key);
+        int index = getIndexFromHash(key);
         resizeIfNeed();
         if (table[index] == null) {
             table[index] = node;
@@ -33,7 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 if (newNode.next == null) {
                     newNode.next = node;
                     size++;
-                    return;
+                    break;
                 }
                 newNode = newNode.next;
             }
@@ -75,14 +75,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndexFromHash(K key) {
-        if (key == null) {
-            return 0;
-        } else {
-            return Math.abs(key.hashCode() % table.length);
-        }
+        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
