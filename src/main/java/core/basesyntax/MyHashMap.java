@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -10,7 +9,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V>[] table;
     private int threshold;
-    private int size = 0;
+    private int size;
     private int capacity;
 
     public MyHashMap() {
@@ -68,15 +67,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size = 0;
             Node<K, V>[] oldTable = table;
             table = new Node[capacity];
-            Arrays.fill(table, null);
             for (Node<K, V> node : oldTable) {
-                if (node != null) {
                     while (node != null) {
                         put(node.key, node.value);
                         node = node.next;
                     }
                 }
-            }
         }
     }
 
