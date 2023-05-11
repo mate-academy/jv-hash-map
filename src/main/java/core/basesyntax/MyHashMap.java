@@ -42,9 +42,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         while (currentNode != null) {
             if (areEqual(currentNode.key, key)) {
                 return currentNode.value;
-            } else {
-                currentNode = currentNode.next;
             }
+            currentNode = currentNode.next;
         }
         return null;
     }
@@ -55,11 +54,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHashCode(Object key) {
-        if (key == null) {
-            return 0;
-        } else {
-            return Math.abs(key.hashCode());
-        }
+        return (key == null) ? 0 : Math.abs(key.hashCode());
     }
 
     private int getIndex(K key) {
