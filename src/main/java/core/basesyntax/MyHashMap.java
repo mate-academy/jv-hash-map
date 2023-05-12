@@ -14,20 +14,37 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.table = new Node [DEFAULT_INITIAL_CAPACITY];
         this.threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
-
-    private static class Node<K,V> {
-        private final K key;
-        private V value;
-        private Node<K,V> next;
-
-        private Node(K key, V value) {
-            this.key = key;
-            this.value = value;
+    @Override
+    public void put(K key, V value) {
+        if (size >= threshold) {
+            resize();
+        }
+        int index = getIndex(key, table.length);
+        Node<K, V> node = new Node<>(key, value);
+        if (table[index] == null) {
+            table[index] = node;
+            size++;
+        } else {
+            putToNodeList(table[index], node, key, value);
         }
     }
 
-    private int getIndex(K key, int length) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % length);
+    @Override
+    public V getValue(K key) {
+        int index = getIndex(key, table.length);
+        Node<K,V> current = table[index];
+        while (current != null) {
+            if (Objects.equals(current.key, key)) {
+                return current.value;
+            }
+            current = current.next;
+        }
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
     }
 
     private void resize() {
@@ -61,36 +78,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    @Override
-    public void put(K key, V value) {
-        if (size >= threshold) {
-            resize();
-        }
-        int index = getIndex(key, table.length);
-        Node<K, V> node = new Node<>(key, value);
-        if (table[index] == null) {
-            table[index] = node;
-            size++;
-        } else {
-            putToNodeList(table[index], node, key, value);
-        }
+    private int getIndex(K key, int length) {
+        return (key == null) ? 0 : Math.abs(key.hashCode() % length);
     }
 
-    @Override
-    public V getValue(K key) {
-        int index = getIndex(key, table.length);
-        Node<K,V> current = table[index];
-        while (current != null) {
-            if (Objects.equals(current.key, key)) {
-                return current.value;
-            }
-            current = current.next;
-        }
-        return null;
-    }
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
-    @Override
-    public int getSize() {
-        return size;
+        private Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 }
