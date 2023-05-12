@@ -63,7 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = indexOf(hash);
         Node<K, V> node = table[index];
         while (node != null) {
-            if (hash(node.key) == hash(key) || node.key.equals(key)) {
+            if (elementsAreEqual(node.key, key)) {
                 return node;
             }
             node = node.next;
@@ -71,19 +71,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
+    private boolean elementsAreEqual(K firstElement, K secondElement) {
+        return firstElement == secondElement
+                || firstElement != null && firstElement.equals(secondElement);
+    }
+
     private void resize() {
-        int newCapacity = table.length * 2;
-        Node<K,V>[] newTable = new Node[newCapacity];
-        for (Node<K, V> node : table) {
+        Node<K, V>[] oldTable = table;
+        table = new Node[table.length * 2];
+        for (Node<K, V> node : oldTable) {
             while (node != null) {
-                Node<K, V> next = node.next;
-                int newIndex = hash(node.key) & (newCapacity - 1);
-                node.next = newTable[newIndex];
-                newTable[newIndex] = node;
-                node = next;
+                put(node.key, node.value);
+                size--;
+                node = node.next;
             }
         }
-        table = newTable;
     }
 
     private static class Node<K, V> {
