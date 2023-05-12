@@ -39,9 +39,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int index = getIndexByKeyHash(key);
         Node<K, V> node = table[index];
-        if (node == null) {
-            return null;
-        }
         while (node != null) {
             if (areKeysEqual(node.key, key)) {
                 return node.value;
@@ -64,14 +61,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] previousTable = table;
         table = new Node[table.length * 2];
         for (Node<K, V> node : previousTable) {
-            if (node == null) {
-                continue;
-            }
-            while (node.next != null) {
+            while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
             }
-            put(node.key, node.value);
         }
     }
 
