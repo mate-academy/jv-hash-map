@@ -4,19 +4,17 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4; // aka 16
+    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
     private int size;
-    private int threshold;
     private Node<K, V>[] table;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold) {
+        if (size >= table.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
         putVal(key, value);
@@ -25,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void putVal(K key, V value) {
         int index = hash(key);
         if (table[index] == null) {
-            table[index] = new Node<>(key, value, null);
+            table[index] = new Node<>(key, value);
         } else {
             Node<K, V> temp = table[index];
             while (temp != null) {
@@ -34,7 +32,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     return;
                 }
                 if (temp.next == null) {
-                    temp.next = new Node<>(key, value, null);
+                    temp.next = new Node<>(key, value);
                     break;
                 }
                 temp = temp.next;
@@ -46,9 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         size = 0;
         Node<K, V>[] oldTable = table;
-        int newCapacity = oldTable.length << 1;
-        threshold <<= 1;
-        table = new Node[newCapacity];
+        table = new Node[oldTable.length << 1];
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
@@ -84,10 +80,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        private Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
