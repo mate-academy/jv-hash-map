@@ -70,10 +70,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             previous = currentNode;
             currentNode = currentNode.next;
         }
-        assert previous != null;
-        newNode.next = null;
-        previous.next = newNode;
-
+        if (previous != null) {
+            newNode.next = null;
+            previous.next = newNode;
+        }
     }
 
     private boolean areKeysEqual(K key, K newKey) {
@@ -82,12 +82,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resizeIfNecessary() {
         if (size == threshold) {
-            table = resize();
+            resize();
         }
     }
 
     @SuppressWarnings({"unchecked"})
-    private Node<K,V>[] resize() {
+    private void resize() {
         Node<K,V>[] oldTable = table;
         int newCapacity = table.length << 1;
         table = (Node<K, V>[]) new Node[newCapacity];
@@ -107,7 +107,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node = next;
             }
         }
-        return table;
     }
 
     private static class Node<K, V> {
