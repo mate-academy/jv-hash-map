@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 public class MyHashMapTest {
     private static final Car firstCar = new Car("Audi", "black");
@@ -270,6 +271,55 @@ public class MyHashMapTest {
                 int length = Array.getLength(field.get(myHashMap));
                 Assert.assertEquals("After first resizing, length of array should be " + 32,
                         32, length);
+            }
+        }
+    }
+
+    @Test
+    public void checkElementIndexWithDifferentHashCodeTest() throws IllegalAccessException {
+        MyMap<Car, Integer> myHashMap = new MyHashMap<>();
+        Car firstCar = new Car("Focus", "Red");
+        Car secondCar = new Car("S3", "Purple");
+        myHashMap.put(firstCar, firstCar.hashCode());
+        myHashMap.put(secondCar, secondCar.hashCode());
+        Field[] declaredFields = myHashMap.getClass().getDeclaredFields();
+        for (Field field : declaredFields) {
+            if (field.getType().isArray()) {
+                field.setAccessible(true);
+                int length = Array.getLength(field.get(myHashMap));
+                int expectedFirstCarIndex = Math.abs(firstCar.hashCode() % length);
+                int expectedSecondCarIndex = Math.abs(secondCar.hashCode() % length);
+                Object[] array = (Object[]) field.get(myHashMap);
+                Assert.assertNotNull("Test failed! The first element should be at the index "
+                                + expectedFirstCarIndex,
+                        array[expectedFirstCarIndex]);
+                Assert.assertNotNull("Test failed! The second element should be at the index "
+                                + expectedSecondCarIndex,
+                       array[expectedSecondCarIndex]);
+            }
+        }
+    }
+
+    @Test
+    public void checkElementIndexWithTheSameHashCodeTest() throws IllegalAccessException {
+        MyMap<Plane, Integer> myHashMap = new MyHashMap<>();
+        Plane firstPlane = new Plane("777", "Red");
+        Plane secondPlane = new Plane("737", "Purple");
+        myHashMap.put(firstPlane, firstPlane.hashCode());
+        myHashMap.put(secondPlane, secondPlane.hashCode());
+        Field[] declaredFields = myHashMap.getClass().getDeclaredFields();
+        for (Field field : declaredFields) {
+            if (field.getType().isArray()) {
+                field.setAccessible(true);
+                Object[] array = (Object[]) field.get(myHashMap);
+                Assert.assertNotNull("Test failed! the first and second element"
+                                + " should be with the same array index "
+                                + firstPlane.hashCode(),
+                        array[1]);
+                Assert.assertNull("Test failed! the first and second element"
+                                + " should be with the same array index "
+                                + secondPlane.hashCode(),
+                        array[0]);
             }
         }
     }
