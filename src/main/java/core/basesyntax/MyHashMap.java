@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -10,7 +9,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
     private int threshold;
-
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
