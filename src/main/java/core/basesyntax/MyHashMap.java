@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -29,7 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     final int hashKey(K key) {
-        return (key == null) ? 0 : (Math.abs(key.hashCode()) % capacity);
+        return (key == null) ? 0 : (Math.abs(Objects.hash(key)) % capacity);
     }
 
     @SuppressWarnings("unchecked")
