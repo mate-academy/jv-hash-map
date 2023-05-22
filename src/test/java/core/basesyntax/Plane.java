@@ -41,6 +41,6 @@ public class Plane {
 
     @Override
     public int hashCode() {
-        return Objects.hash(model, color);
+        return 1;
     }
 }

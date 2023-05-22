@@ -42,6 +42,6 @@ public class Car {
 
     @Override
     public int hashCode() {
-        return 1;
+        return Objects.hash(model, color);
     }
 }
