@@ -4,10 +4,8 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private static final float INCREASE_CAPACITY = 2f;
-    private int loadFactor = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
-    private int capacity = DEFAULT_CAPACITY;
+    private static final float LOAD_FACTOR = 0.75f;
+    private static final float GROW_FACTOR = 2f;
     private Node<K, V>[] table;
     private int size;
 
@@ -16,13 +14,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.table = new Node[DEFAULT_CAPACITY];
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        Node(int hash, K key, V value, Node<K, V> next) {
+        private Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
             this.key = key;
             this.value = value;
@@ -30,16 +28,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    final int hashKey(K key) {
-        return (key == null) ? 0 : (Math.abs(Objects.hash(key)) % capacity);
+    private int hashKey(K key) {
+        return (key == null) ? 0 : (Math.abs(Objects.hash(key)) % table.length);
     }
 
     @SuppressWarnings("unchecked")
     final void resize() {
-        capacity = (int) (table.length * INCREASE_CAPACITY);
-        loadFactor = (int) (capacity * DEFAULT_LOAD_FACTOR);
         Node<K, V>[] oldTable = table;
-        table = new Node[capacity];
+        table = new Node[(int) (table.length * GROW_FACTOR)];
         size = 0;
         for (Node<K, V> currentBucket : oldTable) {
             while (currentBucket != null) {
@@ -51,7 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (loadFactor < size) {
+        if (table.length * LOAD_FACTOR < size) {
             resize();
         }
         int hashKeyNode = hashKey(key);
@@ -90,4 +86,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public int getSize() {
         return size;
     }
+
 }
