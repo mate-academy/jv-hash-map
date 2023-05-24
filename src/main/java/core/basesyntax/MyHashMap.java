@@ -14,37 +14,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.table = new Node[DEFAULT_CAPACITY];
     }
 
-    private static class Node<K, V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        private Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
-    private int hashKey(K key) {
-        return (key == null) ? 0 : (Math.abs(Objects.hash(key)) % table.length);
-    }
-
-    @SuppressWarnings("unchecked")
-    final void resize() {
-        Node<K, V>[] oldTable = table;
-        table = new Node[(int) (table.length * GROW_FACTOR)];
-        size = 0;
-        for (Node<K, V> currentBucket : oldTable) {
-            while (currentBucket != null) {
-                put(currentBucket.key, currentBucket.value);
-                currentBucket = currentBucket.next;
-            }
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         if (table.length * LOAD_FACTOR < size) {
@@ -54,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = hashKeyNode & (table.length - 1);
         Node<K, V> currentNode = table[index];
         if (table[index] == null) {
-            table[index] = new Node<>(hashKeyNode, key, value, null);
+            table[index] = new Node<>(key, value);
         } else {
             while ((currentNode.key != key && !currentNode.key.equals(key))
                     && currentNode.next != null) {
@@ -64,7 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode.value = value;
                 return;
             }
-            currentNode.next = new Node<>(hashKeyNode, key, value, null);
+            currentNode.next = new Node<>(key, value);
         }
         size++;
     }
@@ -87,4 +56,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        private Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+
+    private int hashKey(K key) {
+        return (key == null) ? 0 : (Math.abs(Objects.hash(key)) % table.length);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void resize() {
+        Node<K, V>[] oldTable = table;
+        table = new Node[(int) (table.length * GROW_FACTOR)];
+        size = 0;
+        for (Node<K, V> currentBucket : oldTable) {
+            while (currentBucket != null) {
+                put(currentBucket.key, currentBucket.value);
+                currentBucket = currentBucket.next;
+            }
+        }
+    }
 }
