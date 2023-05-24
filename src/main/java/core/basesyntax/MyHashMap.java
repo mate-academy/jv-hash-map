@@ -19,11 +19,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table.length * LOAD_FACTOR < size) {
             resize();
         }
-        int hashKeyNode = hashKey(key);
-        int index = hashKeyNode & (table.length - 1);
-        Node<K, V> currentNode = table[index];
-        if (table[index] == null) {
-            table[index] = new Node<>(key, value);
+        Node<K, V> currentNode = table[hashKey(key) & (table.length - 1)];
+        if (table[hashKey(key) & (table.length - 1)] == null) {
+            table[hashKey(key) & (table.length - 1)] = new Node<>(key, value);
         } else {
             while ((currentNode.key != key && !currentNode.key.equals(key))
                     && currentNode.next != null) {
