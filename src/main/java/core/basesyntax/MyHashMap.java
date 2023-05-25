@@ -74,7 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         if (size > threshold) {
-            Node<K, V>[] oldArray = array;
+            final Node<K, V>[] oldArray = array;
             array = new Node[array.length * 2];
             threshold = (int) (array.length * DEFAULT_LOAD_FACTOR);
             size = 0;
@@ -91,10 +91,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         public Node(K key, V value) {
             this.hash = (key == null) ? 0 : key.hashCode();
