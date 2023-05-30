@@ -7,16 +7,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int GROW = 2;
     private int size;
-    private final int threshold;
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
         table = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
+        int threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
         Node<K, V> node = new Node<>(key, value, null);
         int index = hash(key);
         if (size == threshold) {
