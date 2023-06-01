@@ -18,12 +18,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > threshold) {
             resize();
         }
-        Node<K, V> node = table[getIndex(key)];
-        if (node == null) {
-            table[getIndex(key)] = new Node<>(key, value, null);
-            size++;
-            return;
-        }
+        int index = getIndex(key);
+        Node<K, V> node = table[index];
         while (node != null) {
             if (node.key != null && (key == node.key || node.key.equals(key))) {
                 node.value = value;
@@ -33,23 +29,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node.value = value;
                 return;
             }
-            if (node.next == null) {
-                node.next = new Node<>(key, value, null);
-                size++;
-                return;
-            }
-
             node = node.next;
         }
+        Node<K, V> nodeNew = new Node<>(key, value, table[index]);
+        table[index] = nodeNew;
+        size++;
     }
 
     @Override
     public V getValue(K key) {
         Node<K, V> node = table[getIndex(key)];
         while (node != null) {
-            if (node.key == null && key == null) {
-                return node.value;
-            } else if (Objects.equals(node.key, key)) {
+            if (Objects.equals(node.key, key)) {
                 return node.value;
             }
             node = node.next;
