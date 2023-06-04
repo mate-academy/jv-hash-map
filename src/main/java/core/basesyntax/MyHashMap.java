@@ -1,71 +1,46 @@
 package core.basesyntax;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
-    private static final double LOAD_FACTOR = 0.75;
+    private static final float LOAD_FACTOR = 0.75f;
 
-    private List<Node<K, V>>[] buckets;
+    private Entry<K, V>[] table;
     private int size;
-    private int capacity;
 
     public MyHashMap() {
-        capacity = INITIAL_CAPACITY;
-        buckets = (List<Node<K, V>>[]) new List[capacity];
-        initializeBuckets(buckets);
+        table = (Entry<K, V>[]) new Entry[INITIAL_CAPACITY];
+        size = 0;
     }
 
     @Override
     public void put(K key, V value) {
-        if (key == null) {
-            putForNullKey(value);
-            return;
-        }
-
-        int bucketIndex = getBucketIndex(key, capacity);
-        List<Node<K, V>> bucket = buckets[bucketIndex];
-        Node<K, V> node = getNodeByKey(key, bucket);
-        if (node != null) {
-            node.value = value;
-        } else {
-            bucket.add(new Node<>(key, value));
-            size++;
-
-            if (size >= capacity * LOAD_FACTOR) {
-                resize();
+        int index = getIndex(key);
+        Entry<K, V> entry = table[index];
+        while (entry != null) {
+            if ((key == null && entry.key == null) || (key != null && key.equals(entry.key))) {
+                entry.value = value;
+                return;
             }
+            entry = entry.next;
         }
-    }
-
-    private void putForNullKey(V value) {
-        List<Node<K, V>> nullKeyBucket = buckets[0];
-        Node<K, V> node = getNodeByKey(null, nullKeyBucket);
-        if (node != null) {
-            node.value = value;
-        } else {
-            nullKeyBucket.add(new Node<>(null, value));
-            size++;
+        addEntry(index, key, value);
+        size++;
+        if (size >= table.length * LOAD_FACTOR) {
+            resize();
         }
     }
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
-            return getValueForNullKey();
+        int index = getIndex(key);
+        Entry<K, V> entry = table[index];
+        while (entry != null) {
+            if ((key == null && entry.key == null) || (key != null && key.equals(entry.key))) {
+                return entry.value;
+            }
+            entry = entry.next;
         }
-
-        int bucketIndex = getBucketIndex(key, capacity);
-        List<Node<K, V>> bucket = buckets[bucketIndex];
-        Node<K, V> node = getNodeByKey(key, bucket);
-        return node != null ? node.value : null;
-    }
-
-    private V getValueForNullKey() {
-        List<Node<K, V>> nullKeyBucket = buckets[0];
-        Node<K, V> node = getNodeByKey(null, nullKeyBucket);
-        return node != null ? node.value : null;
+        return null;
     }
 
     @Override
@@ -73,46 +48,45 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getBucketIndex(K key, int bucketCount) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % bucketCount;
+    private int getIndex(K key) {
+        if (key == null) {
+            return 0;
+        }
+        return Math.abs(key.hashCode() % table.length);
     }
 
-    private Node<K, V> getNodeByKey(K key, List<Node<K, V>> bucket) {
-        for (Node<K, V> node : bucket) {
-            if ((key == null && node.key == null) || (key != null && key.equals(node.key))) {
-                return node;
+    private void addEntry(int index, K key, V value) {
+        Entry<K, V> entry = new Entry<>(key, value);
+        if (table[index] == null) {
+            table[index] = entry;
+        } else {
+            Entry<K, V> current = table[index];
+            while (current.next != null) {
+                current = current.next;
             }
+            current.next = entry;
         }
-        return null;
     }
 
     private void resize() {
-        int newCapacity = capacity * 2;
-        List<Node<K, V>>[] newBuckets = (List<Node<K, V>>[]) new List[newCapacity];
-        initializeBuckets(newBuckets);
+        Entry<K, V>[] oldTable = table;
+        table = (Entry<K, V>[]) new Entry[table.length * 2];
+        size = 0;
 
-        for (List<Node<K, V>> bucket : buckets) {
-            for (Node<K, V> node : bucket) {
-                int bucketIndex = getBucketIndex(node.key, newCapacity);
-                newBuckets[bucketIndex].add(node);
+        for (Entry<K, V> entry : oldTable) {
+            while (entry != null) {
+                put(entry.key, entry.value);
+                entry = entry.next;
             }
         }
-
-        buckets = newBuckets;
-        capacity = newCapacity;
     }
 
-    private void initializeBuckets(List<Node<K, V>>[] buckets) {
-        for (int i = 0; i < buckets.length; i++) {
-            buckets[i] = new ArrayList<>();
-        }
-    }
+    private static class Entry<K, V> {
+        K key;
+        V value;
+        Entry<K, V> next;
 
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-
-        public Node(K key, V value) {
+        public Entry(K key, V value) {
             this.key = key;
             this.value = value;
         }
