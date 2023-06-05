@@ -9,7 +9,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = (Entry<K, V>[]) new Entry[INITIAL_CAPACITY];
-        size = 0;
     }
 
     @Override
@@ -17,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Entry<K, V> entry = table[index];
         while (entry != null) {
-            if ((key == null && entry.key == null) || (key != null && key.equals(entry.key))) {
+            if ((key == entry.key) || (key != null && key.equals(entry.key))) {
                 entry.value = value;
                 return;
             }
@@ -49,10 +48,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode() % table.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void addEntry(int index, K key, V value) {
@@ -61,10 +57,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = entry;
         } else {
             Entry<K, V> current = table[index];
-            while (current.next != null) {
+            Entry<K, V> prev = null;
+
+            while (current != null) {
+                if (key == null) {
+                    if (current.key == null) {
+                        current.value = value;
+                        return;
+                    }
+                } else {
+                    if (key.equals(current.key)) {
+                        current.value = value;
+                        return;
+                    }
+                }
+                prev = current;
                 current = current.next;
             }
-            current.next = entry;
+
+            prev.next = entry;
         }
     }
 
