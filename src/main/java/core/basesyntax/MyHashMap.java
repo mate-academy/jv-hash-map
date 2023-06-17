@@ -10,7 +10,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        this.table =  new Node[DEFAULT_CAPACITY];
+        this.table = new Node[DEFAULT_CAPACITY];
     }
 
     private class Node<K,V> {
