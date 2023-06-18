@@ -9,6 +9,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K,V>[] table;
     private int size;
 
+    public MyHashMap() {
+        this.table = new Node[DEFAULT_CAPACITY];
+    }
+
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value, null);
@@ -68,9 +72,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
-    }
-    public MyHashMap() {
-        this.table = new Node[DEFAULT_CAPACITY];
     }
 
     private class Node<K,V> {
