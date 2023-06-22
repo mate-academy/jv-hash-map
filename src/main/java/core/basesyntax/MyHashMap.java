@@ -7,7 +7,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int newCapacity = DEFAULT_INITIAL_CAPACITY;
     private Node<K, V>[] table;
-    private int trashold;
     private int size;
 
     public MyHashMap() {
@@ -18,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         Node<K, V> node = new Node<>(key, value, null);
         int index = getIndex(node.key);
-        if (size > trashold) {
+        if (size > newCapacity * DEFAULT_LOAD_FACTOR) {
             resize();
         }
         if (table[index] == null) {
@@ -66,7 +65,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         newCapacity = newCapacity << 1;
-        trashold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
         Node<K, V>[] previousTable = table;
         table = new Node[newCapacity];
         size = 0;
