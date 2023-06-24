@@ -8,7 +8,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private int threshold;
 
-
     public MyHashMap() {
         capacity = INITIAL_CAPACITY;
         table = new Node[INITIAL_CAPACITY];
@@ -19,28 +18,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         if (size > threshold) {
             resize();
-        }
-        int hash = hash(key);
-        Node<K, V> newNode = new Node<>(hash(key), key, value, null);
-        if (table[hash] == null) {
-            table[hash] = newNode;
+            put(key, value);
         } else {
-            Node<K, V> precededToInsertedNode = table[hash];
-            while (true) {
-                if (key == null && precededToInsertedNode.key == null
-                        || precededToInsertedNode.key != null && precededToInsertedNode.key.equals(key)) {
-                    precededToInsertedNode.value = value;
+            int hash = hash(key);
+            Node<K, V> newNode = new Node<>(hash, key, value, null);
+            if (table[hash] == null) {
+                table[hash] = newNode;
+            } else {
+                Node<K, V> currentNode = table[hash];
+                currentNode = getNode(key, value, currentNode);
+                if (currentNode == null) {
                     return;
                 }
-                if (precededToInsertedNode.next != null) {
-                    precededToInsertedNode = precededToInsertedNode.next;
-                } else {
-                    break;
-                }
+                currentNode.next = newNode;
             }
-            precededToInsertedNode.next = newNode;
+            size++;
         }
-        size++;
     }
 
     @Override
@@ -49,13 +42,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (node == null) {
             return null;
         }
-        while (node.next != null) {
-            if (key == null && node.key == null || node.key != null && node.key.equals(key)) {
+        do {
+            if (isKeysEqual(key, node)) {
                 return node.value;
             }
-            node = node.next;
         }
-        return table[hash(key)].value;
+        while ((node = node.next) != null);
+        return null;
     }
 
     @Override
@@ -63,34 +56,45 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private Node<K, V> getNode(K key, V value, Node<K, V> currentNode) {
+        while (true) {
+            if (isKeysEqual(key, currentNode)) {
+                currentNode.value = value;
+                return null;
+            }
+            if (currentNode.next != null) {
+                currentNode = currentNode.next;
+            } else {
+                break;
+            }
+        }
+        return currentNode;
+    }
+
     private int hash(Object key) {
-        return 1;
-       // return (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
+        return (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
+    }
+
+    private boolean isKeysEqual(K key, Node<K, V> currentNode) {
+        return key == null && currentNode.key == null
+                || currentNode.key != null && currentNode.key.equals(key);
     }
 
     private void resize() {
         capacity *= 2;
         threshold = (int) (capacity * LOAD_FACTOR);
         Node<K, V>[] resizeTable = new Node[capacity];
-        reorganiseNodeDueToResizing(resizeTable);
-       // table = resizeTable;
+        repositionExistNodes(resizeTable);
     }
 
-    private void reorganiseNodeDueToResizing(Node<K, V>[] resizeTable) {
+    private void repositionExistNodes(Node<K, V>[] resizeTable) {
         Node<K, V>[] copyTable = table;
         table = resizeTable;
+        size = 0;
         for (Node<K, V> node : copyTable) {
             if (node != null) {
                 do {
-                   if (resizeTable[hash(node.key)] != null) {
-                        Node<K, V> precededToInsert = resizeTable[hash(node.key)];
-                        while (precededToInsert.next != null) {
-                            precededToInsert = precededToInsert.next;
-                        }
-                        precededToInsert.next = node;
-                    } else {
-                        resizeTable[hash(node.key)] = put(node.key, node.value);
-                    }
+                    put(node.key, node.value);
                 } while ((node = node.next) != null);
             }
         }
@@ -107,16 +111,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-    }
-}
-
-class Test {
-    public static void main(String[] args) {
-        MyMap<Integer, String> myMap = new MyHashMap<>();
-        myMap.put(null, "node" + null);
-        for (int i = 0; i < 100; i++) {
-            myMap.put(i, "node" + i);
         }
     }
 }
