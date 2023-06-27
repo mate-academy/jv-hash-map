@@ -6,32 +6,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
     private int size = 0;
     private Node<K, V>[] table;
-    private int defaultCapacityThreshold;
-
-    private static class Node<K, V> {
-        private K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-    }
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        defaultCapacityThreshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
         double newThreshold = table.length * LOAD_FACTOR;
-        double threshold = (table.length == 0) ? defaultCapacityThreshold : newThreshold;
+        double threshold = (table.length == 0) ? (DEFAULT_CAPACITY * LOAD_FACTOR) : newThreshold;
         if (table == null || size >= threshold) {
-            resizeAndTransfer(key);
+            resizeAndTransfer();
         }
-        int index = getIndexByHashCode(key, table.length);
+        int index = getIndexByHashCode(key);
         Node<K, V> newNode = new Node<>(key, value);
         if (table[index] == null) {
             table[index] = newNode;
@@ -58,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table == null) {
             return null;
         }
-        int index = getIndexByHashCode(key, table.length);
+        int index = getIndexByHashCode(key);
         Node<K, V> current = table[index];
         while (current != null) {
             if (keysAreEqual(current.key, key)) {
@@ -74,9 +61,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getIndexByHashCode(K key, int tableLength) {
-        int hashCode = (key == null) ? 0 : key.hashCode();
-        return hashCode & (tableLength - 1);
+    private int getIndexByHashCode(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private boolean keysAreEqual(K key1, K key2) {
@@ -86,19 +72,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key1.equals(key2);
     }
 
-    private void resizeAndTransfer(K key) {
-        int newLength = table.length * INCREASE_FACTOR;
-        Node<K, V>[] newTable = new Node[newLength];
-        for (int i = 0; i < table.length; i++) {
-            Node<K, V> current = table[i];
-            while (current != null) {
-                Node<K, V> next = current.next;
-                int newIndex = getIndexByHashCode(current.key, newLength);
-                current.next = newTable[newIndex];
-                newTable[newIndex] = current;
-                current = next;
+    private void resizeAndTransfer() {
+        Node<K, V>[] previousTable = table;
+        table = new Node[table.length * INCREASE_FACTOR];
+        size = 0;
+        for (Node<K, V> node : previousTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
-        table = newTable;
+    }
+    private class Node<K, V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 }
