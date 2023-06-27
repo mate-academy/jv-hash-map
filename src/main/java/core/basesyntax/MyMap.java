@@ -7,8 +7,7 @@ public interface MyMap<K, V> {
 
     int getSize();
 
-    public int hashCode();
+    void remove(K key);
 
-    public void remove(K key);
-
+    void resize();
 }
