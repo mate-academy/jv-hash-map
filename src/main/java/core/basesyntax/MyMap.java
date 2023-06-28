@@ -6,4 +6,10 @@ public interface MyMap<K, V> {
     V getValue(K key);
 
     int getSize();
+
+    boolean isEmpty();
+
+    boolean containsKey(K key);
+
+    boolean containsValue(V value);
 }
