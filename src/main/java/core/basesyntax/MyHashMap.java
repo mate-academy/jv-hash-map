@@ -118,9 +118,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     static class Node<K, V> {
-        private K key;
+        private final K key;
         private V value;
-        private Node next;
+        private Node<K, V> next;
 
         public Node(K key, V value) {
             this.key = key;
