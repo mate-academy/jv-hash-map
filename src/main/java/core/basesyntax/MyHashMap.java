@@ -5,7 +5,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
     private Node<K, V>[] table;
-    private int size = 0;
+    private int size;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
@@ -16,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= table.length * LOAD_FACTOR) {
             resize();
         }
-        int index = getIndexHash(key);
+        int index = getIndex(key);
         Node<K, V> newNode = new Node<>(key, value);
         if (table[index] == null) {
             table[index] = newNode;
@@ -27,23 +27,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 if (isEqualKeys(current.key, key)) {
                     current.value = value;
                     return;
-                } else if (current.next == null) {
+                }
+                if (current.next == null) {
                     current.next = newNode;
                     size++;
                     return;
-                } else {
-                    current = current.next;
                 }
+                current = current.next;
             }
         }
     }
 
     @Override
     public V getValue(K key) {
-        if (table == null) {
-            return null;
-        }
-        int index = getIndexHash(key);
+        int index = getIndex(key);
         Node<K, V> current = table[index];
         while (current != null) {
             if (isEqualKeys(current.key, key)) {
@@ -70,7 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getIndexHash(K key) {
+    private int getIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
