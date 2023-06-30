@@ -94,7 +94,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldTable = table;
-        if (table == null) {
+        if (oldTable == null) {
             capacity = DEFAULT_INITIAL_CAPACITY;
             threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
             table = (Node<K, V>[]) new Node[capacity];
