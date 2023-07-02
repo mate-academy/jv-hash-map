@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -14,7 +13,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[INITIAL_CAPACITY];
         threshold = INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR;
     }
-
 
     @Override
     public void put(K key, V value) {
@@ -32,9 +30,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table[index] = newNode;
         size++;
 
-//        if (size > threshold) {
-//            resize();
-//        }
+        if (size >= threshold) {
+            resize();
+        }
+    }
+
+    public void putWithoutResize(K key, V value) {
+        int index = hash(key);
+        Node<K, V> newNode = new Node<>(key, value);
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (Objects.equals(node.key, newNode.key)) {
+                node.value = newNode.value;
+                return;
+            }
+            node = node.next;
+        }
+        newNode.next = table[index];
+        table[index] = newNode;
+        size++;
+
     }
 
     @Override
@@ -65,27 +80,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         int newCapacity = table.length << 1;
-        Node<K, V>[] oldTable = table;
+        final Node<K, V>[] oldTable = table;
         table = new Node[newCapacity];
+        size = 0;
+        threshold = newCapacity * DEFAULT_LOAD_FACTOR;
 
         for (Node<K, V> node : oldTable) {
             while (node != null) {
-                put(node.key, node.value);
+                putWithoutResize(node.key, node.value);
                 node = node.next;
             }
         }
     }
 
     static class Node<K, V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
         public Node(K key, V value) {
             this.key = key;
             this.value = value;
             hash = key == null ? 0 : key.hashCode();
         }
-        final int hash;
-        final K key;
-
-        V value;
-        Node<K, V> next;
     }
 }
