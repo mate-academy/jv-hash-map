@@ -35,23 +35,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public void putWithoutResize(K key, V value) {
-        int index = hash(key);
-        Node<K, V> newNode = new Node<>(key, value);
-        Node<K, V> node = table[index];
-        while (node != null) {
-            if (Objects.equals(node.key, newNode.key)) {
-                node.value = newNode.value;
-                return;
-            }
-            node = node.next;
-        }
-        newNode.next = table[index];
-        table[index] = newNode;
-        size++;
-
-    }
-
     @Override
     public V getValue(K key) {
         int index = hash(key);
@@ -87,7 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         for (Node<K, V> node : oldTable) {
             while (node != null) {
-                putWithoutResize(node.key, node.value);
+                put(node.key, node.value);
                 node = node.next;
             }
         }
