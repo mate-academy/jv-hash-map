@@ -15,20 +15,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         factCapacity = INITIAL_CAPACITY;
     }
 
-    private static class Node<K, V> {
-        private final K key;
-        private int hash;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.hash = hash;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         checkSize();
@@ -38,27 +24,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[bucketIndex] == null) {
             table[bucketIndex] = new Node<>(hash, key, value, null);
         } else {
-            Node<K, V> tmp = table[bucketIndex];
+            Node<K, V> node = table[bucketIndex];
 
-            if (tmp.hash == hash && Objects.equals(tmp.key, key)) {
-                tmp.value = value;
+            if (node.hash == hash && Objects.equals(node.key, key)) {
+                node.value = value;
                 return;
             }
 
-            while (tmp.next != null) {
-                if (tmp.hash == hash && Objects.equals(tmp.key, key)) {
-                    tmp.value = value;
+            while (node.next != null) {
+                if (node.hash == hash && Objects.equals(node.key, key)) {
+                    node.value = value;
                     return;
                 }
-                tmp = tmp.next;
+                node = node.next;
             }
 
-            if (tmp.hash == hash && Objects.equals(tmp.key, key)) {
-                tmp.value = value;
+            if (node.hash == hash && Objects.equals(node.key, key)) {
+                node.value = value;
                 return;
             }
 
-            tmp.next = new Node<>(hash, key, value, null);
+            node.next = new Node<>(hash, key, value, null);
         }
         size++;
     }
@@ -67,19 +53,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int hash = hash(key);
         int bucketIndex = hash % factCapacity;
-        Node<K, V> tmp = table[bucketIndex];
+        Node<K, V> tmpNode = table[bucketIndex];
 
-        if (tmp == null) {
+        if (tmpNode == null) {
             return null;
         } else {
-            while (tmp.next != null) {
-                if (Objects.equals(tmp.key, key)) {
-                    return tmp.value;
+            while (tmpNode.next != null) {
+                if (Objects.equals(tmpNode.key, key)) {
+                    return tmpNode.value;
                 }
-                tmp = tmp.next;
+                tmpNode = tmpNode.next;
             }
         }
-        return tmp.value;
+        return tmpNode.value;
     }
 
     @Override
@@ -121,5 +107,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         table = newTable;
         factCapacity = newCapacity;
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private int hash;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(int hash, K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.hash = hash;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
