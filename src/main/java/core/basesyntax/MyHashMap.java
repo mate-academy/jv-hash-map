@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
+    private static final int GROWTH_RATE = 2;
     private int factCapacity;
 
     private Node<K, V>[] table;
@@ -18,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         checkSize();
-        int hash = hash(key);
+        int hash = getHash(key);
         int bucketIndex = hash % factCapacity;
 
         if (table[bucketIndex] == null) {
@@ -26,20 +27,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> node = table[bucketIndex];
 
-            if (node.hash == hash && Objects.equals(node.key, key)) {
-                node.value = value;
-                return;
-            }
-
             while (node.next != null) {
-                if (node.hash == hash && Objects.equals(node.key, key)) {
+                if (Objects.equals(node.key, key)) {
                     node.value = value;
                     return;
                 }
+
                 node = node.next;
             }
 
-            if (node.hash == hash && Objects.equals(node.key, key)) {
+            if (Objects.equals(node.key, key)) {
                 node.value = value;
                 return;
             }
@@ -51,21 +48,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key);
+        int hash = getHash(key);
         int bucketIndex = hash % factCapacity;
         Node<K, V> tmpNode = table[bucketIndex];
 
-        if (tmpNode == null) {
-            return null;
-        } else {
-            while (tmpNode.next != null) {
-                if (Objects.equals(tmpNode.key, key)) {
-                    return tmpNode.value;
-                }
-                tmpNode = tmpNode.next;
+        while (tmpNode != null) {
+            if (Objects.equals(tmpNode.key, key)) {
+                return tmpNode.value;
             }
+            tmpNode = tmpNode.next;
         }
-        return tmpNode.value;
+        return null;
     }
 
     @Override
@@ -73,16 +66,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(K key) {
-        int hash = 0;
+    private int getHash(K key) {
+        int hash;
         if (key == null) {
-            return hash;
+            return 0;
         }
         hash = key.hashCode();
-        if (hash < 0) {
-            hash *= -1;
-        }
-        return hash;
+        return Math.abs(hash);
     }
 
     private void checkSize() {
@@ -92,7 +82,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int newCapacity = factCapacity * 2;
+        int newCapacity = factCapacity * GROWTH_RATE;
         Node<K, V>[] newTable = new Node[newCapacity];
 
         for (Node<K, V> node : table) {
