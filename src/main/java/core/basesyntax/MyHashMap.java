@@ -5,19 +5,11 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private int size = 0;
-    private Node<K,V>[] table = (Node<K,V>[])new Node[CAPACITY];
+    private int size;
+    private Node<K,V>[] table;
 
-    private static class Node<K,V> {
-        private K key;
-        private V value;
-        private Node<K,V> next;
-
-        private Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
+    public MyHashMap() {
+        table = new Node[CAPACITY];
     }
 
     @Override
@@ -78,5 +70,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int hash(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
+    }
+
+    private static class Node<K,V> {
+        private K key;
+        private V value;
+        private Node<K,V> next;
+
+        private Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
