@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.List;
 
 public class MyHashMapTest {
     private static final Car firstCar = new Car("Audi", "black");
@@ -175,6 +176,161 @@ public class MyHashMapTest {
         Integer secondActualValue = myHashMap.getValue(firstCar);
         Assert.assertEquals("Test failed! HashMap expects to contain value 5  for key `firstCar`,"
                 + " but was " + secondActualValue, Integer.valueOf(5), secondActualValue);
+    }
+
+    @Test
+    public void removeFromHashWithoutCollisions() {
+        MyMap<Car, Integer> myHashMap = new MyHashMap<>();
+        myHashMap.put(firstCar, 1000);
+        myHashMap.put(secondCar, 1500);
+        myHashMap.put(thirdCar, 2000);
+        Integer firstActualValue = myHashMap.remove(secondCar);
+        Assert.assertEquals("Test failed! Hash should return the value of removed key-value pair.",
+                Integer.valueOf(1500), firstActualValue);
+        Assert.assertEquals("Test failed! Hash size should decrease after key-value pair remove.",
+                2, myHashMap.getSize());
+        Assert.assertEquals("Test failed! Hash should still contain the other key-value pairs "
+                + "which were not removed.", Integer.valueOf(1000), myHashMap.getValue(firstCar));
+        Assert.assertEquals("Test failed! Hash should still contain the other key-value pairs "
+                + "which were not removed.", Integer.valueOf(2000), myHashMap.getValue(thirdCar));
+        Assert.assertNull("Test failed! Hash should not contain the removed key-value pair "
+                + "after remove.", myHashMap.getValue(secondCar));
+    }
+
+    @Test
+    public void removeFromHashWithCollisions() {
+        MyMap<Plane, Integer> myHashMap = new MyHashMap<>();
+        myHashMap.put(firstPlane, 1000);
+        myHashMap.put(secondPlane, 1500);
+        myHashMap.put(thirdPlane, 2000);
+        Integer firstActualValue = myHashMap.remove(secondPlane);
+        Assert.assertEquals("Test failed! Hash should return the value of removed key-value pair.",
+                Integer.valueOf(1500), firstActualValue);
+        Assert.assertEquals("Test failed! Hash size should decrease after key-value pair remove.",
+                2, myHashMap.getSize());
+        Assert.assertEquals("Test failed! Hash should still contain the other key-value pairs "
+                + "which were not removed.", Integer.valueOf(1000), myHashMap.getValue(firstPlane));
+        Assert.assertEquals("Test failed! Hash should still contain the other key-value pairs "
+                + "which were not removed.", Integer.valueOf(2000), myHashMap.getValue(thirdPlane));
+        Assert.assertNull("Test failed! Hash should not contain the removed key-value pair "
+                + "after remove.", myHashMap.getValue(secondPlane));
+    }
+
+    @Test
+    public void removeFromEmptyHashReturnsNull() {
+        MyMap<Plane, Integer> myHashMap = new MyHashMap<>();
+        Assert.assertNull("Test failed! Hash should return null if it doesn't contain any key-value pair.",
+                myHashMap.remove(firstPlane));
+    }
+
+    @Test
+    public void removeByNonExistentKeyReturnsNull() {
+        MyMap<Plane, Integer> myHashMap = new MyHashMap<>();
+        myHashMap.put(firstPlane, 1000);
+        myHashMap.put(secondPlane, 1500);
+        Assert.assertNull("Test failed! Hash should return null if it doesn't contain the key-value pair.",
+                myHashMap.remove(thirdPlane));
+    }
+
+    @Test
+    public void getKeysReturnsCorrectListOfKeysWithoutCollisions() {
+        MyMap<Car, Integer> myHashMap = new MyHashMap<>();
+        myHashMap.put(firstCar, 1000);
+        myHashMap.put(secondCar, 1500);
+        myHashMap.put(thirdCar, 2000);
+        List<Car> listOfKeys = myHashMap.getKeys();
+        Assert.assertEquals("Test failed! List of keys must have correct size.",
+                3, listOfKeys.size());
+        Assert.assertTrue("Test failed! List of keys must have correct keys.",
+                listOfKeys.contains(firstCar));
+        Assert.assertTrue("Test failed! List of keys must have correct keys.",
+                listOfKeys.contains(secondCar));
+        Assert.assertTrue("Test failed! List of keys must have correct keys.",
+                listOfKeys.contains(thirdCar));
+    }
+
+    @Test
+    public void getKeysReturnsCorrectListOfKeysWithCollisions() {
+        MyMap<Plane, Integer> myHashMap = new MyHashMap<>();
+        myHashMap.put(firstPlane, 1000);
+        myHashMap.put(secondPlane, 1500);
+        myHashMap.put(thirdPlane, 2000);
+        List<Plane> listOfKeys = myHashMap.getKeys();
+        Assert.assertEquals("Test failed! List of keys must have correct size.",
+                3, listOfKeys.size());
+        Assert.assertTrue("Test failed! List of keys must have correct keys.",
+                listOfKeys.contains(firstPlane));
+        Assert.assertTrue("Test failed! List of keys must have correct keys.",
+                listOfKeys.contains(secondPlane));
+        Assert.assertTrue("Test failed! List of keys must have correct keys.",
+                listOfKeys.contains(thirdPlane));
+    }
+
+    @Test
+    public void getKeysReturnsEmptyList() {
+        List<Plane> expectedListOfKeys = List.of();
+        MyMap<Plane, Integer> myHashMap = new MyHashMap<>();
+        List<Plane> listOfKeys = myHashMap.getKeys();
+        Assert.assertEquals("Test failed! Expected hash to return empty list of keys.",
+                expectedListOfKeys, listOfKeys);
+    }
+
+    @Test
+    public void getValuesReturnsCorrectListOfKeysWithoutCollisions() {
+        MyMap<Car, Integer> myHashMap = new MyHashMap<>();
+        myHashMap.put(firstCar, 1000);
+        myHashMap.put(secondCar, 1500);
+        myHashMap.put(thirdCar, 2000);
+        List<Integer> listOfValues = myHashMap.getValues();
+        Assert.assertEquals("Test failed! List of keys must have correct size.",
+                3, listOfValues.size());
+        Assert.assertTrue("Test failed! List of keys must have correct values.",
+                listOfValues.contains(1000));
+        Assert.assertTrue("Test failed! List of keys must have correct values.",
+                listOfValues.contains(1500));
+        Assert.assertTrue("Test failed! List of keys must have correct values.",
+                listOfValues.contains(2000));
+    }
+
+    @Test
+    public void getValuesReturnsCorrectListOfKeysWithCollisions() {
+        MyMap<Plane, Integer> myHashMap = new MyHashMap<>();
+        myHashMap.put(firstPlane, 1000);
+        myHashMap.put(secondPlane, 1500);
+        myHashMap.put(thirdPlane, 2000);
+        List<Integer> listOfValues = myHashMap.getValues();
+        Assert.assertEquals("Test failed! List of keys must have correct size.",
+                3, listOfValues.size());
+        Assert.assertTrue("Test failed! List of keys must have correct values.",
+                listOfValues.contains(1000));
+        Assert.assertTrue("Test failed! List of keys must have correct values.",
+                listOfValues.contains(1500));
+        Assert.assertTrue("Test failed! List of keys must have correct values.",
+                listOfValues.contains(2000));
+    }
+
+    @Test
+    public void getValuesReturnsEmptyList() {
+        List<Integer> expectedListOfValues = List.of();
+        MyMap<Plane, Integer> myHashMap = new MyHashMap<>();
+        List<Integer> listOfValues = myHashMap.getValues();
+        Assert.assertEquals("Test failed! Expected hash to return empty list of values.",
+                expectedListOfValues, listOfValues);
+    }
+
+    @Test
+    public void isEmptyReturnsTrueFromEmptyHash() {
+        MyMap<Plane, Integer> myHashMap = new MyHashMap<>();
+        Assert.assertTrue("Test failed! Empty hash should return true.",
+                myHashMap.isEmpty());
+    }
+
+    @Test
+    public void isEmptyReturnsFalseFromNonEmptyHash() {
+        MyMap<Plane, Integer> myHashMap = new MyHashMap<>();
+        myHashMap.put(firstPlane, 1000);
+        Assert.assertFalse("Test failed! Non-empty hash should return false.",
+                myHashMap.isEmpty());
     }
 
     @Test
