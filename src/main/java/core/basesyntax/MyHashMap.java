@@ -16,25 +16,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int hash = hash(key);
-        int bucketIndex = getBucketIndex(hash);
-        Node<K, V> bucket = table[bucketIndex];
-        if (bucket == null) {
-            table[bucketIndex] = new Node<>(key, value, null);
-        } else {
-            Node<K, V> prev = null;
-            while (bucket != null) {
-                if (
-                        bucket.key == key
-                        || (bucket.key != null && bucket.key.equals(key))
-                ) {
-                    bucket.value = value;
-                    return;
-                }
-                prev = bucket;
-                bucket = bucket.next;
-            }
-            prev.next = new Node<>(key, value, null);
+        if (!addToTable(key, value)) {
+            return;
         }
 
         if (++size > threshold) {
@@ -130,52 +113,39 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return table.length - 1 & hash;
     }
 
-    /**
-     * Because we are using power-of-two expansion,
-     * the elements from each bucket must either stay at same index,
-     * or move with a power of two offset in the new table.
-     */
+    private boolean addToTable(K key, V value) {
+        int hash = hash(key);
+        int bucketIndex = getBucketIndex(hash);
+        Node<K, V> bucket = table[bucketIndex];
+        if (bucket == null) {
+            table[bucketIndex] = new Node<>(key, value, null);
+        } else {
+            Node<K, V> prev = null;
+            while (bucket != null) {
+                if (
+                        bucket.key == key
+                        || (bucket.key != null && bucket.key.equals(key))
+                ) {
+                    bucket.value = value;
+                    return false;
+                }
+                prev = bucket;
+                bucket = bucket.next;
+            }
+            prev.next = new Node<>(key, value, null);
+        }
+
+        return true;
+    }
+
     private void resize() {
         Node<K, V>[] oldTable = table;
         table = new Node[table.length << 1];
         threshold = (int) (table.length * LOAD_FACTOR);
-        for (int i = 0; i < oldTable.length; i++) {
-            Node<K, V> bucket = oldTable[i];
-            if (bucket != null) {
-                if (bucket.next == null) {
-                    table[getBucketIndex(hash(bucket.key))] = bucket;
-                } else {
-                    Node<K, V> sameIndexBucketHead = null;
-                    Node<K, V> sameIndexBucketTail = null;
-                    Node<K, V> offsetBucketHead = null;
-                    Node<K, V> offsetBucketTail = null;
-                    while (bucket != null) {
-                        if ((hash(bucket.key) & oldTable.length) == 0) {
-                            if (sameIndexBucketTail == null) {
-                                sameIndexBucketHead = bucket;
-                            } else {
-                                sameIndexBucketTail.next = bucket;
-                            }
-                            sameIndexBucketTail = bucket;
-                        } else {
-                            if (offsetBucketTail == null) {
-                                offsetBucketHead = bucket;
-                            } else {
-                                offsetBucketTail.next = bucket;
-                            }
-                            offsetBucketTail = bucket;
-                        }
-                        bucket = bucket.next;
-                    }
-                    if (sameIndexBucketTail != null) {
-                        sameIndexBucketTail.next = null;
-                        table[i] = sameIndexBucketHead;
-                    }
-                    if (offsetBucketTail != null) {
-                        offsetBucketTail.next = null;
-                        table[i + oldTable.length] = offsetBucketHead;
-                    }
-                }
+        for (Node<K, V> bucket : oldTable) {
+            while (bucket != null) {
+                addToTable(bucket.key, bucket.value);
+                bucket = bucket.next;
             }
         }
     }
