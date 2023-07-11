@@ -103,7 +103,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static int hash(Object key) {
+    private int hash(K key) {
         return key == null ? 0 : key.hashCode();
     }
 
