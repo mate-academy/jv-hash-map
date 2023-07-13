@@ -3,6 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
+    private static final int FIRST_BUCKET_INDEX = 0;
     private Node<K, V>[] innerArray;
     private int size;
     private int threshold;
@@ -14,13 +15,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int goalBucket = Math.abs(key == null ? 0 : key.hashCode() % innerArray.length);
-        Node<K, V> newNode = new Node<>(key == null ? 0 : key.hashCode(), key, value, null);
-        if (innerArray[goalBucket] == null) {
-            innerArray[goalBucket] = newNode;
+        int targetBucket = findTargetBucketByKey(key);
+        Node<K, V> newNode = createNewNode(key, value);
+        if (innerArray[targetBucket] == null) {
+            innerArray[targetBucket] = newNode;
         } else {
-            Node<K, V> lastNodeInBucket = innerArray[goalBucket];
-            Node<K, V> preLastNodeInBucket = innerArray[goalBucket];
+            Node<K, V> lastNodeInBucket = innerArray[targetBucket];
+            Node<K, V> preLastNodeInBucket = innerArray[targetBucket];
             while (lastNodeInBucket != null) {
                 if (lastNodeInBucket.key == key || lastNodeInBucket.key != null
                         && lastNodeInBucket.key.equals(key)) {
@@ -39,8 +40,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int goalBucket = Math.abs(key == null ? 0 : key.hashCode() % innerArray.length);
-        Node<K, V> lastNodeInBucket = innerArray[goalBucket];
+        int targetBucket = findTargetBucketByKey(key);
+        Node<K, V> lastNodeInBucket = innerArray[targetBucket];
         while (lastNodeInBucket != null) {
             if (lastNodeInBucket.key == key || lastNodeInBucket.key != null
                     && lastNodeInBucket.key.equals(key)) {
@@ -69,17 +70,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putWithoutSizeUp(K key, V value) {
-        int goalBucket = Math.abs(key == null ? 0 : key.hashCode() % innerArray.length);
-        Node<K, V> newNode = new Node<>(key == null ? 0 : key.hashCode(), key, value, null);
-        if (innerArray[goalBucket] == null) {
-            innerArray[goalBucket] = newNode;
+        int targetBucket = findTargetBucketByKey(key);
+        Node<K, V> newNode = createNewNode(key, value);
+        if (innerArray[targetBucket] == null) {
+            innerArray[targetBucket] = newNode;
         } else {
-            Node<K, V> lastNodeInBucket = innerArray[goalBucket];
+            Node<K, V> lastNodeInBucket = innerArray[targetBucket];
             while (lastNodeInBucket.next != null) {
                 lastNodeInBucket = lastNodeInBucket.next;
             }
             lastNodeInBucket.next = newNode;
         }
+    }
+
+    private int findTargetBucketByKey(K key) {
+        return Math.abs(key == null ? FIRST_BUCKET_INDEX : key.hashCode() % innerArray.length);
+    }
+
+    private Node<K, V> createNewNode(K key, V value) {
+        return new Node<>(key == null ? FIRST_BUCKET_INDEX : key.hashCode(), key, value, null);
     }
 
     private class Node<K, V> {
