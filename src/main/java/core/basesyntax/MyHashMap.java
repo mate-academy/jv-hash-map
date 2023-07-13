@@ -9,6 +9,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
     private int capacity;
+
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
         capacity = DEFAULT_CAPACITY;
