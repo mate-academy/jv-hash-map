@@ -5,9 +5,14 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private static final int RESIZE_FACTOR = 2;
-    private int capacity = 16;
-    private Node<K, V>[] table = (Node<K, V>[]) new Node[capacity];
+    private static final int DEFAULT_CAPACITY = 16;
+    private Node<K, V>[] table;
     private int size;
+    private int capacity;
+    public MyHashMap() {
+        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        capacity = DEFAULT_CAPACITY;
+    }
 
     private static class Node<K, V> {
         private final K key;
@@ -47,19 +52,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> currentNode = table[getIndex(key)];
-        if (currentNode == null) {
-            return null;
-        }
-        if (Objects.equals(currentNode.key, key)) {
-            return currentNode.value;
-        }
-        while (!Objects.equals(currentNode.key, key)) {
-            if (currentNode.next == null) {
-                return null;
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
             }
             currentNode = currentNode.next;
         }
-        return currentNode.value;
+        return null;
     }
 
     @Override
