@@ -81,12 +81,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         for (Node<K, V> node : oldBucket) {
             while (node != null) {
-                final Node<K, V> nextNode = node.next;
-                int index = getIndex(node.key);
-                node.next = buckets[index];
-                buckets[index] = node;
-                size++;
-                node = nextNode;
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
