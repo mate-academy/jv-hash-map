@@ -15,27 +15,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int hash = keyHash(key);
-        int index = indexByHash(hash);
-        for (Node<K, V> node = table[index]; node != null; node = node.next) {
-            if (Objects.equals(node.key, key)) {
-                node.value = value;
-                return;
-            }
+        Node<K,V> node = findNodeByKey(key);
+        if (node == null) {
+            addNode(key, value);
+        } else {
+            node.value = value;
         }
-        addNode(hash, key, value, index);
     }
 
     @Override
     public V getValue(K key) {
-        int hash = keyHash(key);
-        int index = indexByHash(hash);
-        for (Node<K, V> node = table[index]; node != null; node = node.next) {
-            if (Objects.equals(node.key, key)) {
-                return node.value;
-            }
-        }
-        return null;
+        Node<K,V> node = findNodeByKey(key);
+        return node == null ? null : node.value;
     }
 
     @Override
@@ -43,13 +34,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void addNode(int hash, K key, V value, int bucketIndex) {
+    private Node<K, V> findNodeByKey(K key) {
+        int hash = keyHash(key);
+        int index = indexByHash(hash);
+        for (Node<K, V> node = table[index]; node != null; node = node.next) {
+            if (Objects.equals(node.key, key)) {
+                return node;
+            }
+        }
+        return null;
+    }
+
+    private void addNode(K key, V value) {
+        int hash = keyHash(key);
+        int index = indexByHash(hash);
         Node<K, V> newNode = new Node<>(hash, key, value, null);
-        if (table[bucketIndex] != null) {
-            Node<K, V> lastNodeOfBucket = getLastNodeOfChain(table[bucketIndex]);
+        if (table[index] != null) {
+            Node<K, V> lastNodeOfBucket = getLastNodeOfChain(table[index]);
             lastNodeOfBucket.next = newNode;
         } else {
-            table[bucketIndex] = newNode;
+            table[index] = newNode;
         }
         increment();
     }
