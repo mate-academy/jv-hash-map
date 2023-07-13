@@ -6,7 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final int DEFAULT_COEFFICIENT = 2;
-    private int size = 0;
+    private int size;
     private Node<K,V>[] table;
 
     public MyHashMap() {
@@ -55,7 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K,V> next;
@@ -67,7 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public void resize() {
+    private void resize() {
         Node<K,V>[] newTable = table;
         size = 0;
         table = new Node[newTable.length * DEFAULT_COEFFICIENT];
