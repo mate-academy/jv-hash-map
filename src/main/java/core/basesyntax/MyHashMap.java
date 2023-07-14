@@ -72,10 +72,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         for (Node<K,V> node : oldArrCash) {
             while (node != null) {
-                this.put(node.key, node.value);
+                addToEndOfBucket(node.key, node.value);
                 node = node.next;
             }
         }
+    }
+
+    private void addToEndOfBucket(K key, V value) {
+        Node<K, V> node = new Node<>(key, value);
+        Node<K, V> currNode = table[bucketFor(node.key)];
+        size++;
+        if (currNode == null) {
+            table[bucketFor(key)] = node;
+            return;
+        }
+        while (currNode.next != null) {
+            currNode = currNode.next;
+        }
+        currNode.next = node;
     }
 
     private boolean keysAreEqual(K key1, K key2) {
