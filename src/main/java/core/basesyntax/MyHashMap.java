@@ -4,17 +4,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int STOCK_ARR_LENGTH = 16;
     private static final float MAX_FILL = 0.75f;
     private static final int GROWTH_COEFICIENT = 2;
-
     private Node[] arr;
     private int size;
 
     public MyHashMap() {
-        this.arr = (Node<K, V>[]) new Node[STOCK_ARR_LENGTH];
+        this.arr = new Node[STOCK_ARR_LENGTH];
     }
 
     @Override
     public void put(K key, V value) {
-        int pos = indexOf(key);
+        int pos = bucketFor(key);
         if (arr[pos] == null) {
             arr[pos] = new Node<>(key, value);
             increaseSize();
@@ -31,14 +30,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (arr[indexOf(key)] == null) {
-            return null;
-        }
         Node tempNode = findNode(key);
-        if (keysAreEqual(key, (K)tempNode.key)) {
-            return (V) tempNode.value;
-        }
-        return null;
+        return arr[bucketFor(key)] == null || !keysAreEqual(key, (K)findNode(key).key)
+                ? null : (V)tempNode.value;
     }
 
     @Override
@@ -46,15 +40,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int indexOf(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode()) % arr.length;
+    private int bucketFor(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % arr.length;
     }
 
     private Node findNode(K key) {
-        Node currNode = arr[indexOf(key)];
+        Node currNode = arr[bucketFor(key)];
         if (currNode == null) {
             return null;
         }
@@ -64,7 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             currNode = currNode.next;
         }
-        return currNode; //last node by index
+        return currNode; //last node in bucket
     }
 
     private void increaseSize() {
@@ -75,12 +66,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void growArr() {
         Node[] oldArrCash = arr;
-        arr = (Node<K, V>[]) new Node[arr.length * GROWTH_COEFICIENT];
+        arr = new Node[arr.length * GROWTH_COEFICIENT];
         size = 0;
-
         for (Node node : oldArrCash) {
             while (node != null) {
-                this.put((K) node.key, (V) node.value);
+                this.put((K)node.key, (V)node.value);
                 node = node.next;
             }
         }
