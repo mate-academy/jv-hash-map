@@ -96,7 +96,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K, V> previousNode;
         do {
-            if (hash == currentNode.hash && (keyIsEquals(key, currentNode.key))) {
+            if (hash == currentNode.hash && (keyIsEqual(key, currentNode.key))) {
                 V oldVal = currentNode.value;
                 currentNode.value = value;
                 return oldVal;
@@ -114,7 +114,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = calculateIndex(hash);
         Node<K, V> node = table[index];
         while (node != null) {
-            if (hash == node.hash && (keyIsEquals(key, node.key))) {
+            if (hash == node.hash && (keyIsEqual(key, node.key))) {
                 return node;
             }
             node = node.next;
@@ -122,7 +122,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private boolean keyIsEquals(K key1, K key2) {
+    private boolean keyIsEqual(K key1, K key2) {
         return key1 == key2 || key1 != null && key1.equals(key2);
     }
 }
