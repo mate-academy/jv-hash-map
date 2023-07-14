@@ -4,6 +4,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
     private static final int FIRST_BUCKET_INDEX = 0;
+    private static final int INNER_ARRAY_RESIZE_FACTOR = 2;
     private Node<K, V>[] innerArray;
     private int size;
     private int threshold;
@@ -60,7 +61,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         size = 0;
         Node<K, V>[] oldInnerArray = innerArray;
-        innerArray = new Node[innerArray.length * 2];
+        innerArray = new Node[innerArray.length * INNER_ARRAY_RESIZE_FACTOR];
         threshold = (int) (LOAD_FACTOR * innerArray.length);
         for (Node<K, V> node : oldInnerArray) {
             while (node != null) {
