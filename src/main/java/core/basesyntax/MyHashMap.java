@@ -15,7 +15,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         int pos = bucketFor(key);
         if (table[pos] == null) {
-            increaseSize();
+            size++;
+            growTableIfNeeded();
             table[pos] = new Node<>(key, value);
             return;
         }
@@ -25,7 +26,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         tempNode.next = new Node<>(key, value);
-        increaseSize();
+        size++;
+        growTableIfNeeded();
     }
 
     @Override
@@ -60,16 +62,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return currNode;
     }
 
-    private void increaseSize() {
-        if (++size >= table.length * MAX_FILL) {
-            growArr();
+    private void growTableIfNeeded() {
+        if (size < table.length * MAX_FILL) {
+            return;
         }
-    }
-
-    private void growArr() {
         Node<K,V>[] oldArrCash = table;
         table = (Node<K, V>[])new Node[table.length * GROWTH_COEFICIENT];
-        size = 0;
         for (Node<K,V> node : oldArrCash) {
             while (node != null) {
                 addToEndOfBucket(node.key, node.value);
@@ -81,7 +79,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void addToEndOfBucket(K key, V value) {
         Node<K, V> node = new Node<>(key, value);
         Node<K, V> currNode = table[bucketFor(node.key)];
-        size++;
         if (currNode == null) {
             table[bucketFor(key)] = node;
             return;
