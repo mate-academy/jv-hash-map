@@ -68,8 +68,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void increaseSize() {
-        size++;
-        if (size >= arr.length * MAX_FILL) {
+        if (++size >= arr.length * MAX_FILL) {
             growArr();
         }
     }
