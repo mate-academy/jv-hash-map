@@ -13,30 +13,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int pos = bucketFor(key);
-        if (table[pos] == null) {
-            size++;
+        Node<K, V> tempNode = getNodeWith(key);
+        if (tempNode == null) {
             growTableIfNeeded();
-            table[pos] = new Node<>(key, value);
-            return;
-        }
-        Node<K,V> tempNode = closestNode(key);
-        if (keysAreEqual(key, tempNode.key)) {
+            addToEndOfBucket(key, value);
+        } else {
             tempNode.value = value;
-            return;
         }
-        tempNode.next = new Node<>(key, value);
-        size++;
-        growTableIfNeeded();
     }
 
     @Override
     public V getValue(K key) {
-        Node<K,V> tempNode = closestNode(key);
-        return tempNode != null
-                && tempNode.hash == hashOf(key)
-                && (keysAreEqual(tempNode.key, key))
-                ? tempNode.value : null;
+        Node<K,V> tempNode = getNodeWith(key);
+        return tempNode != null ? tempNode.value : null;
     }
 
     @Override
@@ -45,21 +34,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int bucketFor(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
+        return Math.abs(hashOf(key) % table.length);
     }
 
-    private Node<K,V> closestNode(K key) {
+    private Node<K,V> getNodeWith(K key) {
         Node<K,V> currNode = table[bucketFor(key)];
         if (currNode == null) {
             return null;
         }
-        while (currNode.next != null) {
+        while (currNode != null) {
             if (currNode.hash == hashOf(key) && keysAreEqual(currNode.key, key)) {
                 return currNode;
             }
             currNode = currNode.next;
         }
-        return currNode;
+        return null;
     }
 
     private void growTableIfNeeded() {
@@ -68,6 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K,V>[] oldArrCash = table;
         table = (Node<K, V>[])new Node[table.length * GROWTH_COEFICIENT];
+        size = 0;
         for (Node<K,V> node : oldArrCash) {
             while (node != null) {
                 addToEndOfBucket(node.key, node.value);
@@ -77,16 +67,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void addToEndOfBucket(K key, V value) {
-        Node<K, V> node = new Node<>(key, value);
-        Node<K, V> currNode = table[bucketFor(node.key)];
+        Node<K, V> newNode = new Node<>(key, value);
+        Node<K, V> currNode = table[bucketFor(newNode.key)];
+        size++;
         if (currNode == null) {
-            table[bucketFor(key)] = node;
+            table[bucketFor(key)] = newNode;
             return;
         }
         while (currNode.next != null) {
             currNode = currNode.next;
         }
-        currNode.next = node;
+        currNode.next = newNode;
     }
 
     private boolean keysAreEqual(K key1, K key2) {
