@@ -15,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int targetBucket = findTargetBucketByKey(key);
+        int targetBucket = findBucketByKey(key);
         Node<K, V> newNode = createNewNode(key, value);
         if (innerArray[targetBucket] == null) {
             innerArray[targetBucket] = newNode;
@@ -40,7 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int targetBucket = findTargetBucketByKey(key);
+        int targetBucket = findBucketByKey(key);
         Node<K, V> lastNodeInBucket = innerArray[targetBucket];
         while (lastNodeInBucket != null) {
             if (lastNodeInBucket.key == key || lastNodeInBucket.key != null
@@ -58,32 +58,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        size = 0;
         Node<K, V>[] oldInnerArray = innerArray;
         innerArray = new Node[innerArray.length * 2];
         threshold = (int) (LOAD_FACTOR * innerArray.length);
         for (Node<K, V> node : oldInnerArray) {
             while (node != null) {
-                this.putWithoutSizeUp(node.key, node.value);
+                this.put(node.key, node.value);
                 node = node.next;
             }
         }
     }
 
-    private void putWithoutSizeUp(K key, V value) {
-        int targetBucket = findTargetBucketByKey(key);
-        Node<K, V> newNode = createNewNode(key, value);
-        if (innerArray[targetBucket] == null) {
-            innerArray[targetBucket] = newNode;
-        } else {
-            Node<K, V> lastNodeInBucket = innerArray[targetBucket];
-            while (lastNodeInBucket.next != null) {
-                lastNodeInBucket = lastNodeInBucket.next;
-            }
-            lastNodeInBucket.next = newNode;
-        }
-    }
-
-    private int findTargetBucketByKey(K key) {
+    private int findBucketByKey(K key) {
         return Math.abs(key == null ? FIRST_BUCKET_INDEX : key.hashCode() % innerArray.length);
     }
 
@@ -102,32 +89,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = 17;
-            result = 17 * result + (key == null ? 0 : key.hashCode());
-            result = 17 * result + (value == null ? 0 : value.hashCode());
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (obj instanceof Node) {
-                Node<K, V> newNode = (Node<K, V>) obj;
-                return hash == newNode.hash
-                        && (key == newNode.key || key != null && key.equals(newNode.key)
-                        && (value == newNode.value || value != null
-                        && value.equals(newNode.value)));
-            }
-            return false;
         }
     }
 }
