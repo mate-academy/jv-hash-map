@@ -15,8 +15,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         Node<K, V> tempNode = getNodeWith(key);
         if (tempNode == null) {
-            growTableIfNeeded();
             addToEndOfBucket(key, value);
+            size++;
+            growTableIfNeeded();
         } else {
             tempNode.value = value;
         }
@@ -57,7 +58,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K,V>[] oldArrCash = table;
         table = (Node<K, V>[])new Node[table.length * GROWTH_COEFICIENT];
-        size = 0;
         for (Node<K,V> node : oldArrCash) {
             while (node != null) {
                 addToEndOfBucket(node.key, node.value);
@@ -69,7 +69,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void addToEndOfBucket(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value);
         Node<K, V> currNode = table[bucketFor(newNode.key)];
-        size++;
         if (currNode == null) {
             table[bucketFor(key)] = newNode;
             return;
