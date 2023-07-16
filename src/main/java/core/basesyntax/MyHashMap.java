@@ -1,7 +1,7 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int initialCapacity = 16;
+    private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
     private static final int GROWTH_RATE = 2;
     private Node<K, V>[] arrayNodes;
@@ -16,8 +16,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public MyHashMap() {
-        this.arrayNodes = (Node<K, V>[]) new Node[initialCapacity];
-        actualCapacity = initialCapacity;
+        this.arrayNodes = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
+        actualCapacity = INITIAL_CAPACITY;
         size = 0;
     }
 
