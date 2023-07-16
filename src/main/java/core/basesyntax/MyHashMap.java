@@ -14,12 +14,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
+
+        public Node(int hashKey, K key, V value) {
+            this.hashKey = hashKey;
+            this.key = key;
+            this.value = value;
+        }
     }
 
     public MyHashMap() {
         this.arrayNodes = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
         actualCapacity = INITIAL_CAPACITY;
-        size = 0;
         threshold = (int) (actualCapacity * LOAD_FACTOR);
     }
 
@@ -28,10 +33,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             grow();
         }
-        Node<K,V> newNode = new Node<>();
-        newNode.key = key;
-        newNode.value = value;
-        newNode.hashKey = key == null ? 0 : key.hashCode();
+        int hashKey = key == null ? 0 : key.hashCode();
+        Node<K,V> newNode = new Node<>(hashKey, key, value);
         int index = key == null ? 0 : Math.abs(key.hashCode()) % actualCapacity;
         if (arrayNodes[index] == null) {
             arrayNodes[index] = newNode;
