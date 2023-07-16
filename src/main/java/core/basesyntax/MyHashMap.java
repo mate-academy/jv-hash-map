@@ -7,6 +7,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] arrayNodes;
     private int size;
     private int actualCapacity;
+    private int threshold;
 
     private static class Node<K, V> {
         private int hashKey;
@@ -19,11 +20,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.arrayNodes = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
         actualCapacity = INITIAL_CAPACITY;
         size = 0;
+        threshold = (int) (actualCapacity * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        if ((double) size / actualCapacity > LOAD_FACTOR) {
+        if (size == threshold) {
             grow();
         }
         Node<K,V> newNode = new Node<>();
@@ -65,6 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void grow() {
         int index;
         actualCapacity = actualCapacity * GROWTH_RATE;
+        threshold = (int)(actualCapacity * LOAD_FACTOR);
         Node<K, V>[] newArrayNodes = (Node<K, V>[]) new Node[actualCapacity];
         for (Node<K, V> currentNode : arrayNodes) {
             while (currentNode != null) {
