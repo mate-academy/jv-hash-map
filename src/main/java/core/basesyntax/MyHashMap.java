@@ -37,7 +37,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K,V> currentNode = arrayNodes[index];
             if (findNodeByKey(key) != null) {
                 currentNode = findNodeByKey(key);
-                currentNode.value = value;
+                if (currentNode != null) {
+                    currentNode.value = value;
+                }
                 return;
             } else {
                 while (currentNode.next != null) {
@@ -67,7 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> currentNode : arrayNodes) {
             while (currentNode != null) {
                 // Обчислює індекс нового масиву згідно розміру масиву
-                index = getIndex(currentNode.key);
+                index = Math.abs(currentNode.hashKey % actualCapacity);
                 // зберегти наступну ноду старого масиву
                 Node<K, V> nextNode = currentNode.next;
                 // перепривласнити ноді next взявши ноду з нового масиву по індексу
@@ -82,12 +84,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         arrayNodes = newArrayNodes;
     }
 
-    private int getIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % actualCapacity;
-    }
-
     private Node<K, V> findNodeByKey(K key) {
-        int index = getIndex(key);
+        int index = key == null ? 0 : Math.abs(key.hashCode()) % actualCapacity;
         Node<K, V> currentNode = arrayNodes[index];
         while (currentNode != null) {
             if (isEqualKeys(currentNode.key, key)) {
