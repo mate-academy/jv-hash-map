@@ -20,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         checkGrow();
         int index = calculateIndex(key);
         if (table[index] == null) {
-            table[index] = createNode(key, value); //non exist value
+            table[index] = createNode(key, value);
         } else {
             putInBucket(index, key, value);
         }
