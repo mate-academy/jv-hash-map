@@ -4,7 +4,8 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
-    private static final double LOAD_FACTOR = 0.75;
+    private static final float LOAD_FACTOR = 0.75f;
+    private static final int RESIZE_COEFFICIENT = 2;
     private int capacity;
     private int threshold;
     private int size;
@@ -18,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        ensureCapacity();
+        resizeIfNecessary();
         int arrayIndex = getArrayIndex(key);
         Node<K, V> indexNode = table[arrayIndex];
         if (indexNode != null) {
@@ -55,12 +56,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void ensureCapacity() {
+    private void resizeIfNecessary() {
         if (size < threshold) {
             return;
         }
-        capacity *= 2;
-        threshold *= 2;
+        capacity *= RESIZE_COEFFICIENT;
+        threshold *= RESIZE_COEFFICIENT;
         Node<K, V>[] oldTable = table;
         table = new Node[capacity];
         size = 0;
