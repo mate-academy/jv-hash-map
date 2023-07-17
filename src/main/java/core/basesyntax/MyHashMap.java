@@ -1,22 +1,22 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int STOCK_ARR_LENGTH = 16;
+    private static final int STOCK_ARRAY_LENGTH = 16;
     private static final float MAX_FILL = 0.75f;
     private static final int GROWTH_COEFICIENT = 2;
     private Node<K,V>[] table;
     private int size;
 
     public MyHashMap() {
-        this.table = (Node<K, V>[]) new Node[STOCK_ARR_LENGTH];
+        table = (Node<K, V>[]) new Node[STOCK_ARRAY_LENGTH];
     }
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> tempNode = getNodeWith(key);
+        Node<K, V> tempNode = getNode(key);
         if (tempNode == null) {
             growTableIfNeeded();
-            addToEndOfBucket(key, value);
+            addNewNode(key, value);
             size++;
         } else {
             tempNode.value = value;
@@ -25,7 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K,V> tempNode = getNodeWith(key);
+        Node<K,V> tempNode = getNode(key);
         return tempNode != null ? tempNode.value : null;
     }
 
@@ -34,20 +34,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int bucketFor(K key) {
+    private int getBucket(K key) {
         return Math.abs(hashOf(key) % table.length);
     }
 
-    private Node<K,V> getNodeWith(K key) {
-        Node<K,V> currNode = table[bucketFor(key)];
-        if (currNode == null) {
-            return null;
-        }
-        while (currNode != null) {
-            if (currNode.hash == hashOf(key) && keysAreEqual(currNode.key, key)) {
-                return currNode;
+    private Node<K,V> getNode(K key) {
+        Node<K,V> currentNode = table[getBucket(key)];
+        while (currentNode != null) {
+            if (currentNode.hash == hashOf(key) && keysAreEqual(currentNode.key, key)) {
+                return currentNode;
             }
-            currNode = currNode.next;
+            currentNode = currentNode.next;
         }
         return null;
     }
@@ -56,39 +53,38 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size < table.length * MAX_FILL) {
             return;
         }
-        Node<K,V>[] oldArrCash = table;
+        Node<K,V>[] oldTable = table;
         table = (Node<K, V>[])new Node[table.length * GROWTH_COEFICIENT];
-        for (Node<K,V> node : oldArrCash) {
+        for (Node<K,V> node : oldTable) {
             while (node != null) {
-                addToEndOfBucket(node.key, node.value);
+                addNewNode(node.key, node.value);
                 node = node.next;
             }
         }
     }
 
-    private void addToEndOfBucket(K key, V value) {
+    private void addNewNode(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value);
-        Node<K, V> currNode = table[bucketFor(newNode.key)];
-        if (currNode == null) {
-            table[bucketFor(key)] = newNode;
+        Node<K, V> currentNode = table[getBucket(newNode.key)];
+        if (currentNode == null) {
+            table[getBucket(key)] = newNode;
             return;
         }
-        while (currNode.next != null) {
-            currNode = currNode.next;
+        while (currentNode.next != null) {
+            currentNode = currentNode.next;
         }
-        currNode.next = newNode;
+        currentNode.next = newNode;
     }
 
-    private boolean keysAreEqual(K key1, K key2) {
-        return key1 == key2 || key1 != null && key1.equals(key2);
+    private boolean keysAreEqual(K first, K second) {
+        return first == second || first != null && first.equals(second);
     }
 
     private static int hashOf(Object key) {
         if (key == null) {
             return 0;
-        } else {
-            return key.hashCode();
         }
+        return key.hashCode();
     }
 
     private class Node<K, V> {
