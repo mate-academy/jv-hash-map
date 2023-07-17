@@ -18,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        Node<K, V> node = new Node<>(getHash(key), key, value, null);
+        Node<K, V> node = new Node<>(key, value, null);
         int index = getIndex(node.key);
         if (table[index] == null) {
             table[index] = node;
@@ -68,12 +68,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (LOAD_FACTOR * table.length);
         size = 0;
         for (Node<K, V> node : oldTable) {
-            if (node != null) {
+            while (node != null) {
                 put(node.key, node.value);
-                while (node.next != null) {
-                    put(node.next.key, node.next.value);
-                    node = node.next;
-                }
+                node = node.next;
             }
         }
     }
@@ -92,13 +89,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
