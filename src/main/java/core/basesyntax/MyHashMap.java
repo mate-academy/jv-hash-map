@@ -59,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K,V> targetNode = table[i];
             while (targetNode != null) {
                 Node<K,V> nextNode = targetNode.next;
-                int newIndex = hashCodeOfTheKey(targetNode.key) & (newCapacity - 1);
+                int newIndex = targetNode.hash & (newCapacity - 1);
                 targetNode.next = newTable[newIndex];
                 newTable[newIndex] = targetNode;
                 targetNode = nextNode;
@@ -69,11 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hashCodeOfTheKey(K key) {
-        if (key == null) {
-            return 0;
-        } else {
-            return Math.abs(key.hashCode());
-        }
+        return key == null ? 0 : Math.abs(key.hashCode());
     }
 
     private int findIndex(K key) {
