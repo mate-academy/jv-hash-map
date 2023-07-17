@@ -15,7 +15,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        resizeIfLoaded();
+        if (size > threshold) {
+            resize();
+        }
         if (putVal(key, value) == null) {
             size++;
         }
@@ -54,13 +56,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @SuppressWarnings("unchecked")
-    private void resizeIfLoaded() {
-        if (size > threshold) {
-            Node<K, V>[] oldTable = table;
-            table = (Node<K, V>[]) new Node[table.length << 1];
-            threshold = threshold << 1;
-            transfer(oldTable);
-        }
+    private void resize() {
+        Node<K, V>[] oldTable = table;
+        table = (Node<K, V>[]) new Node[table.length << 1];
+        threshold = threshold << 1;
+        transfer(oldTable);
     }
 
     private void transfer(Node<K, V>[] oldTable) {
@@ -105,7 +105,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             previousNode = currentNode;
             currentNode = currentNode.next;
         } while (currentNode != null);
-
         previousNode.next = new Node<>(hash, key, value);
         return null;
     }
