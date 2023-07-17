@@ -4,6 +4,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int RESIZE_INCREASE_NUMBER = 2;
+    private static final int FIRST_PRIME_NUMBER = 31;
+    private static final int SECOND_PRIME_NUMBER = 17;
 
     private int tableCapacity;
     private int threshold;
@@ -18,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int bucketPosition = getBucketPosition(key, tableCapacity);
+        int bucketPosition = getBucketPosition(key);
         Node<K, V> previousNode = null;
         Node<K, V> bucketByIndex = table[bucketPosition];
         while (bucketByIndex != null) {
@@ -41,17 +43,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void resize() {
-        tableCapacity *= RESIZE_INCREASE_NUMBER;
-        Node<K, V>[] newTable = new Node[tableCapacity];
-        threshold = (int) (DEFAULT_LOAD_FACTOR * tableCapacity);
-        transferToNewTable(newTable);
-        table = newTable;
-    }
-
     @Override
     public V getValue(K key) {
-        int bucketPosition = getBucketPosition(key, table.length);
+        int bucketPosition = getBucketPosition(key);
         Node<K, V> nodeByIndex = getNodeByIndex(key, bucketPosition);
         while (nodeByIndex != null) {
             if (ifKeysEquals(key, nodeByIndex)) {
@@ -67,10 +61,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private void resize() {
+        tableCapacity *= RESIZE_INCREASE_NUMBER;
+        Node<K, V>[] newTable = new Node[tableCapacity];
+        threshold = (int) (DEFAULT_LOAD_FACTOR * tableCapacity);
+        transferToNewTable(newTable);
+        table = newTable;
+    }
+
     private void transferToNewTable(Node<K, V>[] newTable) {
         for (Node<K, V> currentNode : table) {
             while (currentNode != null) {
-                int newBucketPosition = getBucketPosition(currentNode.key, tableCapacity);
+                int newBucketPosition = getBucketPosition(currentNode.key);
                 Node<K, V> nextNode = currentNode.next;
                 currentNode.next = newTable[newBucketPosition];
                 newTable[newBucketPosition] = currentNode;
@@ -95,14 +97,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == node.key) || (key != null && key.equals(node.key));
     }
 
-    private int getBucketPosition(K key, int tableCapacity) {
+    private int getBucketPosition(K key) {
         return (key == null) ? 0 : getKeyHashCode(key) % tableCapacity;
     }
 
     private int getKeyHashCode(K key) {
-        int firstPrimeNumber = 31;
-        int secondPrimeNumber = 17;
-        return (key == null) ? 0 : Math.abs(firstPrimeNumber * secondPrimeNumber + key.hashCode());
+        return (key == null) ? 0 : Math.abs(
+                FIRST_PRIME_NUMBER * SECOND_PRIME_NUMBER + key.hashCode());
     }
 
     private static class Node<K, V> {
