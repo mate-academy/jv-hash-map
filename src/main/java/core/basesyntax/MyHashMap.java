@@ -15,9 +15,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         Node<K, V> tempNode = getNodeWith(key);
         if (tempNode == null) {
+            growTableIfNeeded();
             addToEndOfBucket(key, value);
             size++;
-            growTableIfNeeded();
         } else {
             tempNode.value = value;
         }
@@ -91,7 +91,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private static class Node<K, V> {
+    private class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
