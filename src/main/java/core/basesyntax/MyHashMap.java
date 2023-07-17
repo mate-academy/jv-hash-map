@@ -100,8 +100,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private int hashKey;
-        private K key;
+        private final int hashKey;
+        private final K key;
         private V value;
         private Node<K, V> next;
 
