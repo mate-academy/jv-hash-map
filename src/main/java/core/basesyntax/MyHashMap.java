@@ -9,19 +9,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int actualCapacity;
     private int threshold;
 
-    private static class Node<K, V> {
-        private int hashKey;
-        private K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(int hashKey, K key, V value) {
-            this.hashKey = hashKey;
-            this.key = key;
-            this.value = value;
-        }
-    }
-
     public MyHashMap() {
         this.arrayNodes = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
         actualCapacity = INITIAL_CAPACITY;
@@ -110,6 +97,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return key1.equals(key2);
         }
         return false;
+    }
+
+    private static class Node<K, V> {
+        private int hashKey;
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(int hashKey, K key, V value) {
+            this.hashKey = hashKey;
+            this.key = key;
+            this.value = value;
+        }
     }
 
 }
