@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
@@ -11,11 +13,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         innerArray = new Node[DEFAULT_CAPACITY];
-        threshold = (int) (LOAD_FACTOR * DEFAULT_CAPACITY);
     }
 
     @Override
     public void put(K key, V value) {
+        if (size > (int) (LOAD_FACTOR * innerArray.length)) {
+            resize();
+        }
         int targetBucket = findBucketByKey(key);
         Node<K, V> newNode = createNewNode(key, value);
         if (innerArray[targetBucket] == null) {
@@ -24,8 +28,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> lastNodeInBucket = innerArray[targetBucket];
             Node<K, V> preLastNodeInBucket = innerArray[targetBucket];
             while (lastNodeInBucket != null) {
-                if (lastNodeInBucket.key == key || lastNodeInBucket.key != null
-                        && lastNodeInBucket.key.equals(key)) {
+                if (Objects.equals(lastNodeInBucket.key, key)) {
                     lastNodeInBucket.value = value;
                     return;
                 }
@@ -34,9 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             preLastNodeInBucket.next = newNode;
         }
-        if (++size > threshold) {
-            resize();
-        }
+        size++;
     }
 
     @Override
@@ -44,8 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int targetBucket = findBucketByKey(key);
         Node<K, V> lastNodeInBucket = innerArray[targetBucket];
         while (lastNodeInBucket != null) {
-            if (lastNodeInBucket.key == key || lastNodeInBucket.key != null
-                    && lastNodeInBucket.key.equals(key)) {
+            if (Objects.equals(lastNodeInBucket.key, key)) {
                 return lastNodeInBucket.value;
             }
             lastNodeInBucket = lastNodeInBucket.next;
@@ -62,7 +62,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         Node<K, V>[] oldInnerArray = innerArray;
         innerArray = new Node[innerArray.length * INNER_ARRAY_RESIZE_FACTOR];
-        threshold = (int) (LOAD_FACTOR * innerArray.length);
         for (Node<K, V> node : oldInnerArray) {
             while (node != null) {
                 this.put(node.key, node.value);
@@ -76,7 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> createNewNode(K key, V value) {
-        return new Node<>(key == null ? FIRST_BUCKET_INDEX : key.hashCode(), key, value, null);
+        return new Node<>(key == null ? FIRST_BUCKET_INDEX : key.hashCode(), key, value);
     }
 
     private class Node<K, V> {
@@ -85,11 +84,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        private Node(int hash, K key, V value, Node<K, V> next) {
+        private Node(int hash, K key, V value) {
             this.hash = hash;
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
