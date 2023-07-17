@@ -66,9 +66,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void transfer(Node<K, V>[] oldTable) {
         for (Node<K, V> node : oldTable) {
             while (node != null) {
-                Node<K, V> newNode = new Node<>(node.hash, node.key, node.value);
-                relocateNode(newNode);
-                node = node.next;
+                Node<K, V> next = node.next;
+                node.next = null;
+                relocateNode(node);
+                node = next;
             }
         }
     }
