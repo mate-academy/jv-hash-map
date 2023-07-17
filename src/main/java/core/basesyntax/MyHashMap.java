@@ -13,17 +13,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         buckets = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         checkCapacity();
@@ -75,11 +64,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void increaseCapacity() {
         int newCapacity = buckets.length * RESIZE_FACTOR;
-        Node<K, V>[] oldBucket = buckets;
+        Node<K, V>[] oldBuckets = buckets;
         buckets = (Node<K, V>[]) new Node[newCapacity];
         size = 0;
 
-        for (Node<K, V> node : oldBucket) {
+        for (Node<K, V> node : oldBuckets) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
@@ -92,5 +81,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return 0;
         }
         return Math.abs(key.hashCode()) % buckets.length;
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 }
