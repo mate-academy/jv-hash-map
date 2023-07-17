@@ -36,15 +36,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 nodeInBucket = nodeInBucket.next;
             } while (nodeInBucket != null);
-
         }
         size++;
     }
 
-    private void checkSize() {
-        if (size == threshold) {
-            resize();
+    @Override
+    public V getValue(K key) {
+        int keyInTable = hash(key) % changeableCapacity;
+        Node<K, V> nodeInTable = table[keyInTable];
+        while (nodeInTable != null) {
+            if (Objects.equals(nodeInTable.key, key)) {
+                return nodeInTable.value;
+            }
+            nodeInTable = nodeInTable.next;
         }
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
     }
 
     private void resize() {
@@ -62,30 +73,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    @Override
-    public V getValue(K key) {
-        for (Node<K, V> node : table) {
-            while (node != null) {
-                if (Objects.equals(node.key, key)) {
-                    return node.value;
-                }
-                node = node.next;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
-    }
-
     private int hash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
     private int getIndex(Node<K, V> node) {
         return node.hash % changeableCapacity;
+    }
+
+    private void checkSize() {
+        if (size == threshold) {
+            resize();
+        }
     }
 
     private class Node<K, V> {
