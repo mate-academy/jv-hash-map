@@ -8,19 +8,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int SIZE_MULTIPLIER = 2;
     private Node<K, V>[] table;
     private int size;
-    private int threshold;
 
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
-        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        checkGrow();
+        checkSizeAndGrowIfNeeded();
         int index = calculateIndex(key);
         if (table[index] == null) {
-            table[index] = createNode(key, value);
+            table[index] = increaseSizeAndReturnNewNode(key, value);
         } else {
             putInBucket(index, key, value);
         }
@@ -43,9 +41,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private Node<K, V> createNode(K key, V value) {
+    private Node<K, V> increaseSizeAndReturnNewNode(K key, V value) {
         size++;
-        return new Node<>(key, value, getHashForKey(key));
+        return new Node<>(key, value);
     }
 
     private void putInBucket(int index, K key, V value) {
@@ -56,7 +54,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 break;
             }
             if (currentNode.next == null) {
-                currentNode.next = createNode(key, value);
+                currentNode.next = increaseSizeAndReturnNewNode(key, value);
                 break;
             }
             currentNode = currentNode.next;
@@ -65,15 +63,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int calculateIndex(K key) {
         int keyHash = getHashForKey(key);
-        return Math.abs(keyHash % table.length);
+        return keyHash == 0 ? 0 : Math.abs(keyHash % table.length);
     }
 
     private int getHashForKey(K key) {
         return key == null ? 0 : key.hashCode();
     }
 
-    private void checkGrow() {
-        if (size == threshold) {
+    private void checkSizeAndGrowIfNeeded() {
+        if (size == table.length * LOAD_FACTOR) {
             grow();
         }
     }
@@ -81,7 +79,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void grow() {
         Node<K, V>[] oldTable = table;
         table = (Node<K, V>[]) new Node[oldTable.length * SIZE_MULTIPLIER];
-        threshold *= SIZE_MULTIPLIER;
         size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
@@ -92,15 +89,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        Node(K key, V value, int hash) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.hash = hash;
         }
     }
 }
