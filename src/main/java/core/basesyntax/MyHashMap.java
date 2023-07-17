@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -16,7 +15,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[DEFAULT_CAPACITY];
         threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
-
 
     @Override
     public void put(K key, V value) {
@@ -51,9 +49,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         size = 0;
-        Node<K, V>[] oldTable = table;
+        final Node<K, V>[] oldTable = table;
         changeableCapacity *= DEFAULT_RESIZE_MULTIPLIER;
-        Node<K, V>[] newTable = new Node[changeableCapacity];
+        final Node<K, V>[] newTable = new Node[changeableCapacity];
         table = newTable;
         threshold = (int) (LOAD_FACTOR * changeableCapacity);
         for (Node<K, V> node : oldTable) {
@@ -66,11 +64,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int indexOfKey = key == null ? 0 : (Math.abs(key.hashCode()) % 16);
-        Node<K, V> nodeInTable = table[indexOfKey];
         for (Node<K, V> node : table) {
             while (node != null) {
-                if (Objects.equals(node.key, key)){
+                if (Objects.equals(node.key, key)) {
                     return node.value;
                 }
                 node = node.next;
