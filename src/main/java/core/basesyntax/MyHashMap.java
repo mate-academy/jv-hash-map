@@ -14,15 +14,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (!containsKey(key)) {
+        if (size == 0) {
             return null;
         }
-        int index = bucketIndex(hash(key));
+        int hash = hash(key);
+        int index = bucketIndex(hash);
         Node<K, V> node = table[index];
-        while (node.key != key && (node.key == null || !node.key.equals(key))) {
+        while (node != null) {
+            if ((node.hash == hash)
+                    && (node.key == key || node.key != null && node.key.equals(key))) {
+                return node.value;
+            }
             node = node.next;
         }
-        return node.value;
+        return null;
     }
 
     @Override
@@ -78,11 +83,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-    }
-
-    private boolean containsKey(K key) {
-        return (table != null && table.length != 0)
-                && (table[bucketIndex(hash(key))] != null || key == null);
     }
 
     private int hash(K key) {
