@@ -28,7 +28,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
         }
-
         addNode(hash, key, value, index);
     }
 
@@ -46,7 +45,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return node.value;
             }
         }
-
         return null;
     }
 
@@ -73,7 +71,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             hash = (key != null) ? hashCode(key) : 0;
             bucketIndex = indexFor(hash, hashTable.length);
         }
-
         Node<K, V> newNode = new Node<>(hash, key, value, hashTable[bucketIndex]);
         hashTable[bucketIndex] = newNode;
         size++;
@@ -89,7 +86,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize(int newCapacity) {
-
         Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
         transfer(newTable);
         hashTable = newTable;
