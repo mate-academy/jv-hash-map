@@ -22,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(node.key);
         if (table[index] == null) {
             table[index] = node;
-        } else if (putIfKeyContainsInHashMap(node, index)) {
+        } else if (putIfKeyContainsInHashMap(node)) {
             return;
         } else {
             Node<K, V> currentNode = table[index];
@@ -36,16 +36,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = getIndex(key);
-        Node<K, V> currentNode = table[index];
-        while (currentNode != null) {
-            if (currentNode.key == key
-                    || currentNode.key != null && currentNode.key.equals(key)) {
-                return currentNode.value;
-            }
-            currentNode = currentNode.next;
-        }
-        return null;
+        Node<K, V> currentNode = findNodeByKey(key);
+        return currentNode == null ? null : currentNode.value;
     }
 
     @Override
@@ -75,17 +67,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private boolean putIfKeyContainsInHashMap(Node<K, V> node, int index) {
-        Node<K, V> currentNode = table[index];
+    private boolean putIfKeyContainsInHashMap(Node<K, V> node) {
+        Node<K, V> currentNode = findNodeByKey(node.key);
+        if (currentNode != null) {
+            currentNode.value = node.value;
+            return true;
+        }
+        return false;
+    }
+
+    private Node<K,V> findNodeByKey(K key) {
+        int index = getIndex(key);
+        Node<K,V> currentNode = table[index];
         while (currentNode != null) {
-            if (currentNode.key == node.key
-                    || currentNode.key != null && currentNode.key.equals(node.key)) {
-                currentNode.value = node.value;
-                return true;
+            if (currentNode.key == key
+                    || currentNode.key != null && currentNode.key.equals(key)) {
+                return currentNode;
             }
             currentNode = currentNode.next;
         }
-        return false;
+        return null;
     }
 
     private class Node<K, V> {
