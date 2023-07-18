@@ -9,7 +9,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INNER_ARRAY_RESIZE_FACTOR = 2;
     private Node<K, V>[] innerArray;
     private int size;
-    private int threshold;
 
     public MyHashMap() {
         innerArray = new Node[DEFAULT_CAPACITY];
