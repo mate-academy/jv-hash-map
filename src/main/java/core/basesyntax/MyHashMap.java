@@ -6,7 +6,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private static final int DEFAULT_RESIZE_MULTIPLIER = 2;
     private static final int DEFAULT_CAPACITY = 16;
-    private int changeableCapacity = 16;
     private Node<K, V>[] table;
     private int size;
     private int threshold;
@@ -20,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(hash(key), key, value, null);
         checkSize();
-        int index = getIndex(newNode);
+        int index = getIndex(key);
         if (table[index] == null) {
             table[index] = newNode;
         } else {
@@ -42,8 +41,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int keyInTable = hash(key) % changeableCapacity;
-        Node<K, V> nodeInTable = table[keyInTable];
+        int index = getIndex(key);
+        Node<K, V> nodeInTable = table[index];
         while (nodeInTable != null) {
             if (Objects.equals(nodeInTable.key, key)) {
                 return nodeInTable.value;
@@ -61,10 +60,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         size = 0;
         final Node<K, V>[] oldTable = table;
-        changeableCapacity *= DEFAULT_RESIZE_MULTIPLIER;
-        final Node<K, V>[] newTable = new Node[changeableCapacity];
+        Node<K, V>[] newTable = new Node[table.length * DEFAULT_RESIZE_MULTIPLIER];
         table = newTable;
-        threshold = (int) (LOAD_FACTOR * changeableCapacity);
+        threshold = (int) (LOAD_FACTOR * newTable.length);
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
@@ -77,8 +75,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
-    private int getIndex(Node<K, V> node) {
-        return node.hash % changeableCapacity;
+    private int getIndex(K key) {
+        return hash(key) % table.length;
     }
 
     private void checkSize() {
