@@ -3,6 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     static final int DEFAULT_INITIAL_CAPACITY = 16;
+    static final int GROWTH_FACTOR = 2;
     private int size;
     private Node<K, V>[] map;
 
@@ -17,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (map[getIndex(key)] != null) {
             Node oldNode = map[index];
             while (true) {
-                if (oldNode.key == key || oldNode.key != null && oldNode.key.equals(key)) {
+                if (isEqual((K) oldNode.key, key)) {
                     oldNode.value = value;
                     return;
                 }
@@ -43,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         while (true) {
-            if (oldNode.key == key || oldNode.key != null && oldNode.key.equals(key)) {
+            if (isEqual((K) oldNode.key, key)) {
                 return (V) oldNode.value;
             } else {
                 if (oldNode.next == null) {
@@ -63,7 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         if (map.length * DEFAULT_LOAD_FACTOR == size) {
             Node<K, V>[] oldMap = map;
-            map = new Node[oldMap.length * 2];
+            map = new Node[oldMap.length * GROWTH_FACTOR];
             size = 0;
             for (Node<K, V> element : oldMap) {
                 while (element != null) {
@@ -82,7 +83,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    static class Node<K, V> {
+    final boolean isEqual(K firstKey, K secondKey) {
+        return firstKey == secondKey || firstKey != null && firstKey.equals(secondKey);
+    }
+
+    private class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
