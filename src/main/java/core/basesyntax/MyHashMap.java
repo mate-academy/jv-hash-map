@@ -7,12 +7,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int RESIZE_INDEX = 2;
     private static final float LOAD_FACTOR = 0.75f;
     private int size;
-    private int threshHold;
+    private int threshold;
     private Node<K, V>[] hashTable;
 
     public MyHashMap() {
         hashTable = new Node[DEFAULT_CAPACITY];
-        threshHold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
@@ -40,14 +40,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> getNode = hashTable[getIndex(key)];
-        while (getNode != null) {
-            if (Objects.equals(getNode.key, key)) {
-                return getNode.value;
-            }
-            getNode = getNode.next;
-        }
-        return null;
+        Node<K, V> node = findNodeByKey(key);
+        return node == null ? null : node.value;
     }
 
     @Override
@@ -64,9 +58,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (size == threshHold) {
+        if (size == threshold) {
             int newCapacity = hashTable.length * RESIZE_INDEX;
-            threshHold = (int) (hashTable.length * LOAD_FACTOR);
+            threshold = (int) (hashTable.length * LOAD_FACTOR);
             size = 0;
             Node<K, V>[] oldTable = hashTable;
             hashTable = new Node[newCapacity];
@@ -79,6 +73,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private Node<K, V> findNodeByKey(K key) {
+        int index = getIndex(key);
+        for (Node<K, V> node = hashTable[index]; node != null; node = node.next) {
+            if (Objects.equals(node.key, key)) {
+                return node;
+            }
+        }
+        return null;
+    }
+
     private class Node<K, V> {
         private final K key;
         private V value;
@@ -88,6 +92,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
         }
-
     }
 }
