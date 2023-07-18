@@ -21,21 +21,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int bucketPosition = getBucketPosition(key);
-        Node<K, V> previousNode = null;
-        Node<K, V> bucketNode = table[bucketPosition];
-        while (bucketNode != null) {
-            if (Objects.equals(key, bucketNode.key)) {
-                bucketNode.value = value;
-                return;
-            }
-            previousNode = bucketNode;
-            bucketNode = bucketNode.next;
-        }
         Node<K, V> newNode = new Node<>(key, value, null);
-        if (previousNode != null) {
-            previousNode.next = newNode;
-        } else {
+        Node<K, V> bucketNode = table[bucketPosition];
+        if (bucketNode == null) {
             table[bucketPosition] = newNode;
+        } else {
+            Node<K, V> previousNode = null;
+            while (bucketNode != null) {
+                if (Objects.equals(key, bucketNode.key)) {
+                    bucketNode.value = value;
+                    return;
+                }
+                previousNode = bucketNode;
+                bucketNode = bucketNode.next;
+            }
+            previousNode.next = newNode;
         }
         size++;
         if (size > threshold) {
@@ -87,8 +87,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getKeyHashCode(K key) {
-        return (key == null) ? 0 : Math.abs(
-                FIRST_PRIME_NUMBER * SECOND_PRIME_NUMBER + key.hashCode());
+        return Math.abs(FIRST_PRIME_NUMBER * SECOND_PRIME_NUMBER + key.hashCode());
     }
 
     private static class Node<K, V> {
