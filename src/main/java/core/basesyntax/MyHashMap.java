@@ -5,41 +5,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 16;
     static final int GROWTH_FACTOR = 2;
     private int size;
-    private Node<K, V>[] map;
+    private Node<K, V>[] mapArray;
 
     public MyHashMap() {
-        this.map = new Node[DEFAULT_INITIAL_CAPACITY];
+        this.mapArray = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         int index = getIndex(key);
-        Node newNode = new Node<>(key == null ? 0 : key.hashCode(), key, value, null);
-        if (map[getIndex(key)] != null) {
-            Node oldNode = map[index];
-            while (true) {
-                if (isEqual((K) oldNode.key, key)) {
-                    oldNode.value = value;
-                    return;
-                }
-                if (oldNode.next == null) {
-                    oldNode.next = newNode;
-                    size++;
-                    resize();
-                    return;
-                }
-                oldNode = oldNode.next;
-            }
-        } else {
-            map[index] = newNode;
-            size++;
-            resize();
-        }
+        Node newNode = new Node<>(key, value, null);
+        insert(index, newNode, key, value);
     }
 
     @Override
     public V getValue(K key) {
-        Node oldNode = map[getIndex(key)];
+        Node oldNode = mapArray[getIndex(key)];
         if (oldNode == null) {
             return null;
         }
@@ -61,17 +42,44 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private void resizeIfFull() {
+        if (mapArray.length * DEFAULT_LOAD_FACTOR == size) {
+            resize();
+        }
+    }
+
     private void resize() {
-        if (map.length * DEFAULT_LOAD_FACTOR == size) {
-            Node<K, V>[] oldMap = map;
-            map = new Node[oldMap.length * GROWTH_FACTOR];
-            size = 0;
-            for (Node<K, V> element : oldMap) {
-                while (element != null) {
-                    put(element.key, element.value);
-                    element = element.next;
-                }
+        Node<K, V>[] oldMap = mapArray;
+        mapArray = new Node[oldMap.length * GROWTH_FACTOR];
+        size = 0;
+        for (Node<K, V> element : oldMap) {
+            while (element != null) {
+                put(element.key, element.value);
+                element = element.next;
             }
+        }
+    }
+
+    private void insert(int index, Node newNode, K key, V value) {
+        if (mapArray[index] != null) {
+            Node oldNode = mapArray[index];
+            while (true) {
+                if (isEqual((K) oldNode.key, key)) {
+                    oldNode.value = value;
+                    return;
+                }
+                if (oldNode.next == null) {
+                    oldNode.next = newNode;
+                    size++;
+                    resizeIfFull();
+                    return;
+                }
+                oldNode = oldNode.next;
+            }
+        } else {
+            mapArray[index] = newNode;
+            size++;
+            resizeIfFull();
         }
     }
 
@@ -79,7 +87,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return 0;
         } else {
-            return Math.abs(key.hashCode() % map.length);
+            return Math.abs(key.hashCode() % mapArray.length);
         }
     }
 
@@ -88,13 +96,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
