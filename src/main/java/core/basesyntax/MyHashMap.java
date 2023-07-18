@@ -7,17 +7,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static final float LOAD_FACTOR = 0.75f;
 
     private int capacity;
+    private int threshold;
     private Node<K,V>[] bucketList;
     private int size;
 
     @Override
     public void put(K key, V value) {
         if (containsKey(key)) {
-            //
+            Node<K,V> existingNode = getNode(hash(key), key);
+            existingNode.setValue(value);
             return;
         }
-        Node<K,V> newNode = new Node<>(key.hashCode(), key, value, null);
-        int newNodePos = hash(newNode.getKey()) % capacity;
+        Node<K,V> newNode = new Node<>(hash(key), key, value, null);
+        int newNodePos = hash(key) % capacity;
         if (bucketList[newNodePos] == null) {
             bucketList[newNodePos] = newNode;
             size++;
@@ -33,28 +35,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K,V> valueNode;
-        if (key == null) {
-            valueNode = bucketList[0];
-            while (valueNode.getKey() != null) {
-                valueNode = valueNode.next;
-            }
-        } else {
-            valueNode = bucketList[hash(key) % capacity];
-            while (!valueNode.getKey().equals(key)) {
-                valueNode = valueNode.next;
-            }
-        }
+        Node<K,V> valueNode = getNode(hash(key), key);
         return valueNode.getValue();
     }
 
     @Override
     public int getSize() {
         return size;
-    }
-
-    public boolean isEmpty() {
-        return size == 0;
     }
 
     /* ------------ Node inner class ------------ */
@@ -128,7 +115,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : key.hashCode();
     }
 
+    private void put(Node<K,V> node) {
+        put(node.getKey(), node.getValue());
+    }
+
     private void resize() {
-        //
+        if (size >= threshold) {
+            int oldCapacity = capacity;
+            int oldThreshold = threshold;
+            capacity = capacity << 1;
+            threshold = (int) (capacity * LOAD_FACTOR);
+            Node<K,V>[] oldBucketList = bucketList;
+//            Node<K,V>[] newBucketList = (Node<K,V>[]) new Node[newCapacity];
+            bucketList = (Node<K,V>[]) new Node[capacity];
+            Node<K,V> curNode;
+            for (int i = 0; i < oldCapacity; i++) {
+                curNode = oldBucketList[i];
+                while(curNode != null) {
+                    put(curNode);
+                    curNode = curNode.next;
+                }
+            }
+        }
     }
 }
