@@ -20,7 +20,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         putValue(hash(key), key, value);
     }
 
-
     @Override
     public V getValue(K key) {
         Node<K, V> node = table[indexFor(hash(key))];
