@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
@@ -36,15 +38,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = findIndex(key);
-        Node<K, V> node = table[index];
-        while (node != null) {
-            if (node.key == key || node.key != null && node.key.equals(key)) {
-                return node.value;
-            }
-            node = node.next;
-        }
-        return null;
+        Node<K, V> node = findNodeTheByKey(key);
+        return node == null ? null : node.value;
     }
 
     @Override
@@ -77,16 +72,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean isKeyPresent(Node<K, V> node, int index) {
-        Node<K, V> tempNode = table[index];
-        while (tempNode != null) {
-            if (tempNode.key == node.key
-                    || tempNode.key != null && tempNode.key.equals(node.key)) {
-                tempNode.value = node.value;
-                return true;
-            }
-            tempNode = tempNode.next;
+        Node<K, V> tempNode = findNodeTheByKey(node.key);
+        if (tempNode != null) {
+            tempNode.value = node.value;
+            return true;
         }
         return false;
+    }
+
+    private Node<K, V> findNodeTheByKey(K key) {
+        int index = findIndex(key);
+        for (Node<K, V> node = table[index]; node != null; node = node.next) {
+            if (Objects.equals(node.key, key)) {
+                return node;
+            }
+        }
+        return null;
     }
 
     private class Node<K, V> {
