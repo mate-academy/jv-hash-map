@@ -20,18 +20,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> newNode = new Node<>(key, value);
         Node<K, V> current = table[index];
         if (current == null) {
-            table[bucketIndex(key)] = newNode;
+            table[index] = newNode;
             size++;
         }
         while (current != null) {
             if (current.key == key || current.key != null && current.key.equals(key)) {
                 current.value = value;
-                break;
+               return;
             }
             if (current.next == null) {
                 current.next = newNode;
                 size++;
-                break;
+                return;
             }
             current = current.next;
         }
