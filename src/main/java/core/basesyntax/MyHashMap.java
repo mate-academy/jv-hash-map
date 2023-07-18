@@ -19,8 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int index = bucketIndex(hash(key));
         Node<K, V> node = table[index];
-        while (key == null && node.key != null || node.key == null
-                && key != null || node.key != null && !node.key.equals(key)) {
+        while (node.key != key && (node.key == null || !node.key.equals(key))) {
             node = node.next;
         }
         return node.value;
