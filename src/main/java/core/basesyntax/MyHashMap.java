@@ -9,18 +9,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K,V>[] table;
     private int size;
 
+    public MyHashMap() {
+        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
+    }
+
     @Override
     public void put(K key, V value) {
-        int index;
+        int index = getIndex(key);
         Node<K,V> tail = null;
-        Node<K,V> newNode = new Node<>(hash(key), key, value, null);
+        Node<K,V> newNode = new Node<>(key, value);
         if (size == threshold) {
             resize();
-        }
-        if (key == null) {
-            index = 0;
-        } else {
-            index = Math.abs(key.hashCode() % capacity);
         }
         Node<K,V> currentNode = table[index];
         if (table[index] == null) {
@@ -44,17 +44,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index;
-        if (size == 0) {
-            return null;
-        }
-        if (key == null) {
-            index = 0;
-        } else {
-            index = Math.abs(key.hashCode() % capacity);
-        }
+        int index = getIndex(key);
         Node<K,V> currentNode = table[index];
-
         while (currentNode != null) {
             if (currentNode.key == key || currentNode.key != null && currentNode.key.equals(key)) {
                 return currentNode.value;
@@ -70,42 +61,37 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K,V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K,V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
-    }
-
-    private int hash(Object key) {
-        return (key == null) ? 0 : key.hashCode();
     }
 
     private Node<K,V> [] resize() {
-        Node<K,V>[] oldTab = table;
+        final Node<K,V>[] oldTable = table;
         Node<K,V> currentNode;
-        if (table == null) {
-            threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
-            return table = new Node[DEFAULT_INITIAL_CAPACITY];
-        } else {
-            size = 0;
-            capacity *= CAPACITY_MULTIPLIER;
-            threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
-            table = new Node[capacity];
-            for (int i = 0; i < oldTab.length; i++) {
-                currentNode = oldTab[i];
-                while (currentNode != null) {
-                    put(currentNode.key, currentNode.value);
-                    currentNode = currentNode.next;
-                }
+        size = 0;
+        capacity *= CAPACITY_MULTIPLIER;
+        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
+        table = new Node[capacity];
+        for (int i = 0; i < oldTable.length; i++) {
+            currentNode = oldTable[i];
+            while (currentNode != null) {
+                put(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
             }
         }
         return table;
+    }
+
+    private int getIndex(K key) {
+        if (key == null) {
+            return 0;
+        }
+        return Math.abs(key.hashCode() % capacity);
     }
 }
