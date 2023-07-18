@@ -19,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         Node<K, V> existingNode = getNodeByKey(key);
-        if (getNodeByKey(key) != null) {
+        if (existingNode != null) {
             existingNode.value = value;
         } else {
             addNode(key, value, getIndexByKey(key));
