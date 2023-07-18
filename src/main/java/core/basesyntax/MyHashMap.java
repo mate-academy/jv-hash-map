@@ -4,14 +4,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final int GROWTH_FACTOR = 2;
     private static final float LOAD_FACTOR = 0.75f;
-    private int capacity;
     private int threshold;
     private Node<K, V>[] buckets;
     private int size;
 
     public MyHashMap() {
         this.buckets = new Node[INITIAL_CAPACITY];
-        this.capacity = INITIAL_CAPACITY;
         this.threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
     }
 
@@ -20,11 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        if (key == null) {
-            putForNullKey(value);
-            return;
-        }
-        int index = getIndexOfNodeByKey(key);
+        int index = getIndexByKey(key);
         Node<K, V> node = buckets[index];
         while (node != null) {
             if (keyEquals(node.key, key)) {
@@ -38,16 +32,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
-            return getValueForNullKey();
-        }
-        int index = getIndexOfNodeByKey(key);
-        Node<K, V> node = buckets[index];
-        while (node != null) {
-            if (keyEquals(node.key, key)) {
-                return node.value;
+        int index = getIndexByKey(key);
+        Node<K, V> currentNode = buckets[index];
+        while (currentNode != null) {
+            if (keyEquals(currentNode.key, key)) {
+                return currentNode.value;
             }
-            node = node.next;
+            currentNode = currentNode.next;
         }
         return null;
     }
@@ -57,62 +48,43 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void putForNullKey(V value) {
-        Node<K, V> node = buckets[0];
-        while (node != null) {
-            if (node.key == null) {
-                node.value = value;
-                return;
-            }
-            node = node.next;
-        }
-        addNode(null, value, 0);
-    }
-
     private void addNode(K key, V value, int index) {
         Node<K, V> newNode = new Node<>(key, value);
-        newNode.next = buckets[index];
-        buckets[index] = newNode;
+        Node<K, V> node = buckets[index];
+        if (node == null) {
+            buckets[index] = newNode;
+        } else {
+            while (node.next != null) {
+                node = node.next;
+            }
+            node.next = newNode;
+        }
         size++;
     }
 
     private void resize() {
-        capacity = capacity * GROWTH_FACTOR;
-        threshold = (int) (capacity * LOAD_FACTOR);
-        Node<K, V>[] newBuckets = new Node[capacity];
-        for (Node<K, V> node : buckets) {
+        Node<K, V>[] oldTable = buckets;
+        buckets = new Node[oldTable.length * GROWTH_FACTOR];
+        size = 0;
+        for (Node<K, V> node : oldTable) {
             while (node != null) {
-                Node<K, V> next = node.next;
-                int index = getIndexOfNodeByKey(node.key);
-                node.next = newBuckets[index];
-                newBuckets[index] = node;
-                node = next;
+                put(node.key, node.value);
+                node = node.next;
             }
         }
-        buckets = newBuckets;
+        threshold = (int) (buckets.length * LOAD_FACTOR);
     }
 
-    private V getValueForNullKey() {
-        Node<K, V> node = buckets[0];
-        while (node != null) {
-            if (node.key == null) {
-                return node.value;
-            }
-            node = node.next;
-        }
-        return null;
-    }
-
-    private int getIndexOfNodeByKey(K key) {
+    private int getIndexByKey(K key) {
         int hash = key == null ? 0 : Math.abs(key.hashCode());
-        return hash % capacity;
+        return hash % buckets.length;
     }
 
     private boolean keyEquals(K key1, K key2) {
         return key1 == null ? key2 == null : key1.equals(key2);
     }
 
-    private static class Node<K, V> {
+    private class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
