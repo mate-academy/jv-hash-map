@@ -23,15 +23,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int newNodePos = getBucketPos(hash(key));
         if (bucketList[newNodePos] == null) {
             bucketList[newNodePos] = newNode;
-            size++;
         } else {
             Node<K,V> existingNode = bucketList[newNodePos];
             while (existingNode.next != null) {
                 existingNode = existingNode.next;
             }
             existingNode.next = newNode;
-            size++;
         }
+        size++;
     }
 
     @Override
@@ -105,24 +104,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return false;
     }
 
-    //TODO: optimise this method
     private Node<K,V> getNode(int hash, K key) {
-        Node<K,V> searchedNode;
+        Node<K,V> searchedNode = null;
         if (capacity != 0 && bucketList[getBucketPos(hash)] != null) {
             searchedNode = bucketList[getBucketPos(hash)];
 
-            if (compareNodeHashAndKey(searchedNode, hash, key)) {
-                return searchedNode;
-            } else {
-                while (searchedNode.next != null) {
-                    searchedNode = searchedNode.next;
-                    if (compareNodeHashAndKey(searchedNode, hash, key)) {
-                        return searchedNode;
-                    }
+            while (!compareNodeHashAndKey(searchedNode, hash, key)) {
+                if ((searchedNode = searchedNode.next) == null) {
+                    break;
                 }
             }
         }
-        return null;
+        return searchedNode;
     }
 
     private boolean compareNodeHashAndKey(Node<K,V> node, int hash, K key) {
@@ -140,6 +133,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (hash < 0 ? hash * -1 : hash) % capacity;
     }
 
+//    private void putNode(Node<K,V> node) {
+//        if (containsKey(node.key)) {
+//            Node<K,V> existingNode = getNode(hash(node.key), node.key);
+//            existingNode.setValue(node.value);
+//            return;
+//        }
+//        resize();
+//        int newNodePos = getBucketPos(hash(node.key));
+//        if (bucketList[newNodePos] == null) {
+//            bucketList[newNodePos] = node;
+//        } else {
+//            Node<K,V> existingNode = bucketList[newNodePos];
+//            while (existingNode.next != null) {
+//                existingNode = existingNode.next;
+//            }
+//            existingNode.next = node;
+//        }
+//    }
+
     private void put(Node<K,V> node) {
         put(node.getKey(), node.getValue());
     }
@@ -152,11 +164,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         if (size >= threshold && threshold > 0) {
             int oldCapacity = capacity;
-//            int oldThreshold = threshold;
             capacity = capacity << 1;
             threshold = (int) (capacity * LOAD_FACTOR);
             Node<K,V>[] oldBucketList = bucketList;
-//            Node<K,V>[] newBucketList = (Node<K,V>[]) new Node[newCapacity];
             bucketList = (Node<K,V>[]) new Node[capacity];
             Node<K,V> curNode;
             for (int i = 0; i < oldCapacity; i++) {
