@@ -71,19 +71,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void fillResizedHashMap(Node<K, V>[] oldTable) {
         for (Node<K, V> node : oldTable) {
-            if (node != null) {
+            while (node != null) {
                 put(node.key, node.value);
-                while (node.next != null) {
-                    node = node.next;
-                    put(node.key, node.value);
-                }
+                node = node.next;
             }
         }
     }
 
     private int getKeyIndex(K key) {
         int keyHashCode = (key == null) ? 0 : key.hashCode();
-        return ((keyHashCode >= 0) ? keyHashCode : keyHashCode * -1) % table.length;
+        return Math.abs(keyHashCode) % table.length;
     }
 
     private class Node<K, V> {
@@ -91,7 +88,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        Node(K key, V value) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
         }
