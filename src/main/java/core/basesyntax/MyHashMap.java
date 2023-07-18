@@ -25,6 +25,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[tableIndex] == null) {
             table[tableIndex] = tempNode;
         } else if (isKeyPresent(tempNode)) {
+            Node<K, V> node = findNodeByTheKey(key);
+            node.value = tempNode.value;
             return;
         } else {
             Node<K, V> node = table[tableIndex];
@@ -38,7 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = findNodeTheByKey(key);
+        Node<K, V> node = findNodeByTheKey(key);
         return node == null ? null : node.value;
     }
 
@@ -72,15 +74,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean isKeyPresent(Node<K, V> node) {
-        Node<K, V> tempNode = findNodeTheByKey(node.key);
-        if (tempNode != null) {
-            tempNode.value = node.value;
-            return true;
-        }
-        return false;
+        Node<K, V> tempNode = findNodeByTheKey(node.key);
+        return tempNode != null;
     }
 
-    private Node<K, V> findNodeTheByKey(K key) {
+    private Node<K, V> findNodeByTheKey(K key) {
         int index = findIndex(key);
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
             if (Objects.equals(node.key, key)) {
