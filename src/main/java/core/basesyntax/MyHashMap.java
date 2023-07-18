@@ -9,8 +9,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        this.buckets = new Node[INITIAL_CAPACITY];
-        this.threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
+        buckets = new Node[INITIAL_CAPACITY];
+        threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
@@ -18,29 +18,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        int index = getIndexByKey(key);
-        Node<K, V> node = buckets[index];
-        while (node != null) {
-            if (keyEquals(node.key, key)) {
-                node.value = value;
-                return;
-            }
-            node = node.next;
+        Node<K, V> existingNode = getNodeByKey(key);
+        if (getNodeByKey(key) != null) {
+            existingNode.value = value;
+        } else {
+            addNode(key, value, getIndexByKey(key));
         }
-        addNode(key, value, index);
     }
 
     @Override
     public V getValue(K key) {
-        int index = getIndexByKey(key);
-        Node<K, V> currentNode = buckets[index];
-        while (currentNode != null) {
-            if (keyEquals(currentNode.key, key)) {
-                return currentNode.value;
-            }
-            currentNode = currentNode.next;
-        }
-        return null;
+        Node<K,V> existingNode = getNodeByKey(key);
+        return existingNode == null ? null : existingNode.value;
     }
 
     @Override
@@ -48,16 +37,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private Node<K, V> getNodeByKey(K key) {
+        int index = getIndexByKey(key);
+        Node<K, V> currentNode = buckets[index];
+        while (currentNode != null) {
+            if (areKeysEqual(currentNode.key, key)) {
+                return currentNode;
+            }
+            currentNode = currentNode.next;
+        }
+        return null;
+    }
+
     private void addNode(K key, V value, int index) {
         Node<K, V> newNode = new Node<>(key, value);
-        Node<K, V> node = buckets[index];
-        if (node == null) {
+        Node<K, V> currentNode = buckets[index];
+        if (currentNode == null) {
             buckets[index] = newNode;
         } else {
-            while (node.next != null) {
-                node = node.next;
+            while (currentNode.next != null) {
+                currentNode = currentNode.next;
             }
-            node.next = newNode;
+            currentNode.next = newNode;
         }
         size++;
     }
@@ -80,8 +81,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return hash % buckets.length;
     }
 
-    private boolean keyEquals(K key1, K key2) {
-        return key1 == null ? key2 == null : key1.equals(key2);
+    private boolean areKeysEqual(K firstKey, K secondKey) {
+        return firstKey == null ? secondKey == null : firstKey.equals(secondKey);
     }
 
     private class Node<K, V> {
