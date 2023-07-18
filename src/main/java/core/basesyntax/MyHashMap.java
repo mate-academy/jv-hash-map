@@ -23,6 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> newNode = new Node<>(key, value);
             hashTable[index] = newNode;
             size++;
+            return;
         }
         Node<K, V> node = hashTable[index];
         while (node != null) {
