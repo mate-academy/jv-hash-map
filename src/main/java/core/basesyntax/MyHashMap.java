@@ -11,7 +11,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K,V>[] table;
 
     public MyHashMap() {
-        createNewTable();
+        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        threshold = (int)(DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
@@ -19,11 +20,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        int index = getIndex(key);
-        Node<K, V> indexNode = table[index];
-        Node<K, V> newNode = new Node<>(getHash(key), key, value, null);
+        Node<K, V> indexNode = table[getIndex(key)];
+        Node<K, V> newNode = new Node<>(getHash(key), key, value);
         if (indexNode == null) {
-            table[index] = newNode;
+            table[getIndex(key)] = newNode;
         } else {
             Node<K, V> previousNode = null;
             while (indexNode != null) {
@@ -42,13 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> node = getNode(key);
-        if (node == null) {
-            return null;
-        }
-        while (!Objects.equals(node.key, key)) {
-            node = node.next;
-        }
-        return node.value;
+        return node == null ? null : node.value;
     }
 
     @Override
@@ -57,12 +51,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> getNode(Object key) {
-        return table[getIndex(key)];
+        Node<K, V> node = table[getIndex(key)];
+        if (node == null) {
+            return null;
+        }
+        while (!Objects.equals(node.key, key)) {
+            node = node.next;
+        }
+        return node;
     }
 
     private int getIndex(Object key) {
-        int index = Math.abs(getHash(key) % table.length);
-        return index;
+        return Math.abs(getHash(key) % table.length);
     }
 
     private int getHash(Object key) {
@@ -72,8 +72,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         size = 0;
         Node<K, V>[] oldInnerArray = table;
-        table = new Node[table.length * SIZE_MULTIPLIER];
-        threshold = (int) (table.length * LOAD_FACTOR);
+        int newNewTableCapacity = (int) (table.length * SIZE_MULTIPLIER);
+        table = new Node[newNewTableCapacity];
+        threshold = (int) (newNewTableCapacity * LOAD_FACTOR);
         for (Node<K, V> node : oldInnerArray) {
             while (node != null) {
                 put(node.key, node.value);
@@ -82,24 +83,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private Node<K, V>[] createNewTable() {
-        Node<K, V>[] initialNodeArray = new Node[DEFAULT_CAPACITY];
-        table = initialNodeArray;
-        threshold = (int) (table.length * LOAD_FACTOR);
-        return initialNodeArray;
-    }
-
     private class Node<K, V> {
         private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
+        public Node(int hash, K key, V value) {
             this.hash = hash;
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
