@@ -89,7 +89,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return initialNodeArray;
     }
 
-    static class Node<K, V> {
+    private class Node<K, V> {
         private int hash;
         private K key;
         private V value;
