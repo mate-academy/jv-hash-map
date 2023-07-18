@@ -26,12 +26,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         while (current != null) {
             if (current.key == key || current.key != null && current.key.equals(key)) {
                 current.value = value;
-               return;
+                break;
             }
             if (current.next == null) {
                 current.next = newNode;
                 size++;
-                return;
+                break;
             }
             current = current.next;
         }
