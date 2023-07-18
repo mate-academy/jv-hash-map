@@ -3,9 +3,15 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_RESIZE_MULTIPLIER = 2;
     private int threshold;
     private Node<K,V>[] table;
     private int size;
+
+    public MyHashMap() {
+        table = (Node<K,V>[])new Node[DEFAULT_INITIAL_CAPACITY];
+        threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
+    }
 
     @Override
     public void put(K key, V value) {
@@ -18,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         int hash = hash(key);
-        int index = bucketIndex(hash);
+        int index = getBucketIndex(hash);
         Node<K, V> node = table[index];
         while (node != null) {
             if ((node.hash == hash)
@@ -35,27 +41,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private class Node<K, V> {
-        private int hash;
-        private K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     private V putValue(int hash, K key, V value) {
         Node<K,V> node = new Node<>(hash, key, value, null);
-        if (table == null || table.length == 0) {
-            table = (Node<K,V>[])new Node[DEFAULT_INITIAL_CAPACITY];
-            threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
-        }
-        int index = bucketIndex(hash);
+        int index = getBucketIndex(hash);
         if (table[index] == null) {
             table[index] = node;
             size++;
@@ -75,12 +63,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = table;
         table = (Node<K,V>[]) new Node[newCapacity];
         for (Node<K, V> node : oldTable) {
-            if (node != null) {
+            while (node != null) {
                 put(node.key, node.value);
-                while (node.next != null) {
-                    node = node.next;
-                    put(node.key, node.value);
-                }
+                node = node.next;
             }
         }
     }
@@ -89,12 +74,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : key.hashCode();
     }
 
-    private int bucketIndex(int hash) {
+    private int getBucketIndex(int hash) {
         return Math.abs(hash % table.length);
     }
 
     private V addIfBucketIsNotEmpty(int hash, Node<K, V> newNode) {
-        int index = bucketIndex(hash);
+        int index = getBucketIndex(hash);
         Node<K, V> node = table[index];
         while (node != null) {
             if ((newNode.key == node.key)
@@ -111,5 +96,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         node.next = newNode;
         size++;
         return newNode.value;
+    }
+
+    private class Node<K, V> {
+        private int hash;
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(int hash, K key, V value, Node<K, V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
