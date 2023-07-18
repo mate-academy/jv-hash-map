@@ -1,14 +1,14 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    static final float LOAD_FACTOR = 0.75f;
     static final int DEFAULT_INITIAL_CAPACITY = 16;
     static final int GROWTH_FACTOR = 2;
     private int size;
     private Node<K, V>[] mapArray;
 
     public MyHashMap() {
-        this.mapArray = new Node[DEFAULT_INITIAL_CAPACITY];
+        mapArray = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
     @Override
@@ -20,20 +20,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node oldNode = mapArray[getIndex(key)];
+        Node<K, V> oldNode = mapArray[getIndex(key)];
         if (oldNode == null) {
             return null;
         }
         while (true) {
-            if (isEqual((K) oldNode.key, key)) {
-                return (V) oldNode.value;
-            } else {
-                if (oldNode.next == null) {
-                    return null;
-                } else {
-                    oldNode = oldNode.next;
-                }
+            if (areKeysEqual(oldNode.key, key)) {
+                return oldNode.value;
             }
+            if (oldNode.next == null) {
+                return null;
+            }
+            oldNode = oldNode.next;
         }
     }
 
@@ -43,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resizeIfFull() {
-        if (mapArray.length * DEFAULT_LOAD_FACTOR == size) {
+        if (mapArray.length * LOAD_FACTOR == size) {
             resize();
         }
     }
@@ -60,11 +58,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void insert(int index, Node newNode, K key, V value) {
+    private void insert(int index, Node<K, V> newNode, K key, V value) {
         if (mapArray[index] != null) {
-            Node oldNode = mapArray[index];
+            Node<K, V> oldNode = mapArray[index];
             while (true) {
-                if (isEqual((K) oldNode.key, key)) {
+                if (areKeysEqual(oldNode.key, key)) {
                     oldNode.value = value;
                     return;
                 }
@@ -83,15 +81,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    final int getIndex(K key) {
+    private int getIndex(K key) {
         if (key == null) {
             return 0;
-        } else {
-            return Math.abs(key.hashCode() % mapArray.length);
         }
+        return Math.abs(key.hashCode() % mapArray.length);
     }
 
-    final boolean isEqual(K firstKey, K secondKey) {
+    private boolean areKeysEqual(K firstKey, K secondKey) {
         return firstKey == secondKey || firstKey != null && firstKey.equals(secondKey);
     }
 
@@ -100,7 +97,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
