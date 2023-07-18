@@ -20,13 +20,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resizeHashMap();
         }
-        Node<K, V> newNode = new Node<>(key, value, null);
-        int keyIndex = getIndexOfNode(newNode);
+        Node<K, V> newNode = new Node<>(key, value);
+        int keyIndex = getIndexOfNode(hashCodeOfKey(key));
         Node<K, V> currentNode = table[keyIndex];
         if (currentNode == null) {
             table[keyIndex] = newNode;
         } else {
-            while (true) {
+            while (currentNode != null) {
                 if (Objects.equals(currentNode.key, key)) {
                     currentNode.value = value;
                     return;
@@ -42,7 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int indexNodetoFind = getIndexOfNode(new Node<>(key, null, null));
+        int indexNodetoFind = getIndexOfNode(hashCodeOfKey(key));
         Node<K, V> currentNode = table[indexNodetoFind];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
@@ -58,8 +58,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getIndexOfNode(Node<K, V> node) {
-        return node.hash % table.length;
+    private int getIndexOfNode(int hash) {
+        return hash % table.length;
     }
 
     private void resizeHashMap() {
@@ -80,21 +80,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private int hashCodeOfKey(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode());
+    }
+
     private static class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        private Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
-            this.hash = hashCode();
-        }
-
-        public int hashCode() {
-            return key == null ? 0 : Math.abs(key.hashCode());
         }
     }
 }
