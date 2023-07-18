@@ -17,24 +17,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
     }
 
-    private void resizeHashMap() {
-        capacity *= DEFAULT_RESIZE_VALUE;
-        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
-        Node<K, V>[] oldtable = table;
-        table = (Node<K, V>[]) new Node[capacity];
-        size = 0;
-
-        for (int i = 0; i < oldtable.length; ++i) {
-            if (oldtable[i] != null) {
-                Node<K, V> currentNode = oldtable[i];
-                while (currentNode != null) {
-                    put(currentNode.key, currentNode.value);
-                    currentNode = currentNode.next;
-                }
-            }
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         if (size == threshold) {
@@ -60,10 +42,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         ++size;
     }
 
-    private int getIndexOfKeyNode(Node<K, V> node) {
-        return node.hash % capacity;
-    }
-
     @Override
     public V getValue(K key) {
         int findIndexNode = getIndexOfKeyNode(new Node<>(key, null, null));
@@ -80,6 +58,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private int getIndexOfKeyNode(Node<K, V> node) {
+        return node.hash % capacity;
+    }
+
+    private void resizeHashMap() {
+        capacity *= DEFAULT_RESIZE_VALUE;
+        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
+        Node<K, V>[] oldtable = table;
+        table = (Node<K, V>[]) new Node[capacity];
+        size = 0;
+
+        for (int i = 0; i < oldtable.length; ++i) {
+            if (oldtable[i] != null) {
+                Node<K, V> currentNode = oldtable[i];
+                while (currentNode != null) {
+                    put(currentNode.key, currentNode.value);
+                    currentNode = currentNode.next;
+                }
+            }
+        }
     }
 
     private static class Node<K, V> {
