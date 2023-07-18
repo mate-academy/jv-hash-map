@@ -23,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void putValue(int hash, K key, V value) {
         int index = indexFor(hash);
         for (Node<K, V> n = table[index]; n != null; n = n.next) {
-            if ((key == n.key) || (key != null && key.equals(n.key))) {
+            if (Objects.equals(key, n.key)) {
                 n.value = value;
                 return;
             }
