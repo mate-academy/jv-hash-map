@@ -17,21 +17,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if (size >= threshold) {
+            resize();
+        }
         if (key == null) {
             putForNullKey(value);
             return;
         }
-        if (size >= threshold) {
-            resize();
-        }
-        int index = getIndex(key);
-        Node<K, V> bucket = buckets[index];
-        while (bucket != null) {
-            if (keyEquals(bucket.key, key)) {
-                bucket.value = value;
+        int index = getIndexOfNodeByKey(key);
+        Node<K, V> node = buckets[index];
+        while (node != null) {
+            if (keyEquals(node.key, key)) {
+                node.value = value;
                 return;
             }
-            bucket = bucket.next;
+            node = node.next;
         }
         addNode(key, value, index);
     }
@@ -41,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return getValueForNullKey();
         }
-        int index = getIndex(key);
+        int index = getIndexOfNodeByKey(key);
         Node<K, V> node = buckets[index];
         while (node != null) {
             if (keyEquals(node.key, key)) {
@@ -83,7 +83,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> node : buckets) {
             while (node != null) {
                 Node<K, V> next = node.next;
-                int index = getIndex(node.key);
+                int index = getIndexOfNodeByKey(node.key);
                 node.next = newBuckets[index];
                 newBuckets[index] = node;
                 node = next;
@@ -93,17 +93,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private V getValueForNullKey() {
-        Node<K, V> bucket = buckets[0];
-        while (bucket != null) {
-            if (bucket.key == null) {
-                return bucket.value;
+        Node<K, V> node = buckets[0];
+        while (node != null) {
+            if (node.key == null) {
+                return node.value;
             }
-            bucket = bucket.next;
+            node = node.next;
         }
         return null;
     }
 
-    private int getIndex(K key) {
+    private int getIndexOfNodeByKey(K key) {
         int hash = key == null ? 0 : Math.abs(key.hashCode());
         return hash % capacity;
     }
