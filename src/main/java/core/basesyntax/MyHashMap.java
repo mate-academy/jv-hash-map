@@ -6,33 +6,35 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private static final int RESIZE_COEFFICIENT = 2;
-    private int capacity;
     private int threshold;
     private int size;
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        capacity = INITIAL_CAPACITY;
-        threshold = (int) (capacity * LOAD_FACTOR);
         table = new Node[INITIAL_CAPACITY];
+        threshold = (int) (table.length * LOAD_FACTOR);
+
     }
 
     @Override
     public void put(K key, V value) {
-        resizeIfNecessary();
-        int arrayIndex = getArrayIndex(key);
+        resizeIfSizeEqualsThreshold();
+        int arrayIndex = getKeyIndex(key);
         Node<K, V> indexNode = table[arrayIndex];
         if (indexNode != null) {
-            Node<K, V> lastNode = null;
-            while (indexNode != null) {
-                if (Objects.equals(indexNode.key, key)) {
-                    indexNode.value = value;
+            if (Objects.equals(indexNode.key, key)) {
+                indexNode.value = value;
+                return;
+            }
+            while (indexNode.next != null) {
+                if (Objects.equals(indexNode.next.key, key)) {
+                    indexNode.next.value = value;
                     return;
                 }
-                lastNode = indexNode;
                 indexNode = indexNode.next;
             }
-            lastNode.next = new Node<>(key, value);
+
+            indexNode.next = new Node<>(key, value);
         } else {
             table[arrayIndex] = new Node<>(key, value);
         }
@@ -41,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> tableNode = table[getArrayIndex(key)];
+        Node<K, V> tableNode = table[getKeyIndex(key)];
         while (tableNode != null) {
             if (Objects.equals(tableNode.key, key)) {
                 return tableNode.value;
@@ -56,15 +58,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resizeIfNecessary() {
-        if (size < threshold) {
+    private void resizeIfSizeEqualsThreshold() {
+        if (size != threshold) {
             return;
         }
-        capacity *= RESIZE_COEFFICIENT;
         threshold *= RESIZE_COEFFICIENT;
         Node<K, V>[] oldTable = table;
-        table = new Node[capacity];
+        table = new Node[table.length * RESIZE_COEFFICIENT];
         size = 0;
+        fillResizedHashMap(oldTable);
+    }
+
+    private void fillResizedHashMap(Node<K, V>[] oldTable) {
         for (Node<K, V> node : oldTable) {
             if (node != null) {
                 put(node.key, node.value);
@@ -76,9 +81,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getArrayIndex(K key) {
-        return ((key == null) ? 0 :
-                (key.hashCode() >= 0) ? key.hashCode() : key.hashCode() * -1) % capacity;
+    private int getKeyIndex(K key) {
+        int keyHashCode = (key == null) ? 0 : key.hashCode();
+        return ((keyHashCode >= 0) ? keyHashCode : keyHashCode * -1) % table.length;
     }
 
     private class Node<K, V> {
