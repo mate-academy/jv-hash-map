@@ -61,7 +61,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return 0;
         }
-        int hashCode = key.hashCode();
         return Math.abs(key.hashCode()) % table.length;
     }
 
