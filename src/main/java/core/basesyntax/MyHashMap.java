@@ -20,6 +20,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         putValue(hash(key), key, value);
     }
 
+
+    @Override
+    public V getValue(K key) {
+        Node<K, V> node = table[indexFor(hash(key))];
+        while (node != null) {
+            if (Objects.equals(key, node.key)) {
+                return node.value;
+            }
+            node = node.next;
+        }
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
     private void putValue(int hash, K key, V value) {
         int index = indexFor(hash);
         for (Node<K, V> n = table[index]; n != null; n = n.next) {
@@ -46,28 +64,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return (key == null) ? 0 : key.hashCode() & (table.length - 1);
+        return (key == null) ? 0 : key.hashCode();
     }
 
     private int indexFor(int hash) {
         return hash & (table.length - 1);
-    }
-
-    @Override
-    public V getValue(K key) {
-        Node<K, V> node = table[indexFor(hash(key))];
-        while (node != null) {
-            if (Objects.equals(key, node.key)) {
-                return node.value;
-            }
-            node = node.next;
-        }
-        return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
     }
 
     private static class Node<K, V> {
