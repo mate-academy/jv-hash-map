@@ -48,7 +48,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putValue(int index, K key, V value) {
-        if (size + 1 > threshold) {
+        if (size == threshold) {
             resize();
         }
         Node<K, V> node = table[index];
@@ -59,7 +59,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (compareKeys(currentKey, key)) {
                 node.value = value;
                 return;
-            } else if (node.next == null) {
+            }
+            if (node.next == null) {
                 node.next = newNode;
                 size++;
                 return;
@@ -70,8 +71,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private boolean compareKeys(K fistKey, K secondKey) {
-        return fistKey == secondKey || (fistKey != null && fistKey.equals(secondKey));
+    private boolean compareKeys(K firstKey, K secondKey) {
+        return firstKey == secondKey || (firstKey != null && firstKey.equals(secondKey));
     }
 
     private void resize() {
@@ -85,8 +86,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void transferNodesFromOldTable(Node[] oldTable) {
-        for (int i = 0; i < oldTable.length; i++) {
-            Node<K, V> currentNode = oldTable[i];
+        for (Node<K, V> currentNode : oldTable) {
             while (currentNode != null) {
                 put(currentNode.key, currentNode.value);
                 currentNode = currentNode.next;
