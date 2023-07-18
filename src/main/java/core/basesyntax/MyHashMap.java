@@ -13,8 +13,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         hashTable = new Node[DEFAULT_CAPACITY];
         threshHold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
-
-
     }
 
     @Override
@@ -39,8 +37,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         hashTable[index] = newNode;
         size++;
     }
-
-
 
     @Override
     public V getValue(K key) {
