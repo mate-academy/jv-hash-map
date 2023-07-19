@@ -23,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (indexNode == null) {
             table[getIndex(key)] = newNode;
         } else {
-            getLastNode(key, value, indexNode, newNode);
+            putAtTheEnd(key, value, indexNode, newNode);
         }
         size++;
     }
@@ -50,7 +50,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return node;
     }
 
-    private void getLastNode(K key, V value, Node<K, V> indexNode, Node<K, V> newNode) {
+    private void putAtTheEnd(K key, V value, Node<K, V> indexNode, Node<K, V> newNode) {
         Node<K, V> previousNode = null;
         while (indexNode != null) {
             if (Objects.equals(indexNode.key, key)) {
