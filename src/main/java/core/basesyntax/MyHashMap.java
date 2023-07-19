@@ -3,7 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-
+    private static final int RESIZE_FACTOR = 2;
     private Node<K, V>[] hashTable;
     private int size;
     private int threshold;
@@ -21,14 +21,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int hash = hashCode(key);
         int index = indexFor(hash, hashTable.length);
-
-        for (Node<K, V> node = hashTable[index]; node != null; node = node.next) {
-            if (node.hash == hash && (key.equals(node.key))) {
-                node.value = value;
-                return;
-            }
+        Node<K, V> node = findNodeByKey(key, hash, index);
+        if (node != null) {
+            node.value = value;
+        } else {
+            addNode(hash, key, value, index);
         }
-        addNode(hash, key, value, index);
     }
 
     @Override
@@ -36,16 +34,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return getForNullKey();
         }
-
         int hash = hashCode(key);
         int index = indexFor(hash, hashTable.length);
-
-        for (Node<K, V> node = hashTable[index]; node != null; node = node.next) {
-            if (node.hash == hash && (key.equals(node.key))) {
-                return node.value;
-            }
-        }
-        return null;
+        Node<K, V> node = findNodeByKey(key, hash, index);
+        return (node != null) ? node.value : null;
     }
 
     @Override
@@ -67,8 +59,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void addNode(int hash, K key, V value, int bucketIndex) {
         if (size >= threshold) {
-            resize(2 * hashTable.length);
-            hash = (key != null) ? hashCode(key) : 0;
+            resize(RESIZE_FACTOR * hashTable.length);
+            hash = hashCode(key);
             bucketIndex = indexFor(hash, hashTable.length);
         }
         Node<K, V> newNode = new Node<>(hash, key, value, hashTable[bucketIndex]);
@@ -109,12 +101,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public int hashCode(K key) {
-        if (key == null) {
-            return 0;
+        return 31 * 17 + key.hashCode();
+    }
+
+    private Node<K, V> findNodeByKey(K key, int hash, int index) {
+        for (Node<K, V> node = hashTable[index]; node != null; node = node.next) {
+            if (node.hash == hash && key.equals(node.key)) {
+                return node;
+            }
         }
-        int hash = 17;
-        hash = 31 * hash + key.hashCode();
-        return hash;
+        return null;
     }
 
     private static class Node<K, V> {
