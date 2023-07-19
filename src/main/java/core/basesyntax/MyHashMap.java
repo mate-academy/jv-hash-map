@@ -23,8 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int index = getIndex(key);
         if (table[index] == null) {
-            Node<K, V> newNode = new Node<>(key, value);
-            table[index] = newNode;
+            table[index] = new Node<>(key, value);
             size++;
             return;
         } else {
@@ -37,9 +36,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 tableNode = tableNode.next;
             }
         }
-        Node<K, V> oldNode = table[index];
         Node<K, V> newNode = new Node<>(key, value);
-        newNode.next = oldNode;
+        newNode.next = table[index];
         table[index] = newNode;
         size++;
     }
@@ -62,12 +60,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int capasity = table.length * GROWTH_FACTOR;
-        Node<K, V>[] newTable = new Node[capasity];
+        Node<K, V>[] newTable = new Node[table.length * GROWTH_FACTOR];
         threshold = (int) (newTable.length * DEFAULT_LOAD_FACTOR);
-        Node<K, V>[] oldTable = table;
-        this.table = newTable;
         this.size = DEFAULT_SIZE;
+        copyArray(table);
+    }
+
+    private void copyArray(Node<K, V>[] oldTable) {
+        this.table = new Node[table.length * GROWTH_FACTOR];
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
@@ -86,7 +86,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private int hash;
         private Node<K, V> next;
 
-        public Node(K key, V value) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
         }
