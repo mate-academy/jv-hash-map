@@ -5,23 +5,23 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 16;
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private int threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     private int size;
-    private int capacity = DEFAULT_INITIAL_CAPACITY;
-    private Node<K,V>[] tableNodes = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
+    private Node<K,V>[] tableNodes;
+
+    public MyHashMap() {
+        tableNodes = new Node[DEFAULT_INITIAL_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
-        if (size > threshold) {
-            resizingTableNodes();
+        if (size > tableNodes.length * DEFAULT_LOAD_FACTOR) {
+            resize();
         }
-        final int index = key == null ? 0 : key.getClass().hashCode() % capacity;
-        final int newHash = index == 0 ? 0 : key.getClass().hashCode();
-        final Node<K,V> newNode = new Node<>(newHash, key, value);
-        if (tableNodes[index] == null) {
-            tableNodes[index] = newNode;
+        final Node<K,V> newNode = new Node<>(key, value);
+        if (tableNodes[getIndex(key)] == null) {
+            tableNodes[getIndex(key)] = newNode;
         } else {
-            Node<K,V> node = tableNodes[index];
+            Node<K,V> node = tableNodes[getIndex(key)];
             while (node.next != null || Objects.equals(key, node.key)) {
                 if (Objects.equals(key, node.key)) {
                     node.value = value;
@@ -29,18 +29,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 node = node.next;
             }
-            searchLastNode(tableNodes[index]).next = newNode;
+            searchLastNode(tableNodes[getIndex(key)]).next = newNode;
         }
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        final int index = key == null ? 0 : key.getClass().hashCode() % capacity;
-        if (tableNodes[index] == null) {
+        if (tableNodes[getIndex(key)] == null) {
             return null;
         }
-        Node<K,V> node = tableNodes[index];
+        Node<K,V> node = tableNodes[getIndex(key)];
         while (node.next != null || Objects.equals(key, node.key)) {
             if (Objects.equals(key, node.key)) {
                 return node.value;
@@ -56,49 +55,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     static class Node<K,V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K,V> next;
 
-        public Node(int hash, K key, V value) {
-            this.hash = hash;
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
         }
     }
 
-    private void resizingTableNodes() {
-        Node<K,V>[] newNodes = (Node<K, V>[]) new Node[capacity + DEFAULT_INITIAL_CAPACITY];
-        final int lengthOld = capacity;
-        int newIndex;
-        capacity = capacity + DEFAULT_INITIAL_CAPACITY;
-        for (int i = 0; i < lengthOld; i++) {
-            if (tableNodes[i] != null) {
-                while (tableNodes[i].next != null) {
-                    newIndex = tableNodes[i].hash % capacity;
-                    Node<K,V> newNode = new Node<>(tableNodes[i].hash, tableNodes[i].key,
-                            tableNodes[i].value);
-                    if (newNodes[newIndex] == null) {
-                        newNodes[newIndex] = newNode;
-                    } else {
-                        Node<K,V> firstNode = newNodes[newIndex];
-                        searchLastNode(firstNode).next = newNode;
-                    }
-                    tableNodes[i] = tableNodes[i].next;
-                    if (tableNodes[i].next == null) {
-                        newNode = new Node<>(tableNodes[i].hash, tableNodes[i].key,
-                                tableNodes[i].value);
-                        Node<K,V> firstNode = newNodes[newIndex];
-                        searchLastNode(firstNode).next = newNode;
-
-                    }
-                }
-
+    private void resize() {
+        Node<K,V>[] oldTable = tableNodes;
+        tableNodes = (Node<K, V>[]) new Node[oldTable.length + DEFAULT_INITIAL_CAPACITY];
+        size = 0;
+        for (int i = 0; i < oldTable.length; i++) {
+            while (oldTable[i] != null) {
+                put(oldTable[i].key, oldTable[i].value);
+                oldTable[i] = oldTable[i].next;
             }
         }
-        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
-        tableNodes = newNodes;
     }
 
     private Node<K,V> searchLastNode(Node<K,V> firstNode) {
@@ -109,5 +85,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             firstNode = firstNode.next;
         }
         return firstNode;
+    }
+
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % tableNodes.length;
     }
 }
