@@ -20,9 +20,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         resize();
         Node<K,V> newNode = new Node<>(hash(key), key, value, null);
-        //if (putNode(newNode)) {
-        //    size++;
-        //}
+//        if (putNode(newNode)) {
+//            size++;
+//        }
 
         int newNodePos = getBucketPos(hash(key));
         if (bucketList[newNodePos] == null) {
@@ -153,7 +153,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             existingNode.setValue(node.value);
             return false;
         }
-        //resize();
         int newNodePos = getBucketPos(node.hash);
         if (bucketList[newNodePos] == null) {
             bucketList[newNodePos] = node;
@@ -174,16 +173,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             bucketList = (Node<K,V>[]) new Node[capacity];
         }
         if (size >= threshold && threshold > 0) {
+            final int oldCapacity = capacity;
             capacity = capacity << 1;
             threshold = (int) (capacity * LOAD_FACTOR);
-            int oldCapacity = capacity;
+            Node<K,V> curNode;
             Node<K,V>[] oldBucketList = bucketList;
             bucketList = (Node<K,V>[]) new Node[capacity];
-            Node<K,V> curNode;
             for (int i = 0; i < oldCapacity; i++) {
                 curNode = oldBucketList[i];
                 while (curNode != null) {
-                    //putNode(curNode);
+//                    putNode(curNode);
                     put(curNode);
                     size--;
                     curNode = curNode.next;
