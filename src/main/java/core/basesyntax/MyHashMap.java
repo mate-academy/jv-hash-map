@@ -27,8 +27,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    /* ------------ Node inner class ------------ */
-
     private class Node<K,V> {
         private final int hash;
         private final K key;
@@ -48,12 +46,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     + " =" + value
                     + '}';
         }
-    }
-
-    /* ------------ HashMap private methods ------------ */
-
-    private boolean containsKey(K key) {
-        return getNode(hash(key), key) != null;
     }
 
     private Node<K,V> getNode(int hash, K key) {
@@ -81,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private boolean putNode(K key, V value) {
         Node<K,V> node = new Node<>(hash(key), key, value, null);
-        if (containsKey(node.key)) {
+        if (getNode(node.hash, node.key) != null) {
             Node<K,V> existingNode = getNode(node.hash, node.key);
             existingNode.value = node.value;
             return false;
