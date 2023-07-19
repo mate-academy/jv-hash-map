@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import java.util.Objects;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 1 << 4;
     private static final float LOAD_FACTOR = 0.75f;
@@ -13,10 +11,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-//        Node<K,V> newNode = new Node<>(hash(key), key, value, null);
-//        if (putNode(newNode)) {
-//            size++;
-//        }
+        //Node<K,V> newNode = new Node<>(hash(key), key, value, null);
+        //if (putNode(newNode)) {
+        //    size++;
+        //}
         if (putNode(key, value)) {
             size++;
         }
@@ -146,7 +144,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 curNode = oldBucketList[i];
                 while (curNode != null) {
                     putNode(curNode.key, curNode.value);
-//                    putNode(curNode);
+                    //putNode(curNode);
                     curNode = curNode.next;
                 }
             }
