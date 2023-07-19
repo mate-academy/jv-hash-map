@@ -18,21 +18,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (setValueIfKeyExist(index, key, value)) {
             return;
         }
-        Node<K, V> newNode;
-        if (key == null) {
-            newNode = new Node<>(null, value, null);
-        } else {
-            newNode = new Node<>(key, value, null);
+        Node<K, V> newNode = new Node<>(key, value);
+        if (table[index] != null) {
+            newNode.next = table[index];
         }
-        if (table[index] == null) {
-            table[index] = newNode;
-        } else {
-            Node<K,V> currentNode = table[index];
-            while (currentNode.next != null) {
-                currentNode = currentNode.next;
-            }
-            currentNode.next = newNode;
-        }
+        table[index] = newNode;
         size++;
     }
 
@@ -96,14 +86,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     static class Node<K, V> {
-        private K key;
+        private final K key;
         private V value;
         private Node<K,V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
