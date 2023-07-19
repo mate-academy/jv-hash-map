@@ -27,13 +27,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         } else {
-            Node<K, V> tableNode = table[index];
-            while (tableNode != null) {
-                if (Objects.equals(tableNode.key, key)) {
-                    tableNode.value = value;
-                    return;
-                }
-                tableNode = tableNode.next;
+            Node<K, V> tableNode = getNodeByKey(key);
+            if (tableNode != null) {
+                tableNode.value = value;
+                return;
             }
         }
         Node<K, V> newNode = new Node<>(key, value);
@@ -44,10 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> tableNode = table[getIndex(key)];
-        while (tableNode != null && !Objects.equals(tableNode.key, key)) {
-            tableNode = tableNode.next;
-        }
+        Node<K, V> tableNode = getNodeByKey(key);
         if (tableNode == null) {
             return null;
         }
@@ -59,14 +53,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private Node<K, V> getNodeByKey(K key) {
+        Node<K, V> tableNode = table[getIndex(key)];
+        while (tableNode != null && !Objects.equals(tableNode.key, key)) {
+            tableNode = tableNode.next;
+        }
+        return tableNode;
+    }
+
     private void resize() {
         Node<K, V>[] newTable = new Node[table.length * GROWTH_FACTOR];
         threshold = (int) (newTable.length * DEFAULT_LOAD_FACTOR);
         this.size = DEFAULT_SIZE;
-        copyArray(table);
+        transferNodesToBiggerMap(table);
     }
 
-    private void copyArray(Node<K, V>[] oldTable) {
+    private void transferNodesToBiggerMap(Node<K, V>[] oldTable) {
         this.table = new Node[table.length * GROWTH_FACTOR];
         for (Node<K, V> node : oldTable) {
             while (node != null) {
@@ -83,7 +85,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private class Node<K, V> {
         private final K key;
         private V value;
-        private int hash;
         private Node<K, V> next;
 
         private Node(K key, V value) {
