@@ -5,10 +5,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 16;
     static final int GROWTH_FACTOR = 2;
     private int size;
-    private Node<K, V>[] mapArray;
+    private Node<K, V>[] table;
 
     public MyHashMap() {
-        mapArray = new Node[DEFAULT_INITIAL_CAPACITY];
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
     @Override
@@ -20,19 +20,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> oldNode = mapArray[getIndex(key)];
-        if (oldNode == null) {
-            return null;
-        }
-        while (true) {
+        Node<K, V> oldNode = table[getIndex(key)];
+        while (oldNode != null) {
             if (areKeysEqual(oldNode.key, key)) {
                 return oldNode.value;
             }
-            if (oldNode.next == null) {
-                return null;
-            }
             oldNode = oldNode.next;
         }
+        return null;
     }
 
     @Override
@@ -41,14 +36,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resizeIfFull() {
-        if (mapArray.length * LOAD_FACTOR == size) {
+        if (table.length * LOAD_FACTOR == size) {
             resize();
         }
     }
 
     private void resize() {
-        Node<K, V>[] oldMap = mapArray;
-        mapArray = new Node[oldMap.length * GROWTH_FACTOR];
+        Node<K, V>[] oldMap = table;
+        table = new Node[oldMap.length * GROWTH_FACTOR];
         size = 0;
         for (Node<K, V> element : oldMap) {
             while (element != null) {
@@ -59,33 +54,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void insert(int index, Node<K, V> newNode, K key, V value) {
-        if (mapArray[index] != null) {
-            Node<K, V> oldNode = mapArray[index];
-            while (true) {
-                if (areKeysEqual(oldNode.key, key)) {
-                    oldNode.value = value;
+        if (table[index] != null) {
+            Node<K, V> currentNode = table[index];
+            while (currentNode != null) {
+                if (areKeysEqual(currentNode.key, key)) {
+                    currentNode.value = value;
                     return;
                 }
-                if (oldNode.next == null) {
-                    oldNode.next = newNode;
-                    size++;
-                    resizeIfFull();
-                    return;
+                if (currentNode.next == null) {
+                    break;
                 }
-                oldNode = oldNode.next;
+                currentNode = currentNode.next;
             }
+            currentNode.next = newNode;
         } else {
-            mapArray[index] = newNode;
-            size++;
-            resizeIfFull();
+            table[index] = newNode;
         }
+        size++;
+        resizeIfFull();
     }
 
     private int getIndex(K key) {
         if (key == null) {
             return 0;
         }
-        return Math.abs(key.hashCode() % mapArray.length);
+        return Math.abs(key.hashCode() % table.length);
     }
 
     private boolean areKeysEqual(K firstKey, K secondKey) {
