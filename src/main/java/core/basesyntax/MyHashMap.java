@@ -3,7 +3,6 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int CAPACITY_MULTIPLIER = 2;
@@ -21,11 +20,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         resize();
         int index = getIndex(key);
         Node<K, V> node = table[index];
+
         if (node == null) {
             table[index] = new Node<>(key, value);
             size++;
         } else {
-            while (node != null) {
+            while (true) {
                 if (Objects.equals(key, node.key)) {
                     node.value = value;
                     return;
@@ -65,7 +65,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void expand() {
+        int newCapacity = table.length * CAPACITY_MULTIPLIER;
+        threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
+        var oldTable = table;
+        table = new Node[newCapacity];
+        size = 0;
 
+        for (var node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
+        }
     }
 
     private int getIndex(K key) {
@@ -74,7 +85,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private K key;
+        private final K key;
         private V value;
         private Node<K, V> next;
 
