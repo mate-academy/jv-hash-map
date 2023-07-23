@@ -7,13 +7,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     static final int SIZE_MULTIPLICATOR = 2;
 
-    private int currentCapacity;
     private int size;
     private Node<K, V>[] table;
+    private int threshold;
 
     public MyHashMap() {
-        currentCapacity = DEFAULT_INITIAL_CAPACITY;
-        table = new Node[currentCapacity];
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
@@ -22,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             updateValue(key, value);
             return;
         }
-        if (size + 1 > currentCapacity * DEFAULT_LOAD_FACTOR) {
+        if (size + 1 > threshold) {
             table = resize();
         }
         Node<K, V> node = new Node<>(key, value);
@@ -44,10 +44,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V>[] resize() {
-        int oldCapacity = currentCapacity;
-        currentCapacity = oldCapacity * SIZE_MULTIPLICATOR;
+        int newCapacity = table.length * SIZE_MULTIPLICATOR;
         Node<K, V>[] oldTable = table;
-        table = new Node[currentCapacity];
+        table = new Node[newCapacity];
         size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
@@ -55,11 +54,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node = node.next;
             }
         }
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
         return table;
     }
 
     private void placeNodeToTable(Node<K, V> node) {
-        int index = Math.abs(getHash(node.key) % currentCapacity);
+        int index = Math.abs(getHash(node.key) % table.length);
         if (table[index] == null) {
             table[index] = node;
         } else {
@@ -88,13 +88,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> returnNodeByKey(K key) {
-        for (Node<K, V> node : table) {
-            while (node != null) {
-                if (Objects.equals(node.key, key)) {
-                    return node;
-                }
-                node = node.next;
+        int index = Math.abs(getHash(key) % table.length);
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return node;
             }
+            node = node.next;
         }
         return null;
     }
