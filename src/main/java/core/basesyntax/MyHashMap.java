@@ -4,8 +4,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private static final int INCREASE_FACTOR = 2;
-    private static final int ZERO_NUMBER = 0;
-    private static final int ONE_NUMBER = 1;
     private Node<K, V>[] table;
     private int capacity;
     private int threshold;
@@ -16,12 +14,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size + ONE_NUMBER >= threshold) {
+        if (size + 1 >= threshold) {
             resize();
         }
 
-        Node<K, V> newNode = new Node<>(hash(key), key, value, null);
-        int newNodeIndex = newNode.hash;
+        Node<K, V> newNode = new Node<>(key, value);
+        int newNodeIndex = getHash(newNode.key) % capacity;
         if (table[newNodeIndex] == null) {
             table[newNodeIndex] = newNode;
         } else {
@@ -55,17 +53,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         final int oldCapacity = capacity;
-        capacity = (capacity == ZERO_NUMBER) ? INITIAL_CAPACITY : capacity * INCREASE_FACTOR;
+        capacity = (capacity == 0) ? INITIAL_CAPACITY : capacity * INCREASE_FACTOR;
         threshold = (int) (capacity * LOAD_FACTOR);
         Node<K, V>[] oldTable = table;
         table = new Node[capacity];
+        size = 0;
 
-        for (int i = ZERO_NUMBER; i < oldCapacity; i++) {
+        for (int i = 0; i < oldCapacity; i++) {
             if (oldTable[i] != null) {
                 Node<K, V> oldNode = oldTable[i];
                 while (oldNode != null) {
                     put(oldNode.key, oldNode.value);
-                    --size;
                     oldNode = oldNode.next;
                 }
             }
@@ -73,11 +71,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> getNode(K key) {
-        if (size == ZERO_NUMBER) {
-            return null;
-        }
-
-        for (Node<K, V> kvNode : table) {
+        Node<K, V> kvNode;
+        for (int i = 0; i < capacity; i++) {
+            kvNode = table[i];
             while (kvNode != null) {
                 if (kvNode.key == key || (kvNode.key != null && kvNode.key.equals(key))) {
                     return kvNode;
@@ -88,21 +84,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private int hash(Object key) {
-        return key == null ? ZERO_NUMBER : Math.abs(key.hashCode() % capacity);
+    private int getHash(Object key) {
+        return key == null ? 0 : Math.abs(key.hashCode());
     }
 
     private class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
+            this.next = null;
         }
     }
 
