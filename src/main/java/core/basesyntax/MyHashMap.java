@@ -5,13 +5,16 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private int threshold = Math.round(DEFAULT_CAPACITY * LOAD_FACTOR);
-    private Node<K, V>[] table = new Node[DEFAULT_CAPACITY];
+    private Node<K, V>[] table;
     private int size;
+
+    public MyHashMap() {
+        this.table = new Node[DEFAULT_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
-        if (size > threshold) {
+        if (size > table.length * LOAD_FACTOR) {
             resize();
         }
         int index = getIndex(key);
@@ -59,7 +62,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 current = current.next;
             }
         }
-        threshold = threshold * 2;
     }
 
     private static class Node<K, V> {
@@ -73,5 +75,4 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
         }
     }
-
 }
