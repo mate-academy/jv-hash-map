@@ -18,14 +18,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (keyExists(key)) {
-            updateValue(key, value);
+        Node<K, V> node = returnNodeByKey(key);
+        if (node != null) {
+            node.value = value;
             return;
         }
         if (size + 1 > threshold) {
             resize();
         }
-        Node<K, V> node = new Node<>(key, value);
+        node = new Node<>(key, value);
         placeNodeToTable(node);
     }
 
@@ -69,18 +70,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             currentNode.next = node;
         }
         size++;
-    }
-
-    private void updateValue(K key, V value) {
-        Node<K, V> node = returnNodeByKey(key);
-        node.value = value;
-    }
-
-    private boolean keyExists(K key) {
-        if (size == 0) {
-            return false;
-        }
-        return returnNodeByKey(key) != null;
     }
 
     private Node<K, V> returnNodeByKey(K key) {
