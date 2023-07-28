@@ -23,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         if (size + 1 > threshold) {
-            table = resize();
+            resize();
         }
         Node<K, V> node = new Node<>(key, value);
         placeNodeToTable(node);
@@ -43,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private Node<K, V>[] resize() {
+    private void resize() {
         int newCapacity = table.length * SIZE_MULTIPLICATOR;
         Node<K, V>[] oldTable = table;
         table = new Node[newCapacity];
@@ -55,7 +55,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
-        return table;
     }
 
     private void placeNodeToTable(Node<K, V> node) {
@@ -81,10 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == 0) {
             return false;
         }
-        if (returnNodeByKey(key) != null) {
-            return true;
-        }
-        return false;
+        return returnNodeByKey(key) != null;
     }
 
     private Node<K, V> returnNodeByKey(K key) {
