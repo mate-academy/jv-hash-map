@@ -4,7 +4,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    public static final int CAPACITY_MULTIPLIER = 2;
+    private static final int CAPACITY_MULTIPLIER = 2;
     private int size;
     private int capacity;
     private float loadFactor;
