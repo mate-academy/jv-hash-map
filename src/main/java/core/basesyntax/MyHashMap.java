@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_CAPACITY = 16;
@@ -20,17 +22,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.table = new Node[capacity];
     }
 
-    private int hash(K key) {
-        int hash = key == null ? 0 : key.hashCode() % capacity;
-        return hash >= 0 ? hash : -1 * hash;
-    }
-
     @Override
     public void put(K key, V value) {
-        int index = hash(key);
+        if (size > capacity * loadFactor) {
+            resize();
+        }
+        int index = getIndex(key);
         Node<K,V> node = table[index];
         while (node != null) {
-            if ((node.key == null && key == null) || (node.key != null && node.key.equals(key))) {
+            if (Objects.equals(node.key, key)) {
                 node.value = value;
                 return;
             }
@@ -40,17 +40,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         newNode.next = table[index];
         table[index] = newNode;
         size++;
-        if (size > capacity * loadFactor) {
-            resize();
-        }
     }
 
     @Override
     public V getValue(K key) {
-        int index = hash(key);
+        int index = getIndex(key);
         Node<K,V> node = table[index];
         while (node != null) {
-            if ((node.key == null && key == null) || (node.key != null && node.key.equals(key))) {
+            if (Objects.equals(node.key, key)) {
                 return node.value;
             }
             node = node.next;
@@ -63,13 +60,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private int getIndex(K key) {
+        int hash = key == null ? 0 : key.hashCode() % capacity;
+        return hash >= 0 ? hash : -1 * hash;
+    }
+
     private void resize() {
         capacity = capacity * CAPACITY_MULTIPLIER;
         Node<K,V> [] newTable = new Node[capacity];
         for (int i = 0; i < capacity / CAPACITY_MULTIPLIER; i++) {
             Node<K,V> node = table[i];
             while (node != null) {
-                int index = hash(node.key);
+                int index = getIndex(node.key);
                 var currentNode = newTable[index];
                 if (currentNode == null) {
                     newTable[index] = new Node<>(node.key, node.value);
