@@ -3,10 +3,10 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final float LOAD_FACTOR = 0.75f;
     private int capacity = 16;
     private Node<K, V>[] container = new Node[capacity];
     private int size;
-    private static final float LOAD_FACTOR = 0.75f;
 
     private class Node<K, V> {
         private K key;
