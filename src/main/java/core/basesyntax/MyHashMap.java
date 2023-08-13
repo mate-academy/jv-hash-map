@@ -82,7 +82,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (nodeBucket == null) {
                 Node<K, V> newNode = new Node<>(hash, key, value);
                 //if (predNodeBucket != null) {
-                    predNodeBucket.next = newNode;
+                predNodeBucket.next = newNode;
                 //}
                 size++;
                 setted = true;
