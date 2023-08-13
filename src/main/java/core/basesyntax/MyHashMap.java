@@ -9,7 +9,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private Node<K, V>[] tabNode;
 
-
     public MyHashMap() {
         this.capacity = DEFAULT_CAPACITY;
         this.tabNode = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
