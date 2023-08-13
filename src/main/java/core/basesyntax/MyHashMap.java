@@ -1,14 +1,14 @@
 package core.basesyntax;
 
 import java.util.Map;
-import static java.lang.Math.abs;
+import java.lang.Math;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private final static double LOAD_FACTOR = 0.75f;
-    private final static int DEFAULT_CAPACITY = 16;
     private int capacity;
     private int size;
     private Node<K, V>[] tabNode;
+    private final static double LOAD_FACTOR = 0.75f;
+    private final static int DEFAULT_CAPACITY = 16;
 
     public MyHashMap() {
         this.capacity = DEFAULT_CAPACITY;
@@ -92,7 +92,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     static final int hash(Object key) {
         int h;
-        return (key == null) ? 0 : (h = abs(key.hashCode())) ^ (h >>> 16);
+        return (key == null) ? 0 : (h = Math.abs(key.hashCode())) ^ (h >>> 16);
     }
 
     private class Node<K, V> implements Map.Entry<K, V> {
