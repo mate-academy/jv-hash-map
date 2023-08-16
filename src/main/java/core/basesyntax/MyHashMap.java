@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         int hashCode = (key == null ? 0 : key.hashCode());
-        int index = Math.abs(hashCode % table.length);
+        int index = getIndex(hashCode, table.length);
         Node<K, V> currentNode = table[index];
 
         if (!replaceValue(currentNode, key, value)) {
@@ -35,7 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int hashCode = (key == null ? 0 : key.hashCode());
-        int index = Math.abs(hashCode % table.length);
+        int index = getIndex(hashCode, table.length);
         Node<K, V> node = table[index];
 
         while (node != null) {
@@ -53,7 +53,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static class Node<K, V> implements Map.Entry<K,V> {
+    private static class Node<K, V> {
         private final int hash;
         private K key;
         private V value;
@@ -64,39 +64,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.hash = (key == null ? 0 : key.hashCode());
         }
-
-        @Override
-        public K getKey() {
-            return key;
-        }
-
-        @Override
-        public V getValue() {
-            return value;
-        }
-
-        @Override
-        public V setValue(V value) {
-            this.value = value;
-            return value;
-        }
     }
 
     private void resize() {
         int newCapacity = table.length << 1;
         Node<K, V>[] newTable = new Node[newCapacity];
+        Node<K, V>[] oldTable = table;
+        table = newTable;
+        size = 0;
 
-        for (Node<K, V> oldNode : table) {
+        for (Node<K, V> oldNode : oldTable) {
             while (oldNode != null) {
-                Node<K, V> next = oldNode.next;
-                int newIndex = Math.abs(oldNode.hash % newCapacity);
-                oldNode.next = newTable[newIndex];
-                newTable[newIndex] = oldNode;
-                oldNode = next;
+                K key = oldNode.key;
+                V value = oldNode.value;
+                put(key, value);
+                oldNode = oldNode.next;
             }
         }
+    }
 
-        table = newTable;
+    private int getIndex(int hashCode, int arrayLength) {
+        return Math.abs(hashCode % arrayLength);
     }
 
     private boolean replaceValue(Node<K, V> node, K key, V value) {
