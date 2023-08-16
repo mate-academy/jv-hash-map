@@ -4,85 +4,47 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
-    private int capacity = 16;
-    private Node<K, V>[] container = new Node[capacity];
+    private static final int DEFAULT_CAPACITY = 16;
+    private int capacity;
+    private Node<K, V>[] container;
     private int size;
 
-    private class Node<K, V> {
-        private K key;
-        private V value;
-        private int hash;
-        private Node next;
-
-        private Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-            this.hash = (key == null) ? 0 : Math.abs(key.hashCode());
-        }
+    public MyHashMap() {
+        this.capacity = DEFAULT_CAPACITY;
+        container = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (isContainerLoaded()) {
+        if (size > capacity * LOAD_FACTOR) {
             resizeContainer();
         }
 
-        Node<K, V> currentBucket = container[getIndexForKey(key)];
-
-        if (!isBucketEmpty(currentBucket)) {
-            if (Objects.equals(currentBucket.key, key)) {
-                currentBucket.value = value;
+        Node<K, V> currentNode = container[getIndex(key)];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                currentNode.value = value;
                 return;
             }
-
-            Node<K, V> currentNode = currentBucket;
-            while (currentNode.next != null) {
-                currentNode = currentNode.next;
-
-                if (Objects.equals(currentNode.key, key)) {
-                    currentNode.value = value;
-                    return;
-                }
-
-            }
-
-            currentNode.next = new Node<>(key, value);
-            size++;
-            return;
+            currentNode = currentNode.next;
         }
 
-        if (key == null) {
-            container[0] = new Node<>(null, value);
-        } else {
-            container[Math.abs(key.hashCode()) % capacity] = new Node<>(key, value);
-        }
-
+        container[getIndex(key)] = new Node<>(key, value, container[getIndex(key)]);
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode;
-
-        if (key == null) {
-            currentNode = container[0];
-        } else {
-            currentNode = container[Math.abs(key.hashCode()) % capacity];
-        }
-
-        if (isBucketEmpty(currentNode)) {
-            return null;
-        }
-
-        while (!Objects.equals(currentNode.key, key)) {
-            if (currentNode.next == null) {
-                return null;
+        Node<K, V> currentNode = container[getIndex(key)];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
             }
 
             currentNode = currentNode.next;
         }
 
-        return currentNode.value;
+        return null;
     }
 
     @Override
@@ -98,7 +60,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             while (currentNode != null) {
                 Node<K, V> nextNode = currentNode.next;
 
-                int newIndex = Math.abs(currentNode.hash) % (capacity * 2);
+                int newIndex = Math.abs(currentNode.key.hashCode()) % (capacity * 2);
                 currentNode.next = newContainer[newIndex];
                 newContainer[newIndex] = currentNode;
 
@@ -110,15 +72,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         container = newContainer;
     }
 
-    private int getIndexForKey(K key) {
+    private int getIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 
-    private boolean isBucketEmpty(Node<K, V> bucket) {
-        return bucket == null;
-    }
+    private class Node<K, V> {
+        private K key;
+        private V value;
+        private Node next;
 
-    private boolean isContainerLoaded() {
-        return size > capacity * LOAD_FACTOR;
+        private Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
