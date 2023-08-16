@@ -21,13 +21,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hashCode = (key == null ? 0 : key.hashCode());
         int index = getIndex(hashCode, table.length);
         Node<K, V> currentNode = table[index];
-
-        if (!replaceValue(currentNode, key, value)) {
-            Node<K, V> newNode = new Node<>(key, value);
-            newNode.next = currentNode;
-            table[index] = newNode;
-            size++;
+        Node<K, V> nodeToIterate = currentNode;
+        while (nodeToIterate != null) {
+            K currentKey = nodeToIterate.key;
+            if (currentKey == key || (currentKey != null && currentKey.equals(key))) {
+                nodeToIterate.value = value;
+                return;
+            }
+            nodeToIterate = nodeToIterate.next;
         }
+        Node<K, V> newNode = new Node<>(key, value);
+        newNode.next = currentNode;
+        table[index] = newNode;
+        size++;
     }
 
     @Override
@@ -83,18 +89,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getIndex(int hashCode, int arrayLength) {
         return Math.abs(hashCode % arrayLength);
-    }
-
-    private boolean replaceValue(Node<K, V> node, K key, V value) {
-        while (node != null) {
-            K currentKey = node.key;
-            if (currentKey == key || (currentKey != null && currentKey.equals(key))) {
-                node.value = value;
-                return true;
-            }
-            node = node.next;
-        }
-
-        return false;
     }
 }
