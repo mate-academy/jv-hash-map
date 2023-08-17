@@ -4,52 +4,45 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
-    private int size;
+    private int size = 0;
 
     public MyHashMap() {
         this.table = (Node<K,V>[]) new Node[INITIAL_CAPACITY];
-        this.size = 0;
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= (table.length * LOAD_FACTOR)) {
-            increaseArray();
-        }
-        boolean added = put(key, value, table);
-
-        if (added) {
-            size++;
-        }
-    }
-
-    public boolean put(K key, V value, Node<K, V>[] dst) {
-        int index = getElementPosition(key, dst.length);
-        Node<K, V> currentElement = dst[index];
+        int index = getElementPosition(key);
+        Node<K, V> currentElement = table[index];
 
         if (currentElement == null) {
-            Node<K, V> newNode = new Node<>(key, value, null);
-            dst[index] = newNode;
-            return true;
+            Node<K, V> newNode = new Node<>(key, value);
+            table[index] = newNode;
+            size++;
         } else {
             while (true) {
                 if (currentElement.key == key
                         || (currentElement.key != null && currentElement.key.equals(key))) {
                     currentElement.value = value;
-                    return false;
+                    break;
                 }
                 if (currentElement.next == null) {
-                    currentElement.next = new Node<>(key, value, null);
-                    return true;
+                    currentElement.next = new Node<>(key, value);
+                    size++;
+                    break;
                 }
                 currentElement = currentElement.next;
             }
+        }
+
+        if (size > (table.length * LOAD_FACTOR)) {
+            increaseArray();
         }
     }
 
     @Override
     public V getValue(K key) {
-        int index = getElementPosition(key, table.length);
+        int index = getElementPosition(key);
         Node<K, V> currentElement = table[index];
         while (currentElement != null) {
             if (currentElement.key == key
@@ -68,23 +61,36 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getElementPosition(K element, int arrayLength) {
-        return element == null ? 0 : Math.abs(element.hashCode() % arrayLength);
+    private int getElementPosition(K element) {
+        return element == null ? 0 : Math.abs(element.hashCode() % table.length);
     }
 
     private void increaseArray() {
-        Node<K, V>[] newTable = new Node[table.length * 2];
+        Node<K, V>[] oldTab = table;
+        table = (Node<K,V>[])new Node[oldTab.length * 2];
 
-        for (Node<K, V> node:table) {
-            Node<K, V> currentElement = node;
+        for (int j = 0; j < oldTab.length; j++) {
+            Node<K, V> oldCurElem = oldTab[j];
 
-            while (currentElement != null) {
-                put(currentElement.key, currentElement.value, newTable);
-                currentElement = currentElement.next;
+            while (oldCurElem != null) {
+                int newIndex = getElementPosition(oldCurElem.key);
+                Node<K, V> currentElement = table[newIndex];
+
+                if (currentElement == null) {
+                    table[newIndex] = new Node<>(oldCurElem.key, oldCurElem.value);
+                } else {
+                    while (true) {
+                        if (currentElement.next == null) {
+                            currentElement.next = new Node<>(oldCurElem.key, oldCurElem.value);
+                            break;
+                        }
+                        currentElement = currentElement.next;
+                    }
+                }
+
+                oldCurElem = oldCurElem.next;
             }
         }
-
-        table = newTable;
     }
 
     public static class Node<K, V> {
@@ -92,10 +98,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
