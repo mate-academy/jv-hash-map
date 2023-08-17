@@ -18,8 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
 
-        int hashCode = (key == null ? 0 : key.hashCode());
-        int index = getIndex(hashCode, table.length);
+        int index = getIndex(key);
         Node<K, V> currentNode = table[index];
         Node<K, V> nodeToIterate = currentNode;
         while (nodeToIterate != null) {
@@ -38,8 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hashCode = (key == null ? 0 : key.hashCode());
-        int index = getIndex(hashCode, table.length);
+        int index = getIndex(key);
         Node<K, V> node = table[index];
 
         while (node != null) {
@@ -87,7 +85,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getIndex(int hashCode, int arrayLength) {
-        return Math.abs(hashCode % arrayLength);
+    private int getIndex(K key) {
+        int hashCode = (key == null ? 0 : key.hashCode());
+        return Math.abs(hashCode % table.length);
     }
 }
