@@ -4,7 +4,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
-    private int size = 0;
+    private int size;
 
     public MyHashMap() {
         this.table = (Node<K,V>[]) new Node[INITIAL_CAPACITY];
@@ -68,27 +68,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void increaseArray() {
         Node<K, V>[] oldTab = table;
         table = (Node<K,V>[])new Node[oldTab.length * 2];
+        size = 0;
 
         for (int j = 0; j < oldTab.length; j++) {
-            Node<K, V> oldCurElem = oldTab[j];
+            Node<K, V> oldNode = oldTab[j];
 
-            while (oldCurElem != null) {
-                int newIndex = getElementPosition(oldCurElem.key);
-                Node<K, V> currentElement = table[newIndex];
+            while (oldNode != null) {
+                put(oldNode.key, oldNode.value);
 
-                if (currentElement == null) {
-                    table[newIndex] = new Node<>(oldCurElem.key, oldCurElem.value);
-                } else {
-                    while (true) {
-                        if (currentElement.next == null) {
-                            currentElement.next = new Node<>(oldCurElem.key, oldCurElem.value);
-                            break;
-                        }
-                        currentElement = currentElement.next;
-                    }
-                }
-
-                oldCurElem = oldCurElem.next;
+                oldNode = oldNode.next;
             }
         }
     }
