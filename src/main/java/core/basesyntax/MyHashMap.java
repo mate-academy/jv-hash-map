@@ -22,7 +22,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> oldNode = table[index];
         while (oldNode != null) {
             if (key == null && oldNode.key == null || key != null && key.equals(oldNode.key)) {
-                size--;
+                oldNode.value = value;
+                return;
             }
             oldNode = oldNode.next;
         }
