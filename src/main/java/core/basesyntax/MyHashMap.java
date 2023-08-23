@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = new Node<>(hash(key), key, value, null);
             size++;
         } else {
-            put(index, key, value);
+            putOrSet(index, key, value);
         }
         increaseCapacity();
     }
@@ -29,7 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> node = findNode(key);
-        return node != null ?  node.value : null;
+        return node != null ? node.value : null;
     }
 
     @Override
@@ -37,7 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void put(int index, K key, V value) {
+    private void putOrSet(int index, K key, V value) {
         Node<K, V> node = table[index];
         while (node != null) {
             if (node.isEqualKey(key)) {
