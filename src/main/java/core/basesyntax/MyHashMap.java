@@ -20,16 +20,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (node == null) {
             table[index] = new Node<>(hash(key), key, value, null);
             size++;
-            return;
+        } else {
+            put(index, key, value);
         }
-        updateOrInsertNode(index, node, key, value);
         increaseCapacity();
     }
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = findNodeByKey(key);
-        return node == null ? null : node.value;
+        Node<K, V> node = findNode(key);
+        return node != null ?  node.value : null;
     }
 
     @Override
@@ -37,14 +37,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    @Override
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
-    private void updateOrInsertNode(int index, Node<K, V> node, K key, V value) {
+    private void put(int index, K key, V value) {
+        Node<K, V> node = table[index];
         while (node != null) {
-            if (isEqualKeys(node.key, key)) {
+            if (node.isEqualKey(key)) {
                 node.setValue(value);
                 return;
             }
@@ -54,10 +50,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private Node<K, V> findNodeByKey(K key) {
+    private Node<K, V> findNode(K key) {
         int index = getIndex(key);
         Node<K, V> node = table[index];
-        while (node != null && !isEqualKeys(node.key, key)) {
+        while (node != null && !node.isEqualKey(key)) {
             node = node.next;
         }
         return node;
@@ -69,10 +65,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int hash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
-    }
-
-    private boolean isEqualKeys(K first, K last) {
-        return first == last || first != null && first.equals(last);
     }
 
     private void increaseCapacity() {
@@ -88,14 +80,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = (Node<K, V>[]) new Node[newCapacity];
         size = 0;
         for (Node<K, V> node : oldTable) {
-            outConnectedNodes(node);
-        }
-    }
-
-    private void outConnectedNodes(Node<K, V> node) {
-        while (node != null) {
-            put(node.key, node.value);
-            node = node.next;
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
         }
     }
 
@@ -114,6 +102,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         public final void setValue(V value) {
             this.value = value;
+        }
+
+        public boolean isEqualKey(K another) {
+            return key == another || key != null && key.equals(another);
         }
     }
 }
