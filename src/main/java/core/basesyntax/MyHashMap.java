@@ -5,24 +5,24 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private Node<K, V>[] tables;
+    private Node<K, V>[] table;
     private int threshold;
     private int size;
 
     public MyHashMap() {
-        tables = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
-        updateThreshold();
+        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        threshold = (int) (table.length * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(hash(key), key, value, null);
         int bucketIndex = getBucketIndex(key);
-        if (tables[bucketIndex] == null) {
-            tables[bucketIndex] = newNode;
+        if (table[bucketIndex] == null) {
+            table[bucketIndex] = newNode;
             size++;
         } else {
-            linkNode(tables[bucketIndex], newNode);
+            linkNode(table[bucketIndex], newNode);
         }
         if (size >= threshold) {
             resizeTables();
@@ -31,7 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> current = tables[getBucketIndex(key)];
+        Node<K, V> current = table[getBucketIndex(key)];
         while (current != null) {
             if (current.equalsByKey(key)) {
                 return current.value;
@@ -51,27 +51,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucketIndex(K key) {
-        return hash(key) % tables.length;
+        return hash(key) % table.length;
     }
 
     private void linkNode(Node<K, V> current, Node<K, V> newNode) {
-        while (true) {
-            if (current.equalsByKey(newNode.key)) {
-                current.value = newNode.value;
+        for (Node<K, V> start = current; start != null; start = start.next) {
+            if (start.equalsByKey(newNode.key)) {
+                start.value = newNode.value;
                 return;
             }
-            if (!current.hasNext()) {
-                current.next = newNode;
-                size++;
-                return;
-            }
-            current = current.next;
+            current = start;
         }
+        current.next = newNode;
+        size++;
     }
 
     private void resizeTables() {
-        final Node<K, V>[] temp = tables;
-        tables = (Node<K, V>[]) new Node[tables.length << 1];
+        final Node<K, V>[] temp = table;
+        table = (Node<K, V>[]) new Node[table.length << 1];
         size = 0;
         updateThreshold();
         for (Node<K, V> node : temp) {
@@ -83,7 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void updateThreshold() {
-        threshold = (int) (LOAD_FACTOR * tables.length);
+        threshold = (int) (LOAD_FACTOR * table.length);
     }
 
     private static class Node<K, V> {
@@ -102,9 +99,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private boolean equalsByKey(K another) {
             return Objects.equals(key, another);
         }
-
-        private boolean hasNext() {
-            return next != null;
-        }
     }
 }
+
