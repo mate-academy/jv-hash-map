@@ -73,9 +73,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] newTable = new Node[newCapacity];
         for (Node<K, V> node: table) {
             while (node != null) {
+                int index = getIndex(node.key);
                 Node<K, V> nextNode = node.next;
-                node.next = newTable[getIndex(node.key)];
-                newTable[getIndex(node.key)] = node;
+                node.next = newTable[index];
+                newTable[index] = node;
                 node = nextNode;
             }
         }
