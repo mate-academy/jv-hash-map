@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -49,32 +51,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return h < 0 ? h * -1 : h;
     }
 
-    public void print() {
-        int i = 0;
-        for (Node<K, V> node : table) {
-            print(node, i++);
-        }
-    }
-
-    private void print(Node<K, V> node, int i) {
-        StringBuilder builder = new StringBuilder().append(i).append(".\t");
-        while (node != null) {
-            builder.append(node.value).append(" -> ");
-            node = node.next;
-        }
-        builder.append("null");
-        System.out.println(builder);
-    }
-
     private void resize() {
         tableLength *= 2;
         Node<K, V>[] oldTable = table;
         table = new Node[tableLength];
         for (Node<K, V> kvNode : oldTable) {
             if (kvNode != null) {
-                putNodeAtPosition(kvNode, kvNode.hash % tableLength);
+                addAllNodeByHead(kvNode);
             }
         }
+    }
+
+    private void addAllNodeByHead(Node<K, V> head) {
+        List<Node<K, V>> nodes = new ArrayList<>();
+        Node<K, V> currentNode = head;
+        while (currentNode != null) {
+            Node<K, V> addedNode = currentNode;
+            currentNode = currentNode.next;
+            addedNode.next = null;
+            nodes.add(addedNode);
+        }
+        for (Node<K, V> node : nodes) {
+            putNodeAtPosition(node, node.hash % tableLength);
+        }
+
     }
 
     private boolean putNodeAtPosition(Node<K, V> node, int position) {
