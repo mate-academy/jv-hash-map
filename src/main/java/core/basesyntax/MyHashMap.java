@@ -14,14 +14,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @SuppressWarnings("unchecked")
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
-        size = 0;
         capacity = DEFAULT_CAPACITY;
         threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        resize();
+        if (size >= threshold) {
+            resize();
+        }
         Node<K, V> newNode;
         if (key == null) {
             newNode = new Node<>(0, key, value, null);
@@ -75,20 +76,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @SuppressWarnings("unchecked")
     private void resize() {
-        if (size >= threshold) {
-            size = 0;
-            capacity *= 2;
-            threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
-            Node<K, V>[] oldTab = table;
-            table = (Node<K, V>[]) new Node[capacity];
-            for (Node<K, V> kvNode : oldTab) {
-                if (kvNode != null) {
-                    Node<K, V> nextItem = kvNode.next;
-                    put(kvNode.key, kvNode.value);
-                    while (nextItem != null) {
-                        put(nextItem.key, nextItem.value);
-                        nextItem = nextItem.next;
-                    }
+        size = 0;
+        capacity *= 2;
+        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
+        Node<K, V>[] oldTab = table;
+        table = (Node<K, V>[]) new Node[capacity];
+        for (Node<K, V> kvNode : oldTab) {
+            if (kvNode != null) {
+                Node<K, V> nextItem = kvNode.next;
+                put(kvNode.key, kvNode.value);
+                while (nextItem != null) {
+                    put(nextItem.key, nextItem.value);
+                    nextItem = nextItem.next;
                 }
             }
         }
