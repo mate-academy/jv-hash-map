@@ -3,7 +3,8 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private int size = 0;
+    private static final int GROW_FACTOR = 2;
+    private int size;
     private Node<K,V>[] table;
 
     public MyHashMap() {
@@ -12,7 +13,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size + 1 > table.length * LOAD_FACTOR) {
+        if (size >= table.length * LOAD_FACTOR) {
             resize();
         }
 
@@ -22,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             node.value = value;
         } else {
             int bucketIndex = getBucketIndex(key);
-            int hashCode = (key == null) ? (0) : (Math.abs(key.hashCode()));
+            int hashCode = key == null ? 0 : Math.abs(key.hashCode());
             Node<K, V> newNode = new Node<>(hashCode, key, value, table[bucketIndex]);
             table[bucketIndex] = newNode;
             size++;
@@ -33,7 +34,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         Node<K, V> node = getNode(key);
 
-        return (node == null) ? (null) : (node.value);
+        return node == null ? null : node.value;
     }
 
     @Override
@@ -42,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int newCapacity = table.length * 2;
+        int newCapacity = table.length * GROW_FACTOR;
         Node<K, V>[] newTable = (Node<K,V>[]) new Node[newCapacity];
         Node<K, V>[] oldTable = table;
         table = newTable;
@@ -77,7 +78,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucketIndex(K key) {
-        return (key == null) ? (0) : (Math.abs(key.hashCode()) % table.length);
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private class Node<K,V> {
