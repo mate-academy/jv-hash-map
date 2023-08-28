@@ -17,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (node != null) {
             node.value = value;
         } else {
-            int bucketNumber = getBucketNumber(key);
+            int bucketNumber = getBucketIndex(key);
             int hashCode = (key == null) ? (0) : (Math.abs(key.hashCode()));
             Node<K, V> newNode = new Node<>(hashCode, key, value, this.table[bucketNumber]);
             this.table[bucketNumber] = newNode;
@@ -64,7 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
 
-        int bucketNumber = getBucketNumber(key);
+        int bucketNumber = getBucketIndex(key);
         Node<K, V> node = this.table[bucketNumber];
 
         while (node != null) {
@@ -77,7 +77,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private int getBucketNumber(K key) {
+    private int getBucketIndex(K key) {
         return (key == null) ? (0) : (Math.abs(key.hashCode()) % this.table.length);
     }
 
