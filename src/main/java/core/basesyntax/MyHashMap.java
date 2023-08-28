@@ -6,9 +6,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size = 0;
     private Node<K,V>[] table;
 
+    public MyHashMap() {
+        table = (Node<K,V>[]) new Node[INITIAL_CAPACITY];
+    }
+
     @Override
     public void put(K key, V value) {
-        if (this.table == null || (this.size + 1) > this.table.length * LOAD_FACTOR) {
+        if (size + 1 > table.length * LOAD_FACTOR) {
             resize();
         }
 
@@ -19,9 +23,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             int bucketIndex = getBucketIndex(key);
             int hashCode = (key == null) ? (0) : (Math.abs(key.hashCode()));
-            Node<K, V> newNode = new Node<>(hashCode, key, value, this.table[bucketIndex]);
-            this.table[bucketIndex] = newNode;
-            this.size++;
+            Node<K, V> newNode = new Node<>(hashCode, key, value, table[bucketIndex]);
+            table[bucketIndex] = newNode;
+            size++;
         }
     }
 
@@ -34,20 +38,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public int getSize() {
-        return this.size;
+        return size;
     }
 
     private void resize() {
-        if (this.table == null) {
-            this.table = (Node<K,V>[]) new Node[INITIAL_CAPACITY];
-            return;
-        }
-
-        int newCapacity = this.table.length * 2;
+        int newCapacity = table.length * 2;
         Node<K, V>[] newTable = (Node<K,V>[]) new Node[newCapacity];
         Node<K, V>[] oldTable = table;
-        this.table = newTable;
-        this.size = 0;
+        table = newTable;
+        size = 0;
 
         for (Node<K, V> bucket : oldTable) {
             Node<K, V> node = bucket;
@@ -60,12 +59,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> getNode(K key) {
-        if (this.size == 0) {
+        if (size == 0) {
             return null;
         }
 
         int bucketIndex = getBucketIndex(key);
-        Node<K, V> node = this.table[bucketIndex];
+        Node<K, V> node = table[bucketIndex];
 
         while (node != null) {
             if ((node.key == null) ? (key == null) : (node.key.equals(key))) {
@@ -78,7 +77,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucketIndex(K key) {
-        return (key == null) ? (0) : (Math.abs(key.hashCode()) % this.table.length);
+        return (key == null) ? (0) : (Math.abs(key.hashCode()) % table.length);
     }
 
     private class Node<K,V> {
