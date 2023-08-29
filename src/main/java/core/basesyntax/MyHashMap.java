@@ -17,6 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        increaseCapacity();
         int index = getIndex(key);
         Node<K, V> node = table[index];
         Node<K, V> newNode = new Node<>(key, value);
@@ -26,7 +27,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             putOrSet(index, newNode);
         }
-        increaseCapacity();
     }
 
     @Override
