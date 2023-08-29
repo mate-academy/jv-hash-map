@@ -16,6 +16,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if (size >= threshold) {
+            resizeTables();
+        }
         Node<K, V> newNode = new Node<>(key, value, null);
         int bucketIndex = getBucketIndex(key);
         if (table[bucketIndex] == null) {
@@ -23,9 +26,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             linkNode(table[bucketIndex], newNode);
-        }
-        if (size >= threshold) {
-            resizeTables();
         }
     }
 
@@ -95,4 +95,3 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 }
-
