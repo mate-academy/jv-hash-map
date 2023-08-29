@@ -77,7 +77,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return hash(key) % hashTable.length;
     }
 
-    private class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
