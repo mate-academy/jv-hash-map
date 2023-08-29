@@ -62,9 +62,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        threshold = (int) (array.length * LOAD_FACTOR);
         Node[] oldArray = array;
         array = new Node[array.length * CAPACITY_MULTIPLIER];
-        threshold = (int) (array.length * LOAD_FACTOR);
         size = 0;
         for (Node<K, V> node : oldArray) {
             while (node != null) {
