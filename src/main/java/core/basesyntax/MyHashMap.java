@@ -7,6 +7,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
+    private static final int CAPACITY_MULTIPLIER = 2;
     private Node<K, V>[] table;
     private int size;
     private int tableLength;
@@ -47,12 +48,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getKeyHash(K key) {
-        int h = key == null ? 0 : key.hashCode();
-        return h < 0 ? h * -1 : h;
+        int hash = key == null ? 0 : key.hashCode();
+        return hash < 0 ? hash * -1 : hash;
     }
 
     private void resize() {
-        tableLength *= 2;
+        tableLength *= CAPACITY_MULTIPLIER;
         Node<K, V>[] oldTable = table;
         table = new Node[tableLength];
         for (Node<K, V> kvNode : oldTable) {
@@ -74,7 +75,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> node : nodes) {
             putNodeAtPosition(node, node.hash % tableLength);
         }
-
     }
 
     private boolean putNodeAtPosition(Node<K, V> node, int position) {
