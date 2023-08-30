@@ -5,18 +5,13 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private int threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
+    private int threshold;
     private int size;
     private Node<K,V>[] buckets;
 
     public MyHashMap() {
         buckets = (Node<K,V>[]) new Node[DEFAULT_CAPACITY];
-    }
-
-    public static void main(String[] args) {
-        MyMap<String, Integer> myHashMap = new MyHashMap<>();
-        myHashMap.put(null, 4);
-        myHashMap.put(null, 10);
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
