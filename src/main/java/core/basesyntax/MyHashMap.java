@@ -9,9 +9,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private int threshold;
 
-    @SuppressWarnings("unchecked")
     public MyHashMap() {
-        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
         threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
@@ -20,41 +19,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        putValue(getIndexByHash(key), key, value);
-    }
-
-    @Override
-    public V getValue(K key) {
-        Node<K, V> tempNode = table[getIndexByHash(key)];
-        while (tempNode != null) {
-            if (Objects.equals(tempNode.key, key)) {
-                return tempNode.value;
-            }
-            tempNode = tempNode.next;
-        }
-        return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
-    }
-
-    private int getIndexByHash(K key) {
-        if (key == null) {
-            return 0;
-        }
-        int result = 17;
-        result = result * 31 + key.hashCode();
-        return result >= 0 ? result % table.length : -result % table.length;
+        putValue(hash(key), key, value);
     }
 
     private void putValue(int hash, K key, V value) {
         Node<K,V> newNode = new Node<>(hash, key, value);
-        if (table[getIndexByHash(key)] == null) {
-            table[getIndexByHash(key)] = newNode;
+        if (table[getIndex(key)] == null) {
+            table[getIndex(key)] = newNode;
         } else {
-            Node<K,V> tempNode = table[getIndexByHash(key)];
+            Node<K,V> tempNode = table[getIndex(key)];
             while (tempNode != null) {
                 if (Objects.equals(tempNode.key, key)) {
                     tempNode.value = value;
@@ -70,11 +43,40 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
+    public V getValue(K key) {
+        Node<K, V> tempNode = table[getIndex(key)];
+        while (tempNode != null) {
+            if (Objects.equals(tempNode.key, key)) {
+                return tempNode.value;
+            }
+            tempNode = tempNode.next;
+        }
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    private int getIndex(K key) {
+        return hash(key) >= 0 ? hash(key) % table.length : -hash(key) % table.length;
+    }
+
+    private int hash(K key) {
+        if (key == null) {
+            return 0;
+        }
+        int result = 17;
+        result = result * 31 + key.hashCode();
+        return result;
+    }
+
     private void resize() {
         size = 0;
         Node<K,V>[] oldTable = table;
-        table = (Node<K, V>[]) new Node[(int) (table.length * 2)];
+        table = new Node[(int) (table.length * 2)];
         threshold = (int) (table.length * LOAD_FACTOR);
         for (Node<K,V> node : oldTable) {
             while (node != null) {
