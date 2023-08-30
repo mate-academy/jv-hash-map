@@ -10,11 +10,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private int capacity;
 
+    public MyHashMap() {
+        table = new Node[DEFAULT_CAPACITY];
+        capacity = DEFAULT_CAPACITY;
+    }
+
     @Override
     public void put(K key, V value) {
         checkCapacity();
         Node<K, V> node = new Node<>(key, value);
-        int index = getIndex(key);
+        int index = getBucketIndex(key);
         if (table[index] == null) {
             table[index] = node;
         } else {
@@ -37,7 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         if (size > 0) {
-            Node<K, V> current = table[getIndex(key)];
+            Node<K, V> current = table[getBucketIndex(key)];
             while (current != null) {
                 if (Objects.equals(current.key, key)) {
                     return current.value;
@@ -53,15 +58,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getIndex(K key) {
+    private int getBucketIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
     private void checkCapacity() {
-        if (capacity == 0) {
-            table = new Node[DEFAULT_CAPACITY];
-            capacity = DEFAULT_CAPACITY;
-        }
         if (size >= capacity * LOAD_FACTOR) {
             resize();
         }
