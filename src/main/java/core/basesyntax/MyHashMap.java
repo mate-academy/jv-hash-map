@@ -19,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resizeTables();
         }
-        Node<K, V> newNode = new Node<>(key, value, null);
+        Node<K, V> newNode = new Node<>(key, value);
         int bucketIndex = getBucketIndex(key);
         if (table[bucketIndex] == null) {
             table[bucketIndex] = newNode;
@@ -88,10 +88,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        private Node(K key, V value, Node<K, V> node) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = node;
         }
     }
 }
