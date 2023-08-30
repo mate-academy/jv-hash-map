@@ -63,7 +63,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-
     private boolean putNodeAtPosition(Node<K, V> node, int position) {
         if (table[position] == null) {
             table[position] = node;
