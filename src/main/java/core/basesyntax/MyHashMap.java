@@ -41,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = key == null ? 0 : Math.abs(key.hashCode() % currentCapacity;
+        int index = key == null ? 0 : Math.abs(key.hashCode()) % currentCapacity;
         Node<K, V> node = buckets[index];
         if (node == null) {
             return null;
