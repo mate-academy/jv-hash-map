@@ -10,25 +10,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int CAPACITY_MULTIPLIER = 2;
     private Node<K, V>[] table;
     private int size;
-    private int tableLength;
+    private int threshold;
 
     public MyHashMap() {
         table = new Node[INITIAL_CAPACITY];
-        tableLength = INITIAL_CAPACITY;
+        threshold = (int) (table.length * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> newNode = new Node<>(getKeyHash(key), key, value, null);
-        size = putNodeAtPosition(newNode, getKeyHash(key) % tableLength) ? size + 1 : size;
-        if (size > tableLength * LOAD_FACTOR) {
+        if (size > threshold) {
             resize();
         }
+        Node<K, V> newNode = new Node<>(key, value);
+        size = putNodeAtPosition(newNode, getBucketIndex(key)) ? size + 1 : size;
     }
 
     @Override
     public V getValue(K key) {
-        int position = getKeyHash(key) % tableLength;
+        int position = getBucketIndex(key);
         Node<K, V> currentNode = table[position];
         if (currentNode == null) {
             return null;
@@ -47,15 +47,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getKeyHash(K key) {
+    private int getBucketIndex(K key) {
         int hash = key == null ? 0 : key.hashCode();
-        return hash < 0 ? hash * -1 : hash;
+        return (hash < 0 ? hash * -1 : hash) % table.length;
     }
 
     private void resize() {
-        tableLength *= CAPACITY_MULTIPLIER;
         Node<K, V>[] oldTable = table;
-        table = new Node[tableLength];
+        table = new Node[table.length * CAPACITY_MULTIPLIER];
+        threshold = (int) (table.length * LOAD_FACTOR);
         for (Node<K, V> kvNode : oldTable) {
             if (kvNode != null) {
                 addAllNodeByHead(kvNode);
@@ -73,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             nodes.add(addedNode);
         }
         for (Node<K, V> node : nodes) {
-            putNodeAtPosition(node, node.hash % tableLength);
+            putNodeAtPosition(node, getBucketIndex(node.key));
         }
     }
 
@@ -97,16 +97,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
