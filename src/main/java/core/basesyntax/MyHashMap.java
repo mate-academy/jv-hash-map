@@ -32,7 +32,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> newNode = new Node<>(key, value, table[index]);
             table[index] = newNode;
         }
-        if (size++ >= threshold) {
+        size++;
+        if (size >= threshold) {
             resize();
         }
     }
