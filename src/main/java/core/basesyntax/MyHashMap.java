@@ -77,10 +77,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucket(K key) {
-        if (hash(key) >= 0) {
-            return hash(key) % table.length;
-        }
-        return -hash(key) % table.length;
+        return Math.abs(hash(key)) % table.length;
     }
 
     private static class Node<K, V> {
