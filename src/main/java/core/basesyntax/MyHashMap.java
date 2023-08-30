@@ -67,6 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
     }
+
     private int hash(K key) {
         if (key == null) {
             return 0;
