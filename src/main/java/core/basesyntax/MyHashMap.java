@@ -3,8 +3,7 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-
-    private static final int DEFAULT_CAPACITY = 1 << 4; // aka 16
+    private static final int DEFAULT_CAPACITY = 1 << 4;
     private static final float LOAD_FACTOR = 0.75f;
     private int size;
     private int threshold;
@@ -17,6 +16,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if (size > threshold) {
+            resize();
+        }
         int index = calculateIndex(key);
         //if node is null, creating new node
         if (table[index] == null) {
@@ -33,9 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> newNode = new Node<>(key, value, table[index]);
             table[index] = newNode;
         }
-        if (++size > threshold) {
-            resize();
-        }
+        size++;
     }
 
     @Override
