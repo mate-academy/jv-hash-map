@@ -12,7 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         array = new Node[DEFAULT_CAPACITY];
-        threshold = 12;
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             resize();
         }
-        int bucket = getKeyHash(key) % array.length;
+        int bucket = findBucket(key);
         Node currentNode = array[bucket];
         if (array[bucket] == null) {
             array[bucket] = node;
@@ -41,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int bucket = getKeyHash(key) % array.length;
+        int bucket = findBucket(key);
         Node<K, V> currentNode = array[bucket];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
@@ -58,7 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getKeyHash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() + 17);
+        return key == null ? 0 : Math.abs(key.hashCode() * 17);
     }
 
     private void resize() {
@@ -74,6 +74,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private int findBucket(K key) {
+        return getKeyHash(key) % array.length;
+    }
+
     private class Node<K, V> {
         private final K key;
         private V value;
@@ -87,6 +91,3 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
 }
-
-
-
