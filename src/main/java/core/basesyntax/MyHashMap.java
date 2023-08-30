@@ -22,28 +22,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        Node<K, V> newNode;
-        if (key == null) {
-            newNode = new Node<>(key, value, null);
-        } else {
-            newNode = new Node<>(key, value, null);
-        }
+        Node<K, V> newNode = new Node<>(key, value, null);
         int position = getPosition(key);
         if (table[position] == null) {
             table[position] = newNode;
-        } else if (Objects.equals(table[position].key, key)) {
-            table[position].value = newNode.value;
-            return;
         } else {
             Node<K, V> itemInTable = table[position];
-            while (itemInTable.next != null) {
-                itemInTable = itemInTable.next;
+            Node<K, V> cache = table[position];
+            while (itemInTable != null) {
                 if (Objects.equals(itemInTable.key, key)) {
                     itemInTable.value = newNode.value;
                     return;
                 }
+                cache = itemInTable;
+                itemInTable = itemInTable.next;
             }
-            itemInTable.next = newNode;
+            cache.next = newNode;
         }
         size++;
     }
