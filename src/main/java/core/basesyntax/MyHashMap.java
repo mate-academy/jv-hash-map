@@ -6,20 +6,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int DEFAULT_MULTIPLICATION = 2;
-    private Node<K, V>[] bucket;
+    private Node<K, V>[] buckets;
     private int size;
     private int capacity;
-    private float loadFactor;
     private float threshold;
 
     public MyHashMap() {
-        this(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR);
-    }
-
-    public MyHashMap(int capacity, float loadFactor) {
-        this.capacity = capacity;
-        this.loadFactor = loadFactor;
-        this.bucket = new Node[capacity];
+        this.capacity = DEFAULT_CAPACITY;
+        this.threshold = DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR;
+        this.buckets = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -28,10 +23,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int index = getIndex(key, capacity);
-        Node<K, V> node = bucket[index];
+        Node<K, V> node = buckets[index];
         Node<K, V> newNode = new Node<>(key, value);
         if (node == null) {
-            bucket[index] = newNode;
+            buckets[index] = newNode;
         } else {
             Node<K, V> prev = node;
             while (node != null) {
@@ -50,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = getIndex(key, capacity);
-        Node<K, V> node = bucket[index];
+        Node<K, V> node = buckets[index];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
                 return node.value;
@@ -66,7 +61,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key, int capacity) {
-        return key == null ? 0 : hash(key) % capacity;
+        return hash(key) % capacity;
     }
 
     private int hash(K key) {
@@ -77,7 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int newCapacity = capacity * DEFAULT_MULTIPLICATION;
         Node<K, V>[] newBucket = new Node[newCapacity];
         for (int i = 0; i < capacity; i++) {
-            Node<K, V> node = bucket[i];
+            Node<K, V> node = buckets[i];
             while (node != null) {
                 Node<K, V> next = node.next;
                 int index = getIndex(node.key, newCapacity);
@@ -86,7 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node = next;
             }
         }
-        bucket = newBucket;
+        buckets = newBucket;
         capacity = newCapacity;
         threshold = capacity * DEFAULT_LOAD_FACTOR;
     }
