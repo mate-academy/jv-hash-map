@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -53,27 +51,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        size = 0;
         Node<K, V>[] oldTable = table;
         table = new Node[table.length * CAPACITY_MULTIPLIER];
         threshold = (int) (table.length * LOAD_FACTOR);
         for (Node<K, V> kvNode : oldTable) {
-            if (kvNode != null) {
-                addAllNodeByHead(kvNode);
+            while (kvNode != null) {
+                put(kvNode.key, kvNode.value);
+                kvNode = kvNode.next;
             }
-        }
-    }
-
-    private void addAllNodeByHead(Node<K, V> head) {
-        List<Node<K, V>> nodes = new ArrayList<>();
-        Node<K, V> currentNode = head;
-        while (currentNode != null) {
-            Node<K, V> addedNode = currentNode;
-            currentNode = currentNode.next;
-            addedNode.next = null;
-            nodes.add(addedNode);
-        }
-        for (Node<K, V> node : nodes) {
-            putNodeAtPosition(node, getBucketIndex(node.key));
         }
     }
 
