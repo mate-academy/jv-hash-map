@@ -3,9 +3,9 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_CAPACITY = 16;
-    static final double DEFAULT_LOAD_FACTOR = 0.75;
-    static final int CAPACITY_MODIFIER = 2;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final double DEFAULT_LOAD_FACTOR = 0.75;
+    private static final int CAPACITY_MODIFIER = 2;
     private int size;
     private Node<K, V>[] table;
     private int threshold;
@@ -17,11 +17,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int bucket = getBucketbyHash(key);
+        int bucket = getBucket(key);
         Node<K, V> currentNode = table[bucket];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
-                currentNode.value = value;
+                if (!Objects.equals(currentNode.value, value)) {
+                    currentNode.value = value;
+                }
                 return;
             }
             currentNode = currentNode.next;
@@ -34,9 +36,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = table[getBucketbyHash(key)];
+        Node<K, V> currentNode = table[getBucket(key)];
         while (currentNode != null) {
             if (Objects.equals(key,currentNode.key)) {
                 return currentNode.value;
@@ -64,14 +67,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
     }
-
-    private int getBucketbyHash(K key) {
+    private int hash(K key) {
         if (key == null) {
             return 0;
         }
         int result = 17;
         result += 31 * key.hashCode();
-        return result >= 0 ? result % table.length : -result % table.length;
+        return result;
+    }
+
+    private int getBucket(K key) {
+        if (hash(key) >= 0) {
+            return hash(key) % table.length;
+        }
+        return -hash(key) % table.length;
     }
 
     private static class Node<K, V> {
