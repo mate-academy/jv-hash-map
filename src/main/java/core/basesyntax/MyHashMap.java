@@ -20,18 +20,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int index = calculateIndex(key);
-        //if node is null, creating new node
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
         } else {
-            for (Node<K, V> node = table[index]; node != null; node = node.next) {
-                // if we found same key, updating the value
+            Node<K, V> node = table[index];
+            while (node != null){
                 if (Objects.equals(key, node.key)) {
                     node.value = value;
                     return;
                 }
+                node = node.next;
             }
-            // if no same key found, adding node to head
             Node<K, V> newNode = new Node<>(key, value, table[index]);
             table[index] = newNode;
         }
@@ -42,10 +41,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int index = calculateIndex(key);
         if (table[index] != null) {
-            for (Node<K, V> node = table[index]; node != null; node = node.next) {
+            Node<K, V> node = table[index];
+            while (node != null) {
                 if (Objects.equals(key, node.key)) {
                     return node.value;
                 }
+                node = node.next;
             }
         }
         return null;
