@@ -1,19 +1,98 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75f;
+    private Node<K,V>[] table;
+    private int size;
+    private int threshold;
+    private int capacity;
+
+    public MyHashMap() {
+        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
+        capacity = DEFAULT_CAPACITY;
+    }
 
     @Override
     public void put(K key, V value) {
-
+        if (size >= threshold) {
+            resize();
+        }
+        int index = indexBucket(key);
+        Node<K,V> node = table[index];
+        Node<K,V> newNode = new Node<>(key, value);
+        if (node == null) {
+            table[index] = newNode;
+        } else {
+            Node<K, V> prev = node;
+            while (node != null) {
+                if (key == node.key || key != null && key.equals((node.key))) {
+                    node.value = value;
+                    return;
+                }
+                prev = node;
+                node = node.next;
+            }
+            prev.next = newNode;
+        }
+        size++;
     }
 
     @Override
     public V getValue(K key) {
+        int index = indexBucket(key);
+        if (table[index] == null) {
+            return null;
+        }
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (key == node.key || (key != null && key.equals(node.key))) {
+                return node.value;
+            }
+            node = node.next;
+        }
         return null;
     }
 
     @Override
     public int getSize() {
-        return 0;
+        return size;
+    }
+
+    public int indexBucket(K key) {
+        return key == null ? 0 : hash(key) % DEFAULT_CAPACITY;
+    }
+
+    public int hash(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode());
+    }
+
+    private void resize() {
+        capacity = capacity * 2;
+        Node<K, V>[] newTable = new Node[capacity];
+        for (int i = 0; i < table.length; i++) {
+            Node<K, V> node = table[i];
+            while (node != null) {
+                Node<K, V> next = node.next;
+                int index = indexBucket(node.key);
+                node.next = newTable[index];
+                newTable[index] = node;
+                node = next;
+            }
+        }
+        table = newTable;
+        threshold = (int) (capacity * LOAD_FACTOR);
+    }
+
+    private static class Node<K,V> {
+        private K key;
+        private V value;
+        private Node<K,V> next;
+
+        public Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 }
