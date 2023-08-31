@@ -18,10 +18,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold) {
-            increaseCapacity();
-        }
-        int index = getIndex(key, capacity);
+        increaseCapacity();
+        int index = getIndex(key);
         Node<K, V> node = hashMap[index];
         Node<K, V> newNode = new Node<>(key, value);
         if (node == null) {
@@ -43,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = getIndex(key, capacity);
+        int index = getIndex(key);
         Node<K, V> node = hashMap[index];
         Node<K, V> prev = node;
         while (node != null) {
@@ -60,26 +58,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void increaseCapacity() {
-        int newCapacity = capacity * MULTYPLYCATION;
-        Node<K, V>[] newHashMap = new Node[newCapacity];
-        for (Node singleNode : hashMap) {
-            Node<K, V> node = singleNode;
-            while (node != null) {
-                Node<K, V> next = node.next;
-                int index = getIndex(node.key, newCapacity);
-                node.next = newHashMap[index];
-                newHashMap[index] = node;
-                node = next;
-            }
-        }
-        hashMap = newHashMap;
-        capacity = newCapacity;
-        threshold = (int) (capacity * LOAD_FACTOR);
+    private int getIndex(K key) {
+        return hashCode(key) % capacity;
     }
 
-    private int getIndex(K key, int capacity) {
-        return hashCode(key) % capacity;
+    private void increaseCapacity() {
+        if (size >= threshold) {
+            int newCapacity = capacity * MULTYPLYCATION;
+            Node<K, V>[] newHashMap = new Node[newCapacity];
+            capacity = newCapacity;
+            threshold = (int) (capacity * LOAD_FACTOR);
+            for (Node singleNode : hashMap) {
+                Node<K, V> node = singleNode;
+                while (node != null) {
+                    Node<K, V> next = node.next;
+                    int index = getIndex(node.key);
+                    node.next = newHashMap[index];
+                    newHashMap[index] = node;
+                    node = next;
+                }
+            }
+            hashMap = newHashMap;
+        }
     }
 
     private int hashCode(K key) {
