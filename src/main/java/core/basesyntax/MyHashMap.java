@@ -9,7 +9,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private Node<K, V>[] table;
 
-    @SuppressWarnings("unchecked")
     public MyHashMap() {
         capacity = DEFAULT_CAPACITY;
         table = (Node<K, V>[]) new Node[capacity];
@@ -18,6 +17,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if (size > threshold) {
+            resize();
+        }
         Node<K, V> newNode = new Node<>(hash(key), key, value, null);
         int index = getBucketIndex(key);
         if (table[index] == null) {
@@ -38,9 +40,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             node.next = newNode;
         }
         size++;
-        if (size > threshold) {
-            resize();
-        }
     }
 
     @Override
@@ -60,7 +59,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    @SuppressWarnings("unchecked")
     private void resize() {
         capacity = capacity * RESIZE_INDEX;
         threshold = threshold * RESIZE_INDEX;
