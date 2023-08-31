@@ -24,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = new Node<>(key, value, null);
         } else {
             Node<K, V> node = table[index];
-            while (node != null){
+            while (node != null) {
                 if (Objects.equals(key, node.key)) {
                     node.value = value;
                     return;
