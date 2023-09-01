@@ -1,13 +1,12 @@
 package core.basesyntax;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private final int DEFAULT_CAPACITY = 16;
-    private final double LOAD_FACTOR = 0.75;
-    private final int DEFAULT_INCREASE = 2;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final double LOAD_FACTOR = 0.75;
+    private static final int DEFAULT_INCREASE = 2;
     private int threshold;
     private int size;
     private int capacity;
@@ -18,7 +17,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
         capacity = DEFAULT_CAPACITY;
     }
-
 
     @Override
     public void put(K key, V value) {
@@ -69,8 +67,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K,V>[] oldTab = table;
         capacity = capacity * DEFAULT_INCREASE;
+        Node<K,V>[] oldTab = table;
         Node<K,V>[] newTab = new Node[capacity];
         table = newTab;
         size = 0;
@@ -88,10 +86,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public class Node<K, V> implements Map.Entry<K, V> {
-        int hash;
-        K key;
-        V value;
-        Node<K, V> next;
+        private int hash;
+        private K key;
+        private V value;
+        private Node<K, V> next;
 
         public Node(K key, V value) {
             this.key = key;
