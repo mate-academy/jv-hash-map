@@ -6,6 +6,11 @@ public class Bus {
     private String model;
     private String color;
 
+    public Bus(String model, String color) {
+        this.model = model;
+        this.color = color;
+    }
+
     public String getModel() {
         return model;
     }
@@ -22,25 +27,17 @@ public class Bus {
         this.color = color;
     }
 
-    public Bus(String model, String color) {
-        this.model = model;
-        this.color = color;
-    }
-
-    public Bus() {
+    @Override
+    public int hashCode() {
+        return Objects.hash(model, color);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Bus plane = (Bus) o;
-        return Objects.equals(model, plane.model) &&
-                Objects.equals(color, plane.color);
-    }
-
-    @Override
-    public int hashCode() {
-        return 0;
+        Bus bus = (Bus) o;
+        return Objects.equals(model, bus.model) &&
+                Objects.equals(color, bus.color);
     }
 }

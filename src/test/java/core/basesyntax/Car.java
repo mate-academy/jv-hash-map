@@ -3,9 +3,13 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class Car {
-
     private String model;
     private String color;
+
+    public Car(String model, String color) {
+        this.model = model;
+        this.color = color;
+    }
 
     public String getModel() {
         return model;
@@ -23,12 +27,9 @@ public class Car {
         this.color = color;
     }
 
-    public Car(String model, String color) {
-        this.model = model;
-        this.color = color;
-    }
-
-    public Car() {
+    @Override
+    public int hashCode() {
+        return Objects.hash(model, color);
     }
 
     @Override
@@ -38,10 +39,5 @@ public class Car {
         Car car = (Car) o;
         return Objects.equals(model, car.model) &&
                 Objects.equals(color, car.color);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(model, color);
     }
 }
