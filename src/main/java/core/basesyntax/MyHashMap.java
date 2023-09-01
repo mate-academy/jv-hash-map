@@ -1,14 +1,17 @@
 package core.basesyntax;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
     private Entry<K, V>[] buckets;
+    private double threshold;
     private int size;
 
     public MyHashMap() {
         buckets = new Entry[INITIAL_CAPACITY];
-        size = 0;
     }
 
     @Override
@@ -27,6 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         newEntry.next = buckets[index];
         buckets[index] = newEntry;
         size++;
+        threshold = (double) size / buckets.length;
         resize();
     }
 
@@ -57,7 +61,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if ((double) size / buckets.length >= LOAD_FACTOR) {
+        if (threshold >= LOAD_FACTOR) {
             Entry<K, V>[] newBuckets = new Entry[buckets.length * 2];
             for (Entry<K, V> entry : buckets) {
                 while (entry != null) {
