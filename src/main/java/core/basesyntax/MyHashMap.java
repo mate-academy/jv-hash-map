@@ -15,34 +15,43 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
     }
 
-    private static class Node<K, V> {
-        final K key;
-        V value;
-        Node<K, V> next;
-
-        public Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
+    @Override
+    public void put(K key, V value) {
+        if (size >= threshold) {
+            resize();
         }
+        putInTable(table, key, value);
     }
 
     @Override
-    public void put(K key, V value) {
-        if (size >= threshold) { // check if the size is bigger than a threshold
-            resize();            // resize if it is so
+    public V getValue(K key) {
+        int index = calculateIndex(key);
+        Node<K, V> current = table[index];
+        while (current != null) {
+            if (Objects.equals(current.key, key)) {
+                return current.value;
+            }
+            current = current.next;
         }
-        putInTable(table, key, value);
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    private int calculateIndex(K key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void putInTable(Node<K, V>[] table, K key, V value) {
         int index = calculateIndex(key);
         Node<K, V> current = table[index];
-        Node<K, V> newNode = new Node<>(key, value, null); // create new node with the given key and value
-
-        if (current == null) { // go to the bucket and check if it's empty
+        Node<K, V> newNode = new Node<>(key, value, null);
+        if (current == null) {
             table[index] = newNode;
-        } else {   // if it is full - go through the elements of the list and check a key with equals
+        } else {
             Node<K, V> prev = current;
             while (current != null) {
                 if (Objects.equals(newNode.key, current.key)) {
@@ -57,51 +66,48 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private int calculateIndex(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
-    }
-
-
     private void resize() {
         Node<K, V>[] oldTable = table;
-        int oldCapacity = table.length;
-        //create new array of double size
         table = new Node[table.length * 2];
+        size = 0;
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                putInTable(table,node.key, node.value);
+                node = node.next;
+            }
+        }
         threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
-        // go to each bucket. if there is a node there -
-        // take its hashcode and recalculate its position in a new array
-        for (int i = 0; i < oldCapacity; i++) {
-            if (oldTable[i] != null) {   // if there is node -> new hash for the node -> put into new array
-//            putInTable(table, oldTable[i].key, oldTable[i].value); // version of the following code - mistake with size
-                int newIndex = calculateIndex(oldTable[i].key);
-                table[newIndex] = oldTable[i];
-                while (oldTable[i].next != null) {
-                    int index = calculateIndex(oldTable[i].next.key);
-                    table[index] = oldTable[i].next;
-                    oldTable[i] = oldTable[i].next;
-                }
-            }
-        }
     }
 
-    @Override
-    public V getValue(K key) {
-        //calculate hash
-        int index = calculateIndex(key);
-        Node<K, V> current = table[index]; // find the node
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
-        // go to the bucket and iterate till we find the node's value
-        while (current != null) {
-            if (Objects.equals(current.key, key)) {
-                return current.value;  // if it exists - returns its value
-            }
-            current = current.next;
+        public Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
         }
-        return null;
-    }
 
-    @Override
-    public int getSize() {
-        return size;
+        public K getKey() {
+            return key;
+        }
+
+        public V getValue() {
+            return value;
+        }
+
+        public void setValue(V value) {
+            this.value = value;
+        }
+
+        public Node<K, V> getNext() {
+            return next;
+        }
+
+        public void setNext(Node<K, V> next) {
+            this.next = next;
+        }
     }
 }
