@@ -69,8 +69,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         capacity = capacity * 2;
         Node<K, V>[] newTable = new Node[capacity];
-        for (int i = 0; i < table.length; i++) {
-            Node<K, V> node = table[i];
+        for (Node<K, V> kvNode : table) {
+            Node<K, V> node = kvNode;
             while (node != null) {
                 Node<K, V> next = node.next;
                 int index = getIndexBucket(node.key);
