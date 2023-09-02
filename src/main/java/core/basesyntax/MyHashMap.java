@@ -16,6 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
     }
 
+    @Override
     public void put(K key, V value) {
         int index = getIndex(key);
         if (buckets[index] == null) {
@@ -38,6 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    @Override
     public V getValue(K key) {
         int index = getIndex(key);
         if (buckets[index] == null) {
@@ -54,6 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
+    @Override
     public int getSize() {
         return size;
     }
