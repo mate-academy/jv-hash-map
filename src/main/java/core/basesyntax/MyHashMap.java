@@ -60,8 +60,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {return true;}
-        if (o == null || getClass() != o.getClass()) {return false;}
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MyHashMap<?, ?> myHashMap = (MyHashMap<?, ?>) o;
         return size == myHashMap.size && Arrays.equals(buckets, myHashMap.buckets);
     }
