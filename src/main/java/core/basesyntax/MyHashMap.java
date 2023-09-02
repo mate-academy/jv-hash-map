@@ -1,8 +1,7 @@
 package core.basesyntax;
 
-import java.util.LinkedList;
 import java.util.AbstractMap;
-import java.util.Map;
+import java.util.LinkedList;
 import java.util.Map.Entry;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -24,7 +23,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         for (Entry<K, V> entry : buckets[index]) {
-            if ((entry.getKey() == null && key == null) || (entry.getKey() != null && entry.getKey().equals(key))) {
+            if ((entry.getKey() == null && key == null) ||
+                    (entry.getKey() != null && entry.getKey().equals(key))) {
                 entry.setValue(value);
                 return;
             }
@@ -45,7 +45,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         for (Entry<K, V> entry : buckets[index]) {
-            if ((entry.getKey() == null && key == null) || (entry.getKey() != null && entry.getKey().equals(key))) {
+            if ((entry.getKey() == null && key == null) ||
+                    (entry.getKey() != null && entry.getKey().equals(key))) {
                 return entry.getValue();
             }
         }
