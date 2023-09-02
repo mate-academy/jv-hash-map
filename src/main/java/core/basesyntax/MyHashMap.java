@@ -5,12 +5,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int CAPACITY_MULTIPLIER = 2;
     private Node<K, V>[] table;
-    private float threshold;
+    private int threshold;
     private int size;
 
     public MyHashMap() {
         this.table = new Node[DEFAULT_INITIAL_CAPACITY];
-        threshold = DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR;
+        threshold = DEFAULT_INITIAL_CAPACITY * (int)DEFAULT_LOAD_FACTOR;
     }
 
     @Override
@@ -18,49 +18,40 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        int index = indexBucket(key);
+        int index = getIndexBucket(key);
         Node<K, V> node = table[index];
         Node<K, V> newNode = new Node<>(key, value);
         if (node == null) {
             table[index] = newNode;
         } else {
-            // в цьому бакеті щось є(пробігтись, перевірячи ключі,
-            // якщо == міняємо, якщо колізія - некст
             Node<K, V> prev = node;
             while (node != null) {
-                if (key == node.key || (key != null && key.equals(node.key))) {
+                if (key == node.key || key != null && key.equals(node.key)) {
                     node.value = value;
                     return;
                 }
-                prev = node;//1  2  3 null
+                prev = node;
                 node = node.next;
             }
             prev.next = newNode;
         }
         size++;
-        // пошук потрібного бакету
-        // чи бакет емпті, якщо так - шукаємо до кінця списку
     }
 
     @Override
     public V getValue(K key) {
-        int index = indexBucket(key);
+        int index = getIndexBucket(key);
         if (table[index] == null) {
             return null;
         }
         Node<K, V> node = table[index];
         while (node != null) {
-            if (key == node.key || (key != null && key.equals(node.key))) {
+            if (key == node.key || key != null && key.equals(node.key)) {
                 return node.value;
             }
             node = node.next;
         }
         return null;
-        // bucket
-        // проходжусь по  списку і порівнюю ключі (якщо потрібке ключ - ретурн, якщо ні - null
-        // getHasshcode
-        // keep track of getbucket
-
     }
 
     @Override
@@ -68,29 +59,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public int indexBucket(K key) {
-        return key == null ? 0 : hash(key) % DEFAULT_INITIAL_CAPACITY;
+    private int getIndexBucket(K key) {
+        return hash(key) % DEFAULT_INITIAL_CAPACITY;
     }
 
-    public int hash(K key) {
+    private int hash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
-    public void resize() {
+    private void resize() {
         int newCapacity = table.length * CAPACITY_MULTIPLIER;
-        Node<K, V>[] newTable = new Node[newCapacity];
-        for (int i = 0; i < table.length; i++) {
-            Node<K, V> node = table[i];
+        Node<K, V>[] oldTab = table;
+        table = new Node[newCapacity];
+        size = 0;
+        for (Node<K,V> node : oldTab) {
             while (node != null) {
-                Node<K, V> next = node.next;
-                int index = indexBucket(node.key);
-                node.next = newTable[index];
-                newTable[index] = node;
-                node = next;
+                put(node.key, node.value);
+                node = node.next;
             }
         }
-        table = newTable;
-        threshold = DEFAULT_LOAD_FACTOR * newCapacity;
+        threshold = (int)(DEFAULT_LOAD_FACTOR * newCapacity);
     }
 
     private static class Node<K, V> {
