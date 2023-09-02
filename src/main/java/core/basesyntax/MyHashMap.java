@@ -1,8 +1,10 @@
 package core.basesyntax;
 
 import java.util.AbstractMap;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
@@ -16,7 +18,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
     }
 
-    @Override
     public void put(K key, V value) {
         int index = getIndex(key);
         if (buckets[index] == null) {
@@ -24,8 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         for (Entry<K, V> entry : buckets[index]) {
-            if ((entry.getKey() == null && key == null)
-                    || (entry.getKey() != null && entry.getKey().equals(key))) {
+            if (isEqual(entry.getKey(), key)) {
                 entry.setValue(value);
                 return;
             }
@@ -39,7 +39,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    @Override
     public V getValue(K key) {
         int index = getIndex(key);
         if (buckets[index] == null) {
@@ -47,8 +46,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         for (Entry<K, V> entry : buckets[index]) {
-            if ((entry.getKey() == null && key == null)
-                    || (entry.getKey() != null && entry.getKey().equals(key))) {
+            if (isEqual(entry.getKey(), key)) {
                 return entry.getValue();
             }
         }
@@ -56,16 +54,42 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    @Override
     public int getSize() {
         return size;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MyHashMap<?, ?> myHashMap = (MyHashMap<?, ?>) o;
+        return size == myHashMap.size && Arrays.equals(buckets, myHashMap.buckets);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(size);
+        result = 31 * result + Arrays.hashCode(buckets);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "MyHashMap{" +
+                "buckets=" + Arrays.toString(buckets) +
+                ", size=" + size +
+                '}';
+    }
+
     private int getIndex(K key) {
+        return getIndex(key, buckets.length);
+    }
+
+    private int getIndex(K key, int length) {
         if (key == null) {
             return 0;
         }
-        return Math.abs(key.hashCode()) % buckets.length;
+        return Math.abs(key.hashCode()) % length;
     }
 
     private void resize() {
@@ -84,10 +108,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         buckets = newBuckets;
     }
 
-    private int getIndex(K key, int length) {
-        if (key == null) {
-            return 0;
+    private boolean isEqual(K key1, K key2) {
+        if (key1 == null) {
+            return key2 == null;
         }
-        return Math.abs(key.hashCode()) % length;
+        return key1.equals(key2);
     }
 }
