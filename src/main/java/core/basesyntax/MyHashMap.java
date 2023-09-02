@@ -19,32 +19,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        int index = indexBucket(key);
+        int index = getIndexBucket(key);
         Node<K,V> node = table[index];
         Node<K,V> newNode = new Node<>(key, value);
         if (node == null) {
             table[index] = newNode;
         } else {
-            Node<K, V> prev = node;
             while (node != null) {
                 if (key == node.key || key != null && key.equals((node.key))) {
                     node.value = value;
                     return;
                 }
-                prev = node;
+                if (node.next == null) {
+                    newNode.next = table[index];
+                    table[index] = newNode;
+                }
                 node = node.next;
             }
-            prev.next = newNode;
         }
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        int index = indexBucket(key);
-        if (table[index] == null) {
-            return null;
-        }
+        int index = getIndexBucket(key);
         Node<K, V> node = table[index];
         while (node != null) {
             if (key == node.key || (key != null && key.equals(node.key))) {
@@ -60,12 +58,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public int indexBucket(K key) {
+    public int getIndexBucket(K key) {
         return key == null ? 0 : hash(key) % DEFAULT_CAPACITY;
     }
 
     public int hash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode());
+        return Math.abs(key.hashCode());
     }
 
     private void resize() {
@@ -75,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> node = table[i];
             while (node != null) {
                 Node<K, V> next = node.next;
-                int index = indexBucket(node.key);
+                int index = getIndexBucket(node.key);
                 node.next = newTable[index];
                 newTable[index] = node;
                 node = next;
