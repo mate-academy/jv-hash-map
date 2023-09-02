@@ -76,8 +76,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public String toString() {
         return "MyHashMap{"
-                + "buckets=" + Arrays.toString(buckets)
-                + ", size=" + size
+                + "buckets="
+                + Arrays.toString(buckets)
+                + ", size="
+                + size
                 + '}';
     }
 
