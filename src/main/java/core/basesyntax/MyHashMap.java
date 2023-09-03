@@ -24,6 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K,V> newNode = new Node<>(key, value);
         if (node == null) {
             table[index] = newNode;
+            size++;
         } else {
             while (node != null) {
                 if (key == node.key || key != null && key.equals((node.key))) {
@@ -33,11 +34,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 if (node.next == null) {
                     newNode.next = table[index];
                     table[index] = newNode;
+                    size++;
+                    return;
                 }
                 node = node.next;
             }
         }
-        size++;
     }
 
     @Override
@@ -68,19 +70,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         capacity = capacity * 2;
-        Node<K, V>[] newTable = new Node[capacity];
-        for (Node<K, V> kvNode : table) {
-            Node<K, V> node = kvNode;
+        threshold = (int) (capacity * LOAD_FACTOR);
+        Node<K, V>[] oldNode = table;
+        table = new Node[capacity];
+        size = 0;
+        for (Node<K, V> node : oldNode) {
             while (node != null) {
-                Node<K, V> next = node.next;
-                int index = getIndexBucket(node.key);
-                node.next = newTable[index];
-                newTable[index] = node;
-                node = next;
+                put(node.key, node.value);
+                node = node.next;
             }
         }
-        table = newTable;
-        threshold = (int) (capacity * LOAD_FACTOR);
     }
 
     private static class Node<K,V> {
