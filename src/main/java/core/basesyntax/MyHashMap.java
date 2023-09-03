@@ -20,18 +20,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public void put(K key, V value) {
         int index = getIndex(key);
-        if (buckets[index] == null) {
-            buckets[index] = new LinkedList<>();
+        LinkedList<Entry<K, V>> bucket = buckets[index];
+        if (bucket == null) {
+            bucket = new LinkedList<>();
+            buckets[index] = bucket;
         }
 
-        for (Entry<K, V> entry : buckets[index]) {
-            if (isEqual(entry.getKey(), key)) {
+        for (Entry<K, V> entry : bucket) {
+            if (Objects.equals(entry.getKey(), key)) {
                 entry.setValue(value);
                 return;
             }
         }
 
-        buckets[index].add(new AbstractMap.SimpleEntry<>(key, value));
+        bucket.add(new AbstractMap.SimpleEntry<>(key, value));
         size++;
 
         if ((double) size / buckets.length >= LOAD_FACTOR) {
@@ -41,12 +43,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public V getValue(K key) {
         int index = getIndex(key);
-        if (buckets[index] == null) {
+        LinkedList<Entry<K, V>> bucket = buckets[index];
+        if (bucket == null) {
             return null;
         }
 
-        for (Entry<K, V> entry : buckets[index]) {
-            if (isEqual(entry.getKey(), key)) {
+        for (Entry<K, V> entry : bucket) {
+            if (Objects.equals(entry.getKey(), key)) {
                 return entry.getValue();
             }
         }
@@ -79,12 +82,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public String toString() {
-        return "MyHashMap{"
-                + "buckets="
-                + Arrays.toString(buckets)
-                + ", size="
-                + size
-                + '}';
+        return "MyHashMap{" + "buckets=" + Arrays.toString(buckets) + ", size=" + size + '}';
     }
 
     private int getIndex(K key) {
@@ -104,20 +102,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (bucket != null) {
                 for (Entry<K, V> entry : bucket) {
                     int index = getIndex(entry.getKey(), newBuckets.length);
-                    if (newBuckets[index] == null) {
-                        newBuckets[index] = new LinkedList<>();
+                    LinkedList<Entry<K, V>> newBucket = newBuckets[index];
+                    if (newBucket == null) {
+                        newBucket = new LinkedList<>();
+                        newBuckets[index] = newBucket;
                     }
-                    newBuckets[index].add(entry);
+                    newBucket.add(entry);
                 }
             }
         }
         buckets = newBuckets;
-    }
-
-    private boolean isEqual(K key1, K key2) {
-        if (key1 == null) {
-            return key2 == null;
-        }
-        return key1.equals(key2);
     }
 }
