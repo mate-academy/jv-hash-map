@@ -17,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         ensureTreshold();
-        int index = key == null ? 0 : Math.abs(key.hashCode() % table.length);
+        int index = getIndex(key);
         if (table[index] == null) {
             table[index] = new Node(key, value, null);
             size++;
@@ -40,14 +40,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = key == null ? 0 : Math.abs(key.hashCode() % table.length);
+        int index = getIndex(key);
         Node<K, V> current = table[index];
         while (current != null) {
             if (Objects.equals(key, current.key)) {
                 return current.value;
-            } else {
-                current = current.next;
             }
+            current = current.next;
         }
         return null;
     }
@@ -55,18 +54,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
-    }
-
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(K key, V value, Node<K,V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
     }
 
     private void ensureTreshold() {
@@ -87,6 +74,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 put(node.key, node.value);
                 node = node.next;
             }
+        }
+    }
+
+    private int getIndex(K key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value, Node<K,V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
         }
     }
 }
