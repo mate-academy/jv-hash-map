@@ -7,12 +7,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int size;
     private int threshold;
+    private int defaultCapacityIncrease;
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        size = 0;
         table = new Node[DEFAULT_CAPACITY];
         threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
+        defaultCapacityIncrease = table.length * 2;
     }
 
     @Override
@@ -68,7 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldTable = table;
-        table = new Node[table.length * 2];
+        table = new Node[defaultCapacityIncrease];
         size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
@@ -87,26 +88,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
-            this.next = next;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
-        }
-
-        public Node<K, V> getNext() {
-            return next;
-        }
-
-        public void setNext(Node<K, V> next) {
             this.next = next;
         }
     }
