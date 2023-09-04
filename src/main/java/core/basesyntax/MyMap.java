@@ -6,4 +6,8 @@ public interface MyMap<K, V> {
     V getValue(K key);
 
     int getSize();
+
+    void resize();
+
+    void remove(K key);
 }
