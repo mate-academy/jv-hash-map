@@ -6,12 +6,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K,V>[] table;
     private int size;
     private int threshold;
-    private int capacity;
+    //private int capacity;
 
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
         threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
-        capacity = DEFAULT_CAPACITY;
+        //capacity = DEFAULT_CAPACITY;
     }
 
     @Override
@@ -69,10 +69,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        capacity = capacity * 2;
-        threshold = (int) (capacity * LOAD_FACTOR);
+        int newLength = table.length * 2;
+        threshold = (int) (newLength * LOAD_FACTOR);
         Node<K, V>[] oldNode = table;
-        table = new Node[capacity];
+        table = new Node[newLength];
         size = 0;
         for (Node<K, V> node : oldNode) {
             while (node != null) {
