@@ -6,11 +6,6 @@ public class Plane {
     private String model;
     private String color;
 
-    public Plane(String model, String color) {
-        this.model = model;
-        this.color = color;
-    }
-
     public String getModel() {
         return model;
     }
@@ -27,9 +22,11 @@ public class Plane {
         this.color = color;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(model, color);
+    public Plane(String model, String color) {
+        this.model = model;this.color = color;
+    }
+
+    public Plane() {
     }
 
     @Override
@@ -39,5 +36,10 @@ public class Plane {
         Plane plane = (Plane) o;
         return Objects.equals(model, plane.model) &&
                 Objects.equals(color, plane.color);
+    }
+
+    @Override
+    public int hashCode() {
+        return 1;
     }
 }
