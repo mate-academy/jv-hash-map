@@ -3,127 +3,116 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_CAPACITY = 16;
+    private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-
+    private static final int MAX_CAPACITY = Integer.MAX_VALUE;
+    private static final int ARRAY_INCREASE = 2;
+    private Node<K, V>[] table = new Node[INITIAL_CAPACITY];
     private int size;
-    private Node<K, V>[] buckets;
+    private int threshold;
+    private int capacity;
 
-    public MyHashMap() {
-        buckets = new Node[DEFAULT_CAPACITY];
-    }
-
+    @Override
     public void put(K key, V value) {
-        if (key == null) {
-            resize();
-            int index = 0;
-            Node<K, V> node = buckets[index];
-            while (node != null) {
-                if (Objects.equals(key, node.key)) {
-                    node.value = value;
-                    return;
-                }
-                node = node.next;
-            }
-            buckets[index] = new Node<>(key, value, buckets[index]);
-            size++;
-        } else {
-            int index = getIndex(key);
-            Node<K, V> newNode = new Node<>(key, value, null);
-            if (buckets[index] == null) {
-                buckets[index] = newNode;
-                size++;
-            } else {
-                Node<K, V> currentNode = buckets[index];
-                Node<K, V> prevNode = null;
-                while (currentNode != null) {
-                    if (Objects.equals(key, currentNode.key)) {
-                        currentNode.value = value;
+        Node<K, V> newNode = new Node<>(key, value, null);
+        capacity = table.length;
+        int position = getPosition(key);
+        threshold = (int) (LOAD_FACTOR * capacity);
+
+        if (size >= threshold) {
+            table = resize();
+        }
+
+        for (int i = 0; i < capacity; i++) {
+            if (table[i] != null && Math.abs(table[i].key == null ? 0
+                    : table[i].hash % capacity) == position) {
+                Node<K, V> node = table[i];
+                while (node != null) {
+                    if (Objects.deepEquals(node.key, key)) {
+                        node.value = value;
+                        return;
+
+                    } else if (node.next == null) {
+                        node.next = newNode;
+                        size++;
                         return;
                     }
-                    prevNode = currentNode;
-                    currentNode = currentNode.next;
+                    node = node.next;
                 }
-                if (prevNode != null) {
-                    Node<K, V> newNextNode = prevNode.next;
-                    prevNode.next = newNode;
-                    newNode.next = newNextNode;
-                    size++;
-                }
-            }
-            if ((float) size / buckets.length >= LOAD_FACTOR) {
-                resize();
             }
         }
+
+        table[position] = newNode;
+        size++;
     }
 
+    @Override
     public V getValue(K key) {
-        for (Node<K, V> node : buckets) {
-            while (node != null) {
-                if (Objects.equals(node.key, key)) {
-                    return node.value;
+        if (capacity == 0) {
+            return null;
+        }
+        int position = getPosition(key);
+        for (int i = 0; i < capacity; i++) {
+            if (table[i] != null && i == position) {
+                Node<K, V> node = table[i];
+                for (int j = 0; j <= size; j++) {
+                    if (Objects.equals(node.key, key)) {
+                        return node.value;
+                    } else {
+                        if (node.next != null) {
+                            node = node.next;
+                        }
+                    }
                 }
-                node = node.next;
             }
         }
         return null;
     }
 
+    @Override
     public int getSize() {
         return size;
     }
 
-    private int getIndex(K key) {
-        int index = (key == null) ? 0 : (key.hashCode() % buckets.length);
-        return index > 0 ? index : Math.abs(index);
-    }
-
-    private void resize() {
-        if ((float) size / buckets.length >= LOAD_FACTOR) {
-            int newCapacity = buckets.length * 2;
-            Node<K, V>[] newBuckets = new Node[newCapacity];
-            int newSize = 0;
-
-            for (Node<K, V> node : buckets) {
-                while (node != null) {
-                    Node<K, V> nextNode = node.next;
-                    int newIndex = getIndex(node.key);
-                    node.next = newBuckets[newIndex];
-                    newBuckets[newIndex] = node;
-                    node = nextNode;
-                    newSize++;
-                }
-            }
-
-            buckets = newBuckets;
-            size = newSize;
-        } else if (size < buckets.length / 2) {
-            int newCapacity = buckets.length / 2;
-            Node<K, V>[] newBuckets = new Node[newCapacity];
-            int newSize = 0;
-
-            for (Node<K, V> node : buckets) {
-                while (node != null) {
-                    Node<K, V> nextNode = node.next;
-                    int newIndex = getIndex(node.key);
-                    node.next = newBuckets[newIndex];
-                    newBuckets[newIndex] = node;
-                    node = nextNode;
-                    newSize++;
-                }
-            }
-
-            buckets = newBuckets;
-            size = newSize;
+    private Node<K, V>[] resize() {
+        if (threshold == MAX_CAPACITY) {
+            return table;
         }
+
+        int newCapacity = capacity * ARRAY_INCREASE;
+        Node<K, V>[] newTable = new Node[newCapacity];
+        threshold = (int) (LOAD_FACTOR * newCapacity);
+        capacity = newCapacity;
+
+        for (Node<K, V> node: table) {
+            Node<K, V> currentNode = node;
+            while (currentNode != null) {
+                int position = getPosition(currentNode.key);
+                Node<K, V> newNode = newTable[position];
+                if (newNode == null) {
+                    newTable[position] = new Node<>(currentNode.key, currentNode.value, null);
+                } else {
+                    newNode.next = new Node<>(currentNode.key, currentNode.value, newNode.next);
+                }
+                currentNode = currentNode.next;
+            }
+        }
+        return newTable;
     }
 
-    private static class Node<K, V> {
+    private int getPosition(K key) {
+        return Math.abs(key == null ? 0
+                : key.hashCode() % capacity);
+    }
+
+    private class Node<K, V> {
+        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
         public Node(K key, V value, Node<K, V> next) {
+            this.hash = key == null ? 0 : key.hashCode();
             this.key = key;
             this.value = value;
             this.next = next;
