@@ -7,7 +7,7 @@ public interface MyMap<K, V> {
 
     int getSize();
 
-    void resize();
+//    void resize();
 
     void remove(K key);
 }

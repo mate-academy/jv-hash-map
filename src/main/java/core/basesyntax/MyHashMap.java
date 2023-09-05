@@ -79,10 +79,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    @Override
-    public void resize() {
+    private void resize() {
         int newCapacity = table.length * 2;
-        capacity = (int) (DEFAULT_CAPACITY * newCapacity);
+        capacity = newCapacity;
         size = 0;
         Node<K, V>[] oldTable = table;
         table = (Node<K, V>[]) new Node[newCapacity];
