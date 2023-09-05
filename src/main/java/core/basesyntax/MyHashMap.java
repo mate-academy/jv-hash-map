@@ -8,7 +8,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static double LOAD_FACTOR = 0.75;
     private int threshold;
     private int size;
-
     private Node<K, V>[] table;
 
     public MyHashMap() {
@@ -25,16 +24,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (node == null) {
             table[index] = newNode;
         } else {
-            Node<K, V> prev = node;
             while (node != null) {
                 if (Objects.equals(key, node.key)) {
                     node.value = value;
                     return;
                 }
-                prev = node;
                 node = node.next;
             }
-            prev.next = newNode;
+            newNode.next = table[index];
+            table[index] = newNode;
         }
         size++;
     }
