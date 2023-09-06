@@ -1,12 +1,12 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final int START_CAPACITY = 16;
     private int size;
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        this.table = new Node[16];
-        this.size = 0;
+        this.table = new Node[START_CAPACITY];
     }
 
     @Override
@@ -43,25 +43,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         if (key == null) {
-            int hash = 0;
-            Node<K, V> currentNode = table[hash];
-            while (currentNode != null) {
-                if (currentNode.key == null) {
-                    return currentNode.value;
-                }
-                currentNode = currentNode.next;
-            }
-            return null;
+            return valueForNullKey();
         }
         int hash = hash(key);
-        Node<K, V> currentNode = table[hash];
-        while (currentNode != null) {
-            if (currentNode.key != null && currentNode.key.equals(key)) {
-                return currentNode.value;
-            }
-            currentNode = currentNode.next;
-        }
-        return null;
+        return valueForKey(key, hash);
     }
 
     @Override
@@ -134,5 +119,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if ((double) size / table.length > 0.75) {
             resize();
         }
+    }
+
+    private V valueForKey(K key, int hash) {
+        Node<K, V> currentNode = table[hash];
+        while (currentNode != null) {
+            if (currentNode.key != null && currentNode.key.equals(key)) {
+                return currentNode.value;
+            }
+            currentNode = currentNode.next;
+        }
+        return null;
+    }
+
+    private V valueForNullKey() {
+        int hash = 0;
+        Node<K, V> currentNode = table[hash];
+        while (currentNode != null) {
+            if (currentNode.key == null) {
+                return currentNode.value;
+            }
+            currentNode = currentNode.next;
+        }
+        return null;
     }
 }
