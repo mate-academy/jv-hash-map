@@ -16,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int position = getPosition(key);
         if (size >= (int) (LOAD_FACTOR * table.length)) {
             table = resize();
-            position = getPosition(key); // Recalculate position after resizing
+            position = getPosition(key);
         }
         if (table[position] == null) {
             table[position] = newNode;
