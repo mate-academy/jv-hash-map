@@ -6,13 +6,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
 
-    private int capacity;
     private final double loadFactory;
     private int size;
     private Node<K, V>[] table;
 
     public MyHashMap(int capacity, double loadFactory) {
-        this.capacity = capacity;
         this.loadFactory = loadFactory;
         this.table = new Node[capacity];
     }
@@ -41,7 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         newNode.next = table[index];
         table[index] = newNode;
         size++;
-        if (size > capacity * loadFactory) {
+        if (size > table.length * loadFactory) {
             resize();
         }
     }
@@ -81,7 +79,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         int newCapacity = table.length * 2;
-        capacity = newCapacity;
         size = 0;
         Node<K, V>[] oldTable = table;
         table = (Node<K, V>[]) new Node[newCapacity];
