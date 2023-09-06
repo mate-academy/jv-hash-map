@@ -13,34 +13,25 @@ public class Bus {
     public void setModel(String model) {
         this.model = model;
     }
-
     public String getColor() {
         return color;
     }
-
     public void setColor(String color) {
         this.color = color;
     }
-
     public Bus(String model, String color) {
         this.model = model;
         this.color = color;
     }
-
     public Bus() {
     }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Bus plane = (Bus) o;
-        return Objects.equals(model, plane.model) &&
-                Objects.equals(color, plane.color);
+        Bus plane = (Bus) o; return Objects.equals(model, plane.model) && Objects.equals(color, plane.color);
     }
-
-    @Override
-    public int hashCode() {
+    @Override public int hashCode() {
         return 0;
     }
 }
