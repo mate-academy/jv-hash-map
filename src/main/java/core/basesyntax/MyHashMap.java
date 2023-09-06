@@ -63,9 +63,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V>[] newBuckets = new Node[buckets.length * 2];
             for (Node<K, V> node : buckets) {
                 while (node != null) {
-                    Node<K, V> temp = node.next;
-                    node.next = null;
                     int newIndex = Math.abs(node.key.hashCode()) % newBuckets.length;
+                    Node<K, V> temp = node.next;
                     node.next = newBuckets[newIndex];
                     newBuckets[newIndex] = node;
                     node = temp;
