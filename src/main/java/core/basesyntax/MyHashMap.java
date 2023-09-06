@@ -1,49 +1,47 @@
 package core.basesyntax;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
-    private Entry<K, V>[] buckets;
+    private Node<K, V>[] buckets;
     private double threshold;
     private int size;
 
     public MyHashMap() {
-        buckets = new Entry[INITIAL_CAPACITY];
+        buckets = new Node[INITIAL_CAPACITY];
+        threshold = INITIAL_CAPACITY * LOAD_FACTOR;
     }
 
     @Override
     public void put(K key, V value) {
+        resize();
         int index = getIndex(key);
-        Entry<K, V> entry = buckets[index];
-        while (entry != null) {
-            if ((key == null && entry.key == null)
-                    || (key != null && key.equals(entry.key))) {
-                entry.value = value;
+        Node<K, V> node = buckets[index];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                node.value = value;
                 return;
             }
-            entry = entry.next;
+            node = node.next;
         }
-        Entry<K, V> newEntry = new Entry<>(key, value);
-        newEntry.next = buckets[index];
-        buckets[index] = newEntry;
+        Node<K, V> newNode = new Node<>(key, value);
+        newNode.next = buckets[index];
+        buckets[index] = newNode;
         size++;
         threshold = (double) size / buckets.length;
-        resize();
     }
 
     @Override
     public V getValue(K key) {
         int index = getIndex(key);
-        Entry<K, V> entry = buckets[index];
-        while (entry != null) {
-            if ((key == null && entry.key == null)
-                    || (key != null && key.equals(entry.key))) {
-                return entry.value;
+        Node<K, V> node = buckets[index];
+        while (node != null) {
+            if (Objects.equals(key, node.key)) {
+                return node.value;
             }
-            entry = entry.next;
+            node = node.next;
         }
         return null;
     }
@@ -62,27 +60,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         if (threshold >= LOAD_FACTOR) {
-            Entry<K, V>[] newBuckets = new Entry[buckets.length * 2];
-            for (Entry<K, V> entry : buckets) {
-                while (entry != null) {
-                    Entry<K, V> temp = entry.next;
-                    entry.next = null;
-                    int newIndex = Math.abs(entry.key.hashCode()) % newBuckets.length;
-                    entry.next = newBuckets[newIndex];
-                    newBuckets[newIndex] = entry;
-                    entry = temp;
+            Node<K, V>[] newBuckets = new Node[buckets.length * 2];
+            for (Node<K, V> node : buckets) {
+                while (node != null) {
+                    Node<K, V> temp = node.next;
+                    node.next = null;
+                    int newIndex = Math.abs(node.key.hashCode()) % newBuckets.length;
+                    node.next = newBuckets[newIndex];
+                    newBuckets[newIndex] = node;
+                    node = temp;
                 }
             }
             buckets = newBuckets;
         }
     }
 
-    private static class Entry<K, V> {
+    private static class Node<K, V> {
         private K key;
         private V value;
-        private Entry<K, V> next;
+        private Node<K, V> next;
 
-        Entry(K key, V value) {
+        Node(K key, V value) {
             this.key = key;
             this.value = value;
         }
