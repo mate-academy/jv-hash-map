@@ -61,7 +61,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int newCapacity = Math.min(table.length * ARRAY_INCREASE, MAX_CAPACITY);
         Node<K, V>[] newTable = new Node[newCapacity];
-
         for (Node<K, V> node : table) {
             Node<K, V> currentNode = node;
             while (currentNode != null) {
