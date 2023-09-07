@@ -6,7 +6,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private Node<K, V>[] table;
 
-
     public MyHashMap() {
         this.table = new Node[DEFAULT_INIT_CAPACITY];
     }
@@ -77,7 +76,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if ((double) size / table.length > LOAD_FACTOR) {
             resize();
         }
-
     }
 
     private void resize() {
