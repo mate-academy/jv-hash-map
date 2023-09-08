@@ -5,18 +5,17 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
     private static final int CAPACITY = 16;
-    private int capacity;
+    private static final int GROW_CONSTANT = 2;
     private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        capacity = CAPACITY;
-        table = new Node[capacity];
+        table = new Node[CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        resize();
+        resizeIfNeeded();
         int index = getIndex(key);
         Node<K, V> current = table[index];
         Node<K, V> newNode = new Node(key, value);
@@ -43,12 +42,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = getIndex(key);
-        Node<K, V> i = table[index];
-        while (i != null) {
-            if (Objects.equals(i.key, key)) {
-                return i.value;
+        Node<K, V> currentNode = table[index];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
             }
-            i = i.next;
+            currentNode = currentNode.next;
         }
         return null;
     }
@@ -58,37 +57,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resize() {
-        if (size >= capacity * LOAD_FACTOR) {
-            capacity *= 2;
-            Node<K, V>[] newTable = new Node[capacity];
-            for (Node<K, V> node : table) {
+    private void resizeIfNeeded() {
+        if (size >= table.length * LOAD_FACTOR) {
+            Node<K, V>[] oldTable = table;
+            table = new Node[table.length * GROW_CONSTANT];
+            size = 0;
+            for (Node<K, V> node : oldTable) {
                 while (node != null) {
-                    Node<K, V> current = node;
+                    put(node.key, node.value);
                     node = node.next;
-                    int index = getIndex(current.key);
-                    current.next = newTable[index];
-                    newTable[index] = current;
                 }
             }
-            table = newTable;
         }
     }
 
     private int getIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
-    private class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
-        private final int hash;
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.hash = key == null ? 0 : key.hashCode();
         }
     }
 }
