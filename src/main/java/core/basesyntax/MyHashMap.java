@@ -12,13 +12,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        int hash;
+        private int index;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(int index, K key, V value, Node<K, V> next) {
+            this.index = index;
             this.key = key;
             this.value = value;
             this.next = next;
