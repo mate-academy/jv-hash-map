@@ -273,4 +273,48 @@ public class MyHashMapTest {
             }
         }
     }
+
+    @Test
+    public void removeByCorrectKey() {
+        MyMap<Car, Integer> myHashMap = new MyHashMap<>();
+        myHashMap.put(firstCar, 3);
+        myHashMap.put(secondCar, 5);
+        myHashMap.put(thirdCar, 1);
+
+        Integer valueOfRemovedNode = myHashMap.remove(secondCar);
+
+        Assert.assertEquals("Test failed! The size isn't correct. Expected 2 but was "
+                + myHashMap.getSize(), 2, myHashMap.getSize());
+
+        Integer secondActualValue = myHashMap.getValue(secondCar);
+
+        Assert.assertNull("Test failed! HashMap expects to do not contain value for key " +
+                "`secondCar`, but was ", secondActualValue);
+
+        Assert.assertEquals("Test failed! valueOfRemovedNode expects to contain value 5 ,"
+                + " but was " + valueOfRemovedNode, Integer.valueOf(5), valueOfRemovedNode);
+    }
+
+    @Test
+    public void removeByWrongKey() {
+        MyMap<Car, Integer> myHashMap = new MyHashMap<>();
+        myHashMap.put(firstCar, 3);
+        myHashMap.put(secondCar, 5);
+        myHashMap.put(thirdCar, 1);
+
+        final Car toyotaCar = new Car("Toyota", "blue");
+
+        Integer valueOfRemovedNode = myHashMap.remove(toyotaCar);
+
+        Assert.assertEquals("Test failed! The size isn't correct. Expected 3 but was "
+                + myHashMap.getSize(), 3, myHashMap.getSize());
+
+        Integer secondActualValue = myHashMap.getValue(toyotaCar);
+
+        Assert.assertNull("Test failed! HashMap expects to do not contain value for key " +
+                "`toyotaCar`, but was ", secondActualValue);
+
+        Assert.assertEquals("Test failed! valueOfRemovedNode expects to contain value null ,"
+                + " but was " + valueOfRemovedNode, null, valueOfRemovedNode);
+    }
 }
