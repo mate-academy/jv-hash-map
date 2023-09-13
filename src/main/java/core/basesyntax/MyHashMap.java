@@ -67,13 +67,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         if (table == null || table.length == 0) {
-            table = (Node<K, V>[]) new Node[capacity];
+            table = createTable(capacity);
         } else if (size >= threshold) {
             Node<K, V>[] oldTable = table;
             capacity = Math.min(2 * capacity, MAXIMUM_CAPACITY);
             threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
             size = 0;
-            table = (Node<K, V>[]) new Node[capacity];
+            table = createTable(capacity);
             for (Node<K, V> node : oldTable) {
                 if (node == null) {
                     continue;
@@ -83,6 +83,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 } while ((node = node.next) != null);
             }
         }
+    }
+
+    private Node<K, V>[] createTable(final int tableCapacity) {
+        return (Node<K, V>[]) new Node[tableCapacity];
     }
 
     private void putVal(K key, V value) {
@@ -123,12 +127,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         do {
             if ((node.key == key || (key != null && key.equals(node.key)))) {
                 if (prevNode == null) {// first node in bucket
-                    table[bucketIndex] =
-                            new Node<>(node.next.key, node.next.value, node.next.next);
+                    table[bucketIndex] = node.next;
                     size--;
                     return node.value;
                 }
-                prevNode.next = new Node<>(node.next.key, node.next.value, node.next.next);
+                prevNode.next = node.next;
                 size--;
                 return node.value;
             }
