@@ -41,8 +41,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void clear() {
         if (table != null && size > 0) {
             size = 0;
-            for (int i = 0; i < table.length; i++)
+            for (int i = 0; i < table.length; i++) {
                 table[i] = null;
+            }
         }
     }
 
@@ -69,10 +70,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table == null || table.length == 0) {
             table = createTable(capacity);
         } else if (size >= threshold) {
-            Node<K, V>[] oldTable = table;
             capacity = Math.min(2 * capacity, MAXIMUM_CAPACITY);
             threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
             size = 0;
+            Node<K, V>[] oldTable = table;
             table = createTable(capacity);
             for (Node<K, V> node : oldTable) {
                 if (node == null) {
@@ -100,7 +101,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> prevNode = null;
         do { //update value in existing node (change node)
             if ((node.key == key || (key != null && key.equals(node.key)))) {
-                if (prevNode == null) {// first node in bucket
+                if (prevNode == null) { // first node in bucket
                     table[bucketIndex] = new Node<>(key, value, node.next);
                     return;
                 }
@@ -126,7 +127,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> prevNode = null;
         do {
             if ((node.key == key || (key != null && key.equals(node.key)))) {
-                if (prevNode == null) {// first node in bucket
+                if (prevNode == null) { // first node in bucket
                     table[bucketIndex] = node.next;
                     size--;
                     return node.value;
@@ -197,9 +198,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         public boolean equals(Object o) {
-            if (o == this)
+            if (o == this) {
                 return true;
-            if (o instanceof Node<?, ?> node) {
+            }
+            if (o instanceof Node<?, ?>) {
+                Node<K, V> node = (Node<K, V>) o;
                 return Objects.equals(key, node.key) && Objects.equals(value, node.value);
             }
             return false;

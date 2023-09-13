@@ -9,8 +9,12 @@ public interface MyMap<K, V> {
 
     //P.s: you can implement other methods of the Map interface.
     V remove(K key);
+
     void clear();
+
     boolean containsKey(Object key);
+
     boolean containsValue(Object value);
+
     boolean isEmpty();
 }
