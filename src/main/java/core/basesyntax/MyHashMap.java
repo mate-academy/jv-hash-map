@@ -4,23 +4,23 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    private static final int CAPACITY = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
     private static final int RESIZE_INDEX = 2;
     private int size;
-    private int border;
+    private int threshold;
     private Node<K, V> [] buckets;
 
     public MyHashMap() {
-        buckets = new Node[CAPACITY];
+        buckets = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
 
         Node<K, V> newNode = new Node<>(key, value);
-        border = (int) (buckets.length * LOAD_FACTOR);
-        if (size == border) {
+        threshold = (int) (buckets.length * LOAD_FACTOR);
+        if (size == threshold) {
             doubleCapacity();
 
         }
