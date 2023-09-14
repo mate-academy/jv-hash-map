@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
@@ -8,25 +10,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        size = 0;
     }
 
     @Override
     public void put(K key, V value) {
-        checkLoad(table);
-        int hash = hash(key);
-        Node<K, V> newNode = new Node<>(hash, key, value, null);
-
-        if (key == null) {
-            newNode.hash = 0;
-        }
+        checkLoad();
+        int hash = hash(key, table.length);
+        Node<K, V> newNode = new Node<>(key, value, null);
 
         if (table[hash] == null) {
             table[hash] = newNode;
         } else {
             Node<K, V> currentNode = table[hash];
             while (currentNode != null) {
-                if (currentNode.key == null ? key == null : currentNode.key.equals(key)) {
+                if (Objects.equals(currentNode.key, key)) {
                     currentNode.value = value;
                     return;
                 }
@@ -42,10 +39,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key);
+        int hash = hash(key, table.length);
         Node<K, V> currentNode = table[hash];
         while (currentNode != null) {
-            if (currentNode.key == null ? key == null : currentNode.key.equals(key)) {
+            if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
@@ -73,31 +70,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = newTable;
     }
 
-    private int hash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
-    }
-
     private int hash(K key, int length) {
         return key == null ? 0 : Math.abs(key.hashCode()) % length;
     }
 
     private static class Node<K, V> {
-        private int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
         }
     }
 
-    private void checkLoad(Node<K, V>[] array) {
-        if (size >= array.length * LOAD_FACTOR) {
-            resize(array);
+    private void checkLoad() {
+        if (size >= table.length * LOAD_FACTOR) {
+            resize(table);
         }
     }
 }
