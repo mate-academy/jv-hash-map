@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import java.util.Objects;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final int MAXIMUM_CAPACITY = 1 << 30;
@@ -14,12 +12,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         this.capacity = DEFAULT_INITIAL_CAPACITY;
         this.threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
+        this.table = createTable(capacity);
     }
 
     @Override
     public void put(K key, V value) {
         resize();
-        putVal(key, value);
+        putValue(key, value);
     }
 
     @Override
@@ -41,9 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void clear() {
         if (table != null && size > 0) {
             size = 0;
-            for (int i = 0; i < table.length; i++) {
-                table[i] = null;
-            }
+            table = createTable(capacity);
         }
     }
 
@@ -67,9 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (table == null || table.length == 0) {
-            table = createTable(capacity);
-        } else if (size >= threshold) {
+        if (size >= threshold) {
             capacity = Math.min(2 * capacity, MAXIMUM_CAPACITY);
             threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
             size = 0;
@@ -80,7 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     continue;
                 }
                 do {
-                    putVal(node.key, node.value);
+                    putValue(node.key, node.value);
                 } while ((node = node.next) != null);
             }
         }
@@ -90,10 +85,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (Node<K, V>[]) new Node[tableCapacity];
     }
 
-    private void putVal(K key, V value) {
+    private void putValue(K key, V value) {
         final int bucketIndex = getBucketIndex(key);
         if (table[bucketIndex] == null) { //create first node in bucket
-            table[bucketIndex] = new Node<>(key, value, null);
+            table[bucketIndex] = new Node<>(key, value);
             size++;
             return;
         }
@@ -111,14 +106,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             prevNode = node;
         } while ((node = node.next) != null);
         //add new node at the end of list
-        prevNode.next = new Node<>(key, value, null);
+        prevNode.next = new Node<>(key, value);
         size++;
     }
 
     public V remove(K key) {
-        if (table == null || table.length == 0) {
-            return null;
-        }
         final int bucketIndex = getBucketIndex(key);
         Node<K, V> node = table[bucketIndex];
         if (node == null) {
@@ -147,9 +139,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V> getNode(Object key) {
         final int bucketIndex = getBucketIndex(key);
-        if (this.table == null || this.table.length == 0) {
-            return null;
-        }
         Node<K, V> node = this.table[bucketIndex];
         if (node == null) {
             return null;
@@ -163,7 +152,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static final class Node<K, V> {
-        private final int hash;
         private final K key;
         private Node<K, V> next;
         private V value;
@@ -172,40 +160,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-            this.hash = this.hashCode();
         }
 
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
+        public Node(K key, V value) {
+            this(key, value, null);
         }
 
         public String toString() {
             return key + "=" + value;
-        }
-
-        public int hashCode() {
-            return Objects.hashCode(key) ^ Objects.hashCode(value);
-        }
-
-        public V setValue(V newValue) {
-            V oldValue = value;
-            value = newValue;
-            return oldValue;
-        }
-
-        public boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            }
-            if (o instanceof Node<?, ?>) {
-                Node<K, V> node = (Node<K, V>) o;
-                return Objects.equals(key, node.key) && Objects.equals(value, node.value);
-            }
-            return false;
         }
     }
 }
