@@ -21,7 +21,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        return valueForKey(key);
+        if (key == null) {
+            int index = 0;
+            Node<K, V> currentNode = table[index];
+            while (currentNode != null) {
+                if (currentNode.key == null) {
+                    return currentNode.value;
+                }
+                currentNode = currentNode.next;
+            }
+            return null;
+        }
+        Node<K, V> currentNode = table[getIndex(key)];
+        while (currentNode != null) {
+            if (currentNode.key != null && currentNode.key.equals(key)) {
+                return currentNode.value;
+            }
+            currentNode = currentNode.next;
+        }
+        return null;
     }
 
     @Override
@@ -55,28 +73,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 oldNode = oldNode.next;
             }
         }
-    }
-
-    private V valueForKey(K key) {
-        if (key == null) {
-            int index = 0;
-            Node<K, V> currentNode = table[index];
-            while (currentNode != null) {
-                if (currentNode.key == null) {
-                    return currentNode.value;
-                }
-                currentNode = currentNode.next;
-            }
-            return null;
-        }
-        Node<K, V> currentNode = table[getIndex(key)];
-        while (currentNode != null) {
-            if (currentNode.key != null && currentNode.key.equals(key)) {
-                return currentNode.value;
-            }
-            currentNode = currentNode.next;
-        }
-        return null;
     }
 
     private void putForNonNullKey(int index, K key, V value) {
@@ -122,7 +118,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = newNode;
         }
         size++;
-        if ((double) size / table.length > 0.75) {
+        if ((double) size / table.length > WORKLOAD) {
             resize();
         }
     }
