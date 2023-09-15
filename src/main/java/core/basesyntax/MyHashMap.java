@@ -56,18 +56,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize(Node<K, V>[] array) {
-        Node<K, V>[] newTable = new Node[array.length * 2];
+        Node<K, V>[] copyTable = table;
+        table = new Node[copyTable.length * 2];
+        int oldSize = size;
 
-        for (Node<K, V> element : table) {
+        for (Node<K, V> element : copyTable) {
             while (element != null) {
-                Node<K, V> next = element.next;
-                int newHash = hash(element.key, newTable.length);
-                element.next = newTable[newHash];
-                newTable[newHash] = element;
-                element = next;
+                put(element.key, element.value);
+                element = element.next;
             }
         }
-        table = newTable;
+        size = oldSize;
     }
 
     private int hash(K key, int length) {
