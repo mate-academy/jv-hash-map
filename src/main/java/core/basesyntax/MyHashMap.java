@@ -68,8 +68,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldBuckets = buckets;
         buckets = new Node[oldBuckets.length * 2];
         size = 0;
-        for (int index = 0; index < oldBuckets.length; index++) {
-            Node<K, V> currentNode = oldBuckets[index];
+        for (Node<K, V> oldBucket : oldBuckets) {
+            Node<K, V> currentNode = oldBucket;
             while (currentNode != null) {
                 put(currentNode.key, currentNode.value);
                 currentNode = currentNode.next;
