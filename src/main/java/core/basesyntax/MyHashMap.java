@@ -12,18 +12,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int hash = getHash(key);
 
-        Node<K, V> node = new Node<>(hash, key, value, null);
+        Node<K, V> data = new Node<>(key, value, null);
 
-        Node<K, V> nodeByHash = table[hash];
-        boolean increaseSize;
-        if (nodeByHash == null) {
-            table[hash] = node;
-            increaseSize = true;
-        } else {
-            increaseSize = putNextOrChange(nodeByHash, node);
-        }
+        boolean increaseSize = putData(data);
 
         if (increaseSize && ++size > (table.length * DEFAULT_LOAD_FACTOR)) {
             resize();
@@ -54,16 +46,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void putData(Node<K, V> data) {
+    private boolean putData(Node<K, V> data) {
         int hash = getHash(data.key);
-        data.hash = hash;
 
         Node<K, V> nodeByHash = table[hash];
 
         if (nodeByHash == null) {
             table[hash] = data;
+            return true;
         } else {
-            putNextOrChange(nodeByHash, data);
+            return putNextOrChange(nodeByHash, data);
         }
     }
 
@@ -115,13 +107,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
