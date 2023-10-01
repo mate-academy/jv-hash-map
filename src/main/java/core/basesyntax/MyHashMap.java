@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -13,29 +15,50 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
 
-        Node<K, V> data = new Node<>(key, value, null);
+        Node<K, V> node = new Node<>(key, value, null);
 
-        boolean increaseSize = putData(data);
+        int hash = getHash(key);
 
-        if (increaseSize && ++size > (table.length * DEFAULT_LOAD_FACTOR)) {
+        Node<K, V> nodeByHash = table[hash];
+
+        if (nodeByHash == null) {
+            table[hash] = node;
+        } else {
+            Node<K, V> curr = nodeByHash;
+            Node<K, V> next;
+
+            do {
+                next = curr.next;
+
+                if (Objects.equals(curr.key, key)) {
+                    curr.value = node.value;
+                    return;
+                }
+
+                if (next == null) {
+                    curr.next = node;
+                }
+
+                curr = next;
+            } while (next != null);
+        }
+
+        if (size >= (table.length * DEFAULT_LOAD_FACTOR)) {
             resize();
         }
+
+        size++;
     }
 
     @Override
     public V getValue(K key) {
         Node<K, V> node = table[getHash(key)];
 
-        if (node != null) {
-            do {
-                if (node.key == key
-                        || (node.key != null
-                        && node.key.equals(key))) {
-                    return node.value;
-                }
-
-                node = node.next;
-            } while (node != null);
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return node.value;
+            }
+            node = node.next;
         }
 
         return null;
@@ -46,58 +69,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private boolean putData(Node<K, V> data) {
-        int hash = getHash(data.key);
-
-        Node<K, V> nodeByHash = table[hash];
-
-        if (nodeByHash == null) {
-            table[hash] = data;
-            return true;
-        } else {
-            return putNextOrChange(nodeByHash, data);
-        }
-    }
-
-    private boolean putNextOrChange(Node<K, V> src, Node<K, V> element) {
-        Node<K, V> curr = src;
-        Node<K, V> next;
-        K elementKey = element.key;
-
-        do {
-            next = curr.next;
-
-            if (curr.key == elementKey
-                    || (curr.key != null
-                    && curr.key.equals(elementKey))) {
-                curr.value = element.value;
-                return false;
-            }
-
-            if (next == null) {
-                curr.next = element;
-            }
-
-            curr = next;
-        } while (next != null);
-
-        return true;
-    }
-
     private void resize() {
         Node<K, V>[] oldTable = table;
         table = new Node[table.length << 1];
+        size = 0;
         transferAllData(oldTable);
     }
 
     private void transferAllData(Node<K, V>[] src) {
         Node<K, V> next;
-        for (Node<K, V> data : src) {
-            while (data != null) {
-                next = data.next;
-                data.next = null;
-                putData(data);
-                data = next;
+        for (Node<K, V> node : src) {
+            while (node != null) {
+                next = node.next;
+                node.next = null;
+                put(node.key, node.value);
+                node = next;
             }
         }
     }
