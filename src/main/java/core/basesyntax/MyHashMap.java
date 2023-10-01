@@ -43,11 +43,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             } while (next != null);
         }
 
-        if (size >= (table.length * DEFAULT_LOAD_FACTOR)) {
+        size++;
+        if (size > (table.length * DEFAULT_LOAD_FACTOR)) {
             resize();
         }
-
-        size++;
     }
 
     @Override
