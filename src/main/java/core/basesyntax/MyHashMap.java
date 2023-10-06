@@ -36,7 +36,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = new Node<>(key, value, null);
             size++;
         } else {
-            connectNode(key, value, index, table);
+            addToBucket(key, value, index, table);
             size++;
         }
     }
@@ -76,7 +76,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (newTable[indexResize] == null) {
                 newTable[indexResize] = new Node<>(node.key, node.value, null);
             } else {
-               connectNode(node.key, node.value, indexResize, newTable);
+               addToBucket(node.key, node.value, indexResize, newTable);
             }
         }
         table = newTable;
