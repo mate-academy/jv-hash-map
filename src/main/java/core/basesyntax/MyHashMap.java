@@ -65,7 +65,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == threshold) {
             int oldCapacity = table.length;
             int newCapacity = oldCapacity << 1;
-            threshold = (int) (LOAD_FACTOR * table.length);
+            threshold = (int) (LOAD_FACTOR * newCapacity);
             Node<K, V>[] oldTable = table;
             table = new Node[newCapacity];
             size = 0;
