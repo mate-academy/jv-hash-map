@@ -27,7 +27,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     }
 
-
     @Override
     public void put(K key, V value) {
         if (size >= LOAD_FACTOR * table.length) {
@@ -42,7 +41,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         connectNode(currentNode, newNode);
     }
-
 
     @Override
     public V getValue(K key) {
@@ -60,7 +58,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public int getSize() {
         return size;
     }
-
 
     private void resize() {
         Node<K, V>[] oldTable = table;
