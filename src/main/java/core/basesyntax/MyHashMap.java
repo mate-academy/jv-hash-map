@@ -3,6 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
+    private static final int INCREASE_NUMBER = 2;
     private Node<K, V>[] table;
     private int threshold;
     private int size;
@@ -27,8 +28,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resizeIfNeeded();
-        if (table[hash(key)] == null) {
-            table[hash(key)] = new Node<>(key, value, null);
+        if (table[getTableIndex(key)] == null) {
+            table[getTableIndex(key)] = new Node<>(key, value, null);
             size++;
         } else {
             putIfCollision(key, value);
@@ -37,7 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = table[hash(key)];
+        Node<K, V> node = table[getTableIndex(key)];
         while (node != null) {
             if (key == node.key || (key != null && key.equals(node.key))) {
                 return node.value;
@@ -57,14 +58,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size == 0;
     }
 
-    private int hash(K key) {
+    private int getTableIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private void resizeIfNeeded() {
         if (size == threshold) {
-            int oldCapacity = table.length;
-            int newCapacity = oldCapacity << 1;
+            int newCapacity = table.length * INCREASE_NUMBER;
             threshold = (int) (LOAD_FACTOR * newCapacity);
             Node<K, V>[] oldTable = table;
             table = new Node[newCapacity];
@@ -79,7 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putIfCollision(K key, V value) {
-        Node<K, V> node = table[hash(key)];
+        Node<K, V> node = table[getTableIndex(key)];
         while (node != null) {
             if (key == node.key || key != null && key.equals(node.key)) {
                 node.value = value;
