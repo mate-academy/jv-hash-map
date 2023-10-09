@@ -13,7 +13,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        private final int hashCode;
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -21,10 +20,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
-            this.hashCode = key == null ? 0 : key.hashCode();
             this.next = next;
         }
-
     }
 
     @Override
@@ -32,14 +29,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= LOAD_FACTOR * table.length) {
             resize();
         }
-        Node<K, V> currentNode = table[calculateIndex(key)];
+        int index = calculateIndex(key);
+        Node<K, V> currentNode = table[index];
         Node<K, V> newNode = new Node<>(key, value, null);
         if (currentNode == null) {
-            table[calculateIndex(key)] = newNode;
+            table[index] = newNode;
             size++;
             return;
         }
-        connectNode(currentNode, newNode);
+        setNewNode(currentNode, newNode);
     }
 
     @Override
@@ -77,7 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return index;
     }
 
-    private void connectNode(Node<K, V> currentNode, Node<K, V> newNode) {
+    private void setNewNode(Node<K, V> currentNode, Node<K, V> newNode) {
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, newNode.key)) {
                 currentNode.value = newNode.value;
@@ -91,6 +89,4 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             currentNode = currentNode.next;
         }
     }
-
 }
-
