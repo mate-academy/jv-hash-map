@@ -40,17 +40,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (table != null) {
-            int bucketNumber = hash(key);
-            Node<K, V> nodeInBucket = table[bucketNumber];
-            while (nodeInBucket != null) {
-                if (keysAreEqual(nodeInBucket.key, key)) {
-                    return nodeInBucket.value;
-                }
-                nodeInBucket = nodeInBucket.next;
-            }
-        }
-        return null;
+        Node<K, V> node = getNodeByKey(key);
+        return node == null ? null : node.value;
     }
 
     @Override
@@ -63,14 +54,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean updateIfKeyPresent(K key, V value) {
-        int hash = hash(key);
-        Node<K, V> nodeInBucket = table[hash];
-        while (nodeInBucket != null) {
-            if (keysAreEqual(key, nodeInBucket.key)) {
-                nodeInBucket.value = value;
-                return true;
-            }
-            nodeInBucket = nodeInBucket.next;
+        Node<K, V> node = getNodeByKey(key);
+        if (node != null) {
+            node.value = value;
+            return true;
         }
         return false;
     }
@@ -87,6 +74,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             nodeWithHash.next = new Node<>(hash, key, value, null);
         }
         size++;
+    }
+
+    private Node<K, V> getNodeByKey(K key) {
+        if (table != null) {
+            int hash = hash(key);
+            Node<K, V> nodeInBucket = table[hash];
+            while (nodeInBucket != null) {
+                if (keysAreEqual(nodeInBucket.key, key)) {
+                    return nodeInBucket;
+                }
+                nodeInBucket = nodeInBucket.next;
+            }
+        }
+        return null;
     }
 
     private boolean keysAreEqual(K keyFromMap, K key) {
