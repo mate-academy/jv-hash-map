@@ -3,32 +3,28 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    public static final int INITIAL_CAPACITY = 16;
-    public static final int GROW_VALUE = 2;
-    public static final float LOAD_FACTOR = 0.75f;
+    private static final int INITIAL_CAPACITY = 16;
+    private static final int GROW_FACTOR = 2;
+    private static final float LOAD_FACTOR = 0.75f;
 
     private int size;
-    private Node<K, V>[] mapArray;
+    private Node<K, V>[] bucketsArray;
+
+    public MyHashMap() {
+        bucketsArray = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
-        if (size == 0) {
-            mapArray = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
-        }
-        if (putVal(key, value, mapArray)) {
-            if (++size > mapArray.length * LOAD_FACTOR) {
-                resize();
-            }
+        if (putVal(key, value, bucketsArray)) {
+            resizeIfNeeded();
         }
     }
 
     @Override
     public V getValue(K key) {
-        if (mapArray == null) {
-            return null;
-        }
-        int pos = calcPos(key, mapArray);
-        Node<K, V> currentNode = mapArray[pos];
+        int pos = getKeyIndex(key, bucketsArray);
+        Node<K, V> currentNode = bucketsArray[pos];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
@@ -43,30 +39,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resize() {
-        Node<K, V>[] newMap = (Node<K, V>[]) new Node[mapArray.length * GROW_VALUE];
-        for (Node<K, V> node : mapArray) {
-            if (node != null) {
-                Node<K, V> tempNode = node;
-                while (tempNode != null) {
-                    putVal(tempNode.key, tempNode.value, newMap);
-                    tempNode = tempNode.next;
+    private void resizeIfNeeded() {
+        if (++size > bucketsArray.length * LOAD_FACTOR) {
+            Node<K, V>[] newArray = (Node<K, V>[]) new Node[bucketsArray.length * GROW_FACTOR];
+            for (Node<K, V> node : bucketsArray) {
+                if (node != null) {
+                    Node<K, V> tempNode = node;
+                    while (tempNode != null) {
+                        putVal(tempNode.key, tempNode.value, newArray);
+                        tempNode = tempNode.next;
+                    }
                 }
             }
+            bucketsArray = newArray.clone();
         }
-        mapArray = newMap.clone();
     }
 
-    private int calcPos(K key, Node<K, V>[] array) {
+    private int getKeyIndex(K key, Node<K, V>[] array) {
         int pos = key == null ? 0 : key.hashCode() % array.length;
-        if (pos < 0) {
-            pos = -pos;
-        }
-        return pos;
+        return Math.abs(pos);
     }
 
     private boolean putVal(K key, V value, Node<K, V>[] nodeArray) {
-        int pos = calcPos(key, nodeArray);
+        int pos = getKeyIndex(key, nodeArray);
         Node<K, V> currentNode = nodeArray[pos];
 
         while (currentNode != null && currentNode.next != null) {
