@@ -18,30 +18,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             buckets[index] = new Node<>(key, value);
             size++;
         } else {
-            while (true) {
-                if ((key == null && node.key == null) || (key != null && key.equals(node.key))) {
-                    node.value = value;
-                    return;
-                }
-                if (node.next == null) {
-                    node.next = new Node<>(key, value);
-                    size++;
-                    return;
-                }
-                node = node.next;
-            }
+            addNode(node, key, value);
         }
     }
 
     @Override
     public V getValue(K key) {
         for (Node<K, V> node : buckets) {
-            for (Node<K, V> current = node; current != null; current = current.next) {
-                if ((node.key == null && key == null)
-                        || (node.key != null && node.key.equals(key))) {
-                    return node.value;
+            Node<K, V> current = node;
+            while (current != null) {
+                if (keysEqual(current.key, key)) {
+                    return current.value;
                 }
-                node = node.next;
+                current = current.next;
             }
         }
         return null;
@@ -58,10 +47,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private void addNode(Node<K, V> node, K key, V value) {
+        while (true) {
+            if (keysEqual(node.key, key)) {
+                node.value = value;
+                return;
+            }
+            if (node.next == null) {
+                node.next = new Node<>(key, value);
+                size++;
+                return;
+            }
+            node = node.next;
+        }
+    }
+
+    private boolean keysEqual(K key1, K key2) {
+        return (key1 == null && key2 == null) || (key1 != null && key1.equals(key2));
+    }
+
     private void increase() {
         int newCapacity = buckets.length * MULTIPLIER;
+        final Node<K, V>[] oldTable = buckets;
         threshold = (int) (newCapacity * LOAD_FACTOR);
-        Node<K, V>[] oldTable = buckets;
         buckets = new Node[newCapacity];
         size = 0;
 
@@ -82,10 +90,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
         }
     }
-
 }
