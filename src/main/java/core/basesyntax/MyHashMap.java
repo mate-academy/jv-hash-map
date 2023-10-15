@@ -3,34 +3,32 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final Integer ZERO = 0;
+    private static final Integer KEY_NULL_VALUE = 0;
     private static final Integer BIT_SHIFT_BY_ONE = 1;
-    private boolean wasAdded;
-    private Node[] nodes;
+    private boolean putedInTable;
+    private Node[] table;
     private int size;
 
     public MyHashMap() {
-        nodes = new Node[DEFAULT_CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         growIfSizeIsInLoadFactory();
-        putNodeToArr(nodes, key, value);
-        if (wasAdded) {
-            wasAdded = false;
+        putNodeToArr(table, key, value);
+        if (putedInTable) {
+            putedInTable = false;
             size++;
         }
     }
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
-            key = (K) ZERO;
-        }
-        for (int i = 0; i < nodes.length; i++) {
-            if (nodes[i] != null) {
-                Node current = nodes[i];
+        key = checkIfNull(key);
+        for (int i = 0; i < table.length; i++) {
+            if (table[i] != null) {
+                Node current = table[i];
                 while (current != null) {
                     if (current.key.equals(key)) {
                         return (V) current.value;
@@ -48,60 +46,50 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putNodeToArr(Node[] nodes, K key, V value) {
-        if (key == null) {
-            key = (K) ZERO;
-        }
+        key = checkIfNull(key);
         int index = Math.abs(key.hashCode()) % nodes.length;
-        Node newNode = new Node<>(key.hashCode(), key, value, null);
-        if (nodes[index] == null) {
-            nodes[index] = newNode;
-        } else {
-            Node currentNode = nodes[index];
-            Node prevNode = null;
-            while (currentNode != null) {
-                if (currentNode.key.equals(newNode.key)) {
-                    newNode.next = currentNode.next;
-                    if (prevNode != null) {
-                        prevNode.next = newNode;
-                    } else {
-                        nodes[index] = newNode;
-                    }
-                    return;
-                }
-                prevNode = currentNode;
-                currentNode = currentNode.next;
+        Node newNode = new Node<>(key, value, null);
+        Node currentNode = nodes[index];
+        while (currentNode != null) {
+            if (currentNode.key.equals(key)) {
+                currentNode.value = value;
+                return;
             }
-            prevNode.next = newNode;
+            currentNode = currentNode.next;
         }
-        wasAdded = true;
+        newNode.next = nodes[index];
+        nodes[index] = newNode;
+        putedInTable = true;
     }
 
     private void growIfSizeIsInLoadFactory() {
-        if (size >= nodes.length * LOAD_FACTOR) {
-            Node[] temp = new Node[nodes.length << BIT_SHIFT_BY_ONE];
-            temp[0] = nodes[0];
-            for (int i = 1; i < nodes.length; i++) {
-                if (nodes[i] != null) {
-                    Node currentNode = nodes[i];
-                    while (currentNode != null) {
-                        putNodeToArr(temp, (K) currentNode.key, (V) currentNode.value);
-                        currentNode = currentNode.next;
-                    }
+        if (size >= table.length * LOAD_FACTOR) {
+            Node[] temp = new Node[table.length << BIT_SHIFT_BY_ONE];
+            for (int i = 0; i < table.length; i++) {
+                Node currentNode = table[i];
+                while (currentNode != null) {
+                    putNodeToArr(temp, (K) currentNode.key, (V) currentNode.value);
+                    currentNode = currentNode.next;
                 }
             }
-            nodes = temp;
-            wasAdded = false;
+            putedInTable = false;
+            table = temp;
         }
     }
 
+    private K checkIfNull(K key) {
+        if (key == null) {
+            return (K) KEY_NULL_VALUE;
+        }
+        return key;
+    }
+
     private class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
