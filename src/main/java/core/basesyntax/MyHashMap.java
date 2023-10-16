@@ -21,9 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size > capacity * loadFactor) {
-            resize();
-        }
+        resize();
         int index = getIndex(key);
         Node node = table[index];
         while (node != null) {
@@ -60,25 +58,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        capacity = capacity * CAPACITY_MULTIPLIER;
-        Node[] newTable = new Node[capacity];
-        for (int i = 0; i < capacity / CAPACITY_MULTIPLIER; i++) {
-            Node<K,V> node = table[i];
-            while (node != null) {
-                int index = getIndex(node.key);
-                var currentNode = newTable[index];
-                if (currentNode == null) {
-                    newTable[index] = new Node<>(node.key, node.value);
-                } else {
-                    while (currentNode.next != null) {
-                        currentNode = currentNode.next;
+        if (size > getThreshold()) {
+            capacity = capacity * CAPACITY_MULTIPLIER;
+            Node[] newTable = new Node[capacity];
+            for (int i = 0; i < capacity / CAPACITY_MULTIPLIER; i++) {
+                Node<K,V> node = table[i];
+                while (node != null) {
+                    int index = getIndex(node.key);
+                    var currentNode = newTable[index];
+                    if (currentNode == null) {
+                        newTable[index] = new Node<>(node.key, node.value);
+                    } else {
+                        while (currentNode.next != null) {
+                            currentNode = currentNode.next;
+                        }
+                        currentNode.next = new Node<>(node.key, node.value);
                     }
-                    currentNode.next = new Node<>(node.key, node.value);
+                    node = node.next;
                 }
-                node = node.next;
             }
+            table = newTable;
         }
-        table = newTable;
+    }
+
+    private int getThreshold() {
+        return (int) (capacity * loadFactor);
     }
 
     private int getIndex(K key) {
