@@ -11,7 +11,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         this.capacity = DEFAULT_CAPACITY;
         this.table = (Node<K, V>[]) new Node[capacity];
-        this.size = 0;
     }
 
     @Override
@@ -95,7 +94,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
