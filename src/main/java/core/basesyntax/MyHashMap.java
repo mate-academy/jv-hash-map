@@ -9,7 +9,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        initialize(DEFAULT_CAPACITY);
+        this.capacity = DEFAULT_CAPACITY;
+        this.table = (Node<K, V>[]) new Node[capacity];
+        this.size = 0;
     }
 
     @Override
@@ -35,8 +37,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(Object key) {
-        return key == null ? 0 : (key.hashCode() >= 0
-                ? key.hashCode() : -key.hashCode()) % capacity;
+        if (key == null) {
+            return 0;
+        }
+        int hash = key.hashCode() % capacity;
+        return hash < 0 ? hash + capacity : hash;
     }
 
     private boolean updateIfKeyPresent(K key, V value) {
@@ -79,20 +84,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] oldTable = table;
-        initialize(capacity * 2);
+        final Node<K, V>[] oldTable = table;
+        capacity *= 2;
+        table = (Node<K, V>[]) new Node[capacity];
+        size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
             }
         }
-    }
-
-    private void initialize(int desiredCapacity) {
-        capacity = desiredCapacity;
-        table = (Node<K, V>[]) new Node[capacity];
-        size = 0;
     }
 
     static class Node<K, V> {
@@ -106,5 +107,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
         }
     }
-
 }
+
