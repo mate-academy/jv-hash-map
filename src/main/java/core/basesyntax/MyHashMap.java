@@ -16,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        boolean keyPresent = updateIfKeyPresent(key, value);
+        boolean keyPresent = updateKey(key, value);
         if (!keyPresent) {
             if (size >= capacity * DEFAULT_LOAD_FACTOR) {
                 resize();
@@ -40,11 +40,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return 0;
         }
-        int hash = key.hashCode() % capacity;
-        return hash < 0 ? hash + capacity : hash;
+        return Math.abs(key.hashCode() % capacity);
     }
 
-    private boolean updateIfKeyPresent(K key, V value) {
+    private boolean updateKey(K key, V value) {
         Node<K, V> node = getNodeKey(key);
         if (node != null) {
             node.value = value;
@@ -55,14 +54,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void createNewNode(K key, V value) {
         int hash = hash(key);
-        Node<K, V> nodeWithHash = table[hash];
-        if (nodeWithHash == null) {
+        Node<K, V> nodeHash = table[hash];
+        if (nodeHash == null) {
             table[hash] = new Node<>(key, value, null);
         } else {
-            while (nodeWithHash.next != null) {
-                nodeWithHash = nodeWithHash.next;
+            while (nodeHash.next != null) {
+                nodeHash = nodeHash.next;
             }
-            nodeWithHash.next = new Node<>(key, value, null);
+            nodeHash.next = new Node<>(key, value, null);
         }
         size++;
     }
