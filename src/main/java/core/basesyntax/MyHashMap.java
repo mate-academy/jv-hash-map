@@ -35,11 +35,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(Object key) {
+    private int getIndex(Object key) {
         if (key == null) {
             return 0;
         }
-        return Math.abs(key.hashCode() % capacity);
+        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
     private boolean updateKey(K key, V value) {
@@ -52,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void createNewNode(K key, V value) {
-        int hash = hash(key);
+        int hash = getIndex(key);
         Node<K, V> nodeHash = table[hash];
         if (nodeHash == null) {
             table[hash] = new Node<>(key, value, null);
@@ -66,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> getNodeKey(K key) {
-        int hash = hash(key);
+        int hash = getIndex(key);
         Node<K, V> nodeInBucket = table[hash];
         while (nodeInBucket != null) {
             if (keysAreEqual(nodeInBucket.key, key)) {
