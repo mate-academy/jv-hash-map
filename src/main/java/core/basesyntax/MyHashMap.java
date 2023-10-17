@@ -4,22 +4,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_CAPACITY = 16;
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
-    private int threshold;
     private int size;
 
     public MyHashMap() {
         this.table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
-        this.threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        int hash = hash(key);
-        int index = hash % table.length;
+        int index = getTableIndex(key);
         Node<K, V> newNode = new Node<>(key, value, null);
-        if (size > threshold) {
-            transfer();
-        }
+        checkThresholdAndResize();
         if (table[index] == null) {
             table[index] = newNode;
             size++;
@@ -42,8 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key);
-        int index = hash % table.length;
+        int index = getTableIndex(key);
         Node<K, V> node = table[index];
         while (node != null) {
             if (node.key == key || (node.key != null && node.key.equals(key))) {
@@ -59,11 +53,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode());
+    private int getTableIndex(K key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
-    private void transfer() {
+    private void checkThresholdAndResize() {
+        if (size <= (int) (table.length * DEFAULT_LOAD_FACTOR)) {
+            return;
+        }
         size = 0;
         Node<K, V>[] oldTable = table;
         int newCapacity = table.length * 2;
@@ -74,7 +71,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node = node.next;
             }
         }
-        threshold = threshold * 2;
     }
 
     private static class Node<K, V> {
