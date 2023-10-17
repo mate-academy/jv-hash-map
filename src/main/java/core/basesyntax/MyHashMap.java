@@ -24,7 +24,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = hash(key) % table.length;
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
-            if (key == currentNode.key || (currentNode.key != null && currentNode.key.equals(key))) {
+            if (key == currentNode.key || (currentNode.key
+                    != null && currentNode.key.equals(key))) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
@@ -38,7 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return (key == null) ? 0 :Math.abs(key.hashCode()) ^ (key.hashCode() >>> 16);
+        return (key == null) ? 0 : Math.abs(key.hashCode()) ^ (key.hashCode() >>> 16);
     }
 
     private void insert(Node<K, V> newNode) {
@@ -86,8 +87,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static class Node<K, V> {
         private final int hash;
         private final K key;
-        V value;
-        Node<K, V> next;
+        private V value;
+        private Node<K, V> next;
 
         public Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
