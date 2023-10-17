@@ -3,7 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int SHIFT_BY_ONE = 1;
+    private static final int LENGTH_MULTIPLIER = 2;
     private Node<K, V>[] table;
     private int size;
     private int maxCapacity;
@@ -26,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> node = table[index];
             while (node != null) {
-                if (node.key == key || node.key != null && node.key.equals(key)) {
+                if (isNodeKeyEqual(node, key)) {
                     node.value = newNode.value;
                     return;
                 } else if (node.next == null) {
@@ -43,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         for (Node<K, V> node : table) {
             while (node != null) {
-                if (node.key == key || node.key != null && node.key.equals(key)) {
+                if (isNodeKeyEqual(node, key)) {
                     return node.value;
                 }
                 node = node.next;
@@ -57,13 +57,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private boolean isNodeKeyEqual(Node<K, V> node, K key) {
+        return node.key == key || node.key != null && node.key.equals(key);
+    }
+
     private int hash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private void resize() {
         Node<K, V>[] oldTable = table;
-        table = new Node[table.length << SHIFT_BY_ONE];
+        table = new Node[table.length * LENGTH_MULTIPLIER];
         size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
