@@ -5,7 +5,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final int CAPACITY_MULTIPLIER = 2;
     private int capacity = DEFAULT_CAPACITY;
-    private Node[] data = new Node[DEFAULT_CAPACITY];
+    private Node<K, V>[] data = new Node[DEFAULT_CAPACITY];
     private int size;
 
     @Override
@@ -35,7 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = getIndex(key);
-        Node testNode = data[index];
+        Node<K, V> testNode = data[index];
         while (testNode != null) {
             if (((key == testNode.key)
                     || (key != null && key.equals(testNode.key)))) {
@@ -55,11 +55,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size + 1 >= capacity * LOAD_FACTOR) {
             capacity = capacity * CAPACITY_MULTIPLIER;
             size = 0;
-            Node[] copyData = data;
+            Node<K, V>[] copyData = data;
             data = new Node[capacity];
-            for (Node node : copyData) {
+            for (Node<K, V> node : copyData) {
                 while (node != null) {
-                    put((K) node.key, (V) node.value);
+                    put(node.key, (V) node.value);
                     node = node.next;
                 }
             }
