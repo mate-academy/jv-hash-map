@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final int DOUBLE_MULTIPLIER = 2;
@@ -39,8 +41,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Node<K, V> current = table[index];
         while (current != null) {
-            if ((current.key == key)
-                    || (current.key != null && current.key.equals(key))) {
+
+            if (Objects.equals(current.key, key)) {
                 break;
             }
             current = current.next;
@@ -60,17 +62,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K,V>[] resize() {
         Node<K, V>[] oldTable = table;
         table = new Node[table.length * DOUBLE_MULTIPLIER];
-        Node<K, V> current;
-        for (int i = 0; i < oldTable.length; i++) {
-            if (oldTable[i] != null) {
-                current = oldTable[i];
-                put(current.key, current.value);
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
                 size--;
-                while (current.next != null) {
-                    current = current.next;
-                    put(current.key, current.value);
-                    size--;
-                }
             }
         }
         return table;
@@ -80,8 +76,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Node<K, V> current = table[index];
         while (current != null) {
-            if ((current.key == key)
-                    || (current.key != null && current.key.equals(key))) {
+            if (Objects.equals(current.key, key)) {
                 current.value = value;
                 return true;
             }
