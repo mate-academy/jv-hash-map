@@ -26,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         } else {
-        addOrUpdateNode(currentNode, newNode);
+            addOrUpdateNode(currentNode, newNode);
         }
     }
 
@@ -89,6 +89,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
+
         public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
