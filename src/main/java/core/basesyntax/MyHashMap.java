@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import java.util.Objects;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final int DEFAULT_GROW_FACTOR = 2;
@@ -19,10 +17,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = getIndexByKey(key, capacity);
+        int index = defineIndexByKey(key, capacity);
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
-            if (Objects.equals(key, currentNode.key)) {
+            if ((key == currentNode.key) || (key != null && key.equals(currentNode.key))) {
                 currentNode.value = value;
                 return;
             }
@@ -40,7 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> node = searchNodeByKey(key);
-        return (node != null) ? node.value : null;
+        return (node == null) ? null : node.value;
     }
 
     @Override
@@ -49,35 +47,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int newCapacity = capacity * DEFAULT_GROW_FACTOR;
-        Node<K, V>[] newTable = new Node[newCapacity];
-        int index;
-        for (Node<K, V> node : table) {
+        capacity = capacity * DEFAULT_GROW_FACTOR;
+        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
+        Node[] temporalTable = table;
+        table = new Node[capacity];
+        size = 0;
+        for (Node<K, V> node : temporalTable) {
             while (node != null) {
-                index = getIndexByKey(node.key, newCapacity);
-                Node<K, V> next = node.next;
-                node.next = newTable[index];
-                newTable[index] = node;
-                node = next;
+                put(node.key, node.value);
+                node = node.next;
             }
         }
-        table = newTable;
-        capacity = newCapacity;
-        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
     }
 
-    private int getIndexByKey(K key, int capacity) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode() % capacity);
+    private int defineIndexByKey(K key, int capacity) {
+        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
     private Node<K, V> searchNodeByKey(K key) {
-        int index = getIndexByKey(key, capacity);
+        int index = defineIndexByKey(key, capacity);
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
-            if ((key == null && currentNode.key == null) || (key != null && key.equals(
+            if ((key == currentNode.key) || (key != null && key.equals(
                     currentNode.key))) {
                 return currentNode;
             }
@@ -91,7 +82,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
         }
