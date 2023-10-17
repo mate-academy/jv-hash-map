@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -37,41 +36,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> targetNode = getNode(key);
-        return targetNode == null ? null : targetNode.getValue();
+        return targetNode == null ? null : targetNode.value;
     }
 
     @Override
     public int getSize() {
         return size;
-    }
-
-    private static class Node<K, V> implements Map.Entry<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-
-        @Override
-        public K getKey() {
-            return key;
-        }
-
-        @Override
-        public V getValue() {
-            return value;
-        }
-
-        @Override
-        public V setValue(V newValue) {
-            V oldValue = value;
-            value = newValue;
-            return oldValue;
-        }
     }
 
     private Node<K, V> getNode(K key) {
@@ -120,5 +90,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int calculateBucketPosition(K key) {
         int keyHashCode = key != null ? key.hashCode() : 0;
         return Math.abs((keyHashCode % table.length) - 1);
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
