@@ -13,7 +13,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = hash(key);
+        int index = getIndex(key);
         if (size > 0 && replaceDuplicateKeyValue(key, value)) {
             return;
         }
@@ -36,7 +36,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (!checkElementIndexExistence(key)) {
             return null;
         }
-        int index = hash(key);
+        int index = getIndex(key);
         Node<K, V> current = table[index];
         while (current != null) {
             if ((current.key == key)
@@ -53,7 +53,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(K key) {
+    private int getIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
@@ -77,7 +77,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean replaceDuplicateKeyValue(K key, V value) {
-        int index = hash(key);
+        int index = getIndex(key);
         Node<K, V> current = table[index];
         while (current != null) {
             if ((current.key == key)
@@ -93,7 +93,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private boolean checkElementIndexExistence(K key) {
         if (size > 0) {
             for (int i = 0; i < table.length; i++) {
-                if (table[i] != null && hash(table[i].key) == hash(key)) {
+                if (table[i] != null && getIndex(table[i].key) == getIndex(key)) {
                     return true;
                 }
             }
