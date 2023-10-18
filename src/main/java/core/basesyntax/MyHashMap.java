@@ -70,8 +70,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (LinkedList<Node<K,V>> bucket : buckets) {
             for (Node<K,V> node : bucket) {
                 int newBucketIndex = (node.key == null) ? 0 : getBucketIndex(node.key);
-                System.out.println("Node key: " + node.key + ", newBucketIndex: " + newBucketIndex
-                        + ", newBuckets.size(): " + newBuckets.size());
                 newBuckets.get(newBucketIndex).add(node);
             }
         }
