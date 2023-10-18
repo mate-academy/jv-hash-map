@@ -22,11 +22,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        int index = (key == null) ? 0 : getIndex(key);
-        Node<K, V> bucket = new Node<>((key == null) ? 0 : key.hashCode(), key, value);
+        int index = getIndex(key);
+        Node<K, V> node = new Node<>(key, value);
 
         if (table[index] == null) {
-            table[index] = bucket;
+            table[index] = node;
             size++;
         } else {
             Node<K, V> current = table[index];
@@ -37,8 +37,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 current = current.next;
             }
-            bucket.next = table[index];
-            table[index] = bucket;
+            node.next = table[index];
+            table[index] = node;
             size++;
         }
     }
@@ -78,7 +78,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return 0;
         }
         int index = key.hashCode() % capacity;
-        return index < 0 ? -index : index;
+        return Math.abs(index);
     }
 
     private void resize() {
@@ -98,13 +98,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        private Node(int hash, K key, V value) {
-            this.hash = hash;
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
         }
