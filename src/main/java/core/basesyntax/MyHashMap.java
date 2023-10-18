@@ -38,9 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             currentNode.next = newNode;
         }
         size++;
-        if (size > table.length * DEFAULT_LOAD_FACTOR) {
-            resize();
-        }
+        resize();
     }
 
     private void putForNullKey(V value) {
@@ -62,9 +60,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode.next = new Node<>(null, value, null);
                 size++;
             }
-            if (size > table.length * DEFAULT_LOAD_FACTOR) {
-                resize();
-            }
+            resize();
         }
     }
 
@@ -98,14 +94,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int newCapacity = table.length << 1;
-        Node<K, V>[] oldTable = table;
-        table = new Node[newCapacity];
-        size = 0;
-        for (Node<K, V> node : oldTable) {
-            while (node != null) {
-                putWithResize(node.key, node.value);
-                node = node.next;
+        if (size > table.length * DEFAULT_LOAD_FACTOR) {
+            int newCapacity = table.length << 1;
+            Node<K, V>[] oldTable = table;
+            table = new Node[newCapacity];
+            size = 0;
+            for (Node<K, V> node : oldTable) {
+                while (node != null) {
+                    putWithResize(node.key, node.value);
+                    node = node.next;
+                }
             }
         }
     }
@@ -129,10 +127,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             prevNode.next = new Node<>(key, value, null);
             size++;
         }
-
-        if (size > table.length * DEFAULT_LOAD_FACTOR) {
-            resize();
-        }
     }
 
     private int calculateBucketIndex(K key) {
@@ -149,7 +143,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
