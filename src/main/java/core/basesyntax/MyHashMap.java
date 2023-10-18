@@ -10,7 +10,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        table = createStartTable();
+        table = (Node<K,V>[]) new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -26,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int index = calculateBucketPosition(key);
         Node<K, V> entryNode = new Node<>(key, value, null);
-        if (table[calculateBucketPosition(key)] != null) {
+        if (table[index] != null) {
             entryNode.next = table[index];
         }
         table[index] = entryNode;
@@ -61,10 +61,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private Node<K, V>[] createStartTable() {
-        return (Node<K,V>[]) new Node[DEFAULT_CAPACITY];
-    }
-
     private void resize() {
         int newLength = table.length * GROW_FACTOR;
         Node<K, V>[] oldBucketsTmp = table;
@@ -76,13 +72,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void transfer(Node<K, V>[] newTable) {
         for (Node<K, V> kvNode : newTable) {
-            Node<K, V> node = kvNode;
-            if (node != null) {
-                put(node.key, node.value);
-                while (node.next != null) {
-                    node = node.next;
-                    put(node.key, node.value);
-                }
+            while (kvNode != null) {
+                put(kvNode.key, kvNode.value);
+                kvNode = kvNode.next;
             }
         }
     }
@@ -97,7 +89,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
