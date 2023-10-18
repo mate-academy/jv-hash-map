@@ -3,7 +3,6 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final Integer KEY_NULL_VALUE = 0;
     private static final Integer BIT_SHIFT_BY_ONE = 1;
     private Node[] table;
     private int size;
@@ -14,13 +13,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        int index = getIndex(key);
         growIfSizeIsInLoadFactory();
-        int index = Math.abs(key == null ? 0 : key.hashCode()) % table.length;
         Node newNode = new Node<>(key, value, null);
         Node current = table[index];
         while (current != null) {
-            if (current.key != null && current.key.equals(key)
-                    || current.key == null && key == null) {
+            if (checkKey(current, key)) {
                 current.value = value;
                 return;
             }
@@ -33,17 +31,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (int i = 0; i < table.length; i++) {
-            if (table[i] != null) {
-                Node current = table[i];
-                while (current != null) {
-                    if (current.key != null && current.key.equals(key)
-                            || current.key == null && key == null) {
-                        return (V) current.value;
-                    }
-                    current = current.next;
-                }
+        Node current = table[getIndex(key)];
+        while (current != null) {
+            if (checkKey(current, key)) {
+                return (V) current.value;
             }
+            current = current.next;
         }
         return null;
     }
@@ -66,6 +59,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
+    }
+
+    private int getIndex(K key) {
+        return Math.abs(key == null ? 0 : key.hashCode()) % table.length;
+    }
+
+    private boolean checkKey(Node current, K key) {
+        return current.key != null && current.key.equals(key) || current.key == key;
     }
 
     private class Node<K, V> {
