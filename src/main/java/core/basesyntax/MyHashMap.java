@@ -92,7 +92,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         Node(K key, V value) {
             this.key = key;
-            this.value = value;;
+            this.value = value;
         }
     }
 }
