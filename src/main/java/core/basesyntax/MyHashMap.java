@@ -78,28 +78,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         int newCapacity = table.length * 2;
         Node<K, V>[] newTable = new Node[newCapacity];
-
-        // Обновляем размер table
-        table = newTable;
-
         for (Node<K, V> node : table) {
             while (node != null) {
-                Node<K, V> next = node.next;
-                int indexBucket = (node.key == null) ? 0 : node.key.hashCode() % table.length;
-
-                if (table[indexBucket] == null) {
-                    table[indexBucket] = new Node<>(node.key, node.value, null);
+                int indexBucket = (node.key == null) ? 0 : node.key.hashCode() % newTable.length;
+                Node<K, V> newNode = new Node<>(node.key, node.value, null);
+                if (newTable[indexBucket] == null) {
+                    newTable[indexBucket] = newNode;
                 } else {
-                    Node<K, V> current = table[indexBucket];
+                    Node<K, V> current = newTable[indexBucket];
                     while (current.next != null) {
                         current = current.next;
                     }
-                    current.next = new Node<>(node.key, node.value, null);
+                    current.next = newNode;
                 }
 
-                node = next;
+                node = node.next;
             }
         }
+        table = newTable;
     }
 
     private int calculateIndexBucket(K key) {
@@ -110,23 +106,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[0] == null) {
             table[0] = new Node<>(null, value, null);
             size++;
-        } else {
-            Node<K, V> currentNode = table[0];
-            while (currentNode.next != null) {
-                if (currentNode.key == null) {
-                    currentNode.value = value;
-                    return;
-                }
-                currentNode = currentNode.next;
-            }
+        }
+        Node<K, V> currentNode = table[0];
+        while (currentNode.next != null) {
             if (currentNode.key == null) {
                 currentNode.value = value;
-            } else {
-                currentNode.next = new Node<>(null, value, null);
-                size++;
+                return;
             }
+            currentNode = currentNode.next;
         }
-
+        if (currentNode.key == null) {
+            currentNode.value = value;
+        } else {
+            currentNode.next = new Node<>(null, value, null);
+            size++;
+        }
         if (size > table.length * LOAD_FACTOR) {
             resize();
         }
