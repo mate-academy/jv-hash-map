@@ -37,9 +37,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
-            return getForNullKey();
-        }
         int index = calculateBucketIndex(key);
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
@@ -47,19 +44,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
-        }
-        return null;
-    }
-
-    private V getForNullKey() {
-        if (table[0] != null) {
-            Node<K, V> currentNode = table[0];
-            while (currentNode != null) {
-                if (currentNode.key == null) {
-                    return currentNode.value;
-                }
-                currentNode = currentNode.next;
-            }
         }
         return null;
     }
