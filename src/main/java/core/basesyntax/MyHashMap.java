@@ -14,7 +14,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (key == null) {
-            putForNullKey(value);
+            for (Node<K, V> entry = table[0]; entry != null; entry = entry.next) {
+                if (entry.key == null) {
+                    entry.value = value;
+                    return;
+                }
+            }
+            addEntry(0, null, value, 0);
             return;
         }
         int hash = hash(key);
@@ -31,7 +37,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         if (key == null) {
-            return getForNullKey();
+            for (Node<K, V> entry = table[0]; entry != null; entry = entry.next) {
+                if (entry.key == null) {
+                    return entry.value;
+                }
+            }
         }
         int hash = hash(key);
         int index = indexFor(hash, table.length);
@@ -48,16 +58,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void putForNullKey(V value) {
-        for (Node<K, V> entry = table[0]; entry != null; entry = entry.next) {
-            if (entry.key == null) {
-                entry.value = value;
-                return;
-            }
-        }
-        addEntry(0, null, value, 0);
-    }
-
     private void addEntry(int hash, K key, V value, int bucketIndex) {
         Node<K, V> newNode = new Node<>(hash, key, value, table[bucketIndex]);
         table[bucketIndex] = newNode;
@@ -67,29 +67,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private V getForNullKey() {
-        for (Node<K, V> entry = table[0]; entry != null; entry = entry.next) {
-            if (entry.key == null) {
-                return entry.value;
-            }
-        }
-        return null;
-    }
-
     private void resize() {
         int newCapacity = table.length * DEFAULT_MULTIPLIER;
-        Node<K, V>[] newTable = new Node[newCapacity];
-        for (Node<K, V> oldEntry : table) {
+        Node<K, V>[] oldMap = table;
+        table = new Node[newCapacity];
+        size = 0;
+        for (Node<K, V> oldEntry : oldMap) {
             while (oldEntry != null) {
-                Node<K, V> next = oldEntry.next;
-                int newHash = (oldEntry.key == null) ? 0 : hash(oldEntry.key);
-                int newIndex = indexFor(newHash, newCapacity);
-                oldEntry.next = newTable[newIndex];
-                newTable[newIndex] = oldEntry;
-                oldEntry = next;
+                put(oldEntry.key, oldEntry.value);
+                oldEntry = oldEntry.next;
             }
         }
-        table = newTable;
     }
 
     private int hash(K key) {
