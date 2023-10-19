@@ -14,7 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int index = getIndex(key);
-        growIfSizeIsInLoadFactory();
+        resizeTableIfNeeded();
         Node newNode = new Node<>(key, value, null);
         Node current = table[index];
         while (current != null) {
@@ -46,7 +46,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void growIfSizeIsInLoadFactory() {
+    private void resizeTableIfNeeded() {
         if (size >= table.length * LOAD_FACTOR) {
             Node[] tmpArrNode = table;
             table = new Node[table.length << BIT_SHIFT_BY_ONE];
