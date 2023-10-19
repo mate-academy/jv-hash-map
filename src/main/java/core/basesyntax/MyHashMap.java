@@ -10,58 +10,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        size = 0;
     }
 
     @Override
     public void put(K key, V value) {
-        if (key == null) {
-            putForNullKey(value);
-            return;
-        }
         int index = calculateBucketIndex(key);
         Node<K, V> newNode = new Node<>(key, value, null);
-        if (table[index] == null) {
+        Node<K, V> currentNode = table[index];
+        if (currentNode == null) {
             table[index] = newNode;
         } else {
-            Node<K, V> currentNode = table[index];
+            Node<K, V> prevNode = null;
             while (currentNode != null) {
                 if (Objects.equals(currentNode.key, key)) {
                     currentNode.value = value;
                     return;
                 }
-                if (currentNode.next == null) {
-                    break;
-                }
+                prevNode = currentNode;
                 currentNode = currentNode.next;
             }
-            currentNode.next = newNode;
+            prevNode.next = newNode;
         }
         size++;
         resize();
-    }
-
-    private void putForNullKey(V value) {
-        if (table[0] == null) {
-            table[0] = new Node<>(null, value, null);
-            size++;
-        } else {
-            Node<K, V> currentNode = table[0];
-            while (currentNode.next != null) {
-                if (currentNode.key == null) {
-                    currentNode.value = value;
-                    return;
-                }
-                currentNode = currentNode.next;
-            }
-            if (currentNode.key == null) {
-                currentNode.value = value;
-            } else {
-                currentNode.next = new Node<>(null, value, null);
-                size++;
-            }
-            resize();
-        }
     }
 
     @Override
@@ -101,35 +72,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size = 0;
             for (Node<K, V> node : oldTable) {
                 while (node != null) {
-                    putWithResize(node.key, node.value);
+                    put(node.key, node.value);
                     node = node.next;
                 }
             }
         }
     }
 
-    private void putWithResize(K key, V value) {
-        int index = calculateBucketIndex(key);
-        Node<K, V> currentNode = table[index];
-        if (currentNode == null) {
-            table[index] = new Node<>(key, value, null);
-            size++;
-        } else {
-            Node<K, V> prevNode = null;
-            while (currentNode != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    currentNode.value = value;
-                    return;
-                }
-                prevNode = currentNode;
-                currentNode = currentNode.next;
-            }
-            prevNode.next = new Node<>(key, value, null);
-            size++;
-        }
-    }
-
     private int calculateBucketIndex(K key) {
+        if (key == null) {
+            return 0;
+        }
         return Math.abs(key.hashCode() % table.length);
     }
 
