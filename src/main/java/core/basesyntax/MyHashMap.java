@@ -14,6 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        resize();
         int index = calculateBucketIndex(key);
         Node<K, V> newNode = new Node<>(key, value, null);
         Node<K, V> currentNode = table[index];
@@ -32,7 +33,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             prevNode.next = newNode;
         }
         size++;
-        resize();
     }
 
     @Override
@@ -65,7 +65,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (size > table.length * DEFAULT_LOAD_FACTOR) {
+        if (size >= table.length * DEFAULT_LOAD_FACTOR) {
             int newCapacity = table.length << 1;
             Node<K, V>[] oldTable = table;
             table = new Node[newCapacity];
