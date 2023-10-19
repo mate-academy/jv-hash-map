@@ -18,8 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int bucket = key == null ? 0 : key.hashCode() % capacity;
-        bucket = Math.abs(bucket);
+        int bucket = findTheBucket(key);
         Node<K, V> currentNode = table[bucket];
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
@@ -38,9 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int bucket = key == null ? 0 : key.hashCode() % capacity;
-        bucket = Math.abs(bucket);
-        Node<K, V> currentNode = table[bucket];
+        Node<K, V> currentNode = table[findTheBucket(key)];
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
                 return currentNode.value;
@@ -57,11 +54,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         capacity *= DEFAULT_GROW;
-        Node[] oldTable = table;
+        Node<K, V>[] oldTable = table;
         table = (Node<K, V>[]) new Node[capacity];
         size = 0;
+        transfer(oldTable);
+    }
 
-        for (Node<K, V> node : oldTable) {
+    private int findTheBucket(K key) {
+        int bucket = key == null ? 0 : key.hashCode() % capacity;
+        return Math.abs(bucket);
+    }
+
+    private void transfer(Node<K, V>[] newTable) {
+        for (Node<K, V> node : newTable) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
@@ -80,21 +85,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
         }
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            Node<?, ?> node = (Node<?, ?>) o;
-            return Objects.equals(key, node.key) && Objects.equals(value, node.value);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(key, value);
-        }
     }
 }
