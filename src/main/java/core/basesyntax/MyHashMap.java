@@ -7,8 +7,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int RESIZE_MULTIPLIER = 2;
 
-    private Node<K,V>[] table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
+    private Node<K,V>[] table;
     private int size;
+
+    public MyHashMap() {
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
