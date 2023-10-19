@@ -4,8 +4,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private static final int DEFAULT_MULTIPLIER = 2;
-    private Node<K, V>[] table = new Node[DEFAULT_CAPACITY];
+    private Node<K, V>[] table;
     private int size;
+
+    public MyHashMap() {
+        table = new Node[DEFAULT_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
@@ -13,17 +17,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             putForNullKey(value);
             return;
         }
-
         int hash = hash(key);
         int index = indexFor(hash, table.length);
-
         for (Node<K, V> entry = table[index]; entry != null; entry = entry.next) {
             if (key.equals(entry.key)) {
                 entry.value = value;
                 return;
             }
         }
-
         addEntry(hash, key, value, index);
     }
 
@@ -32,16 +33,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return getForNullKey();
         }
-
         int hash = hash(key);
         int index = indexFor(hash, table.length);
-
         for (Node<K, V> entry = table[index]; entry != null; entry = entry.next) {
             if (key.equals(entry.key)) {
                 return entry.value;
             }
         }
-
         return null;
     }
 
@@ -57,7 +55,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
         }
-
         addEntry(0, null, value, 0);
     }
 
@@ -65,7 +62,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> newNode = new Node<>(hash, key, value, table[bucketIndex]);
         table[bucketIndex] = newNode;
         size++;
-
         if (size > table.length * LOAD_FACTOR) {
             resize();
         }
@@ -83,7 +79,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         int newCapacity = table.length * DEFAULT_MULTIPLIER;
         Node<K, V>[] newTable = new Node[newCapacity];
-
         for (Node<K, V> oldEntry : table) {
             while (oldEntry != null) {
                 Node<K, V> next = oldEntry.next;
@@ -94,7 +89,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 oldEntry = next;
             }
         }
-
         table = newTable;
     }
 
