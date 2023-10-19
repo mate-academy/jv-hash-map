@@ -79,15 +79,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int newCapacity = table.length * 2;
         Node<K, V>[] newTable = new Node[newCapacity];
 
+        // Обновляем размер table
+        table = newTable;
+
         for (Node<K, V> node : table) {
             while (node != null) {
                 Node<K, V> next = node.next;
-                int indexBucket = (node.key == null) ? 0 : node.key.hashCode() % newTable.length;
+                int indexBucket = (node.key == null) ? 0 : node.key.hashCode() % table.length;
 
-                if (newTable[indexBucket] == null) {
-                    newTable[indexBucket] = new Node<>(node.key, node.value, null);
+                if (table[indexBucket] == null) {
+                    table[indexBucket] = new Node<>(node.key, node.value, null);
                 } else {
-                    Node<K, V> current = newTable[indexBucket];
+                    Node<K, V> current = table[indexBucket];
                     while (current.next != null) {
                         current = current.next;
                     }
@@ -97,7 +100,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node = next;
             }
         }
-        table = newTable;
     }
 
     private int calculateIndexBucket(K key) {
