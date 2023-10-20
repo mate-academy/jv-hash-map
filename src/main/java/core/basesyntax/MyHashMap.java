@@ -12,13 +12,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int capacity;
 
     public MyHashMap() {
-        table = ( Node<K, V>[]) new Node[DEFAULT_CAPACITY];
-        capacity = table.length;
+        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        capacity = DEFAULT_CAPACITY;
     }
 
     @Override
     public void put(K key, V value) {
-        int bucket = findTheBucket(key);
+        int bucket = getIndex(key);
         Node<K, V> currentNode = table[bucket];
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
@@ -37,7 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = table[findTheBucket(key)];
+        Node<K, V> currentNode = table[getIndex(key)];
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
                 return currentNode.value;
@@ -60,9 +60,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         transfer(oldTable);
     }
 
-    private int findTheBucket(K key) {
-        int bucket = key == null ? 0 : key.hashCode() % capacity;
-        return Math.abs(bucket);
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 
     private void transfer(Node<K, V>[] newTable) {
