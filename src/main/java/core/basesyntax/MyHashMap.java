@@ -104,11 +104,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         int newCapacity = table.length << 1;
         Node<K,V>[] oldTable = table;
+        threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
         table = new Node[newCapacity];
 
         for (Node<K,V> node : oldTable) {
             while (node != null) {
-                final Node<K,V> nextNode = node.next;
+                Node<K,V> nextNode = node.next;
                 node.next = null;
                 int index = hash(node.key);
                 node.next = table[index];
