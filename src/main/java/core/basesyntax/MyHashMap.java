@@ -12,10 +12,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (key == null) {
-            putForNullKey(value);
-            return;
-        }
         int index = getIndex(key);
         Node<K, V> node = findNode(index, key);
         if (node != null) {
@@ -40,23 +36,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
-    }
-
-    private void putForNullKey(V value) {
-        Node<K, V> node = table[0];
-        if (node == null) {
-            table[0] = new Node<>(null, value, null);
-            size++;
-        } else {
-            while (node != null) {
-                if (node.key == null) {
-                    node.value = value;
-                    return;
-                }
-                node = node.next;
-            }
-            addEntry(null, value, 0);
-        }
     }
 
     private int getIndex(K key) {
