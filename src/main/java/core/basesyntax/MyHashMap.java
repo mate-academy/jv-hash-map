@@ -13,20 +13,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (key == null) {
-            for (Node<K, V> entry = table[0]; entry != null; entry = entry.next) {
-                if (entry.key == null) {
-                    entry.value = value;
-                    return;
-                }
-            }
-            addEntry(0, null, value, 0);
-            return;
-        }
-        int hash = hash(key);
+        int hash = (key == null) ? 0 : hash(key);
         int index = indexFor(hash, table.length);
         for (Node<K, V> entry = table[index]; entry != null; entry = entry.next) {
-            if (key.equals(entry.key)) {
+            if ((key == null && entry.key == null) || (key != null && key.equals(entry.key))) {
                 entry.value = value;
                 return;
             }
@@ -36,17 +26,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
-            for (Node<K, V> entry = table[0]; entry != null; entry = entry.next) {
-                if (entry.key == null) {
-                    return entry.value;
-                }
-            }
-        }
-        int hash = hash(key);
+        int hash = (key == null) ? 0 : hash(key);
         int index = indexFor(hash, table.length);
         for (Node<K, V> entry = table[index]; entry != null; entry = entry.next) {
-            if (key.equals(entry.key)) {
+            if ((key == null && entry.key == null) || (key != null && key.equals(entry.key))) {
                 return entry.value;
             }
         }
