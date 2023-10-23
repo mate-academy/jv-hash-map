@@ -13,23 +13,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int hash = (key == null) ? 0 : hash(key);
-        int index = indexFor(hash, table.length);
+        if (size > table.length * LOAD_FACTOR) {
+            resize();
+        }
+        int index = getIndex(key);
         for (Node<K, V> entry = table[index]; entry != null; entry = entry.next) {
-            if ((key == null && entry.key == null) || (key != null && key.equals(entry.key))) {
+            if ((key == entry.key) || (key != null && key.equals(entry.key))) {
                 entry.value = value;
                 return;
             }
         }
-        addEntry(hash, key, value, index);
+        addEntry(key, value, index);
     }
 
     @Override
     public V getValue(K key) {
-        int hash = (key == null) ? 0 : hash(key);
-        int index = indexFor(hash, table.length);
+        int index = getIndex(key);
         for (Node<K, V> entry = table[index]; entry != null; entry = entry.next) {
-            if ((key == null && entry.key == null) || (key != null && key.equals(entry.key))) {
+            if ((key == entry.key) || (key != null && key.equals(entry.key))) {
                 return entry.value;
             }
         }
@@ -41,13 +42,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void addEntry(int hash, K key, V value, int bucketIndex) {
-        Node<K, V> newNode = new Node<>(hash, key, value, table[bucketIndex]);
+    private void addEntry(K key, V value, int bucketIndex) {
+        Node<K, V> newNode = new Node<>(key, value, table[bucketIndex]);
         table[bucketIndex] = newNode;
         size++;
-        if (size > table.length * LOAD_FACTOR) {
-            resize();
-        }
     }
 
     private void resize() {
@@ -63,22 +61,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hash(K key) {
-        return (key == null) ? 0 : key.hashCode();
-    }
-
-    private int indexFor(int hash, int length) {
-        return hash & (length - 1);
+    private int getIndex(K key) {
+        int hash = (key == null) ? 0 : key.hashCode();
+        return hash & (table.length - 1);
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        private Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
