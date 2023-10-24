@@ -68,18 +68,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resizeTable() {
-        int newCapacity = table.length * 2;
-        Node<K, V>[] newTable = new Node[newCapacity];
-        for (Node<K, V> node : table) {
+        int newLength = table.length * 2;
+        Node<K, V>[] newTable = new Node[newLength];
+        Node<K, V>[] oldTable = table;
+        table = new Node[newLength];
+        size = 0;
+
+        for (Node<K, V> node : oldTable) {
             while (node != null) {
-                int index = node.key == null ? 0 : Math.abs(node.key.hashCode() % newCapacity);
-                Node<K, V> next = node.next;
-                node.next = newTable[index];
-                newTable[index] = node;
-                node = next;
+                put(node.key, node.value);
+                node = node.next;
             }
         }
-        table = newTable;
     }
 
     private void putForNullKey(V value) {
