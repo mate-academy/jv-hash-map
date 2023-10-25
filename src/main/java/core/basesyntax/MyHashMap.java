@@ -2,11 +2,9 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-
     static final int DEFAULT_INITIAL_CAPACITY = 16;
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     static final int RESIZE_MULTIPLIER = 2;
-
     private int threshold;
     private int size;
     private int capacity;
@@ -23,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        putNode(calculateHash(key), key, value);
+        putNode(key, value);
     }
 
     @Override
@@ -49,28 +47,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void putNode(int hash, K key, V value) {
-        Node<K, V> newNode = new Node<>(key, value, null);
+    private void putNode(K key, V value) {
+        int hash = calculateHash(key);
         if (table[hash] == null) {
-            table[hash] = newNode;
+            table[hash] = new Node<>(key, value, null);
             size++;
             return;
         }
-        putLinkedNode(hash, key, value, newNode);
+        putLinkedNode(key, value);
     }
 
-    private void putLinkedNode(int hash, K key, V value, Node<K, V> newNode) {
-        Node<K, V> currentNode = table[hash];
+    private void putLinkedNode(K key, V value) {
+        Node<K, V> currentNode = table[calculateHash(key)];
         while (currentNode != null) {
-            if (key == null && currentNode.key == null) {
-                currentNode.value = value;
-                return;
-            } else if (key != null && key.equals(currentNode.key)) {
+            if (key == null && currentNode.key == null
+                    || key != null && key.equals(currentNode.key)) {
                 currentNode.value = value;
                 return;
             }
             if (currentNode.next == null) {
-                currentNode.next = newNode;
+                currentNode.next = new Node<>(key, value, null);
                 size++;
                 return;
             }
@@ -93,7 +89,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
-                putNode(calculateHash(node.key), node.key, node.value);
+                putNode(node.key, node.value);
                 node = node.next;
             }
         }
