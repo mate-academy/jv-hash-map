@@ -1,55 +1,51 @@
 package core.basesyntax;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
     private static final int RESIZE_INDEX = 2;
     private int size;
-    private ArrayList<Node<K, V>>[] buckets = new ArrayList[DEFAULT_CAPACITY];
+    private int capacity;
+    private Node<K, V>[] buckets;
+
+    public MyHashMap() {
+        this.capacity = DEFAULT_CAPACITY;
+        this.buckets = new Node[capacity];
+    }
 
     @Override
     public void put(K key, V value) {
         int hash = hashCode(key);
         if (buckets[hash] == null) {
-            buckets[hash] = new ArrayList<>();
-        }
-        for (Node<K, V> node : buckets[hash]) {
-            if (keyEquals(node.getKey(), key)) {
-                node.setValue(value);
-                return;
+            buckets[hash] = new Node<>(hash, key, value, null);
+            size++;
+        } else {
+            Node<K, V> node = buckets[hash];
+            while (node != null) {
+                if (keyEquals(node.key, key)) {
+                    node.value = value;
+                    return;
+                }
+                node = node.next;
             }
+            buckets[hash] = new Node<>(hash, key, value, buckets[hash]);
+            size++;
         }
-        buckets[hash].add(new Node<>(hash, key, value, null));
-        size++;
 
-        if ((double) size / buckets.length >= LOAD_FACTOR) {
+        if ((double) size / capacity >= LOAD_FACTOR) {
             resize();
         }
-    }
-
-    private void put(ArrayList<Node<K, V>> bucket, Node<K, V> node) {
-        for (Node<K, V> n : bucket) {
-            if (keyEquals(n.getKey(), node.getKey())) {
-                n.setValue(node.getValue());
-                return;
-            }
-        }
-        bucket.add(node);
     }
 
     @Override
     public V getValue(K key) {
         int hash = hashCode(key);
-        List<Node<K, V>> bucket = buckets[hash];
-        if (bucket != null) {
-            for (Node<K, V> node : bucket) {
-                if (keyEquals(node.getKey(), key)) {
-                    return node.getValue();
-                }
+        Node<K, V> node = buckets[hash];
+        while (node != null) {
+            if (keyEquals(node.key, key)) {
+                return node.value;
             }
+            node = node.next;
         }
         return null;
     }
@@ -60,18 +56,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int capacity = buckets.length * RESIZE_INDEX;
-        ArrayList<Node<K, V>>[] resizeBuckets = new ArrayList[capacity];
+        capacity = capacity * RESIZE_INDEX;
+        Node<K, V>[] resizeBuckets = new Node[capacity];
 
-        for (ArrayList<Node<K, V>> bucket : buckets) {
-            if (bucket != null) {
-                for (Node<K, V> node : bucket) {
-                    int newHashCode = hashCode(node.getKey()) % capacity;
-                    if (resizeBuckets[newHashCode] == null) {
-                        resizeBuckets[newHashCode] = new ArrayList<>();
-                    }
-                    put(resizeBuckets[newHashCode], node);
+        for (Node<K, V> node : buckets) {
+            while (node != null) {
+                int newHashCode = hashCode(node.key) % capacity;
+                if (resizeBuckets[newHashCode] == null) {
+                    resizeBuckets[newHashCode] = new Node<>(
+                            newHashCode, node.key, node.value, null);
+                } else {
+                    Node<K, V> newNode = new Node<>(
+                            newHashCode, node.key, node.value, resizeBuckets[newHashCode]);
+                    resizeBuckets[newHashCode] = newNode;
                 }
+                node = node.next;
             }
         }
         buckets = resizeBuckets;
@@ -85,10 +84,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hashCode(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode()) % buckets.length;
+        return (key == null) ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 
-    private static class Node<K, V> {
+    public static class Node<K, V> {
         private final K key;
         private final int hash;
         private V value;
@@ -100,18 +99,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
-        }
     }
 }
-
