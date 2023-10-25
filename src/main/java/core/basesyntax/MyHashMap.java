@@ -20,11 +20,43 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        Node<K, V> currentNode = table[getBucket(key)];
+        Node<K, V> newNode = new Node<>(key, value, null);
 
+        if (currentNode == null) {
+            size++;
+            resizeIfNeeded();
+            table[getBucket(key)] = newNode;
+            return;
+        }
+        if (Objects.equals(key, currentNode.key)) {
+            newNode.next = currentNode.next;
+            table[getBucket(key)] = newNode;
+            return;
+        }
+
+        while (currentNode.next != null) {
+            if (Objects.equals(key, currentNode.next.key)) {
+                newNode.next = currentNode.next.next;
+                currentNode.next = newNode;
+                return;
+            }
+            currentNode = currentNode.next;
+        }
+        size++;
+        resizeIfNeeded();
+        currentNode.next = newNode;
     }
 
     @Override
     public V getValue(K key) {
+        Node<K, V> currentNode = table[getBucket(key)];
+        while (currentNode != null) {
+            if (Objects.equals(key, currentNode.key)) {
+                return currentNode.value;
+            }
+            currentNode = currentNode.next;
+        }
         return null;
     }
 
@@ -40,8 +72,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key.hashCode() % currentCapacity;
     }
 
-    private void resize() {
-
+    private void resizeIfNeeded() {
+        if (size > threshold) {
+            currentCapacity *= 2;
+            threshold = currentCapacity * LOAD_FACTOR;
+        }
     }
 
     private static class Node<K, V> {
