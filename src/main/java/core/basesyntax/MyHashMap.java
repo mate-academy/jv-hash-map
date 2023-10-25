@@ -26,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = calculateHash(key);
+        int hash = calculateIndex(key);
         if (table[hash] == null) {
             return null;
         }
@@ -48,9 +48,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putNode(K key, V value) {
-        int hash = calculateHash(key);
+        int hash = calculateIndex(key);
         if (table[hash] == null) {
-            table[hash] = new Node<>(key, value, null);
+            table[hash] = new Node<>(key, value);
             size++;
             return;
         }
@@ -58,7 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putLinkedNode(K key, V value) {
-        Node<K, V> currentNode = table[calculateHash(key)];
+        Node<K, V> currentNode = table[calculateIndex(key)];
         while (currentNode != null) {
             if (key == null && currentNode.key == null
                     || key != null && key.equals(currentNode.key)) {
@@ -66,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             if (currentNode.next == null) {
-                currentNode.next = new Node<>(key, value, null);
+                currentNode.next = new Node<>(key, value);
                 size++;
                 return;
             }
@@ -74,7 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int calculateHash(K key) {
+    private int calculateIndex(K key) {
         if (key == null) {
             return 0;
         }
@@ -100,10 +100,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
