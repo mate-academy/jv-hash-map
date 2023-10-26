@@ -4,18 +4,18 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static double LOAD_FACTOR = 0.75;
+    private static final double LOAD_FACTOR = 0.75;
 
     private Node<K, V>[] table;
     private int size;
     private int currentCapacity;
-    private double threshold;
+    private int threshold;
 
     @SuppressWarnings("unchecked")
     public MyHashMap() {
-        this.table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
         currentCapacity = DEFAULT_CAPACITY;
-        threshold = DEFAULT_CAPACITY * LOAD_FACTOR;
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
@@ -34,7 +34,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[getBucket(key)] = newNode;
             return;
         }
-
         while (currentNode.next != null) {
             if (Objects.equals(key, currentNode.next.key)) {
                 newNode.next = currentNode.next.next;
@@ -44,7 +43,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             currentNode = currentNode.next;
         }
         size++;
-        resizeIfNeeded();
+        if (resizeIfNeeded()) {
+            put(newNode.key, newNode.value);
+        }
         currentNode.next = newNode;
     }
 
@@ -66,17 +67,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucket(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return key.hashCode() % currentCapacity;
+        return (key == null) ? 0 : Math.abs(key.hashCode()) % currentCapacity;
     }
 
-    private void resizeIfNeeded() {
-        if (size > threshold) {
-            currentCapacity *= 2;
-            threshold = currentCapacity * LOAD_FACTOR;
+    private boolean resizeIfNeeded() {
+        if (size <= threshold) {
+            return false;
         }
+        final int oldCapacity = currentCapacity;
+        currentCapacity *= 2;
+        threshold = (int) (currentCapacity * LOAD_FACTOR);
+        Node<K, V>[] oldTable = table;
+        table = (Node<K, V>[]) new Node[currentCapacity];
+        size = 0;
+
+        Node<K, V> currentNode;
+        for (int i = 0; i < oldCapacity; i++) {
+            currentNode = oldTable[i];
+            while (currentNode != null) {
+                put(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
+            }
+        }
+        return true;
     }
 
     private static class Node<K, V> {
