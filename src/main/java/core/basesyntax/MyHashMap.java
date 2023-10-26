@@ -3,7 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
-    private static final int RESIZE_INDEX = 2;
+    private static final int GROW_FACTOR = 2;
     private int size;
     private int capacity;
     private Node<K, V>[] buckets;
@@ -56,7 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        capacity = capacity * RESIZE_INDEX;
+        capacity = capacity * GROW_FACTOR;
         Node<K, V>[] resizeBuckets = new Node[capacity];
 
         for (Node<K, V> node : buckets) {
@@ -93,7 +93,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
+        private Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
             this.key = key;
             this.value = value;
