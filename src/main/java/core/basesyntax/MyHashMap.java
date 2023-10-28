@@ -13,41 +13,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (key == null) {
-            if (table[0] == null) {
-                table[0] = new Entry<>(null, value);
-            } else {
-                Entry<K, V> current = table[0];
-                while (current != null) {
-                    if (current.key == null) {
-                        current.value = value;
-                        return;
-                    }
-                    current = current.next;
-                }
-                Entry<K, V> entry = new Entry<>(null, value);
-                entry.next = table[0];
-                table[0] = entry;
-            }
-        } else {
-            int index = hash(key);
-            Entry<K, V> entry = new Entry<>(key, value);
+        int index = (key == null) ? 0 : getBucketIndex(key);
+        Entry<K, V> entry = new Entry<>(key, value);
 
-            if (table[index] == null) {
-                table[index] = entry;
-            } else {
-                Entry<K, V> current = table[index];
-                while (current != null) {
-                    if (current.key != null && current.key.equals(key)) {
-                        current.value = value;
-                        return;
-                    }
-                    current = current.next;
+        if (table[index] == null) {
+            table[index] = entry;
+        } else {
+            Entry<K, V> current = table[index];
+            while (current != null) {
+                if ((key == null && current.key == null)
+                        || (key != null && key.equals(current.key))) {
+                    current.value = value;
+                    return;
                 }
-                entry.next = table[index];
-                table[index] = entry;
+                current = current.next;
             }
+            entry.next = table[index];
+            table[index] = entry;
         }
+
         size++;
         if ((double) size / table.length >= LOAD_FACTOR) {
             resize();
@@ -56,11 +40,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = hash(key);
+        int index = getBucketIndex(key);
         Entry<K, V> current = table[index];
 
         while (current != null) {
-            if (current.key == null && key == null
+            if (current.key == key
                     || current.key != null && current.key.equals(key)) {
                 return current.value;
             }
@@ -74,11 +58,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(K key) {
+    private int getBucketIndex(K key) {
         if (key == null) {
             return 0;
         }
-        return Math.abs(key.hashCode()) % table.length;
+        return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private static class Entry<K, V> {
@@ -101,7 +85,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         for (Entry<K, V> entry : oldTable) {
             while (entry != null) {
-                int index = hash(entry.key);
+                int index = getBucketIndex(entry.key);
                 Entry<K, V> newEntry = new Entry<>(entry.key, entry.value);
                 newEntry.next = table[index];
                 table[index] = newEntry;
