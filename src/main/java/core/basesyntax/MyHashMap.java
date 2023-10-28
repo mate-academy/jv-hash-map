@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75F;
+    private static final int GROWTH_FACTOR = 2;
     private int size;
     private Node<K, V>[] table;
 
@@ -14,28 +15,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        checkSize();
+        resize();
         int position = getPosition(key);
         Node<K, V> currentNode = table[position];
-        Node<K, V> newNode = new Node<>(key, value, null);
 
-        if (table[position] == null) {
-            table[position] = newNode;
-            size++;
-        } else {
-            while (true) {
-                if (Objects.equals(key, currentNode.key)) {
-                    currentNode.value = value;
-                    return;
-                }
-                if (currentNode.next == null) {
-                    currentNode.next = newNode;
-                    size++;
-                    return;
-                }
-                currentNode = currentNode.next;
+        while (currentNode != null) {
+            if (Objects.equals(key, currentNode.key)) {
+                currentNode.value = value;
+                return;
             }
+            currentNode = currentNode.next;
         }
+        table[position] = new Node<>(key, value, table[position]);
+        size++;
     }
 
     @Override
@@ -56,11 +48,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void checkSize() {
+    private void resize() {
         int capacity = table.length;
         int threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
         if (getSize() >= threshold) {
-            capacity = capacity << 1;
+            capacity *= GROWTH_FACTOR;
             transferNodes(capacity);
         }
     }
