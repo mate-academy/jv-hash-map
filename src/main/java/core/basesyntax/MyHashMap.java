@@ -59,9 +59,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucketIndex(K key) {
-        if (key == null) {
-            return 0;
-        }
         return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
