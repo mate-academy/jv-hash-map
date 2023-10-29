@@ -20,18 +20,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> currentNode = table[getBucket(key)];
-        Node<K, V> newNode = new Node<>(key, value, null);
+        Node<K, V> currentNode = table[getIndex(key)];
+        Node<K, V> newNode = new Node<>(key, value);
 
         if (currentNode == null) {
             size++;
             resizeIfNeeded();
-            table[getBucket(key)] = newNode;
+            table[getIndex(key)] = newNode;
             return;
         }
         if (Objects.equals(key, currentNode.key)) {
             newNode.next = currentNode.next;
-            table[getBucket(key)] = newNode;
+            table[getIndex(key)] = newNode;
             return;
         }
         while (currentNode.next != null) {
@@ -51,7 +51,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> currentNode = table[getBucket(key)];
+        Node<K, V> currentNode = table[getIndex(key)];
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
                 return currentNode.value;
@@ -66,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getBucket(K key) {
+    private int getIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode()) % currentCapacity;
     }
 
@@ -97,10 +97,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        private Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
