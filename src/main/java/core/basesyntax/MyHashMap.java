@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_ARRAY_FACTOR = 2;
     private Node<K,V>[] table;
     private int size;
     private int threshold;
@@ -54,8 +55,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int oldCap = (oldTab == null) ? 0 : oldTab.length;
         int newCap;
         if (oldCap > 0) {
-            newCap = oldCap * 2;
-            threshold = threshold * 2;
+            newCap = oldCap * DEFAULT_ARRAY_FACTOR;
+            threshold = threshold * DEFAULT_ARRAY_FACTOR;
         } else {
             newCap = DEFAULT_INITIAL_CAPACITY;
             threshold = (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
