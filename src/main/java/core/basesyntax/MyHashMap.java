@@ -1,19 +1,18 @@
 package core.basesyntax;
 
-import java.util.HashMap;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75F;
     private static final int GROW_VALUE = 2;
+    private Node<K, V>[] table;
     private int size;
-    Node<K, V>[] table;
 
     class Node<K, V> {
-        Node<K, V> next;
-        final K key;
-        V value;
+        private Node<K, V> next;
+        private final K key;
+        private V value;
 
         Node(K key, V value, Node<K, V> next) {
             this.key = key;
@@ -32,8 +31,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = hash(key);
         Node<K, V> currentNode = table[hash];
 
-        while(currentNode != null) {
-            if (Objects.equals(key, currentNode.key)){
+        while (currentNode != null) {
+            if (Objects.equals(key, currentNode.key)) {
                 currentNode.value = value;
                 return;
             }
@@ -66,7 +65,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (getSize() >= threshold) {
             transferNodes(table.length * GROW_VALUE);
         }
-    };
+    }
 
     private void transferNodes(int newCapacity) {
         Node<K, V>[] oldTable = table;
@@ -82,6 +81,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return  key == null ? 0 : (Math.abs(key.hashCode()) % table.length);
+        return key == null ? 0 : (Math.abs(key.hashCode()) % table.length);
     }
 }
