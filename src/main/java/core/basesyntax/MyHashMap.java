@@ -28,8 +28,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        int hash = getIndex(key);
-        Node<K, V> currentNode = table[hash];
+        int position = getIndex(key);
+        Node<K, V> currentNode = table[position];
 
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
@@ -38,14 +38,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             currentNode = currentNode.next;
         }
-        table[hash] = new Node<>(key, value, table[hash]);
+        table[position] = new Node<>(key, value, table[position]);
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        int hash = getIndex(key);
-        Node<K, V> node = table[hash];
+        int position = getIndex(key);
+        Node<K, V> node = table[position];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
                 return node.value;
