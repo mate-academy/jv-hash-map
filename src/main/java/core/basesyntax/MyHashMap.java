@@ -5,13 +5,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
     private static final int GROW_FACTOR = 2;
     private int size;
-    private int capacity;
-    private Node<K, V>[] buckets;
-
-    public MyHashMap() {
-        this.capacity = DEFAULT_CAPACITY;
-        this.buckets = new Node[capacity];
-    }
+    private int capacity = DEFAULT_CAPACITY;
+    private Node<K, V>[] buckets = new Node[capacity];
 
     @Override
     public void put(K key, V value) {
