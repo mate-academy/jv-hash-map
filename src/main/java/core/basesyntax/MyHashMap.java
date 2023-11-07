@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
@@ -20,27 +22,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         int nodeIndex = getIndex(key);
-        Node<K, V> newNode = new Node<>(getKeyHash(key), key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, null);
 
         if (table[nodeIndex] == null) {
             table[nodeIndex] = newNode;
         } else {
             Node<K, V> node = table[nodeIndex];
-            if (node.next == null) {
-                if (isNodeValueSet(node, key, value)) {
+
+            while (node.next != null) {
+                if (isKeyDuplicate(node, key, value)) {
                     return;
                 }
-            } else {
-                while (node.next != null) {
-                    if (isNodeValueSet(node, key, value)) {
-                        return;
-                    }
-                    node = node.next;
-                }
+                node = node.next;
             }
-            if (isNodeValueSet(node, key, value)) {
+
+            if (isKeyDuplicate(node, key, value)) {
                 return;
             }
+
             node.next = newNode;
         }
         size++;
@@ -48,27 +47,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (table == null) {
-            return null;
-        }
-
-        int nodeIndex = getIndex(key);
-
-        if (table[nodeIndex] == null) {
-            return null;
-        } else {
-            Node<K, V> current = table[nodeIndex];
-
-            do {
-                V value = getNodeValue(current, key);
-                if (value != null) {
-                    return value;
+        for (Node<K, V> node : table) {
+            while (node != null) {
+                if (Objects.equals(node.key , key)) {
+                    return node.value;
                 }
-                current = current.next;
-            } while (current.next != null);
-
-            return getNodeValue(current, key);
+                node = node.next;
+            }
         }
+        return null;
     }
 
     @Override
@@ -77,13 +64,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private int keyHash;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        Node(int keyHash, K key, V value, Node<K, V> next) {
-            this.keyHash = keyHash;
+        Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -98,23 +83,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
 
         for (Node<K, V> node : copingTable) {
-            if (node == null) {
-                continue;
-            }
-
-            if (node.next == null) {
+            while (node != null) {
                 put(node.key, node.value);
-                continue;
+                node = node.next;
             }
-
-            Node<K, V> current = node;
-
-            do {
-                put(current.key, current.value);
-                current = current.next;
-            } while (current.next != null);
-
-            put(current.key, current.value);
         }
     }
 
@@ -130,25 +102,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.abs(getKeyHash(key) % table.length);
     }
 
-    private boolean isNodeValueSet(Node<K, V> node, K key, V value) {
-        if (node.key == null && key == null) {
-            node.value = value;
-            return true;
-        }
-        if (node.key != null && node.key.equals(key)) {
+    private boolean isKeyDuplicate(Node<K, V> node, K key, V value) {
+        if ((node.key == null && key == null) ||
+            (node.key != null && node.key.equals(key))) {
             node.value = value;
             return true;
         }
         return false;
-    }
-
-    private V getNodeValue(Node<K, V> node, K key) {
-        if (node.key == null && key == null) {
-            return node.value;
-        }
-        if (node.key != null && node.key.equals(key)) {
-            return node.value;
-        }
-        return null;
     }
 }
