@@ -49,7 +49,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         for (Node<K, V> node : table) {
             while (node != null) {
-                if (Objects.equals(node.key , key)) {
+                if (Objects.equals(node.key, key)) {
                     return node.value;
                 }
                 node = node.next;
@@ -103,8 +103,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean isKeyDuplicate(Node<K, V> node, K key, V value) {
-        if ((node.key == null && key == null) ||
-            (node.key != null && node.key.equals(key))) {
+        if ((node.key == null && key == null)
+                || (node.key != null && node.key.equals(key))) {
             node.value = value;
             return true;
         }
