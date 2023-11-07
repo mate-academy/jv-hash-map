@@ -70,11 +70,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table = new Node[table.length * INCREASE_VALUE];
             size = 0;
             for (Node<K, V> kvNode : oldTable) {
-                    Node<K, V> current = kvNode;
-                    while (current != null) {
-                        put(current.key, current.value);
-                        current = current.next;
-                    }
+                Node<K, V> current = kvNode;
+                while (current != null) {
+                    put(current.key, current.value);
+                    current = current.next;
+                }
             }
         }
     }
