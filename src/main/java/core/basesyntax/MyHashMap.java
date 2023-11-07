@@ -18,9 +18,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resize();
-        Node<K, V> node = new Node<>(hash(key), key, value, null);
+        Node<K, V> node = new Node<>(key, value);
 
-        int index = node.hash % table.length;
+        int index = hash(key) % table.length;
         if (table[index] == null) {
             table[index] = node;
 
@@ -69,7 +69,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         loadFactor = (float) size / table.length;
         if (loadFactor > DEFAULT_LOAD_FACTOR) {
-
             Node<K, V>[] oldTable = table;
             table = new Node[table.length * INCREASE_VALUE];
             size = 0;
@@ -82,21 +81,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     }
                 }
             }
-
         }
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
 
         public final String toString() {
@@ -108,19 +103,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (this == o) {
                 return true;
             }
-
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
             Node<?, ?> node = (Node<?, ?>) o;
-            return hash == node.hash && Objects.equals(key, node.key)
+            return Objects.equals(key, node.key)
                     && Objects.equals(value, node.value)
                     && Objects.equals(next, node.next);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(hash, key, value, next);
+            return Objects.hash(key, value, next);
         }
     }
 }
