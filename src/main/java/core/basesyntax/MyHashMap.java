@@ -19,13 +19,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         resize();
         Node<K, V> node = new Node<>(key, value);
-
-        int index = hash(key) % table.length;
-        if (table[index] == null) {
-            table[index] = node;
-
+        int indexBucket = getIndex(key);
+        if (table[indexBucket] == null) {
+            table[indexBucket] = node;
         } else {
-            Node<K, V> current = table[index];
+            Node<K, V> current = table[indexBucket];
             Node<K, V> prev = null;
             while (current != null) {
                 if (Objects.equals(current.key, node.key)) {
@@ -38,14 +36,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             prev.next = node;
         }
         size++;
-
     }
 
     @Override
     public V getValue(K key) {
-        int indexBuket = hash(key) % table.length;
-        if (table[indexBuket] != null) {
-            Node<K, V> current = table[indexBuket];
+        int indexBucket = getIndex(key);
+        if (table[indexBucket] != null) {
+            Node<K, V> current = table[indexBucket];
 
             while (current != null) {
                 if (Objects.equals(current.key, key)) {
@@ -73,15 +70,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table = new Node[table.length * INCREASE_VALUE];
             size = 0;
             for (Node<K, V> kvNode : oldTable) {
-                if (kvNode != null) {
                     Node<K, V> current = kvNode;
                     while (current != null) {
                         put(current.key, current.value);
                         current = current.next;
                     }
-                }
             }
         }
+    }
+
+    private int getIndex(K key) {
+        return hash(key) % table.length;
     }
 
     private static class Node<K, V> {
@@ -92,10 +91,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node(K key, V value) {
             this.key = key;
             this.value = value;
-        }
-
-        public final String toString() {
-            return key + "=" + value;
         }
 
         @Override
