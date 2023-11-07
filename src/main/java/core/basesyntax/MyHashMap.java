@@ -3,7 +3,6 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int INCREASE_VALUE = 2;
@@ -17,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        resize();
+        resizeIfNeeded();
         Node<K, V> node = new Node<>(key, value);
         int indexBucket = getIndex(key);
         if (table[indexBucket] == null) {
@@ -63,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : Math.abs(key.hashCode());
     }
 
-    private void resize() {
+    private void resizeIfNeeded() {
         loadFactor = (float) size / table.length;
         if (loadFactor > DEFAULT_LOAD_FACTOR) {
             Node<K, V>[] oldTable = table;
@@ -91,25 +90,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node(K key, V value) {
             this.key = key;
             this.value = value;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            Node<?, ?> node = (Node<?, ?>) o;
-            return Objects.equals(key, node.key)
-                    && Objects.equals(value, node.value)
-                    && Objects.equals(next, node.next);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(key, value, next);
         }
     }
 }
