@@ -22,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         int nodeIndex = getIndex(key);
-        Node<K, V> newNode = new Node<>(key, value, null);
+        Node<K, V> newNode = new Node<>(key, value);
 
         if (table[nodeIndex] == null) {
             table[nodeIndex] = newNode;
@@ -30,13 +30,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> node = table[nodeIndex];
 
             while (node.next != null) {
-                if (isKeyDuplicate(node, key, value)) {
+                if (isKeyDuplicate(node, key)) {
+                    node.value = value;
                     return;
                 }
                 node = node.next;
             }
 
-            if (isKeyDuplicate(node, key, value)) {
+            if (isKeyDuplicate(node, key)) {
+                node.value = value;
                 return;
             }
 
@@ -68,10 +70,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        Node(K key, V value, Node<K, V> next) {
+        Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 
@@ -93,21 +94,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int getKeyHash(K key) {
         if (key == null) {
             return 0;
-        } else {
-            return key.hashCode();
         }
+        return key.hashCode();
     }
 
     private int getIndex(K key) {
         return Math.abs(getKeyHash(key) % table.length);
     }
 
-    private boolean isKeyDuplicate(Node<K, V> node, K key, V value) {
-        if ((node.key == null && key == null)
-                || (node.key != null && node.key.equals(key))) {
-            node.value = value;
-            return true;
-        }
-        return false;
+    private boolean isKeyDuplicate(Node<K, V> node, K key) {
+        return (node.key == null && key == null) || (node.key != null && node.key.equals(key));
     }
 }
