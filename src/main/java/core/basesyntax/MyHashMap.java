@@ -1,49 +1,37 @@
 package core.basesyntax;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
 
-    private List<Entry<K, V>>[] buckets;
+    private Entry<K, V>[] buckets;
     private int size;
 
     public MyHashMap() {
-        buckets = new List[DEFAULT_CAPACITY];
-        for (int i = 0; i < DEFAULT_CAPACITY; i++) {
-            buckets[i] = new ArrayList<>();
-        }
+        buckets = new Entry[DEFAULT_CAPACITY];
         size = 0;
     }
 
     @Override
     public void put(K key, V value) {
         int bucketIndex = getBucketIndex(key);
-        List<Entry<K, V>> bucket = buckets[bucketIndex];
 
-        if (key == null) {
-            for (Entry<K, V> entry : bucket) {
-                if (entry.getKey() == null) {
-                    entry.setValue(value);
-                    return;
-                }
+        Entry<K, V> entry = buckets[bucketIndex];
+        while (entry != null) {
+            if (key == null ? entry.key == null : key.equals(entry.key)) {
+                entry.value = value;
+                return;
             }
-            bucket.add(new Entry<>(null, value));
-            size++;
-        } else {
-            for (Entry<K, V> entry : bucket) {
-                if (key.equals(entry.getKey())) {
-                    entry.setValue(value);
-                    return;
-                }
-            }
-            bucket.add(new Entry<>(key, value));
-            size++;
+            entry = entry.next;
         }
 
-        if ((double) size / buckets.length > LOAD_FACTOR) {
+        Entry<K, V> newEntry = new Entry<>(key, value);
+        newEntry.next = buckets[bucketIndex];
+        buckets[bucketIndex] = newEntry;
+
+        size++;
+
+        if (needToResize()) {
             resize();
         }
     }
@@ -51,20 +39,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int bucketIndex = getBucketIndex(key);
-        List<Entry<K, V>> bucket = buckets[bucketIndex];
 
-        if (key == null) {
-            for (Entry<K, V> entry : bucket) {
-                if (entry.getKey() == null) {
-                    return entry.getValue();
-                }
+        Entry<K, V> entry = buckets[bucketIndex];
+        while (entry != null) {
+            if (key == null ? entry.key == null : key.equals(entry.key)) {
+                return entry.value;
             }
-        } else {
-            for (Entry<K, V> entry : bucket) {
-                if (key.equals(entry.getKey())) {
-                    return entry.getValue();
-                }
-            }
+            entry = entry.next;
         }
 
         return null;
@@ -77,21 +58,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getBucketIndex(K key) {
         if (key == null) {
-            return 0; // Я обрав 0, але ви можете вибрати інший індекс за вашими потребами
+            return 0;
         }
         return Math.abs(key.hashCode()) % buckets.length;
     }
 
     private void resize() {
-        List<Entry<K, V>>[] newBuckets = new List[buckets.length * 2];
+        Entry<K, V>[] newBuckets = new Entry[buckets.length * 2];
         for (int i = 0; i < newBuckets.length; i++) {
-            newBuckets[i] = new ArrayList<>();
+            newBuckets[i] = null;
         }
 
-        for (List<Entry<K, V>> bucket : buckets) {
-            for (Entry<K, V> entry : bucket) {
-                int newIndex = Math.abs(entry.getKey().hashCode()) % newBuckets.length;
-                newBuckets[newIndex].add(entry);
+        for (Entry<K, V> entry : buckets) {
+            while (entry != null) {
+                int newIndex = getIndex(entry.key, newBuckets.length);
+                Entry<K, V> next = entry.next;
+
+                entry.next = newBuckets[newIndex];
+                newBuckets[newIndex] = entry;
+
+                entry = next;
             }
         }
 
@@ -101,22 +87,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Entry<K, V> {
         private final K key;
         private V value;
+        private Entry<K, V> next;
 
         public Entry(K key, V value) {
             this.key = key;
             this.value = value;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
+            this.next = null;
         }
     }
+
+    private boolean needToResize() {
+        return (double) size / buckets.length > LOAD_FACTOR;
+    }
+
+    private int getIndex(K key, int newBucketsLength) {
+        return Math.abs(key.hashCode()) % newBucketsLength;
+    }
 }
+
