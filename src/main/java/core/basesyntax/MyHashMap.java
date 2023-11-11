@@ -1,17 +1,16 @@
 package core.basesyntax;
 
-import java.util.LinkedList;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
     private static final int DOUBLE_LENGTH = 2;
-    private LinkedList<Entry<K, V>>[] buckets;
+    private Node<K, V>[] buckets;
     private int size;
 
     public MyHashMap() {
-        buckets = new LinkedList[DEFAULT_CAPACITY];
+        buckets = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -19,31 +18,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= LOAD_FACTOR * buckets.length) {
             resize();
         }
-        int bucketIndex = getBucketIndex(key, buckets.length);
-        if (buckets[bucketIndex] == null) {
-            buckets[bucketIndex] = new LinkedList<>();
-        }
-        LinkedList<Entry<K, V>> bucket = buckets[bucketIndex];
-        for (Entry<K, V> entry : bucket) {
-            if (Objects.equals(key, entry.key)) {
-                entry.value = value;
+        int bucketIndex = getBucketIndex(key);
+        Node<K, V> existing = buckets[bucketIndex];
+        while (existing != null) {
+            if (Objects.equals(key, existing.key)) {
+                existing.value = value;
                 return;
             }
+            existing = existing.next;
         }
-        bucket.add(new Entry<>(key, value));
+        Node<K, V> newNode = new Node<>(key, value, buckets[bucketIndex]);
+        buckets[bucketIndex] = newNode;
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        int bucketIndex = getBucketIndex(key, buckets.length);
-        LinkedList<Entry<K, V>> bucket = buckets[bucketIndex];
-        if (bucket != null) {
-            for (Entry<K, V> entry : bucket) {
-                if (Objects.equals(key, entry.key)) {
-                    return entry.value;
-                }
+        int bucketIndex = getBucketIndex(key);
+        Node<K, V> node = buckets[bucketIndex];
+        while (node != null) {
+            if (Objects.equals(key, node.key)) {
+                return node.value;
             }
+            node = node.next;
         }
         return null;
     }
@@ -54,29 +51,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        LinkedList<Entry<K, V>>[] oldBuckets = buckets;
-        buckets = new LinkedList[oldBuckets.length * DOUBLE_LENGTH];
+        Node<K, V>[] oldBuckets = buckets;
+        buckets = new Node[oldBuckets.length * DOUBLE_LENGTH];
         size = 0;
-        for (LinkedList<Entry<K, V>> bucket : oldBuckets) {
-            if (bucket != null) {
-                for (Entry<K, V> entry : bucket) {
-                    put(entry.key, entry.value);
-                }
+        for (Node<K, V> headNode : oldBuckets) {
+            while (headNode != null) {
+                put(headNode.key, headNode.value);
+                headNode = headNode.next;
             }
         }
     }
 
-    private int getBucketIndex(K key, int bucketsLength) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % bucketsLength;
+    private int getBucketIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % buckets.length;
     }
 
-    private static class Entry<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
+        private Node<K, V> next;
 
-        public Entry(K key, V value) {
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
+            this.next = next;
         }
     }
 }
