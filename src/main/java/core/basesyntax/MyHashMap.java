@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
@@ -16,44 +18,42 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (key == null) {
-            putNullKey(value);
+            int index = getIndex(ZERO_HASH);
+
+            Entry<K, V> current = table[index];
+            while (current != null) {
+                if (current.key == null) {
+                    current.value = value;
+                    return;
+                }
+                current = current.next;
+            }
+
+            addEntry(index, null, value);
             return;
         }
 
-        int hash = key.hashCode();
-        int index = getIndex(hash);
+        int index = getIndexFromKey(key);
 
         Entry<K, V> current = table[index];
         while (current != null) {
-            if (current.key != null && current.key.equals(key)) {
+            if (Objects.equals(current.key, key)) {
                 current.value = value;
                 return;
             }
             current = current.next;
         }
 
-        Entry<K, V> newEntry = new Entry<>(key, value);
-        newEntry.next = table[index];
-        table[index] = newEntry;
-        size++;
-
-        if ((double) size / table.length > LOAD_FACTOR) {
-            resizeTable();
-        }
+        addEntry(index, key, value);
     }
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
-            return getNullVal();
-        }
-
-        int hash = key.hashCode();
-        int index = getIndex(hash);
+        int index = key == null ? 0 : getIndexFromKey(key);
 
         Entry<K, V> current = table[index];
         while (current != null) {
-            if (current.key != null && current.key.equals(key)) {
+            if (Objects.equals(current.key, key)) {
                 return current.value;
             }
             current = current.next;
@@ -75,7 +75,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public Entry(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = null;
         }
     }
 
@@ -83,61 +82,41 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (hash == ZERO_HASH) ? ZERO_HASH : Math.abs(hash % table.length);
     }
 
-    private int getIndex(int hash, int tableSize) {
-        return Math.abs(hash % tableSize);
+    private int getIndexFromKey(K key) {
+        int hash = key.hashCode();
+        return getIndex(hash);
     }
 
-    private void resizeTable() {
-        int newCapacity = table.length * GROW_FACTOR;
-        Entry<K, V>[] newTable = new Entry[newCapacity];
-
-        for (Entry<K, V> current : table) {
-            while (current != null) {
-                Entry<K, V> next = current.next;
-                int newIndex = getIndex(current.key.hashCode(), newCapacity);
-
-                current.next = newTable[newIndex];
-                newTable[newIndex] = current;
-
-                current = next;
-            }
-        }
-
-        table = newTable;
-    }
-
-    private void putNullKey(V value) {
-        int index = getIndex(ZERO_HASH);
-
-        Entry<K, V> current = table[index];
-        while (current != null) {
-            if (current.key == null) {
-                current.value = value;
-                return;
-            }
-            current = current.next;
-        }
-
-        Entry<K, V> newEntry = new Entry<>(null, value);
+    private void addEntry(int index, K key, V value) {
+        Entry<K, V> newEntry = new Entry<>(key, value);
         newEntry.next = table[index];
         table[index] = newEntry;
         size++;
 
+        resizeIfNeeded();
+    }
+
+    private void resizeIfNeeded() {
         if ((double) size / table.length > LOAD_FACTOR) {
-            resizeTable();
+            int newCapacity = table.length * GROW_FACTOR;
+            rehash(newCapacity);
         }
     }
 
-    private V getNullVal() {
-        if (table[ZERO_HASH] != null) {
-            Entry<K, V> current = table[ZERO_HASH];
+    private void rehash(int newCapacity) {
+        Entry<K, V>[] oldTable = table;
+
+        table = (Entry<K, V>[]) new Entry[newCapacity];
+        size = 0;
+
+        for (Entry<K, V> kvEntry : oldTable) {
+            Entry<K, V> current = kvEntry;
             while (current != null) {
-                if (current.key == null) {
-                    return current.value;
-                }
+                K key = current.key;
+                V value = current.value;
+                put(key, value);
                 current = current.next;
             }
         }
-        return null;
     }
 }
