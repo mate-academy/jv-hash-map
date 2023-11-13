@@ -1,8 +1,11 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
+    private static final int INCREASE_VALUE = 2;
     private Node<K,V>[] bucket;
     private int size;
 
@@ -12,14 +15,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= LOAD_FACTOR * bucket.length) {
-            resize();
-        }
+        resize();
         int bucketIndex = getBucketIndex(key);
         Node<K,V> node = bucket[bucketIndex];
         while (node != null) {
-            if ((node.key == null && key == null)
-                    || node.key != null && node.key.equals(key)) {
+            if (Objects.equals(node.key, key)) {
                 node.value = value;
                 return;
             }
@@ -35,8 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int bucketIndex = getBucketIndex(key);
         Node<K,V> node = bucket[bucketIndex];
         while (node != null) {
-            if ((node.key == null && key == null)
-                    || node.key != null && node.key.equals(key)) {
+            if (Objects.equals(node.key, key)) {
                 return node.value;
             }
             node = node.next;
@@ -50,13 +49,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K,V>[] oldBucket = bucket;
-        bucket = new Node[oldBucket.length * 2];
-        size = 0;
-        for (Node<K,V> headNode : oldBucket) {
-            while (headNode != null) {
-                put(headNode.key, headNode.value);
-                headNode = headNode.next;
+        if (size >= LOAD_FACTOR * bucket.length) {
+            Node<K, V>[] oldBucket = bucket;
+            bucket = new Node[oldBucket.length * INCREASE_VALUE];
+            size = 0;
+            for (Node<K, V> headNode : oldBucket) {
+                while (headNode != null) {
+                    put(headNode.key, headNode.value);
+                    headNode = headNode.next;
+                }
             }
         }
     }
