@@ -1,10 +1,9 @@
 package core.basesyntax;
 
-
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
+    private static final int INITIAL_RESIZE_FACTOR = 2;
 
     private Entry<K, V>[] table;
     private int size;
@@ -16,12 +15,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int hash = hash(key);
-        int index = indexFor(hash, table.length);
+        int index = getIndex(hash(key), table.length);
         Entry<K, V> entry = table[index];
         while (entry != null) {
             if ((key == null && entry.getKey() == null)
-                     || (key != null && key.equals(entry.getKey()))) {
+                    || (key != null && key.equals(entry.getKey()))) {
                 entry.setValue(value);
                 return;
             }
@@ -32,7 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         newEntry.setNext(table[index]);
         table[index] = newEntry;
         size++;
-        if ((double) size / table.length > LOAD_FACTOR) {
+        if (size >= table.length * LOAD_FACTOR) {
             resize();
         }
     }
@@ -40,7 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int hash = hash(key);
-        int index = indexFor(hash, table.length);
+        int index = getIndex(hash, table.length);
         Entry<K, V> entry = table[index];
         while (entry != null) {
             if ((key == null && entry.getKey() == null)
@@ -58,25 +56,33 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int newCapacity = table.length * 2;
-        Entry[] newTable = new Entry[newCapacity];
+        int newCapacity = table.length * INITIAL_RESIZE_FACTOR;
+        Entry<K, V>[] newTable = new Entry[newCapacity];
         for (Entry<K, V> entry : table) {
             while (entry != null) {
-                int index = indexFor(hash(entry.getKey()), newCapacity);
-                Entry<K, V> next = entry.getNext();
-                entry.setNext(newTable[index]);
-                newTable[index] = entry;
-                entry = next;
+                putInNewTable(entry, newTable, newCapacity);
+                entry = entry.getNext();
             }
         }
+
         table = newTable;
+    }
+
+    private void putInNewTable(Entry<K, V> entry, Entry<K, V>[] newTable, int newCapacity) {
+        int index = getIndex(hash(entry.getKey()), newCapacity);
+
+        Entry<K, V> existing = newTable[index];
+        Entry<K, V> newEntry = new Entry<>(entry.getKey(), entry.getValue());
+
+        newEntry.setNext(existing);
+        newTable[index] = newEntry;
     }
 
     private int hash(K key) {
         return key == null ? 0 : key.hashCode();
     }
 
-    private int indexFor(int hash, int tableLength) {
+    private int getIndex(int hash, int tableLength) {
         return hash & (tableLength - 1);
     }
 
