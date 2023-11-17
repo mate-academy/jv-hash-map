@@ -4,15 +4,11 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int DEFAULT_CAPACITY = 1 << 4;
-    private int capacity;
-    private int threshold;
+    private static final int DEFAULT_CAPACITY = 16;
     private int size;
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        this.capacity = DEFAULT_CAPACITY;
-        this.threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
         table = new Node[DEFAULT_CAPACITY];
     }
 
@@ -45,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 lastPrev.next = newNode;
             }
         }
-        if (++size > threshold) {
+        if (++size > LOAD_FACTOR * table.length) {
             resize();
         }
     }
@@ -53,7 +49,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         Node<K, V> currentNode = table[getIndex(key)];
-        for (;currentNode != null; currentNode = currentNode.next) {
+        for (; currentNode != null; currentNode = currentNode.next) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
             }
@@ -67,7 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return (key == null) ? 0 : Math.abs(hash(key) % capacity);
+        return (key == null) ? 0 : Math.abs(hash(key) % table.length);
     }
 
     private int hash(K key) {
@@ -75,11 +71,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        capacity = capacity << 1;
-        threshold = (int) (capacity * LOAD_FACTOR);
         size = 0;
         Node<K, V>[] oldTable = table;
-        Node<K, V>[] newTable = new Node[capacity];
+        Node<K, V>[] newTable = new Node[table.length << 1];
         table = newTable;
         for (Node<K, V> bucket: oldTable) {
             if (bucket != null) {
