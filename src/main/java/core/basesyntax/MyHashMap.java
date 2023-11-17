@@ -10,7 +10,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         this.table = new Entry[DEFAULT_CAPACITY];
-        this.size = 0;
     }
 
     @Override
@@ -29,10 +28,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Entry<K, V> newEntry = new Entry<>(key, value);
         newEntry.setNext(table[index]);
         table[index] = newEntry;
+        resize();
         size++;
-        if (size >= table.length * LOAD_FACTOR) {
-            resize();
-        }
     }
 
     @Override
@@ -64,8 +61,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 entry = entry.getNext();
             }
         }
-
-        table = newTable;
+        if (size >= table.length * LOAD_FACTOR) {
+            table = newTable;
+        }
     }
 
     private void putInNewTable(Entry<K, V> entry, Entry<K, V>[] newTable, int newCapacity) {
