@@ -5,29 +5,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
     private static final int INITIAL_RESIZE_FACTOR = 2;
 
-    private Entry<K, V>[] table;
+    private Node[] table;
     private int size;
 
     public MyHashMap() {
-        this.table = new Entry[DEFAULT_CAPACITY];
+        this.table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         int index = getIndex(hash(key), table.length);
-        Entry<K, V> entry = table[index];
-        while (entry != null) {
-            if ((key == null && entry.getKey() == null)
-                    || (key != null && key.equals(entry.getKey()))) {
-                entry.setValue(value);
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if ((key == null && node.key == null)
+                    || (key != null && key.equals(node.key))) {
+                node.value = value;
                 return;
             }
-            entry = entry.getNext();
+            node = node.next;
         }
 
-        Entry<K, V> newEntry = new Entry<>(key, value);
-        newEntry.setNext(table[index]);
-        table[index] = newEntry;
+        Node<K, V> newNode = new Node<>(key, value);
+        newNode.next = table[index];
+        table[index] = newNode;
         resize();
         size++;
     }
@@ -36,13 +36,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int hash = hash(key);
         int index = getIndex(hash, table.length);
-        Entry<K, V> entry = table[index];
-        while (entry != null) {
-            if ((key == null && entry.getKey() == null)
-                    || (key != null && key.equals(entry.getKey()))) {
-                return entry.getValue();
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if ((key == null && node.key == null)
+                    || (key != null && key.equals(node.key))) {
+                return node.value;
             }
-            entry = entry.getNext();
+            node = node.next;
         }
         return null;
     }
@@ -54,26 +54,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         int newCapacity = table.length * INITIAL_RESIZE_FACTOR;
-        Entry<K, V>[] newTable = new Entry[newCapacity];
-        for (Entry<K, V> entry : table) {
-            while (entry != null) {
-                putInNewTable(entry, newTable, newCapacity);
-                entry = entry.getNext();
+        Node<K, V>[]
+        oldTable = table;
+
+        table = new Node[newCapacity];
+        for (Node<K, V> kvNode : oldTable) {
+            Node<K, V> node = kvNode;
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
         if (size >= table.length * LOAD_FACTOR) {
-            table = newTable;
+            resize();
         }
-    }
-
-    private void putInNewTable(Entry<K, V> entry, Entry<K, V>[] newTable, int newCapacity) {
-        int index = getIndex(hash(entry.getKey()), newCapacity);
-
-        Entry<K, V> existing = newTable[index];
-        Entry<K, V> newEntry = new Entry<>(entry.getKey(), entry.getValue());
-
-        newEntry.setNext(existing);
-        newTable[index] = newEntry;
     }
 
     private int hash(K key) {
@@ -84,35 +78,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return hash & (tableLength - 1);
     }
 
-    private static class Entry<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
-        private Entry<K, V> next;
+        private Node<K, V> next;
 
-        public Entry(K key, V value) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
             this.next = null;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
-        }
-
-        public Entry<K, V> getNext() {
-            return next;
-        }
-
-        public void setNext(Entry<K, V> next) {
-            this.next = next;
         }
     }
 }
