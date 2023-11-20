@@ -10,14 +10,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Entry<K, V>[] table;
 
     public MyHashMap() {
-        this.size = 0;
         this.table = new Entry[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         resizeIfNeeded();
-        int hash = (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
+        int hash = getIndex(key);
         Entry<K, V> entry = table[hash];
 
         if (entry == null) {
@@ -42,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
+        int hash = getIndex(key);
         Entry<K, V> entry = table[hash];
         while (entry != null) {
             if (Objects.equals(entry.key, key)) {
@@ -56,6 +55,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private int getIndex(K key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private void resizeIfNeeded() {
@@ -74,25 +77,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 Entry<K, V> next = entry.next;
                 entry.next = null;
 
-                int newHash = (entry.key == null)
-                        ? 0
-                        : Math.abs(entry.key.hashCode()) % newTable.length;
-                Entry<K, V> existing = newTable[newHash];
-
-                if (existing == null) {
-                    newTable[newHash] = entry;
-                } else {
-                    while (existing.next != null) {
-                        existing = existing.next;
-                    }
-                    existing.next = entry;
-                }
+                insertNewEntry(newTable, entry);
 
                 entry = next;
             }
         }
-
         table = newTable;
+    }
+
+    private void insertNewEntry(Entry<K, V>[] newTable, Entry<K, V> entry) {
+        int newHash = (entry.key == null)
+                ? 0
+                : Math.abs(entry.key.hashCode()) % newTable.length;
+        Entry<K, V> existing = newTable[newHash];
+
+        if (existing == null) {
+            newTable[newHash] = entry;
+        } else {
+            while (existing.next != null) {
+                existing = existing.next;
+            }
+            existing.next = entry;
+        }
     }
 
     private static class Entry<K, V> {
