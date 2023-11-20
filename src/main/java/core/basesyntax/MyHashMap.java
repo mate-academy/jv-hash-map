@@ -26,11 +26,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> newNode = new Node<>(key, value);
         int index = getNodeIndex(key);
         if (size > map.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
+
+        Node<K, V> newNode = new Node<>(key, value);
 
         if (map[index] == null) {
             map[index] = newNode;
