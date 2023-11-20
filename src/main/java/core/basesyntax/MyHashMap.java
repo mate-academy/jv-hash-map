@@ -16,9 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         size += putNode(nodes, new Node<>(key, value), false);
-        if (size >= nodes.length * LOAD_FACTOR) {
-            resize();
-        }
+        resize();
     }
 
     @Override
@@ -42,21 +40,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @SuppressWarnings("unchecked")
     private void resize() {
-        int newCapacity = nodes.length * GROW_FACTOR;
-        Node<K, V>[] newNodes = (Node<K, V>[]) new Node[newCapacity];
-
-        for (int i = 0; i < nodes.length; i++) {
-            Node<K,V> node = nodes[i];
-            if (node == null) {
-                continue;
+        if (size >= nodes.length * LOAD_FACTOR) {
+            int newCapacity = nodes.length * GROW_FACTOR;
+            Node<K, V>[] newNodes = (Node<K, V>[]) new Node[newCapacity];
+            for (int i = 0; i < nodes.length; i++) {
+                Node<K, V> node = nodes[i];
+                if (node == null) {
+                    continue;
+                }
+                do {
+                    putNode(newNodes, node, true);
+                    node = node.next;
+                } while (node != null);
             }
-            do {
-                putNode(newNodes, node, true);
-                node = node.next;
-            } while (node != null);
+            nodes = newNodes;
         }
-
-        nodes = newNodes;
     }
 
     private int putNode(Node<K, V>[] array, Node<K, V> node, boolean clone) {
