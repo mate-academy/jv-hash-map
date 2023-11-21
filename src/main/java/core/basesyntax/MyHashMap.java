@@ -13,24 +13,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         map = new Node[DEFAULT_LENGTH];
     }
 
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
+        resizeIfNeeded();
         int index = getNodeIndex(key);
-        if (size > map.length * DEFAULT_LOAD_FACTOR) {
-            resize();
-        }
-
         Node<K, V> newNode = new Node<>(key, value);
 
         if (map[index] == null) {
@@ -74,15 +60,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : Math.abs((key.hashCode() % map.length));
     }
 
-    private void resize() {
-        size = 0;
-        Node<K, V>[] oldMap = map;
-        map = new Node[map.length * GROW_FACTOR];
-        for (Node<K, V> node : oldMap) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+    private void resizeIfNeeded() {
+        if (size > map.length * DEFAULT_LOAD_FACTOR) {
+            size = 0;
+            Node<K, V>[] oldMap = map;
+            map = new Node[map.length * GROW_FACTOR];
+            for (Node<K, V> node : oldMap) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
             }
+        }
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value) {
+            this.key = key;
+            this.value = value;
         }
     }
 }
