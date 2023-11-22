@@ -3,8 +3,9 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
     private static final int DEFAULT_ARRAY_LENGTH = 16;
+    private static final int GROW_FACTOR = 2;
     private int size;
-    private Node<K, V> [] values;
+    private Node<K, V>[] values;
 
     public MyHashMap() {
         values = new Node[DEFAULT_ARRAY_LENGTH];
@@ -21,12 +22,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> currentNode = values[getIndexFromKey(key)];
             while (currentNode != null) {
                 if (currentNode.nodeKey != null && currentNode.nodeKey.equals(key)
-                        || currentNode.nodeKey == null && key == null) {
+                        || currentNode.nodeKey == key) {
                     currentNode.nodeValue = value;
                     break;
                 } else {
                     if (currentNode.next == null) {
-                        currentNode.next = new Node<>(key,value,null);
+                        currentNode.next = new Node<>(key, value, null);
                         size++;
                         break;
                     } else {
@@ -39,13 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (size == 0) {
-            return null;
-        }
         Node<K, V> currentNode = values[getIndexFromKey(key)];
-        if (currentNode == null) {
-            return null;
-        }
         while (currentNode != null) {
             if (currentNode.nodeKey != null && currentNode.nodeKey.equals(key)
                     || currentNode.nodeKey == key) {
@@ -61,9 +56,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void arrayResize_Copy() {
+    private void resize() {
         Node<K, V>[] oldArray = values;
-        values = new Node[values.length * 2];
+        values = new Node[values.length * GROW_FACTOR];
         size = 0;
         for (int i = 0; i < oldArray.length; i++) {
             if (oldArray[i] != null) {
@@ -82,7 +77,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resizeIfNeeded() {
         if (size != 0 && size > (values.length * LOAD_FACTOR)) {
-            arrayResize_Copy();
+            resize();
         }
     }
 
@@ -98,4 +93,3 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 }
-
