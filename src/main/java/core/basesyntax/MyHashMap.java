@@ -16,11 +16,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resizeIfNeeded();
-        int hash = getIndex(key);
-        Entry<K, V> entry = table[hash];
+        int index = getIndex(key);
+        Entry<K, V> entry = table[index];
 
         if (entry == null) {
-            table[hash] = new Entry<>(key, value);
+            table[index] = new Entry<>(key, value);
             size++;
         } else {
             while (entry.next != null) {
@@ -70,34 +70,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         int newCapacity = table.length * 2;
-        Entry<K, V>[] newTable = new Entry[newCapacity];
+        Entry<K, V>[] oldTable = table;
+        size = 0;
+        table = new Entry[newCapacity];
 
-        for (Entry<K, V> entry : table) {
+        for (Entry<K, V> entry : oldTable) {
             while (entry != null) {
-                Entry<K, V> next = entry.next;
-                entry.next = null;
-
-                insertNewEntry(newTable, entry);
-
-                entry = next;
+                put(entry.key, entry.value);
+                entry = entry.next;
             }
-        }
-        table = newTable;
-    }
-
-    private void insertNewEntry(Entry<K, V>[] newTable, Entry<K, V> entry) {
-        int newHash = (entry.key == null)
-                ? 0
-                : Math.abs(entry.key.hashCode()) % newTable.length;
-        Entry<K, V> existing = newTable[newHash];
-
-        if (existing == null) {
-            newTable[newHash] = entry;
-        } else {
-            while (existing.next != null) {
-                existing = existing.next;
-            }
-            existing.next = entry;
         }
     }
 
