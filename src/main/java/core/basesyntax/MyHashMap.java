@@ -5,20 +5,18 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
+    private static final int DOUBLE_SIZE = 2;
 
     private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        this.table = new Node[DEFAULT_CAPACITY];
-        this.size = 0;
+        this.table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size > table.length * LOAD_FACTOR) {
-            resize();
-        }
+        resize();
         int index = getIndex(key);
         Node<K, V> newNode = new Node<>(key, value);
         if (table[index] == null) {
@@ -60,7 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
+        return getIndex(key, table.length);
     }
 
     private int getIndex(K key, int capacity) {
@@ -68,18 +66,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int newCapacity = table.length * 2;
-        Node<K, V>[] newTable = new Node[newCapacity];
-        for (Node<K, V> node : table) {
-            while (node != null) {
-                Node<K, V> nextNode = node.next;
-                int newIndex = getIndex(node.key, newCapacity);
-                node.next = newTable[newIndex];
-                newTable[newIndex] = node;
-                node = nextNode;
+        if (size > table.length * LOAD_FACTOR) {
+            int newCapacity = table.length * DOUBLE_SIZE;
+            Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
+            for (Node<K, V> node : table) {
+                while (node != null) {
+                    Node<K, V> nextNode = node.next;
+                    int newIndex = getIndex(node.key, newCapacity);
+                    node.next = newTable[newIndex];
+                    newTable[newIndex] = node;
+                    node = nextNode;
+                }
             }
+            table = newTable;
         }
-        table = newTable;
     }
 
     private static class Node<K, V> {
