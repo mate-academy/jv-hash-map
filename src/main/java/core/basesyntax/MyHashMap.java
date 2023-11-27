@@ -6,17 +6,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private static final int MULTIPLIER = 2;
-    private Entry<K, V>[] table = new Entry[INITIAL_CAPACITY];
+    private Entry<K, V>[] table;
     private int size;
     private int threshold;
 
     public MyHashMap() {
+        this.table = new Entry[INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         resize();
-        int index = indexPosition(key);
+        int index = getIndex(key);
         Entry<K, V> entry = table[index];
         while (entry != null) {
             if (Objects.equals(entry.key, key)) {
@@ -30,7 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = indexPosition(key);
+        int index = getIndex(key);
         Entry<K, V> entry = table[index];
         while (entry != null) {
             if (Objects.equals(key, entry.key)) {
@@ -67,7 +68,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int indexPosition(K key) {
+    private int getIndex(K key) {
         int hash = key == null ? 0 : key.hashCode();
         return Math.abs(hash) % table.length;
     }
