@@ -20,15 +20,36 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        grow();
         int index = hash(key) % DEFAULT_CAPACITY;
         if (buckets[index] == null) {
             buckets[index] = new Node<>(index, key, value, null);
             size++;
-        } else if (buckets[index] != null && (Objects.equals(key, buckets[index].key))) {
-            buckets[index] = new Node<>(index, key, value, buckets[index].next);
-        } else {
-            buckets[index].next = new Node<>(index, key, value, null);
+        } else if (buckets[index] != null) {
+            Node<K, V> currentNode = buckets[index];
+            if(Objects.equals(key, currentNode.key) && Objects.equals(value, currentNode.value)) {
+                return;
+            }
+            if (Objects.equals(key, currentNode.key)) {
+                currentNode.value = value;
+                return;
+            }
+            for (currentNode = buckets[index]; currentNode.next != null; currentNode = currentNode.next) {
+                if(Objects.equals(key, currentNode.key) && Objects.equals(value, currentNode.value)) {
+                    return;
+                }
+                if (Objects.equals(key, currentNode.key)) {
+                    currentNode.value = value;
+                    return;
+                }
+            }
+            if(Objects.equals(key, currentNode.key) && Objects.equals(value, currentNode.value)) {
+                return;
+            }
+            if (Objects.equals(key, currentNode.key)) {
+                currentNode.value = value;
+                return;
+            }
+            currentNode.next = new Node<>(index, key, value, null);
             size++;
         }
     }
@@ -48,12 +69,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
-    }
-
-    private void grow() {
-        if ((double) size / DEFAULT_CAPACITY >= LOAD_FACTOR) {
-
-        }
     }
 
     private static class Node<K, V> {
