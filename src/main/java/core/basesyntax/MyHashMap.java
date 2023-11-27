@@ -15,8 +15,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> correctNode;
-        return (correctNode = getNode(hash(key), key)) == null ? null : correctNode.value;
+        Node<K, V> correctNode = getNode(hash(key), key);
+        return correctNode == null ? null : correctNode.value;
     }
 
     @Override
@@ -26,10 +26,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void putValue(int hash, K key, V value) {
         int arrayLenght;
+        Node<K, V> currentNode;
         if (bucketsArray == null || (arrayLenght = bucketsArray.length) == 0) {
             arrayLenght = (bucketsArray = resize()).length;
         }
-        Node<K, V> currentNode;
         if ((currentNode = bucketsArray[hash & (arrayLenght - 1)]) == null) {
             bucketsArray[hash & (arrayLenght - 1)] = new Node<>(hash, key, value, null);
             size++;
@@ -37,29 +37,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (currentNode.hash == hash || (key != null && key.equals(currentNode.key))) {
                 currentNode.value = value;
             } else {
-                Node<K, V> tempValue;
-                for (int i = 0; ; ++i) {
-                    tempValue = currentNode.next;
-                    if (tempValue == null) {
+                Node<K, V> nextNode;
+                while (true) {
+                    nextNode = currentNode.next;
+                    if (nextNode == null) {
                         currentNode.next = new Node<>(hash, key, value, null);
                         if (++size > threshold) {
                             bucketsArray = resize();
                         }
                         break;
                     }
-                    if (tempValue.hash == hash || (key != null && key.equals(tempValue.key))) {
-                        tempValue.value = value;
+                    if (nextNode.hash == hash || (key != null && key.equals(nextNode.key))) {
+                        nextNode.value = value;
                         break;
                     }
-                    currentNode = tempValue;
+                    currentNode = nextNode;
                 }
             }
         }
     }
 
     private int hash(K key) {
-        int h;
-        return key == null ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+        int hash;
+        return key == null ? 0 : (hash = key.hashCode()) ^ (hash >>> 16);
     }
 
     private Node<K, V> getNode(int hash, K key) {
@@ -88,19 +88,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] resize() {
         Node<K, V>[] oldBuckets = bucketsArray;
         int oldCapacity = (oldBuckets == null) ? 0 : oldBuckets.length;
-        int newCapacity = 0;
-        if (oldCapacity > 0) {
-            if (oldCapacity >= MAX_CAPACITY) {
-                threshold = Integer.MAX_VALUE;
-                return bucketsArray;
-            } else if (((oldCapacity * 2) < MAX_CAPACITY) && (oldCapacity >= DEFAULT_CAPACITY)) {
-                newCapacity = oldCapacity * 2;
-                threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
-            }
-        } else {
-            newCapacity = DEFAULT_CAPACITY;
-            threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
-        }
+        int newCapacity = getNewCapacity(oldCapacity);
         Node<K, V>[] newBuckets = (Node<K, V>[]) new Node[newCapacity];
         bucketsArray = newBuckets;
         if (oldBuckets != null) {
@@ -111,43 +99,36 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     if (currentNode.next == null) {
                         newBuckets[currentNode.hash & (newCapacity - 1)] = currentNode;
                     } else {
-                        Node<K, V> touchedBitsHead = null;
-                        Node<K, V> touchedBitsTail = null;
-                        Node<K, V> untouchedBitsHead = null;
-                        Node<K, V> untouchedBitsTail = null;
                         Node<K, V> next;
                         do {
                             next = currentNode.next;
-                            if ((currentNode.hash & oldCapacity) == 0) {
-                                if (untouchedBitsTail == null) {
-                                    untouchedBitsHead = currentNode;
-                                } else {
-                                    untouchedBitsTail.next = currentNode;
-                                }
-                                untouchedBitsTail = currentNode;
-                            } else {
-                                if (touchedBitsTail == null) {
-                                    touchedBitsHead = currentNode;
-                                } else {
-                                    touchedBitsTail.next = currentNode;
-                                }
-                                touchedBitsTail = currentNode;
-                            }
+                            putValue(currentNode.hash, currentNode.key, currentNode.value);
+                            size--;
                             currentNode = next;
                         } while (currentNode != null);
-                        if (untouchedBitsTail != null) {
-                            untouchedBitsTail.next = null;
-                            newBuckets[i] = untouchedBitsHead;
-                        }
-                        if (touchedBitsTail != null) {
-                            touchedBitsTail.next = null;
-                            newBuckets[i + oldCapacity] = touchedBitsHead;
-                        }
                     }
                 }
             }
         }
         return newBuckets;
+    }
+
+    private int getNewCapacity(int oldCapacity) {
+        int newCapacity = 0;
+        if (oldCapacity > 0) {
+            if (oldCapacity >= MAX_CAPACITY) {
+                threshold = Integer.MAX_VALUE;
+                throw new RuntimeException("can't extend HashMap, current capacity: "
+                        + oldCapacity + " is more than max capacity: " + MAX_CAPACITY);
+            } else if (((oldCapacity * 2) < MAX_CAPACITY) && (oldCapacity >= DEFAULT_CAPACITY)) {
+                newCapacity = oldCapacity * 2;
+                threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
+            }
+        } else {
+            newCapacity = DEFAULT_CAPACITY;
+            threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
+        }
+        return newCapacity;
     }
 
     private static class Node<K, V> {
