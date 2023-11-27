@@ -5,11 +5,13 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
-    private final Node<K, V>[] buckets;
+    private int currentCapacity = DEFAULT_CAPACITY;
+    private double threshHold = DEFAULT_CAPACITY * LOAD_FACTOR;
+    private Node<K, V>[] buckets;
     private int size;
 
     public MyHashMap() {
-        buckets = new Node[DEFAULT_CAPACITY];
+        buckets = new Node[currentCapacity];
     }
 
     private int hash(Object key) {
@@ -20,13 +22,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = hash(key) % DEFAULT_CAPACITY;
+        resize();
+        int index = hash(key) % currentCapacity;
         if (buckets[index] == null) {
             buckets[index] = new Node<>(index, key, value, null);
             size++;
         } else if (buckets[index] != null) {
             Node<K, V> currentNode = buckets[index];
-            if(Objects.equals(key, currentNode.key) && Objects.equals(value, currentNode.value)) {
+            if (Objects.equals(key, currentNode.key) && Objects.equals(value, currentNode.value)) {
                 return;
             }
             if (Objects.equals(key, currentNode.key)) {
@@ -34,7 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             for (currentNode = buckets[index]; currentNode.next != null; currentNode = currentNode.next) {
-                if(Objects.equals(key, currentNode.key) && Objects.equals(value, currentNode.value)) {
+                if (Objects.equals(key, currentNode.key) && Objects.equals(value, currentNode.value)) {
                     return;
                 }
                 if (Objects.equals(key, currentNode.key)) {
@@ -42,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     return;
                 }
             }
-            if(Objects.equals(key, currentNode.key) && Objects.equals(value, currentNode.value)) {
+            if (Objects.equals(key, currentNode.key) && Objects.equals(value, currentNode.value)) {
                 return;
             }
             if (Objects.equals(key, currentNode.key)) {
@@ -69,6 +72,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    public void resize() {
+        if (size == threshHold) {
+            size = 0;
+            currentCapacity *= 2;
+            threshHold *= 2;
+            Node<K, V>[] oldBuckets = buckets;
+            buckets = new Node[currentCapacity];
+            for (Node<K, V> node : oldBuckets) {
+                for (Node<K, V> currentNode = node; currentNode != null; currentNode = currentNode.next) {
+                    put(currentNode.key, currentNode.value);
+                }
+            }
+        }
     }
 
     private static class Node<K, V> {
