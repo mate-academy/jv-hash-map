@@ -1,7 +1,6 @@
 package core.basesyntax;
 
-import java.util.Objects;
-
+@SuppressWarnings("unchecked")
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
@@ -19,49 +18,35 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : Math.abs((h = key.hashCode()) ^ (h >>> 16));
     }
 
-
     @Override
     public void put(K key, V value) {
         resize();
-        int index = hash(key) % currentCapacity;
+        int hash = hash(key);
+        int index = hash % currentCapacity;
         if (buckets[index] == null) {
-            buckets[index] = new Node<>(index, key, value, null);
+            buckets[index] = new Node<>(hash, key, value, null);
             size++;
         } else if (buckets[index] != null) {
-            Node<K, V> currentNode = buckets[index];
-            if (Objects.equals(key, currentNode.key) && Objects.equals(value, currentNode.value)) {
-                return;
-            }
-            if (Objects.equals(key, currentNode.key)) {
-                currentNode.value = value;
-                return;
-            }
-            for (currentNode = buckets[index]; currentNode.next != null; currentNode = currentNode.next) {
-                if (Objects.equals(key, currentNode.key) && Objects.equals(value, currentNode.value)) {
-                    return;
-                }
-                if (Objects.equals(key, currentNode.key)) {
-                    currentNode.value = value;
-                    return;
+            Node<K, V> currentNode;
+            for (currentNode = buckets[index]; currentNode.next != null;
+                    currentNode = currentNode.next) {
+                if (hasSameKeyOrValue(currentNode, key, value)) {
+                    break;
                 }
             }
-            if (Objects.equals(key, currentNode.key) && Objects.equals(value, currentNode.value)) {
-                return;
+            if (!hasSameKeyOrValue(currentNode, key, value)) {
+                currentNode.next = new Node<>(hash, key, value, null);
+                size++;
             }
-            if (Objects.equals(key, currentNode.key)) {
-                currentNode.value = value;
-                return;
-            }
-            currentNode.next = new Node<>(index, key, value, null);
-            size++;
         }
     }
 
     @Override
     public V getValue(K key) {
         for (Node<K, V> bucket : buckets) {
-            for (Node<K, V> currentNode = bucket; currentNode != null; currentNode = currentNode.next) {
-                if (Objects.equals(key, currentNode.key)) {
+            for (Node<K, V> currentNode = bucket; currentNode != null;
+                    currentNode = currentNode.next) {
+                if (key == currentNode.key || key != null && key.equals(currentNode.key)) {
                     return currentNode.value;
                 }
             }
@@ -74,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public void resize() {
+    private void resize() {
         if (size == threshHold) {
             size = 0;
             currentCapacity *= 2;
@@ -82,18 +67,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V>[] oldBuckets = buckets;
             buckets = new Node[currentCapacity];
             for (Node<K, V> node : oldBuckets) {
-                for (Node<K, V> currentNode = node; currentNode != null; currentNode = currentNode.next) {
+                for (Node<K, V> currentNode = node; currentNode != null;
+                        currentNode = currentNode.next) {
                     put(currentNode.key, currentNode.value);
                 }
             }
         }
     }
 
+    private boolean hasSameKeyOrValue(Node<K, V> currentNode, K key, V value) {
+        if ((key == currentNode.key || key != null && key.equals(currentNode.key))
+                && (value == currentNode.value || value != null
+                && value.equals(currentNode.value))) {
+            return true;
+        }
+        if (key == currentNode.key || key != null && key.equals(currentNode.key)) {
+            currentNode.value = value;
+            return true;
+        }
+        return false;
+    }
+
     private static class Node<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         public Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
