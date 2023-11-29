@@ -35,12 +35,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-            for (Node<K, V> currentNode = buckets[getKeyIndex(key)]; currentNode != null;
-                    currentNode = currentNode.next) {
-                if (key == currentNode.key || key != null && key.equals(currentNode.key)) {
-                    return currentNode.value;
-                }
+        for (Node<K, V> currentNode = buckets[getKeyIndex(key)]; currentNode != null;
+                currentNode = currentNode.next) {
+            if (key == currentNode.key || key != null && key.equals(currentNode.key)) {
+                return currentNode.value;
             }
+        }
         return null;
     }
 
