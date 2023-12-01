@@ -27,7 +27,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        return getNode(key) == null ? null : getNode(key).value;
+        Node<K, V> node = getNode(key);
+        return node == null ? null : node.value;
     }
 
     @Override
