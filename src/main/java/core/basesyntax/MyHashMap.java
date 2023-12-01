@@ -12,12 +12,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = getIndex(key);
-        Node<K, V> nodeNew = checkKey(key);
-        if (nodeNew != null) {
-            nodeNew.value = value;
+        Node<K, V> existedNode = getNode(key);
+        if (existedNode != null) {
+            existedNode.value = value;
             return;
         }
+        int index = getIndex(key);
         table[index] = new Node<>(key, value, table[index]);
         size++;
         if ((float) size / table.length >= LOAD_FACTOR) {
@@ -27,7 +27,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        return checkKey(key) == null ? null : checkKey(key).value;
+        return getNode(key) == null ? null : getNode(key).value;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private Node<K, V> checkKey(K key) {
+    private Node<K, V> getNode(K key) {
         int index = getIndex(key);
         Node<K, V> node = table[index];
         while (node != null) {
@@ -66,7 +66,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K,V> {
-
         private K key;
         private V value;
         private Node<K,V> next;
