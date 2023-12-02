@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
+    private static final int GROWTH_FACTOR = 2;
     private int size;
     private int threshold;
     private Node<K, V>[] table;
@@ -29,14 +30,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void putValue(int hash, K key, V value) {
         Node<K, V>[] data;
         Node<K, V> parent;
-        int i;
         int n;
         if ((data = table) == null || (n = table.length) == 0) {
             data = resize();
             n = data.length;
         }
-        if ((parent = data[i = (n - 1) & hash]) == null) {
-            data[i] = new Node<>(hash, key, value, null);
+        int index = (n - 1) & hash;
+        if ((parent = data[index]) == null) {
+            data[index] = new Node<>(hash, key, value, null);
             size++;
         } else {
             Node<K, V> current;
@@ -45,17 +46,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     || (key != null && key.equals(k)))) {
                 current = parent;
             } else {
-                while (true) {
-                    if ((current = parent.next) == null) {
-                        parent.next = new Node<>(hash, key, value, null);
-                        size++;
-                        break;
-                    }
+                current = parent.next;
+                while (current != null) {
                     if (current.hash == hash
                             && ((k = current.key) == key || (key != null && key.equals(k)))) {
                         break;
                     }
                     parent = current;
+                    current = current.next;
+                }
+                if (current == null) {
+                    parent.next = new Node<>(hash, key, value, null);
+                    size++;
                 }
             }
             if (current != null) {
@@ -67,7 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private static int hash(Object key) {
+    private int hash(Object key) {
         return (key == null) ? 0 : (key.hashCode() % INITIAL_CAPACITY);
     }
 
@@ -78,8 +80,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int newCapacity;
         int newThreshold;
         if (oldCapacity > 0) {
-            newCapacity = oldCapacity * 2;
-            newThreshold = oldThreshold * 2;
+            newCapacity = oldCapacity * GROWTH_FACTOR;
+            newThreshold = oldThreshold * GROWTH_FACTOR;
         } else {
             newCapacity = INITIAL_CAPACITY;
             newThreshold = (int) (LOAD_FACTOR * INITIAL_CAPACITY);
@@ -139,18 +141,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        public final K getKey() {
-            return key;
-        }
-
-        public final V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
         }
     }
 }
