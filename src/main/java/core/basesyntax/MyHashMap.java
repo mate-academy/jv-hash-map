@@ -2,8 +2,8 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 1 << 4;
-    private Node<K, V>[] table;
     private static final float LOAD_FACTOR = 0.75f;
+    private Node<K, V>[] table;
     private int threshold;
     private int capacity;
     private int size;
@@ -16,90 +16,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size == threshold) {
-            resize();
-        }
-        int currentHash = getHash(key);
-        int index = setIndex(currentHash);
-        Node<K, V> node = table[index];
-        if (node != null) {
-            Node<K, V> prev = node;
-            while (node != null) {
-                if (key == node.key) {
-                    node.value = value;
-                    return;
-                }
-                if (key != null && key.equals(node.key)) {
-                    node.value = value;
-                    return;
-                }
-                prev = node;
-                node = node.next;
-            }
-            prev.next = new Node<>(key, value);
-            ++size;
-            return;
-        }
-        table[index] = new Node<>(key, value);
-        ++size;
+        putNode(key, value);
     }
 
     @Override
     public V getValue(K key) {
-        return get(key);
+        return getNodeValue(key);
     }
 
     @Override
     public int getSize() {
         return size;
-    }
-
-    private boolean containsKey(K key) {
-        int index = setIndex(getHash(key));
-        Node<K, V> node = table[index];
-        if (node == null) {
-            return false;
-        }
-        while (node != null) {
-            if (key == node.key || node.key.equals(key)) {
-                return true;
-            }
-            node = node.next;
-        }
-        return false;
-    }
-
-    private static int getHash(Object object) {
-        return object == null ? 0 : object.hashCode() >> 31 ^ object.hashCode();
-    }
-
-    private int setIndex(int hash) {
-        return hash % this.capacity;
-    }
-
-    private V get(K key) {
-        int currentHash = getHash(key);
-        int index = setIndex(currentHash);
-        Node<K, V> node = table[index];
-        if (node != null) {
-            do {
-                if (key == node.key) {
-                    return node.value;
-                }
-                if (key != null && key.equals(node.key)) {
-                    return node.value;
-                }
-                node = node.next;
-            } while (node != null);
-        }
-        return null;
-    }
-
-    private void resize() {
-    }
-
-    private Node<K, V> transfer() {
-        return null;
     }
 
     private static class Node<K, V> {
@@ -112,20 +39,93 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
         }
     }
-}
 
-class T {
-    public static void main(String[] args) {
-        MyHashMap<String, String> map = new MyHashMap<>();
-        map.put("Bogdan", "Hello");
-        map.put("Ivan", "Hello");
-        map.put("Dmytro", "Hello");
-        map.put("Andrii", "Hello");
-        map.put("Vasyl", "Hello");
-        map.put("Petro", "Hello");
-        map.put("Petro", "Hi");
-        map.put("Vasyl", "Hi");
-        map.put(null, "Hello");
-        map.put(null, "Hi");
+    public boolean containsKey(K key) {
+        return getNode(key) != null;
+    }
+
+    private boolean isKeyEquals(K key, Node<K, V> currentNode) {
+        if (key == currentNode.key) {
+            return true;
+        }
+        return key != null && key.equals(currentNode.key);
+    }
+
+    public void putNode(K key, V value) {
+        int index = setIndex(getHash(key));
+        Node<K, V> currentNode = table[index];
+        if (currentNode == null) {
+            table[index] = new Node<>(key, value);
+        } else {
+            Node<K, V> previousNode = currentNode;
+            while (currentNode != null) {
+                if (isKeyEquals(key, currentNode)) {
+                    currentNode.value = value;
+                    return;
+                }
+                previousNode = currentNode;
+                currentNode = currentNode.next;
+            }
+            previousNode.next = new Node<>(key, value);
+        }
+        if (++size == threshold) {
+            resize();
+        }
+    }
+
+    private Node<K, V> getNode(K key) {
+        int currentHash = getHash(key);
+        int index = setIndex(currentHash);
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (isKeyEquals(key, node)) {
+                return node;
+            }
+            node = node.next;
+        }
+        return null;
+    }
+
+    private V getNodeValue(K key) {
+        Node<K, V> node = getNode(key);
+        if (node != null) {
+            return node.value;
+        }
+        return null;
+    }
+
+    private void resize() {
+        Node<K, V>[] newTable = (Node<K, V>[]) new Node[this.capacity << 1];
+        this.capacity = newTable.length;
+        this.threshold = (int) (this.capacity * LOAD_FACTOR);
+        this.table = transfer(newTable);
+    }
+
+    private Node<K, V>[] transfer(Node<K, V>[] to) {
+        for (Node<K, V> node : this.table) {
+            while (node != null) {
+                int index = setIndex(getHash(node.key));
+                Node<K, V> nodeAtIndex = to[index];
+                Node<K, V> newNode = new Node<>(node.key, node.value);
+                if (nodeAtIndex != null) {
+                    while (nodeAtIndex.next != null) {
+                        nodeAtIndex = nodeAtIndex.next;
+                    }
+                    nodeAtIndex.next = newNode;
+                } else {
+                    to[index] = newNode;
+                }
+                node = node.next;
+            }
+        }
+        return to;
+    }
+
+    private static int getHash(Object object) {
+        return (object == null) ? 0 : object.hashCode();
+    }
+
+    private int setIndex(int hash) {
+        return Math.abs(hash % this.capacity);
     }
 }
