@@ -33,13 +33,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> current;
             K currentKey = parent.key;
-            if ((parent.hash == hash && currentKey == key) || (key != null && key.equals(currentKey))) {
+            if ((parent.hash == hash && currentKey == key)
+                    || (key != null && key.equals(currentKey))) {
                 current = parent;
             } else {
                 current = parent.next;
                 while (current != null) {
                     currentKey = current.key;
-                    if (current.hash == hash && (currentKey == key || (key != null && key.equals(currentKey)))) {
+                    if (current.hash == hash && (currentKey == key
+                            || (key != null && key.equals(currentKey)))) {
                         break;
                     }
                     parent = current;
@@ -90,7 +92,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return table;
     }
 
-    private void transfer(Node<K, V>[] oldTable, Node<K, V>[] newTable, int oldCapacity, int newCapacity) {
+    private void transfer(Node<K, V>[] oldTable, Node<K, V>[] newTable,
+                          int oldCapacity, int newCapacity) {
         if (oldTable != null) {
             for (int i = 0; i < oldCapacity; i++) {
                 Node<K, V> current = oldTable[i];
