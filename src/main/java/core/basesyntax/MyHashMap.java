@@ -1,7 +1,6 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-
     public static final int INITIAL_CAPACITY = 16;
     public static final double LOAD_FACTOR = 0.75;
     public static final int GROWTH_FACTOR = 2;
@@ -15,31 +14,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             storage = new Node[INITIAL_CAPACITY];
         }
 
-        int hash = keyHash(key);
-        int storageIndex = storageIndex(hash, storage.length);
+        int hash = getKeyHash(key);
+        int storageIndex = getStorageIndex(hash, storage.length);
 
         Node<K, V> currentNode = storage[storageIndex];
         Node<K, V> prevNode = null;
 
-        while (true) {
-            if (currentNode == null) {
-                Node<K, V> newNode = new Node<>(key, value);
-                if (prevNode != null) {
-                    prevNode.next = newNode;
-                } else {
-                    storage[storageIndex] = newNode;
-                }
-                ++size;
-                resizeIfNeeded();
-                break;
-            }
-            if (areObjectsEqual(currentNode.key, key)) {
+        while (currentNode != null) {
+            if (areKeysEqual(currentNode.key, key)) {
                 currentNode.value = value;
-                break;
+                return;
             }
             prevNode = currentNode;
             currentNode = currentNode.next;
         }
+
+        Node<K, V> newNode = new Node<>(key, value, hash);
+        if (prevNode != null) {
+            prevNode.next = newNode;
+        } else {
+            storage[storageIndex] = newNode;
+        }
+        ++size;
+        resizeIfNeeded();
     }
 
     @Override
@@ -56,12 +53,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static int keyHash(Object key) {
+    private int getKeyHash(K key) {
         return (key == null) ? 0 : key.hashCode();
     }
 
-    private static int storageIndex(int hash, int storageLenght) {
-        return Math.abs(hash % storageLenght);
+    private static int getStorageIndex(int hash, int storageLength) {
+        return Math.abs(hash) % storageLength;
     }
 
     private void resizeIfNeeded() {
@@ -76,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (int i = 0; i < storage.length; i++) {
             Node<K, V> currentNode = storage[i];
             while (currentNode != null) {
-                int newStorageIndex = storageIndex(currentNode.hash, newCapacity);
+                int newStorageIndex = getStorageIndex(currentNode.hash, newCapacity);
                 Node<K, V> lastNodeInRow = lastNodes[newStorageIndex];
                 if (lastNodeInRow == null) {
                     lastNodes[newStorageIndex] = currentNode;
@@ -100,33 +97,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (storage == null) {
             return null;
         }
-        int hash = keyHash(key);
-        int storageIndex = storageIndex(hash, storage.length);
+        int hash = getKeyHash(key);
+        int storageIndex = getStorageIndex(hash, storage.length);
 
         Node<K, V> currentNode = storage[storageIndex];
-        while (true) {
-            if (currentNode == null || areObjectsEqual(currentNode.key, key)) {
-                return currentNode;
-            }
+        while (currentNode != null && !areKeysEqual(currentNode.key, key)) {
             currentNode = currentNode.next;
         }
+        return currentNode;
     }
 
-    private class Node<T, S> {
-        private final T key;
-        private final int hash;
-        private S value;
-        private Node<T, S> next;
+    private boolean areKeysEqual(K key1, K key2) {
+        return key1 == key2 || key1 != null && key1.equals(key2);
+    }
 
-        public Node(T key, S value) {
+    private static class Node<K, V> {
+        private final K key;
+        private final int hash;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value, int hash) {
             this.key = key;
-            this.hash = keyHash(key);
+            this.hash = hash;
             this.value = value;
         }
-
-    }
-
-    private static boolean areObjectsEqual(Object obj1, Object obj2) {
-        return obj1 == obj2 || obj1 != null && obj1.equals(obj2);
     }
 }
