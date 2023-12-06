@@ -10,46 +10,36 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private Node<K, V>[] table;
 
+    public MyHashMap() {
+        table = new Node[INITIAL_CAPACITY];
+        threshold = (int) (LOAD_FACTOR * INITIAL_CAPACITY);
+    }
+
     @Override
     public void put(K key, V value) {
-        putValue(hash(key), key, value);
-    }
-
-    @Override
-    public V getValue(K key) {
-        Node<K, V> current;
-        current = getNode(key);
-        return (current == null) ? null : current.value;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
-    }
-
-    private void putValue(int hash, K key, V value) {
-        Node<K, V>[] data;
+        int hash = (key == null) ? 0 : key.hashCode();
+        Node<K, V>[] data = table;
         Node<K, V> parent;
-        int n;
-        if ((data = table) == null || (n = table.length) == 0) {
+        int tableSize = table.length;
+        if (data == null || tableSize == 0) {
             data = resize();
-            n = data.length;
+            tableSize = table.length;
         }
-        int index = (n - 1) & hash;
-        if ((parent = data[index]) == null) {
+        int index = (tableSize - 1) & hash;
+        parent = data[index];
+        if (parent == null) {
             data[index] = new Node<>(hash, key, value, null);
             size++;
         } else {
             Node<K, V> current;
-            K k;
-            if (parent.hash == hash && ((k = parent.key) == key
-                    || (key != null && key.equals(k)))) {
+            K currentKey = parent.key;
+            if ((parent.hash == hash && currentKey == key) || (key != null && key.equals(currentKey))) {
                 current = parent;
             } else {
                 current = parent.next;
                 while (current != null) {
-                    if (current.hash == hash
-                            && ((k = current.key) == key || (key != null && key.equals(k)))) {
+                    currentKey = current.key;
+                    if (current.hash == hash && (currentKey == key || (key != null && key.equals(currentKey)))) {
                         break;
                     }
                     parent = current;
@@ -69,8 +59,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hash(Object key) {
-        return (key == null) ? 0 : (key.hashCode() % INITIAL_CAPACITY);
+    @Override
+    public V getValue(K key) {
+        Node<K, V> current = getNode(key);
+        return (current == null) ? null : current.value;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
     }
 
     private Node<K, V>[] resize() {
@@ -93,15 +90,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return table;
     }
 
-    private void transfer(Node<K, V>[] oldTable, Node<K, V>[] newTable,
-                          int oldCapacity, int newCapacity) {
+    private void transfer(Node<K, V>[] oldTable, Node<K, V>[] newTable, int oldCapacity, int newCapacity) {
         if (oldTable != null) {
             for (int i = 0; i < oldCapacity; i++) {
                 Node<K, V> current = oldTable[i];
                 if (current != null) {
                     oldTable[i] = null;
                     if (current.next == null) {
-                        newTable[current.hash & (newCapacity - 1)] = current;
+                        int index = current.hash & (newCapacity - 1);
+                        newTable[index] = current;
                     } else {
                         Node<K, V> next;
                         do {
@@ -118,7 +115,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V> getNode(Object key) {
         if (table != null) {
-            int hash = hash(key);
+            int hash = (key == null) ? 0 : key.hashCode();
             Node<K, V> first = table[(table.length - 1) & hash];
             while (first != null) {
                 if (first.hash == hash && Objects.equals(first.key, key)) {
