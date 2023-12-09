@@ -14,7 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if(((int) (LOAD_FACTOR * table.length))==size){
+        if (((int) (LOAD_FACTOR * table.length)) == size) {
             resize();
         }
         int index = indexByHash(key);
@@ -27,7 +27,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             node = node.next;
         }
         Node<K, V> entry = table[index];
-        addNode(index, key, value,entry);
+        addNode(index, key, value, entry);
     }
 
     @Override
