@@ -5,7 +5,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K,V>[] nodes;
     private int size;
-    private int treshold;
+    private int threshold;
     private int maxCap = DEFAULT_INITIAL_CAPACITY;
 
     @Override
@@ -14,21 +14,47 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int index = getIndex(key);
-        Node nodeToPut = new Node<>(key, value);
-        if (nodes[index] == null) {
+        Node<K, V> nodeToPut = new Node<>(key, value);
+        if (key == null) {
+            if (nodes[0] == null) {
+                nodes[0] = nodeToPut;
+                size++;
+            } else if (nodes[0].key == null) {
+                nodes[0].value = value;
+            } else {
+                Node<K, V> current = nodes[0];
+                while (current.next != null || current.key != null) {
+                    if (current.key == null) {
+                        current.value = value;
+                        return;
+                    }
+                    if (current.next == null) {
+                        break;
+                    }
+                    current = current.next;
+                }
+                current.next = nodeToPut;
+                size++;
+            }
+        } else if (nodes[index] == null) {
             nodes[index] = nodeToPut;
+            size++;
         } else {
             Node<K, V> current = nodes[index];
-            while (current.next != null || current.key == key) {
-                if (current.key == key) {
+            while (current.next != null || (current.key != null && current.key.equals(key))) {
+                if (key.equals(current.key)) {
                     current.value = value;
                     return;
+                }
+                if (current.next == null) {
+                    break;
                 }
                 current = current.next;
             }
             current.next = nodeToPut;
+            size++;
         }
-        if (++size > treshold) {
+        if (size > threshold) {
             resize();
         }
     }
@@ -38,7 +64,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == 0 || nodes[getIndex(key)] == null) {
             return null;
         }
-        return nodes[getIndex(key)].value;
+        Node<K, V> currentNode = nodes[getIndex(key)];
+        while (currentNode != null) {
+            if (key == null && currentNode.key == null) {
+                return currentNode.value;
+            } else if (key != null && key.equals(currentNode.key)) {
+                return currentNode.value;
+            }
+            currentNode = currentNode.next;
+        }
+        return null;
     }
 
     @Override
@@ -47,26 +82,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        treshold = (int)(maxCap * DEFAULT_LOAD_FACTOR);
-        if (size == 0) {
-            nodes = new Node[maxCap];
-        } else {
-            Node<K, V>[] oldNodesArray = nodes;
-            nodes = new Node[maxCap];
-            for (int i = 0; i < maxCap; i++) {
-                if (oldNodesArray[i] != null) {
-                    put(oldNodesArray[i].key, oldNodesArray[i].value);
+        size = 0;
+        maxCap = maxCap * 2;
+        threshold = (int)(maxCap * DEFAULT_LOAD_FACTOR);
+        Node<K, V>[] oldNodesArray = nodes;
+        nodes = new Node[maxCap];
+        int oldCap = maxCap / 2;
+        if (oldNodesArray != null) {
+            for (int i = 0; i < oldCap; i++) {
+                Node<K, V> current = oldNodesArray[i];
+                while (current != null) {
+                    put(current.key, current.value);
+                    current = current.next;
                 }
             }
         }
-        maxCap = maxCap * 2;
     }
 
     private int getIndex(K key) {
         if (key == null) {
             return 0;
         }
-        return Math.abs(key.hashCode()) % nodes.length;
+        return Math.abs(key.hashCode()) % maxCap;
     }
 
     private class Node<K, V> {
