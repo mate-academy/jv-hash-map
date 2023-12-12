@@ -6,43 +6,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K,V>[] nodes;
     private int size;
     private int threshold;
-    private int maxCap = DEFAULT_INITIAL_CAPACITY;
+    private int maxCap;
+
+    public MyHashMap() {
+        nodes = new Node[DEFAULT_INITIAL_CAPACITY];
+        maxCap = DEFAULT_INITIAL_CAPACITY;
+    }
 
     @Override
     public void put(K key, V value) {
-        if (size == 0) {
-            resize();
-        }
         int index = getIndex(key);
         Node<K, V> nodeToPut = new Node<>(key, value);
-        if (key == null) {
-            if (nodes[0] == null) {
-                nodes[0] = nodeToPut;
-                size++;
-            } else if (nodes[0].key == null) {
-                nodes[0].value = value;
-            } else {
-                Node<K, V> current = nodes[0];
-                while (current.next != null || current.key != null) {
-                    if (current.key == null) {
-                        current.value = value;
-                        return;
-                    }
-                    if (current.next == null) {
-                        break;
-                    }
-                    current = current.next;
-                }
-                current.next = nodeToPut;
-                size++;
-            }
-        } else if (nodes[index] == null) {
+        if (nodes[index] == null) {
             nodes[index] = nodeToPut;
             size++;
         } else {
             Node<K, V> current = nodes[index];
-            while (current.next != null || (current.key != null && current.key.equals(key))) {
-                if (key.equals(current.key)) {
+            while (current.next != null || (current.key != null && current.key.equals(key))
+                || key == null) {
+                if (key == current.key || key != null && key.equals(current.key)) {
                     current.value = value;
                     return;
                 }
@@ -66,9 +48,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K, V> currentNode = nodes[getIndex(key)];
         while (currentNode != null) {
-            if (key == null && currentNode.key == null) {
-                return currentNode.value;
-            } else if (key != null && key.equals(currentNode.key)) {
+            if (key == currentNode.key || key != null && key.equals(currentNode.key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
@@ -88,13 +68,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldNodesArray = nodes;
         nodes = new Node[maxCap];
         int oldCap = maxCap / 2;
-        if (oldNodesArray != null) {
-            for (int i = 0; i < oldCap; i++) {
-                Node<K, V> current = oldNodesArray[i];
-                while (current != null) {
-                    put(current.key, current.value);
-                    current = current.next;
-                }
+        for (int i = 0; i < oldCap; i++) {
+            Node<K, V> current = oldNodesArray[i];
+            while (current != null) {
+                put(current.key, current.value);
+                current = current.next;
             }
         }
     }
