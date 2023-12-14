@@ -106,8 +106,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     static final int hash(int h) {
-        // Spread bits to regularize both segment and index locations,
-        // using variant of single-word Wang/Jenkins hash.
         h ^= (h >>> 20) ^ (h >>> 12);
         return h ^ (h >>> 7) ^ (h >>> 4);
     }
