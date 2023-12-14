@@ -5,7 +5,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int GROW_FACTOR = 2;
     private static final Double LOAD_FACTOR = 0.75;
     private int size;
-    private Node<K, V>[] innerArray = new Node[DEFAULT_CAPACITY];
+    private Node<K, V>[] innerArray;
+
+    public MyHashMap() {
+        innerArray = new Node[DEFAULT_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
@@ -50,14 +54,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        if (key == null) {
-            return 0;
-        }
-        int moduleOfHashKey = Math.abs(key.hashCode());
-        return moduleOfHashKey % innerArray.length;
+        return (key == null) ? 0 : Math.abs(key.hashCode()) % innerArray.length;
     }
 
-    private boolean equalsKeys(Object k1, Object k2) {
+    private boolean equalsKeys(K k1, K k2) {
         return (k1 == k2 || k1 != null && k1.equals(k2));
     }
 
