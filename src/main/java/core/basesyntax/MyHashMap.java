@@ -4,18 +4,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final int GROW_FACTOR = 2;
     private static final float LOAD_FACTOR = 0.75f;
-    private Node<K, V>[] values;
+    private Node<K, V>[] buckets;
     private int size;
+    private int threshold;
 
     public MyHashMap() {
-        values = new Node[DEFAULT_CAPACITY];
+        buckets = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         checkSize();
-        int index = createIndex(key);
-        Node<K, V> current = values[index];
+        int index = getIndex(key);
+        Node<K, V> current = buckets[index];
         while (current != null) {
             if (equalsKeys(key, current.key)) {
                 current.value = value;
@@ -23,22 +24,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             current = current.next;
         }
-        if (values[index] == null) {
-            values[index] = new Node<>(key, value);
-        } else {
-            current = values[index];
-            while (current.next != null) {
-                current = current.next;
-            }
-            current.next = new Node<>(key, value);
-        }
+        buckets[index] = new Node<>(key, value, buckets[index]);
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        int indexToFind = createIndex(key);
-        Node<K, V> node = values[indexToFind];
+        int indexToFind = getIndex(key);
+        Node<K, V> node = buckets[indexToFind];
         while (node != null) {
             if (equalsKeys(key, node.key)) {
                 return node.value;
@@ -53,8 +46,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int createIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % values.length);
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % buckets.length);
     }
 
     private boolean equalsKeys(K k1, K k2) {
@@ -62,8 +55,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void transfer() {
-        Node<K, V>[] oldArray = values;
-        values = new Node[oldArray.length * GROW_FACTOR];
+        Node<K, V>[] oldArray = buckets;
+        buckets = new Node[oldArray.length * GROW_FACTOR];
         size = 0;
         for (Node<K, V> node : oldArray) {
             while (node != null) {
@@ -74,7 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void checkSize() {
-        int threshold = (int) (values.length * LOAD_FACTOR);
+        threshold = (int) (buckets.length * LOAD_FACTOR);
         if (size == threshold) {
             transfer();
         }
@@ -88,6 +81,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public Node(K key, V value) {
             this.key = key;
             this.value = value;
+        }
+
+        public Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
         }
     }
 }
