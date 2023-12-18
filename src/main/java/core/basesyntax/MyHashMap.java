@@ -53,28 +53,37 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = (key == null) ? 0 : hash(key);
         K k;
         if (tab[i = ((n - 1) & hash)] == null) {
-            //if (first.hash == hash && ((k = first.key) == key || (key != null && key.equals(k)))) {
             first = new Node<>(hash, key, value, null);
             tab[i] = first;
             size++;
-        } else
-        if ((first = tab[i = ((n - 1) & hash)]) != null && (first.key == key || (key != null && !(key.equals(first.key)))))
-            if ((next = first.next) == null) {
+        } //else
+        if ((first = tab[i = ((n - 1) & hash)]) != null && /*((first.key == key) || */(key != null && (!first.key.equals(key)))) {
+            //if ((next = first.next) == null) {
+                /*first.next = new Node<>(hash, key, value, null);
+                tab[i].next = first.next;
+                size++;
+            }*/
+            if ((next = first.next) != null) {
+                /*do {
+                    next.next =
+                }*/
+                while (next.next == null) {
+                    next.next = new Node<>(hash, key, value, null);
+                    size++;
+                    //next = next.next;
+                }
+            } else {
                 first.next = new Node<>(hash, key, value, null);
                 tab[i].next = first.next;
                 size++;
-            } else {
-               if ((first = tab[i = ((n - 1) & hash)]) != null && (first.key == key || (key != null && !(key.equals(first.next.key))))) {
-                    first.next.next = new Node<>(hash, key, value, null);
-                }
-
-                /*do {
-                    if (next.hash == hash &&
-                            ((k = next.key) == key || (key != null && key.equals(k))))
-                        next.value = value;
-                } while ((next = next.next) != null);*/
             }
+
+
         }
+        if ((first = tab[i = ((n - 1) & hash)]) != null && (first.key == key || (key != null && key.equals(first.key)))) {
+            first.value = value;
+        }
+    }
 
 
     @Override
