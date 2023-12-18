@@ -45,6 +45,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if (size > threshold) {
+            resize();
+        }
         Node<K, V>[] tab = table;
         Node<K, V> first;
         Node<K, V> next;
@@ -57,14 +60,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             tab[i] = first;
             size++;
         }
-        if ((first = tab[i = ((n - 1) & hash)]) != null && /*((first.key == key) || */(key != null && (!first.key.equals(key)))) {
+        if ((first = tab[i = ((n - 1) & hash)]) != null && (key != null && (!first.key.equals(key)))) {
             if ((next = first.next) != null) {
                 if (next.next != null) {
                     while (next.next != null) {
                         next = next.next;
                     }
-                    next.next = new Node<>(hash, key, value, null);
-                    //size++;
                 }
                 next.next = new Node<>(hash, key, value, null);
                 size++;
@@ -128,28 +129,46 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 newThreshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
             }
             threshold = newThreshold;
-            //@SuppressWarnings({"rawtypes","unchecked"})
-            //Node<K, V>[] newTab = (Node<K, V>[]) new Node[newCapacity];
-            //table = newTab;
+            Node<K, V>[] newTab = (Node<K, V>[]) new Node[newCapacity];
+            for (int i = 0; i < oldTab.length; i++) {
+                Node<K, V> e;
+                if ((e = oldTab[i]) != null) {
+                    if (e.next != null) {
+                        Node<K,V> loHead = null, loTail = null;
+                        Node<K,V> hiHead = null, hiTail = null;
+                        Node<K,V> next;
+                        do {
+                            next = e.next;
+                            if ((e.hash & oldCapacity) == 0) {
+                                if (loTail == null)
+                                    loHead = e;
+                                else
+                                    loTail.next = e;
+                                loTail = e;
+                            }
+                            else {
+                                if (hiTail == null)
+                                    hiHead = e;
+                                else
+                                    hiTail.next = e;
+                                hiTail = e;
+                            }
+                        } while ((e = next) != null);
+                        if (loTail != null) {
+                            loTail.next = null;
+                            newTab[i] = loHead;
+                        }
+                        if (hiTail != null) {
+                            hiTail.next = null;
+                            newTab[i + oldCapacity] = hiHead;
+                        }
+                    } else {
+                        newTab[e.hash & (newCapacity - 1)] = e;
+                    }
+                }
+            }
+            table = newTab;
         }
         return table;
     }
-
-    /*final Node<K, V> putVal(int hash, K key, V value) {
-        Node<K,V>[] tab = table; Node<K,V> put, next; int n, i;
-        n = table.length;
-        hash = (key == null) ? 0: hash(key);
-        if ((put = table[i = (hash % n)]) == null) {
-            table[i] = new Node<>(hash, key, value, null);
-        } else {
-            if (put.next == null) {
-            put.next = new Node<>(hash, key, value, null);
-        } else {
-                if ()
-            }
-
-        //if (++size > threshold)
-            resize();
-        return table[i];
-    }*/
 }
