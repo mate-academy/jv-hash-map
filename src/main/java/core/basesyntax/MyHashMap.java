@@ -59,10 +59,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         if ((first = tab[i = ((n - 1) & hash)]) != null && /*((first.key == key) || */(key != null && (!first.key.equals(key)))) {
             if ((next = first.next) != null) {
-                while (next.next == null) {
+                if (next.next != null) {
+                    while (next.next != null) {
+                        next = next.next;
+                    }
                     next.next = new Node<>(hash, key, value, null);
-                    size++;
+                    //size++;
                 }
+                next.next = new Node<>(hash, key, value, null);
+                size++;
             } else {
                 first.next = new Node<>(hash, key, value, null);
                 tab[i].next = first.next;
