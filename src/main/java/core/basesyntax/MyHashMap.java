@@ -1,16 +1,16 @@
 package core.basesyntax;
 
-import java.util.HashMap;
+import static java.util.Objects.hash;
+
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.hash;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     public static final int DEFAULT_INITIAL_CAPACITY = 16;
     public static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    public int size;
-    public int threshold = 12;
-    public Node<K, V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
+    private int size;
+    private int threshold;
+    private Node<K, V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
 
     static class Node<K, V> {
         private final int hash;
@@ -54,13 +54,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int n = tab.length;
         int i;
         int hash = (key == null) ? 0 : hash(key);
-        K k;
         if (tab[i = ((n - 1) & hash)] == null) {
             first = new Node<>(hash, key, value, null);
             tab[i] = first;
             size++;
         }
-        if ((first = tab[i = ((n - 1) & hash)]) != null && (key != null && (!first.key.equals(key)))) {
+        if ((first = tab[i = ((n - 1) & hash)]) != null
+                && (key != null && (!first.key.equals(key)))) {
             if ((next = first.next) != null) {
                 if (next.next != null) {
                     while (next.next != null) {
@@ -75,11 +75,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 size++;
             }
         }
-        if ((first = tab[i = ((n - 1) & hash)]) != null && (first.key == key || (key != null && key.equals(first.key)))) {
+        if ((first = tab[i = ((n - 1) & hash)]) != null && (first.key == key
+                || (key != null && key.equals(first.key)))) {
             first.value = value;
         }
     }
-
 
     @Override
     public V getValue(K key) {
@@ -99,15 +99,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int n;
         int hash = (key == null) ? 0 : hash(key);
         K k;
-        if ((tab = table) != null && (n = tab.length) > 0 &&
-                (first = tab[(n - 1) & hash]) != null) {
-            if (first.hash == hash && ((k = first.key) == key || (key != null && key.equals(k))))
+        if ((tab = table) != null && (n = tab.length) > 0
+                && (first = tab[(n - 1) & hash]) != null) {
+            if (first.hash == hash && ((k = first.key) == key || key != null && key.equals(k))) {
                 return first;
+            }
             if ((next = first.next) != null) {
                 do {
-                    if (next.hash == hash &&
-                            ((k = next.key) == key || (key != null && key.equals(k))))
+                    if (next.hash == hash
+                            && ((k = next.key) == key || (key != null && key.equals(k)))) {
                         return next;
+                    }
                 } while ((next = next.next) != null);
             }
         }
@@ -134,23 +136,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 Node<K, V> e;
                 if ((e = oldTab[i]) != null) {
                     if (e.next != null) {
-                        Node<K,V> loHead = null, loTail = null;
-                        Node<K,V> hiHead = null, hiTail = null;
+                        Node<K,V> loHead = null;
+                        Node<K,V> loTail = null;
+                        Node<K,V> hiHead = null;
+                        Node<K,V> hiTail = null;
                         Node<K,V> next;
                         do {
                             next = e.next;
                             if ((e.hash & oldCapacity) == 0) {
-                                if (loTail == null)
+                                if (loTail == null) {
                                     loHead = e;
-                                else
+                                } else {
                                     loTail.next = e;
+                                }
                                 loTail = e;
-                            }
-                            else {
-                                if (hiTail == null)
+                            } else {
+                                if (hiTail == null) {
                                     hiHead = e;
-                                else
+                                } else {
                                     hiTail.next = e;
+                                }
                                 hiTail = e;
                             }
                         } while ((e = next) != null);
