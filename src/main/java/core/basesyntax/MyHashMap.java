@@ -56,29 +56,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             first = new Node<>(hash, key, value, null);
             tab[i] = first;
             size++;
-        } //else
+        }
         if ((first = tab[i = ((n - 1) & hash)]) != null && /*((first.key == key) || */(key != null && (!first.key.equals(key)))) {
-            //if ((next = first.next) == null) {
-                /*first.next = new Node<>(hash, key, value, null);
-                tab[i].next = first.next;
-                size++;
-            }*/
             if ((next = first.next) != null) {
-                /*do {
-                    next.next =
-                }*/
                 while (next.next == null) {
                     next.next = new Node<>(hash, key, value, null);
                     size++;
-                    //next = next.next;
                 }
             } else {
                 first.next = new Node<>(hash, key, value, null);
                 tab[i].next = first.next;
                 size++;
             }
-
-
         }
         if ((first = tab[i = ((n - 1) & hash)]) != null && (first.key == key || (key != null && key.equals(first.key)))) {
             first.value = value;
@@ -102,15 +91,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> first;
         Node<K, V> next;
         int n;
-        int hash;
+        int hash = (key == null) ? 0 : hash(key);
         K k;
         if ((tab = table) != null && (n = tab.length) > 0 &&
-                (first = tab[(n - 1) & (hash = hash(key))]) != null) {
+                (first = tab[(n - 1) & hash]) != null) {
             if (first.hash == hash && ((k = first.key) == key || (key != null && key.equals(k))))
                 return first;
             if ((next = first.next) != null) {
-                /*if (first instanceof TreeNode)
-                    return ((TreeNode<K,V>)first).getTreeNode(hash, key);*/
                 do {
                     if (next.hash == hash &&
                             ((k = next.key) == key || (key != null && key.equals(k))))
