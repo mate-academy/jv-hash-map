@@ -75,7 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 size++;
             }
         }
-        if ((first = tab[i = ((n - 1) & hash)]) != null && (first.key == key
+        if ((first = tab[((n - 1) & hash)]) != null && (first.key == key
                 || (key != null && key.equals(first.key)))) {
             first.value = value;
         }
