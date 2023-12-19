@@ -28,21 +28,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > threshold) {
             resize();
         }
-        Node<K, V> next;
         int index = getBucketIndex(key);
         int hash = (key == null) ? 0 : hash(key);
         if (table[index] == null) {
             table[index] = new Node<>(hash, key, value, null);
             size++;
         }
-        if ((table[index]) != null
+        if (table[index] != null
                 && (key != null && (!table[index].key.equals(key)))) {
-            if ((next = table[index].next) != null) {
-                if (table[index].next.next != null) {
+            Node<K, V> next = table[index].next;
+                if (next != null) {
                     while (next.next != null) {
                         next = next.next;
                     }
-                }
                 next.next = new Node<>(hash, key, value, null);
                 size++;
             } else {
@@ -70,15 +68,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     final Node<K, V> getNode(Object key) {
         int index = getBucketIndex(key);
         int hash = (key == null) ? 0 : hash(key);
-        if ((table) != null && (table.length) > 0
-                && (table[index]) != null) {
-            if (table[index].hash == hash && ((table[index].key) == key || key != null && key.equals(table[index].key))) {
+        if (table != null && table.length > 0
+                && table[index] != null) {
+            if (table[index].hash == hash && (table[index].key == key || key != null && key.equals(table[index].key))) {
                 return table[index];
             }
             if ((table[index].next) != null) {
                 do {
                     if (table[index].next.hash == hash
-                            && ((table[index].next.key) == key || (key != null && key.equals(table[index].next.key)))) {
+                            && (table[index].next.key == key || (key != null && key.equals(table[index].next.key)))) {
                         return table[index].next;
                     }
                     table[index].next = table[index].next.next;

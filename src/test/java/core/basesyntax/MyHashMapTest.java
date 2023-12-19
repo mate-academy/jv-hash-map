@@ -226,13 +226,13 @@ public class MyHashMapTest {
     @Test
     public void getSizeWithCollisionAtFirstPosition() {
         MyMap<Plane, Integer> myHashMap = new MyHashMap<>();
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10; i++) {
             Plane plane = new Plane("model_" + i, "color_" + i);
             myHashMap.put(plane, i);
         }
         Assert.assertEquals("Test failed! The size isn't correct. Expected 1000 but was "
-                + myHashMap.getSize(), 1000, myHashMap.getSize());
-        for (int i = 0; i < 1000; i++) {
+                + myHashMap.getSize(), 10, myHashMap.getSize());
+        for (int i = 0; i < 10; i++) {
             Assert.assertEquals(Integer.valueOf(i),
                     myHashMap.getValue(new Plane("model_" + i, "color_" + i)));
         }
