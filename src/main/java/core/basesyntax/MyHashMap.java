@@ -5,9 +5,9 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75D;
     private static final int INITIAL_CAPACITY = 16;
+    private static final int GROW_RATE = 2;
     private Node<K,V>[] nodesArray;
     private int treshold;
-    private int index;
     private int size;
 
     public MyHashMap() {
@@ -22,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
 
-        index = getIndex(key);
+        int index = getIndex(key);
         if (nodesArray[index] == null) {
             nodesArray[index] = newNode;
             size++;
@@ -57,6 +57,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private int hash(K key) {
+        return (key == null ? 0 : Math.abs(Objects.hash(key)));
+    }
+
+    private int getIndex(K key) {
+        return hash(key) % nodesArray.length;
+    }
+
+    private Node<K,V>[] resize() {
+        Node<K,V>[] oldNodesArray = nodesArray;
+        nodesArray = new Node[oldNodesArray.length * GROW_RATE];
+        treshold = (int) (nodesArray.length * LOAD_FACTOR);
+        size = 0;
+        for (Node<K,V> node : oldNodesArray) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
+        }
+        return nodesArray;
+    }
+
     private class Node<K,V> {
         private K key;
         private V value;
@@ -68,25 +90,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hash(K key) {
-        return (key == null ? 0 : Math.abs(Objects.hash(key)));
-    }
-
-    private int getIndex(K key) {
-        return hash(key) % nodesArray.length;
-    }
-
-    private Node<K,V>[] resize() {
-        Node<K,V>[] oldNodesArray = nodesArray;
-        nodesArray = new Node[oldNodesArray.length * 2];
-        treshold = (int) (nodesArray.length * LOAD_FACTOR);
-        size = 0;
-        for (Node<K,V> node : oldNodesArray) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
-            }
-        }
-        return nodesArray;
-    }
 }
+
+
