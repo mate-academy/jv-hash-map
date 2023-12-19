@@ -1,61 +1,44 @@
 package core.basesyntax;
 
-import java.util.LinkedList;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
-    private LinkedList<Node<K, V>>[] buckets;
+    private static final int RESIZE_VALUE = 2;
+    private Node<K, V>[] buckets;
     private int size;
 
     public MyHashMap() {
-        buckets = new LinkedList[DEFAULT_CAPACITY];
-        size = 0;
-    }
-
-    private static class Node<K, V> {
-        private K key;
-        private V value;
-
-        Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
+        buckets = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
+        resizeIfNeeded();
         int bucketIndex = calculateBucketIndex(key);
-        if (buckets[bucketIndex] == null) {
-            buckets[bucketIndex] = new LinkedList<>();
-        }
+        Node<K, V> existing = buckets[bucketIndex];
 
-        for (Node<K, V> node : buckets[bucketIndex]) {
-            if (isKeysEqual(node.key, key)) {
-                node.value = value;
+        while (existing != null) {
+            if (isKeysEqual(existing.key, key)) {
+                existing.value = value;
                 return;
             }
+            existing = existing.next;
         }
 
-        buckets[bucketIndex].add(new Node<>(key, value));
+        buckets[bucketIndex] = new Node<>(key, value, buckets[bucketIndex]);
         size++;
-
-        if (shouldResize()) {
-            resize();
-        }
     }
 
     @Override
     public V getValue(K key) {
         int bucketIndex = calculateBucketIndex(key);
-        LinkedList<Node<K, V>> bucket = buckets[bucketIndex];
+        Node<K, V> node = buckets[bucketIndex];
 
-        if (bucket != null) {
-            for (Node<K, V> node : bucket) {
-                if (isKeysEqual(node.key, key)) {
-                    return node.value;
-                }
+        while (node != null) {
+            if (isKeysEqual(node.key, key)) {
+                return node.value;
             }
+            node = node.next;
         }
         return null;
     }
@@ -73,21 +56,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key1 == null ? key2 == null : key1.equals(key2);
     }
 
-    private boolean shouldResize() {
-        return size >= buckets.length * DEFAULT_LOAD_FACTOR;
-    }
+    private void resizeIfNeeded() {
+        if (size >= buckets.length * DEFAULT_LOAD_FACTOR) {
+            Node<K, V>[] oldBuckets = buckets;
+            buckets = new Node[oldBuckets.length * RESIZE_VALUE];
+            size = 0;
 
-    private void resize() {
-        LinkedList<Node<K, V>>[] oldBuckets = buckets;
-        buckets = new LinkedList[buckets.length * 2];
-        size = 0;
-
-        for (LinkedList<Node<K, V>> bucket : oldBuckets) {
-            if (bucket != null) {
-                for (Node<K, V> node : bucket) {
-                    put(node.key, node.value);
+            for (Node<K, V> head : oldBuckets) {
+                while (head != null) {
+                    put(head.key, head.value);
+                    head = head.next;
                 }
             }
+        }
+    }
+
+    private static class Node<K, V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
         }
     }
 }
