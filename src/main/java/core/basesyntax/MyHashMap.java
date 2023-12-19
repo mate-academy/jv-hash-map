@@ -6,8 +6,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75D;
     private static final int INITIAL_CAPACITY = 16;
     private Node<K,V>[] nodesArray;
-    private int size;
     private int treshold;
+    private int index;
+    private int size;
 
     public MyHashMap() {
         nodesArray = new Node[INITIAL_CAPACITY];
@@ -16,14 +17,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K,V> newNode = new Node<>(key, value);
-        treshold = (int) (nodesArray.length * LOAD_FACTOR);
 
         if (size > treshold) {
             resize();
         }
 
-        if (nodesArray[getIndex(key)] == null) {
-            nodesArray[getIndex(key)] = newNode;
+        index = getIndex(key);
+        if (nodesArray[index] == null) {
+            nodesArray[index] = newNode;
             size++;
             return;
         }
@@ -65,23 +66,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
         }
-
-        @Override
-        public boolean equals(Object object) {
-            if (this == object) {
-                return true;
-            }
-            if (object == null || getClass() != object.getClass()) {
-                return false;
-            }
-            Node<?, ?> node = (Node<?, ?>) object;
-            return Objects.equals(key, node.key) && Objects.equals(value, node.value);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(key, value);
-        }
     }
 
     private int hash(K key) {
@@ -95,6 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K,V>[] resize() {
         Node<K,V>[] oldNodesArray = nodesArray;
         nodesArray = new Node[oldNodesArray.length * 2];
+        treshold = (int) (nodesArray.length * LOAD_FACTOR);
         size = 0;
         for (Node<K,V> node : oldNodesArray) {
             while (node != null) {
