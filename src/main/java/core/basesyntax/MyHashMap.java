@@ -28,21 +28,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > threshold) {
             resize();
         }
-        Node<K, V>[] tab = table;
-        Node<K, V> first;
         Node<K, V> next;
-        int n = tab.length;
-        int i;
+        int index = getBucketIndex(key);
         int hash = (key == null) ? 0 : hash(key);
-        if (tab[i = ((n - 1) & hash)] == null) {
-            first = new Node<>(hash, key, value, null);
-            tab[i] = first;
+        if (table[index] == null) {
+            table[index] = new Node<>(hash, key, value, null);
             size++;
         }
-        if ((first = tab[i = ((n - 1) & hash)]) != null
-                && (key != null && (!first.key.equals(key)))) {
-            if ((next = first.next) != null) {
-                if (next.next != null) {
+        if ((table[index]) != null
+                && (key != null && (!table[index].key.equals(key)))) {
+            if ((next = table[index].next) != null) {
+                if (table[index].next.next != null) {
                     while (next.next != null) {
                         next = next.next;
                     }
@@ -50,14 +46,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 next.next = new Node<>(hash, key, value, null);
                 size++;
             } else {
-                first.next = new Node<>(hash, key, value, null);
-                tab[i].next = first.next;
+                table[index].next = new Node<>(hash, key, value, null);
                 size++;
             }
         }
-        if ((first = tab[((n - 1) & hash)]) != null && (first.key == key
-                || (key != null && key.equals(first.key)))) {
-            first.value = value;
+        if ((table[index]) != null && (table[index].key == key
+                || (key != null && key.equals(table[index].key)))) {
+            table[index].value = value;
         }
     }
 
