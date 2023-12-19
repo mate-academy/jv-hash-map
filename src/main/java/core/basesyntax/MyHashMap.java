@@ -34,13 +34,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return getNode(key) != null;
     }
 
-    private boolean isKeyEquals(K key, Node<K, V> currentNode) {
-        if (key == currentNode.key) {
-            return true;
-        }
-        return key != null && key.equals(currentNode.key);
-    }
-
     public void putNode(K key, V value) {
         int index = setIndex(getHash(key));
         Node<K, V> currentNode = table[index];
@@ -61,6 +54,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (++size == threshold) {
             resize();
         }
+    }
+
+    private boolean isKeyEquals(K key, Node<K, V> currentNode) {
+        if (key == currentNode.key) {
+            return true;
+        }
+        return key != null && key.equals(currentNode.key);
     }
 
     private Node<K, V> getNode(K key) {
