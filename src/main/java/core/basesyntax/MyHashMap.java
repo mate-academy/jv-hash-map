@@ -30,17 +30,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-    }
-
     public boolean containsKey(K key) {
         return getNode(key) != null;
     }
@@ -122,11 +111,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return to;
     }
 
-    private static int getHash(Object object) {
+    private int getHash(Object object) {
         return (object == null) ? 0 : object.hashCode();
     }
 
     private int setIndex(int hash) {
         return Math.abs(hash % this.capacity);
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 }
