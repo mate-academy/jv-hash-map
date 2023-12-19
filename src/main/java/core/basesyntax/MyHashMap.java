@@ -10,13 +10,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
 
     private static class Node<K, V> {
-        private int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -31,7 +29,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getBucketIndex(key);
         int hash = (key == null) ? 0 : hash(key);
         if (table[index] == null) {
-            table[index] = new Node<>(hash, key, value, null);
+            table[index] = new Node<>(key, value, null);
             size++;
         }
         if (table[index] != null
@@ -41,10 +39,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     while (next.next != null) {
                         next = next.next;
                     }
-                next.next = new Node<>(hash, key, value, null);
+                next.next = new Node<>(key, value, null);
                 size++;
             } else {
-                table[index].next = new Node<>(hash, key, value, null);
+                table[index].next = new Node<>(key, value, null);
                 size++;
             }
         }
@@ -70,12 +68,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = (key == null) ? 0 : hash(key);
         if (table != null && table.length > 0
                 && table[index] != null) {
-            if (table[index].hash == hash && (table[index].key == key || key != null && key.equals(table[index].key))) {
+            if (getHashKey(table[index].key) == hash && (table[index].key == key || key != null && key.equals(table[index].key))) {
                 return table[index];
             }
             if ((table[index].next) != null) {
                 do {
-                    if (table[index].next.hash == hash
+                    if (getHashKey(table[index].next.key) == hash
                             && (table[index].next.key == key || (key != null && key.equals(table[index].next.key)))) {
                         return table[index].next;
                     }
@@ -113,7 +111,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                         Node<K,V> next;
                         do {
                             next = e.next;
-                            if ((e.hash & oldCapacity) == 0) {
+                            if ((getHashKey(e.key) & oldCapacity) == 0) {
                                 if (loTail == null) {
                                     loHead = e;
                                 } else {
@@ -138,7 +136,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                             newTab[i + oldCapacity] = hiHead;
                         }
                     } else {
-                        newTab[e.hash & (newCapacity - 1)] = e;
+                        newTab[getHashKey(e.key) & (newCapacity - 1)] = e;
                     }
                 }
             }
@@ -150,5 +148,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int getBucketIndex(Object key) {
         int hash = (key == null) ? 0 : hash(key);
          return  (table.length - 1) & hash;
+    }
+
+    private int getHashKey(Object key) {
+        return  (key == null) ? 0: hash(key);
     }
 }
