@@ -2,9 +2,6 @@ package core.basesyntax;
 
 import static java.util.Objects.hash;
 
-import java.util.Map;
-import java.util.Objects;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     public static final int DEFAULT_INITIAL_CAPACITY = 16;
     public static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -12,8 +9,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private Node<K, V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
 
-    static class Node<K, V> {
-        private final int hash;
+    private static class Node<K, V> {
+        private int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -23,23 +20,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        public final String toString() {
-            return key + "=" + value;
-        }
-
-        public final int hashCode() {
-            return Objects.hashCode(key) ^ Objects.hashCode(value);
-        }
-
-        public final boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            }
-            return o instanceof Map.Entry<?, ?> e
-                    && Objects.equals(key, e.getKey())
-                    && Objects.equals(value, e.getValue());
         }
     }
 
@@ -93,24 +73,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     final Node<K, V> getNode(Object key) {
-        Node<K, V>[] tab;
-        Node<K, V> first;
-        Node<K, V> next;
-        int n;
+        int index = getBucketIndex(key);
         int hash = (key == null) ? 0 : hash(key);
-        K k;
-        if ((tab = table) != null && (n = tab.length) > 0
-                && (first = tab[(n - 1) & hash]) != null) {
-            if (first.hash == hash && ((k = first.key) == key || key != null && key.equals(k))) {
-                return first;
+        if ((table) != null && (table.length) > 0
+                && (table[index]) != null) {
+            if (table[index].hash == hash && ((table[index].key) == key || key != null && key.equals(table[index].key))) {
+                return table[index];
             }
-            if ((next = first.next) != null) {
+            if ((table[index].next) != null) {
                 do {
-                    if (next.hash == hash
-                            && ((k = next.key) == key || (key != null && key.equals(k)))) {
-                        return next;
+                    if (table[index].next.hash == hash
+                            && ((table[index].next.key) == key || (key != null && key.equals(table[index].next.key)))) {
+                        return table[index].next;
                     }
-                } while ((next = next.next) != null);
+                    table[index].next = table[index].next.next;
+                } while ((table[index].next) != null);
             }
         }
         return null;
@@ -175,5 +152,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table = newTab;
         }
         return table;
+    }
+
+    private int getBucketIndex(Object key) {
+        int hash = (key == null) ? 0 : hash(key);
+         return  (table.length - 1) & hash;
     }
 }
