@@ -101,7 +101,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             threshold = newThreshold;
             table = (Node<K, V>[]) new Node[newCapacity];
-            for (Node<K, V > old: oldTab) {
+            for (Node<K, V> old: oldTab) {
                 if (old != null) {
                     K key = old.key;
                     V value = old.value;
