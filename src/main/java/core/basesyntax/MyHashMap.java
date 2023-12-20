@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 import static java.util.Objects.hash;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -59,30 +61,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    final Node<K, V> getNode(Object key) {
+    private Node<K, V> getNode(Object key) {
         int index = getBucketIndex(key);
         int hash = (key == null) ? 0 : hash(key);
-        if (table != null && table.length > 0
-                && table[index] != null) {
-            if (getHashKey(table[index].key) == hash && (table[index].key == key
-                    || key != null && key.equals(table[index].key))) {
-                return table[index];
-            }
-            if ((table[index].next) != null) {
-                do {
-                    if (getHashKey(table[index].next.key) == hash
-                            && (table[index].next.key == key || (key != null
-                            && key.equals(table[index].next.key)))) {
-                        return table[index].next;
-                    }
-                    table[index].next = table[index].next.next;
-                } while (table[index].next != null);
+        for (Node<K, V> node = table[index]; node != null; node = node.next) {
+            if (Objects.equals(node.key, key)) {
+                return node;
             }
         }
         return null;
     }
 
-    final Node<K, V>[] resize() {
+    private Node<K, V>[] resize() {
         Node<K, V>[] oldTab = table;
         int oldCapacity = (oldTab == null) ? 0 : oldTab.length;
         int newCapacity;
@@ -119,7 +109,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (table.length - 1) & hash;
     }
 
-    private int getHashKey(Object key) {
+    /*private int getHashKey(Object key) {
         return (key == null) ? 0 : hash(key);
-    }
+    }*/
 }
