@@ -5,21 +5,14 @@ import static java.util.Objects.hash;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    public static final int DEFAULT_INITIAL_CAPACITY = 16;
-    public static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int size;
     private Node<K, V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
 
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-    }
+    /*public MyHashMap(Node<K, V>[] table) {
+        this.table = table = new Node[DEFAULT_INITIAL_CAPACITY];
+    }*/
 
     @Override
     public void put(K key, V value) {
@@ -69,40 +62,31 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private Node<K, V>[] resize() {
+    private void resize() {
         Node<K, V>[] oldTab = table;
-        int oldCapacity = (oldTab == null) ? 0 : oldTab.length;
-        int newCapacity;
-        if (oldCapacity > 0) {
-            if ((size > oldCapacity * DEFAULT_LOAD_FACTOR)) {
-                newCapacity = oldCapacity << 1;
-            } else {
-                newCapacity = DEFAULT_INITIAL_CAPACITY;
-            }
-            table = (Node<K, V>[]) new Node[newCapacity];
-            size = 0;
-            for (Node<K, V> old: oldTab) {
-                if (old != null) {
-                    K key = old.key;
-                    V value = old.value;
-                    put(key, value);
-                    if (old.next != null) {
-                        Node<K, V> next = old.next;
-                        while (next != null) {
-                            key = next.key;
-                            value = next.value;
-                            put(key, value);
-                            next = next.next;
-                        }
-                    }
-                }
+        table = new Node[oldTab.length << 1];
+        size = 0;
+        for (Node<K, V> current : oldTab) {
+            while (current != null) {
+                put(current.key, current.value);
+                current = current.next;
             }
         }
-        return table;
     }
 
     private int getBucketIndex(Object key) {
         int hash = (key == null) ? 0 : hash(key);
         return (table.length - 1) & hash;
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 }
