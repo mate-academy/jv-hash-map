@@ -1,14 +1,18 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
     private static final int RESIZE_VALUE = 2;
     private Node<K, V>[] buckets;
     private int size;
+    private int threshold;
 
     public MyHashMap() {
         buckets = new Node[DEFAULT_CAPACITY];
+        threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
@@ -53,14 +57,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean isKeysEqual(K key1, K key2) {
-        return key1 == null ? key2 == null : key1.equals(key2);
+        return Objects.equals(key1, key2);
     }
 
     private void resizeIfNeeded() {
-        if (size >= buckets.length * DEFAULT_LOAD_FACTOR) {
+        if (size >= threshold) {
             Node<K, V>[] oldBuckets = buckets;
             buckets = new Node[oldBuckets.length * RESIZE_VALUE];
             size = 0;
+            threshold = (int) (buckets.length * DEFAULT_LOAD_FACTOR);
 
             for (Node<K, V> head : oldBuckets) {
                 while (head != null) {
