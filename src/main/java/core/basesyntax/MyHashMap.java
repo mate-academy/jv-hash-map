@@ -8,15 +8,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int size;
-    private Node<K, V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
+    private Node<K, V>[] table;
 
-    /*public MyHashMap(Node<K, V>[] table) {
-        this.table = table = new Node[DEFAULT_INITIAL_CAPACITY];
-    }*/
+    public MyHashMap() {
+        this.table = new Node[DEFAULT_INITIAL_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
-        if (size > table.length * DEFAULT_LOAD_FACTOR) {
+        if (size >= table.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
         int index = getBucketIndex(key);
