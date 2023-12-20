@@ -100,16 +100,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 newThreshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
             }
             threshold = newThreshold;
-            Node<K, V>[] newTab = (Node<K, V>[]) new Node[newCapacity];
-            table = newTab;
-            for (int i = 0; i < oldTab.length; i++) {
-                if (oldTab[i] != null) {
-                    K key = oldTab[i].key;
-                    V value = oldTab[i].value;
+            table = (Node<K, V>[]) new Node[newCapacity];
+            for (Node<K, V > old: oldTab) {
+                if (old != null) {
+                    K key = old.key;
+                    V value = old.value;
                     put(key, value);
                     size--;
-                    if (oldTab[i].next != null) {
-                        Node<K, V> next = oldTab[i].next;
+                    if (old.next != null) {
+                        Node<K, V> next = old.next;
                         while (next != null) {
                             key = next.key;
                             value = next.value;
