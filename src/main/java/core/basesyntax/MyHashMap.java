@@ -1,8 +1,8 @@
 package core.basesyntax;
 
-import java.util.Objects;
-
 import static java.util.Objects.hash;
+
+import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     public static final int DEFAULT_INITIAL_CAPACITY = 16;
@@ -31,8 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = new Node<>(key, value);
             size++;
         }
-        if (table[index] != null
-                && (key != null && (!table[index].key.equals(key)))) {
+        if (table[index] != null && !Objects.equals(table[index].key, key)) {
             Node<K, V> next = table[index].next;
             if (next != null) {
                 while (next.next != null) {
@@ -44,8 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             size++;
         }
-        if (table[index] != null && (table[index].key == key
-                || (key != null && key.equals(table[index].key)))) {
+        if (table[index] != null && Objects.equals(table[index].key, key)) {
             table[index].value = value;
         }
     }
@@ -63,7 +61,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V> getNode(Object key) {
         int index = getBucketIndex(key);
-        int hash = (key == null) ? 0 : hash(key);
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
             if (Objects.equals(node.key, key)) {
                 return node;
@@ -77,7 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int oldCapacity = (oldTab == null) ? 0 : oldTab.length;
         int newCapacity;
         if (oldCapacity > 0) {
-            if ((getSize() > oldCapacity * DEFAULT_LOAD_FACTOR)) {
+            if ((size > oldCapacity * DEFAULT_LOAD_FACTOR)) {
                 newCapacity = oldCapacity << 1;
             } else {
                 newCapacity = DEFAULT_INITIAL_CAPACITY;
@@ -108,8 +105,4 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = (key == null) ? 0 : hash(key);
         return (table.length - 1) & hash;
     }
-
-    /*private int getHashKey(Object key) {
-        return (key == null) ? 0 : hash(key);
-    }*/
 }
