@@ -27,7 +27,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int index = getBucketIndex(key);
-        int hash = (key == null) ? 0 : hash(key);
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
             size++;
@@ -35,10 +34,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[index] != null
                 && (key != null && (!table[index].key.equals(key)))) {
             Node<K, V> next = table[index].next;
-                if (next != null) {
-                    while (next.next != null) {
-                        next = next.next;
-                    }
+            if (next != null) {
+                while (next.next != null) {
+                    next = next.next;
+                }
                 next.next = new Node<>(key, value, null);
                 size++;
             } else {
@@ -68,13 +67,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = (key == null) ? 0 : hash(key);
         if (table != null && table.length > 0
                 && table[index] != null) {
-            if (getHashKey(table[index].key) == hash && (table[index].key == key || key != null && key.equals(table[index].key))) {
+            if (getHashKey(table[index].key) == hash && (table[index].key == key
+                    || key != null && key.equals(table[index].key))) {
                 return table[index];
             }
             if ((table[index].next) != null) {
                 do {
                     if (getHashKey(table[index].next.key) == hash
-                            && (table[index].next.key == key || (key != null && key.equals(table[index].next.key)))) {
+                            && (table[index].next.key == key || (key != null
+                            && key.equals(table[index].next.key)))) {
                         return table[index].next;
                     }
                     table[index].next = table[index].next.next;
@@ -100,57 +101,35 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             threshold = newThreshold;
             Node<K, V>[] newTab = (Node<K, V>[]) new Node[newCapacity];
+            table = newTab;
             for (int i = 0; i < oldTab.length; i++) {
-                Node<K, V> e;
-                if ((e = oldTab[i]) != null) {
-                    if (e.next != null) {
-                        Node<K,V> loHead = null;
-                        Node<K,V> loTail = null;
-                        Node<K,V> hiHead = null;
-                        Node<K,V> hiTail = null;
-                        Node<K,V> next;
-                        do {
-                            next = e.next;
-                            if ((getHashKey(e.key) & oldCapacity) == 0) {
-                                if (loTail == null) {
-                                    loHead = e;
-                                } else {
-                                    loTail.next = e;
-                                }
-                                loTail = e;
-                            } else {
-                                if (hiTail == null) {
-                                    hiHead = e;
-                                } else {
-                                    hiTail.next = e;
-                                }
-                                hiTail = e;
-                            }
-                        } while ((e = next) != null);
-                        if (loTail != null) {
-                            loTail.next = null;
-                            newTab[i] = loHead;
+                if (oldTab[i] != null) {
+                    K key = oldTab[i].key;
+                    V value = oldTab[i].value;
+                    put(key, value);
+                    size--;
+                    if (oldTab[i].next != null) {
+                        Node<K, V> next = oldTab[i].next;
+                        while (next != null) {
+                            key = next.key;
+                            value = next.value;
+                            put(key, value);
+                            next = next.next;
+                            size--;
                         }
-                        if (hiTail != null) {
-                            hiTail.next = null;
-                            newTab[i + oldCapacity] = hiHead;
-                        }
-                    } else {
-                        newTab[getHashKey(e.key) & (newCapacity - 1)] = e;
                     }
                 }
             }
-            table = newTab;
         }
         return table;
     }
 
     private int getBucketIndex(Object key) {
         int hash = (key == null) ? 0 : hash(key);
-         return  (table.length - 1) & hash;
+        return (table.length - 1) & hash;
     }
 
     private int getHashKey(Object key) {
-        return  (key == null) ? 0: hash(key);
+        return (key == null) ? 0 : hash(key);
     }
 }
