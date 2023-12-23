@@ -1,12 +1,16 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
-    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final float GROW_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
-    private int capacity;
-    private int threshold;
+
+    public MyHashMap() {
+        table = (Node<K, V>[]) new Node[0];
+    }
 
     private static class Node<K, V> {
         private final int hash;
@@ -25,15 +29,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (table == null || table.length == 0) {
-            table = resize();
-        } else if (size >= threshold) {
+            resize();
+        } else if (size >= (int)(table.length * GROW_FACTOR)) {
             Node<K, V> [] oldTable = table;
-            table = resize();
-            table = transferBuckets(oldTable);
+            resize();
         }
         int bucket = hash(key);
         if (table[bucket] == null) {
             table[bucket] = new Node<>(key, value, null);
+            size++;
         } else {
             Node<K, V> node = table[bucket];
             while (node != null) {
@@ -49,18 +53,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 if (node.next == null) {
                     node.next = new Node<>(key, value, null);
+                    size++;
                     break;
                 } else {
                     node = node.next;
                 }
             }
         }
-        size = getSize();
     }
 
     @Override
     public V getValue(K key) {
-        if (table == null) {
+        if (table == null || table.length == 0) {
             return null;
         }
         int index = hash(key);
@@ -69,10 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return bucket.value;
         }
         while (bucket != null) {
-            if (bucket.key == null && key == null) {
-                return bucket.value;
-            }
-            if (bucket.key != null && bucket.key.equals(key)) {
+            if (Objects.equals(bucket.key, key)) {
                 return bucket.value;
             } else {
                 bucket = bucket.next;
@@ -86,75 +87,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public int getSize() {
-        if (table == null) {
-            return 0;
-        }
-        size = 0;
-        for (Node<K, V> node : table) {
-            if (node != null) {
-                size++;
-                node = node.next;
-                while (node != null) {
-                    size++;
-                    node = node.next;
-                }
-            }
-        }
         return size;
     }
 
     private int hash(K key) {
-        return (key == null) ? 0 : (Math.abs(key.hashCode()) % capacity);
+        return (key == null) ? 0 : (Math.abs(key.hashCode()) % ((int)(table.length * GROW_FACTOR)));
     }
 
-    private Node<K, V>[] resize() {
-        int oldCapacity = table == null ? 0 : table.length;
+    private void resize() {
+        size = 0;
         if (table == null || table.length == 0) {
-            capacity = INITIAL_CAPACITY;
-            threshold = (int) (DEFAULT_LOAD_FACTOR * INITIAL_CAPACITY);
-            return new Node[capacity];
+            table = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
         } else {
-            capacity = oldCapacity * 2;
-            threshold = threshold * 2;
-            Node<K, V>[] newTable = (Node<K, V>[]) new Node[capacity];
-            return newTable;
-        }
-    }
-
-    private Node<K, V>[] transferBuckets(Node<K, V>[] oldTable) {
-        Node<K, V> [] buffer = (Node<K, V> []) new Node[size];
-        int bufferIndex = 0;
-        Node<K, V>[] newTable = (Node<K, V> []) new Node[capacity];
-        for (Node<K, V> node : oldTable) {
-            while (node != null) {
-                buffer[bufferIndex] = node;
-                bufferIndex++;
-                node = node.next;
+            Node<K, V>[] oldTable = table;
+            table = (Node<K, V>[]) new Node[oldTable.length * 2];
+            for (Node<K, V> node : oldTable) {
                 while (node != null) {
-                    buffer[bufferIndex] = node;
-                    node = node.next;
-                    bufferIndex++;
-                }
-            }
-        }
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i].next = null;
-        }
-        for (Node<K, V> node : buffer) {
-            int index = hash(node.key);
-            if (newTable[index] == null) {
-                newTable[index] = node;
-            } else {
-                Node<K, V> newTableBucket = newTable[index];
-                while (newTableBucket != null) {
-                    if (newTableBucket.next == null) {
-                        newTableBucket.next = node;
+                    put(node.key, node.value);
+                    if (node.next == null) {
                         break;
                     }
-                    newTableBucket = newTableBucket.next;
+                    node = node.next;
                 }
             }
         }
-        return newTable;
     }
 }
