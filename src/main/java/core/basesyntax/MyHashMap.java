@@ -6,81 +6,37 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int capacity;
     private int size;
-
     private int threshold;
     private Node<K, V>[] table;
 
     @Override
     public void put(K key, V value) {
         if (table == null || size > threshold) {
-            resize();
+            resizeTable();
         }
-        if (table[getBucketIndex(key)] == null ) {//when bucket index FREE
-            table[getBucketIndex(key)] = new Node<>(key.hashCode(), key, value, null);
-        }
-        if (table[getBucketIndex(key)].key == null && key == null) {
-                table[getBucketIndex(key)].value = value;
-                return;
+        if (key == null) {
+            keyNullCase(value);
+        } else if (nodeBusyAndKeysEquals(key)) {
+            table[bucketIndex(key)].value = value;
+        } else if (nodeBusyAndKeysDifferent(key)) {
+            if (noCollision(key)) {
+                table[bucketIndex(key)].next = addNode(key,value);
+                size++;
+            } else {
+                putWithCollision(key,value);
             }
-        if (table[getBucketIndex(key)].key.equals(key)) {
-                table[getBucketIndex(key)].value = value;
-                return;
-            }
-        if (table[getBucketIndex(key)].next != null) {//backed with list
-                Node<K,V> current = table[getBucketIndex(key)].next;//HEAD
-                while (current != null) {//go while next will be NULL, when NULL make newNode
-                    if (current.key.equals(key)) {
-                        current.value = value;
-
-                    }
-                    if (current.next == null) {
-                        current.next = new Node<>(key.hashCode(),key,value,null);
-                        return;
-                    }
-                    current = current.next;
-                }
-            }
-        }
-    }
-
-
-
-    @SuppressWarnings("unchecked")
-    private void resize() {
-        Node<K,V>[] newTable;
-        Node <K,V> currentNode;
-        if (size > threshold && table != null) {
-            capacity = capacity * 2;
-            threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
-            newTable = (Node<K,V>[])new MyHashMap.Node[capacity];
-            for (Node<K, V> kvNode : table) {
-                if (kvNode != null) {
-                    newTable[getBucketIndex(kvNode.key)] = kvNode;
-                    if (kvNode.next != null) {
-                        currentNode = kvNode.next;
-                        while (currentNode != null) {
-                            newTable[getBucketIndex(currentNode.key)] = currentNode;
-                            currentNode = currentNode.next;
-                        }
-                    }
-                }
-            }
-            table = newTable;
-        }
-        else {
-            capacity = DEFAULT_INITIAL_CAPACITY;
-            threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
-            table = (Node<K,V>[])new MyHashMap.Node[capacity];
+        } else {
+            table[bucketIndex(key)] = addNode(key,value);
+            size++;
         }
     }
 
     @Override
     public V getValue(K key) {
-        if(size > 0) {
-            Node<K,V> node = table[getBucketIndex(key)];
+        if (size > 0) {
+            Node<K,V> node = table[bucketIndex(key)];
             if (node != null) {
-                if ((node.key != null && (node.key.equals(key)))
-                        || (node.key == null && key == null)) {//when Node.key == null
+                if (keysEquals(node,key)) {
                     return node.value;
                 } else {
                     return searchForCollision(node, key);
@@ -90,22 +46,114 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
+    private void resizeTable() {
+        Node<K,V>[] newTable;
+        if (size > threshold) {
+            capacity = capacity * 2;
+            threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
+            newTable = (Node<K,V>[])new MyHashMap.Node[capacity];
+            reHashNodes(newTable);
+
+        } else {
+            makeNewEmptyTable();
+        }
+    }
+
+    private void reHashNodes(Node<K,V>[] newTable) {
+        for (Node<K, V> node : table) {
+            if (node != null) {
+                if (node.next == null) {
+                    putInNewIndex(node,newTable);
+                } else {
+                    while (node != null) {
+                        putInNewIndex(node,newTable);
+                        node = node.next;
+                    }
+                }
+            }
+        }
+        table = newTable;
+    }
+
+    private void makeNewEmptyTable() {
+        capacity = DEFAULT_INITIAL_CAPACITY;
+        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
+        table = (Node<K,V>[])new MyHashMap.Node[capacity];
+    }
+
+    private boolean nodeBusyAndKeysEquals(K key) {
+        return table[bucketIndex(key)] != null
+                && table[bucketIndex(key)].key.equals(key);
+    }
+
+    private boolean keysEquals(Node<K,V> node, K key) {
+        return (node.key == null && key == null) || node.key != null && node.key.equals(key);
+    }
+
+    private boolean nodeBusyAndKeysDifferent(K key) {
+        return table[bucketIndex(key)] != null
+                && !(table[bucketIndex(key)].key.equals(key));
+    }
+
+    private void keyNullCase(V value) {
+        if (table[0] != null) {
+            table[0].value = value;
+        } else {
+            table[0] = new Node<>(0, null, value, null);
+            size++;
+        }
+    }
+
+    private boolean noCollision(K key) {
+        return table[bucketIndex(key)].next == null;
+    }
+
+    private void putWithCollision(K key, V value) {
+        Node<K,V> current = table[bucketIndex(key)].next;
+        while (current != null) {
+            if (current.key.equals(key)) {
+                current.value = value;
+            } else if (current.next == null) {
+                current.next = addNode(key,value);
+                size++;
+                return;
+            } else {
+                current = current.next;
+            }
+        }
+    }
+
+    private void putInNewIndex(Node<K,V> kvNode, Node<K,V>[] newTable) {
+        Node<K,V> node = newTable[bucketIndex(kvNode.key)];
+        if (node == null) {
+            node = addNode(kvNode.key, kvNode.value);
+        } else if (node.next == null) {
+            node.next = addNode(kvNode.key, kvNode.value);
+        } else {
+            node = newTable[bucketIndex(kvNode.key)].next;
+            while (node != null) {
+                if (node.next == null) {
+                    node.next = addNode(kvNode.key, kvNode.value);
+                    return;
+                }
+                node = node.next;
+            }
+        }
+        newTable[bucketIndex(kvNode.key)] = node;
+    }
+
     @Override
     public int getSize() {
         return size;
     }
 
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
-    private int getBucketIndex(K key) {
+    private int bucketIndex(K key) {
         int hash = key == null ? 0 : key.hashCode() % capacity;
         return hash > 0 ? hash : -hash;
     }
 
-    private Node<K,V> getNewNode(int hash, K key, V value) {
-        return new Node<>(hash, key, value,null);
+    private Node<K,V> addNode(K key, V value) {
+        return new Node<>(key.hashCode(), key, value,null);
     }
 
     private V searchForCollision(Node<K,V> node, K key) {
@@ -120,42 +168,47 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K,V> {
-        private final int hashCode;
+        private int hashCode;
         private K key;
         private V value;
         private Node<K,V> next;
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            }
-            if (o == null) {
-                return false;
-            }
-            if (o.getClass() == this.getClass()) {
-                Node<K,V> object = (Node<K,V>) o;
-                return (this.hashCode == object.hashCode) && ((this.key != null && object.key != null)
-                        ? (this.key.equals(object.key)) : (this.key == null & object.key == null))
-                        && ((this.value != null && object.value != null)
-                        ? (this.value.equals(object.value)) : (this.value == null && object.value == null))
-                        && ((this.next != null && object.next != null)
-                        ? this.next.equals(object.next) : (this.next == null && object.next == null));
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return 17 * (this.key == null ? 0 : key.hashCode()) + (this.value == null ? 0 : value.hashCode())
-                    + (this.next == null ? 0 : this.next.hashCode()) + hashCode;
-        }
 
         public Node(int hash, K key, V value, Node<K, V> next) {
             this.hashCode = hash;
             this.key = key;
             this.value = value;
             this.next = next;
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (object == this) {
+                return true;
+            }
+            if (object == null) {
+                return false;
+            }
+            if (object.getClass() == this.getClass()) {
+                Node<K,V> nodeObject = (Node<K,V>) object;
+                return (this.hashCode == nodeObject.hashCode)
+                        && ((this.key != null && nodeObject.key != null)
+                        ? (this.key.equals(nodeObject.key))
+                        : (this.key == null & nodeObject.key == null))
+                        && ((this.value != null && nodeObject.value != null)
+                        ? (this.value.equals(nodeObject.value))
+                        : (this.value == null && nodeObject.value == null))
+                        && ((this.next != null && nodeObject.next != null)
+                        ? this.next.equals(nodeObject.next)
+                        : (this.next == null && nodeObject.next == null));
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return 17 * (this.key == null ? 0 : key.hashCode())
+                    + (this.value == null ? 0 : value.hashCode())
+                    + (this.next == null ? 0 : this.next.hashCode()) + hashCode;
         }
     }
 }

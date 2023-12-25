@@ -33,15 +33,24 @@ public class Car {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Car car = (Car) o;
-        return Objects.equals(model, car.model) &&
-                Objects.equals(color, car.color);
+        if (o == this) {
+            return true;
+        }
+        if (o == null) {
+            return false;
+        }
+        if (o.getClass() == this.getClass()) {
+            Car object = (Car) o;
+            return ((this.color != null && object.color != null)
+                    ? this.color.equals(object.color) : (this.color == null && object.color == null))
+                    && ((this.model != null && object.model != null)
+                    ? this.model.equals(object.model) : (this.model == null && object.model == null));
+        }
+        return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(model, color);
+        return 17 * (this.color == null ? 0 : color.hashCode()) + (this.model == null ? 0 : model.hashCode());
     }
 }
