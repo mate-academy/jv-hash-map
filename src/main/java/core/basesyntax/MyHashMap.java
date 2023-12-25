@@ -9,7 +9,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private Node<K,V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
 
-    class Node<K,V> {
+    static class Node<K,V> {
         private K key;
         private V value;
         private Node<K,V> next;
@@ -20,22 +20,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
         }
 
-        public final K getKey() {
-            return key;
-        }
-
-        public final V getValue() {
-            return value;
-        }
-
         public final int hashCode() {
             return Objects.hashCode(key) ^ Objects.hashCode(value);
-        }
-
-        public final V setValue(V newValue) {
-            V oldValue = value;
-            value = newValue;
-            return oldValue;
         }
 
         public boolean equals(Object object) {
@@ -47,8 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
 
             Node<K, V> node = (Node<K, V>) object;
-            return (value == node.value || (value != null && value.equals(node.getValue())))
-                    && (key == node.key || (key != null && key.equals(node.getKey())));
+            return (Objects.equals(value, node.value)) && (Objects.equals(key, node.key));
         }
     }
 
@@ -59,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int index = getIndex(key);
         if (table[index] == null) {
-            table[index] = new Node<>(key, value,null);
+            table[index] = new Node<>(key, value, null);
             size++;
         } else {
             Node<K, V> node = table[index];
