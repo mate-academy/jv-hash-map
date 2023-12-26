@@ -32,24 +32,15 @@ public class Plane {
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-        if (o == null) {
-            return false;
-        }
-        if (o.getClass() == this.getClass()) {
-            Plane object = (Plane) o;
-            return ((this.color != null && object.color != null)
-                    ? this.color.equals(object.color) : (this.color == null && object.color == null))
-                    && ((this.model != null && object.model != null)
-                    ? this.model.equals(object.model) : (this.model == null && object.model == null));
-        }
-        return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Plane plane = (Plane) o;
+        return Objects.equals(model, plane.model) &&
+                Objects.equals(color, plane.color);
     }
 
     @Override
     public int hashCode() {
-        return 17 * (this.color == null ? 0 : color.hashCode()) + (this.model == null ? 0 : model.hashCode());
+        return 1;
     }
 }

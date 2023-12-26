@@ -96,10 +96,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void keyNullCase(V value) {
-        if (table[0] != null) {
-            table[0].value = value;
+        Node<K,V> node = table[0];
+        if (node != null) {
+            if (node.key == null && node.next == null) {
+                node.value = value;
+            } else if (node.key != null && node.next == null) {
+                node.next = addNode(null,value);
+                size++;
+            } else {
+                while (node.next != null) {
+                    if (node.key == null) {
+                        node.value = value;
+                        return;
+                    } else {
+                        node = node.next;
+                    }
+                }
+                node.next = addNode(null,value);
+                size++;
+            }
         } else {
-            table[0] = new Node<>(0, null, value, null);
+            table[0] = addNode(null,value);
             size++;
         }
     }
@@ -111,8 +128,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void putWithCollision(K key, V value) {
         Node<K,V> current = table[bucketIndex(key)].next;
         while (current != null) {
-            if (current.key.equals(key)) {
+            if (current.key == null && key == null
+                    || current.key != null && current.key.equals(key)) {
                 current.value = value;
+                return;
             } else if (current.next == null) {
                 current.next = addNode(key,value);
                 size++;
@@ -153,12 +172,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K,V> addNode(K key, V value) {
-        return new Node<>(key.hashCode(), key, value,null);
+        if (key == null) {
+            return new Node<>(0, key, value,null);
+        } else {
+            return new Node<>(key.hashCode(), key, value,null);
+        }
     }
 
     private V searchForCollision(Node<K,V> node, K key) {
         while (node != null) {
-            if (node.key.equals(key)) {
+            if (node.key == null && key == null || node.key != null && node.key.equals(key)) {
                 return node.value;
             } else {
                 node = node.next;
@@ -174,7 +197,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private Node<K,V> next;
 
         public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hashCode = hash;
+            this.hashCode = this.hashCode();
             this.key = key;
             this.value = value;
             this.next = next;
