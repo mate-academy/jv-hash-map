@@ -4,18 +4,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
-    private int capacity;
     private int size;
     private int threshold;
     private Node<K, V>[] table;
 
+    public MyHashMap() {
+        this.table = (Node<K,V>[])new MyHashMap.Node[DEFAULT_INITIAL_CAPACITY];
+        this.threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
+    }
+
     @Override
     public void put(K key, V value) {
-        if (table == null || size > threshold) {
-            resizeTable();
+        if (size > threshold) {
+            resize();
         }
         if (key == null) {
-            keyNullCase(value);
+            whenKeyNull(value);
         } else if (nodeBusyAndKeysEquals(key)) {
             table[bucketIndex(key)].value = value;
         } else if (nodeBusyAndKeysDifferent(key)) {
@@ -33,52 +37,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (size > 0) {
-            Node<K,V> node = table[bucketIndex(key)];
-            if (node != null) {
-                if (keysEquals(node,key)) {
-                    return node.value;
-                } else {
-                    return searchForCollision(node, key);
-                }
+        Node<K,V> node = table[bucketIndex(key)];
+        if (node != null) {
+            if (keysEquals(node,key)) {
+                return node.value;
+            } else {
+                return searchForCollision(node, key);
             }
         }
         return null;
     }
 
-    private void resizeTable() {
-        Node<K,V>[] newTable;
-        if (size > threshold) {
-            capacity = capacity * 2;
-            threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
-            newTable = (Node<K,V>[])new MyHashMap.Node[capacity];
-            reHashNodes(newTable);
-
-        } else {
-            makeNewEmptyTable();
-        }
-    }
-
-    private void reHashNodes(Node<K,V>[] newTable) {
-        for (Node<K, V> node : table) {
-            if (node != null) {
-                if (node.next == null) {
-                    putInNewIndex(node,newTable);
-                } else {
-                    while (node != null) {
-                        putInNewIndex(node,newTable);
-                        node = node.next;
-                    }
-                }
+    private void resize() {
+        size = 0;
+        Node<K,V>[] oldTable = table;
+        table = (Node<K,V>[])new MyHashMap.Node[table.length * 2];
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
+        for (Node<K,V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
-        table = newTable;
-    }
-
-    private void makeNewEmptyTable() {
-        capacity = DEFAULT_INITIAL_CAPACITY;
-        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
-        table = (Node<K,V>[])new MyHashMap.Node[capacity];
     }
 
     private boolean nodeBusyAndKeysEquals(K key) {
@@ -95,7 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 && !(table[bucketIndex(key)].key.equals(key));
     }
 
-    private void keyNullCase(V value) {
+    private void whenKeyNull(V value) {
         Node<K,V> node = table[0];
         if (node != null) {
             if (node.key == null && node.next == null) {
@@ -142,32 +122,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void putInNewIndex(Node<K,V> kvNode, Node<K,V>[] newTable) {
-        Node<K,V> node = newTable[bucketIndex(kvNode.key)];
-        if (node == null) {
-            node = addNode(kvNode.key, kvNode.value);
-        } else if (node.next == null) {
-            node.next = addNode(kvNode.key, kvNode.value);
-        } else {
-            node = newTable[bucketIndex(kvNode.key)].next;
-            while (node != null) {
-                if (node.next == null) {
-                    node.next = addNode(kvNode.key, kvNode.value);
-                    return;
-                }
-                node = node.next;
-            }
-        }
-        newTable[bucketIndex(kvNode.key)] = node;
-    }
-
     @Override
     public int getSize() {
         return size;
     }
 
     private int bucketIndex(K key) {
-        int hash = key == null ? 0 : key.hashCode() % capacity;
+        int hash = key == null ? 0 : key.hashCode() % table.length;
         return hash > 0 ? hash : -hash;
     }
 
