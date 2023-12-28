@@ -26,7 +26,7 @@ public class MyHashMapTest {
     public void getByNonExistedKey() {
         MyMap<Car, Integer> myHashMap = new MyHashMap<>();
         Assert.assertNull("Test failed! If key doesn't exist, we should return null.",
-                myHashMap.getValue(firstCar));
+            myHashMap.getValue(firstCar));
     }
 
     @Test
@@ -37,17 +37,17 @@ public class MyHashMapTest {
         myHashMap.put(thirdCar, 1);
 
         Assert.assertEquals("Test failed! The size isn't correct. Expected 3 but was "
-                + myHashMap.getSize(), 3, myHashMap.getSize());
+            + myHashMap.getSize(), 3, myHashMap.getSize());
 
         Integer firstActualValue = myHashMap.getValue(firstCar);
         Integer secondActualValue = myHashMap.getValue(secondCar);
         Integer thirdActualValue = myHashMap.getValue(thirdCar);
         Assert.assertEquals("Test failed! HashMap expects to contain value 3 for key `firstCar`,"
-                + " but was " + firstActualValue, Integer.valueOf(3), firstActualValue);
+            + " but was " + firstActualValue, Integer.valueOf(3), firstActualValue);
         Assert.assertEquals("Test failed! HashMap expects to contain value 5 for key `secondCar`,"
-                + " but was " + secondActualValue, Integer.valueOf(5), secondActualValue);
+            + " but was " + secondActualValue, Integer.valueOf(5), secondActualValue);
         Assert.assertEquals("Test failed! HashMap expects to contain value 1 for key `thirdCar`,"
-                + " but was " + thirdActualValue, Integer.valueOf(1), thirdActualValue);
+            + " but was " + thirdActualValue, Integer.valueOf(1), thirdActualValue);
     }
 
     @Test
@@ -61,17 +61,17 @@ public class MyHashMapTest {
         myHashMap.put(sameThirdCar, 1);
 
         Assert.assertEquals("Test failed! We should add checking if the same element "
-                + "exists in the map", 3, myHashMap.getSize());
+            + "exists in the map", 3, myHashMap.getSize());
 
         Integer firstActualValue = myHashMap.getValue(firstCar);
         Integer secondActualValue = myHashMap.getValue(secondCar);
         Integer thirdActualValue = myHashMap.getValue(thirdCar);
         Assert.assertEquals("Test failed! HashMap expects to contain value 3 for key `firstCar`,"
-                + " but was " + firstActualValue, Integer.valueOf(3), firstActualValue);
+            + " but was " + firstActualValue, Integer.valueOf(3), firstActualValue);
         Assert.assertEquals("Test failed! HashMap expects to contain value 5 for key `secondCar`,"
-                + " but was " + secondActualValue, Integer.valueOf(5), secondActualValue);
+            + " but was " + secondActualValue, Integer.valueOf(5), secondActualValue);
         Assert.assertEquals("Test failed! HashMap expects to contain value 1 for key `thirdCar`,"
-                + " but was " + thirdActualValue, Integer.valueOf(1), thirdActualValue);
+            + " but was " + thirdActualValue, Integer.valueOf(1), thirdActualValue);
     }
 
     @Test
@@ -80,15 +80,15 @@ public class MyHashMapTest {
         myHashMap.put(null, 3);
         Integer firstActualValue = myHashMap.getValue(null);
         Assert.assertEquals("Test failed! HashMap expects to contain value 3 for null key,"
-                + " but was " + firstActualValue, Integer.valueOf(3), firstActualValue);
+            + " but was " + firstActualValue, Integer.valueOf(3), firstActualValue);
         Assert.assertEquals("Test failed! The size isn't correct. Expected 1 but was "
-                + myHashMap.getSize(), 1, myHashMap.getSize());
+            + myHashMap.getSize(), 1, myHashMap.getSize());
         myHashMap.put(null, 5);
         Integer secondActualValue = myHashMap.getValue(null);
         Assert.assertEquals("Test failed! HashMap expects to contain value 5  for null key,"
-                + " but was " + secondActualValue, Integer.valueOf(5), secondActualValue);
+            + " but was " + secondActualValue, Integer.valueOf(5), secondActualValue);
         Assert.assertEquals("Test failed! The size isn't correct. Expected 1 but was "
-                + myHashMap.getSize(), 1, myHashMap.getSize());
+            + myHashMap.getSize(), 1, myHashMap.getSize());
     }
 
     @Test
@@ -99,17 +99,17 @@ public class MyHashMapTest {
         myHashMap.put(thirdPlane, 1);
 
         Assert.assertEquals("Test failed! The size isn't correct. Expected 3 but was "
-                + myHashMap.getSize(), 3, myHashMap.getSize());
+            + myHashMap.getSize(), 3, myHashMap.getSize());
 
         Integer firstActualValue = myHashMap.getValue(firstPlane);
         Integer secondActualValue = myHashMap.getValue(secondPlane);
         Integer thirdActualValue = myHashMap.getValue(thirdPlane);
         Assert.assertEquals("Test failed! HashMap expects to contain value 3 for key `firstPlane`,"
-                + " but was " + firstActualValue, Integer.valueOf(3), firstActualValue);
+            + " but was " + firstActualValue, Integer.valueOf(3), firstActualValue);
         Assert.assertEquals("Test failed! HashMap expects to contain value 5 for key `secondPlane`,"
-                + " but was " + secondActualValue, Integer.valueOf(5), secondActualValue);
+            + " but was " + secondActualValue, Integer.valueOf(5), secondActualValue);
         Assert.assertEquals("Test failed! HashMap expects to contain value 1 for key `thirdPlane`,"
-                + " but was " + thirdActualValue, Integer.valueOf(1), thirdActualValue);
+            + " but was " + thirdActualValue, Integer.valueOf(1), thirdActualValue);
     }
 
     @Test
@@ -121,17 +121,17 @@ public class MyHashMapTest {
         myHashMap.put(firstPlane, 4);
 
         Assert.assertEquals("Test failed! The size isn't correct. Expected 3 but was "
-                + myHashMap.getSize(), 3, myHashMap.getSize());
+            + myHashMap.getSize(), 3, myHashMap.getSize());
 
         Integer firstActualValue = myHashMap.getValue(firstPlane);
         Integer secondActualValue = myHashMap.getValue(secondPlane);
         Integer thirdActualValue = myHashMap.getValue(thirdPlane);
         Assert.assertEquals("Test failed! HashMap expects to contain value 3 for key `firstPlane`,"
-                + " but was " + firstActualValue, Integer.valueOf(4), firstActualValue);
+            + " but was " + firstActualValue, Integer.valueOf(4), firstActualValue);
         Assert.assertEquals("Test failed! HashMap expects to contain value 5 for key `secondPlane`,"
-                + " but was " + secondActualValue, Integer.valueOf(5), secondActualValue);
+            + " but was " + secondActualValue, Integer.valueOf(5), secondActualValue);
         Assert.assertEquals("Test failed! HashMap expects to contain value 1 for key `thirdPlane`,"
-                + " but was " + thirdActualValue, Integer.valueOf(1), thirdActualValue);
+            + " but was " + thirdActualValue, Integer.valueOf(1), thirdActualValue);
     }
 
     @Test
@@ -144,20 +144,20 @@ public class MyHashMapTest {
         myHashMap.put(thirdBus, 1);
 
         Assert.assertEquals("Test failed! The size isn't correct. Expected 4 but was "
-                + myHashMap.getSize(), 4, myHashMap.getSize());
+            + myHashMap.getSize(), 4, myHashMap.getSize());
 
         Integer firstActualValue = myHashMap.getValue(firstBus);
         Integer secondActualValue = myHashMap.getValue(secondBus);
         Integer thirdActualValue = myHashMap.getValue(thirdBus);
         Integer fourthActualValue = myHashMap.getValue(null);
         Assert.assertEquals("Test failed! HashMap expects to contain value 3 for key `firstBus`,"
-                + " but was " + firstActualValue, Integer.valueOf(3), firstActualValue);
+            + " but was " + firstActualValue, Integer.valueOf(3), firstActualValue);
         Assert.assertEquals("Test failed! HashMap expects to contain value 5 for key `secondBus`,"
-                + " but was " + secondActualValue, Integer.valueOf(5), secondActualValue);
+            + " but was " + secondActualValue, Integer.valueOf(5), secondActualValue);
         Assert.assertEquals("Test failed! HashMap expects to contain value 1 for key `thirdBus`,"
-                + " but was " + thirdActualValue, Integer.valueOf(1), thirdActualValue);
+            + " but was " + thirdActualValue, Integer.valueOf(1), thirdActualValue);
         Assert.assertEquals("Test failed! HashMap expects to contain value 10 for null key,"
-                + " but was " + fourthActualValue, Integer.valueOf(10), fourthActualValue);
+            + " but was " + fourthActualValue, Integer.valueOf(10), fourthActualValue);
     }
 
     @Test
@@ -165,16 +165,16 @@ public class MyHashMapTest {
         MyMap<Car, Integer> myHashMap = new MyHashMap<>();
         myHashMap.put(firstCar, 3);
         Assert.assertEquals("Test failed! The size isn't correct. Expected 1 but was "
-                + myHashMap.getSize(), 1, myHashMap.getSize());
+            + myHashMap.getSize(), 1, myHashMap.getSize());
         Integer firstActualValue = myHashMap.getValue(firstCar);
         Assert.assertEquals("Test failed! HashMap expects to contain value 3 for key `firstCar`,"
-                + " but was " + firstActualValue, Integer.valueOf(3), firstActualValue);
+            + " but was " + firstActualValue, Integer.valueOf(3), firstActualValue);
         myHashMap.put(firstCar, 5);
         Assert.assertEquals("Test failed! The size isn't correct. Expected 1 but was "
-                + myHashMap.getSize(), 1, myHashMap.getSize());
+            + myHashMap.getSize(), 1, myHashMap.getSize());
         Integer secondActualValue = myHashMap.getValue(firstCar);
         Assert.assertEquals("Test failed! HashMap expects to contain value 5  for key `firstCar`,"
-                + " but was " + secondActualValue, Integer.valueOf(5), secondActualValue);
+            + " but was " + secondActualValue, Integer.valueOf(5), secondActualValue);
     }
 
     @Test
@@ -185,10 +185,10 @@ public class MyHashMapTest {
             myHashMap.put(car, i);
         }
         Assert.assertEquals("Test failed! The size isn't correct. Expected 1000 but was "
-                + myHashMap.getSize(), 1000, myHashMap.getSize());
+            + myHashMap.getSize(), 1000, myHashMap.getSize());
         for (int i = 0; i < 1000; i++) {
             Assert.assertEquals(Integer.valueOf(i),
-                    myHashMap.getValue(new Car("model_" + i, "color_" + i)));
+                myHashMap.getValue(new Car("model_" + i, "color_" + i)));
         }
     }
 
@@ -196,7 +196,7 @@ public class MyHashMapTest {
     public void getSizeOfEmptyHashMap() {
         MyMap<Car, Integer> myHashMap = new MyHashMap<>();
         Assert.assertEquals("Test failed! The size isn't correct. Expected 0 but was "
-                + myHashMap.getSize(), 0, myHashMap.getSize());
+            + myHashMap.getSize(), 0, myHashMap.getSize());
     }
 
     @Test
@@ -205,7 +205,7 @@ public class MyHashMapTest {
         myHashMap.put(firstPlane, 3);
         myHashMap.put(secondPlane, 5);
         Assert.assertEquals("Test failed! The size isn't correct. Expected 2 but was "
-                + myHashMap.getSize(), 2, myHashMap.getSize());
+            + myHashMap.getSize(), 2, myHashMap.getSize());
     }
 
     @Test
@@ -216,10 +216,10 @@ public class MyHashMapTest {
             myHashMap.put(bus, i);
         }
         Assert.assertEquals("Test failed! The size isn't correct. Expected 1000 but was "
-                + myHashMap.getSize(), 1000, myHashMap.getSize());
+            + myHashMap.getSize(), 1000, myHashMap.getSize());
         for (int i = 0; i < 1000; i++) {
             Assert.assertEquals(Integer.valueOf(i),
-                    myHashMap.getValue(new Bus("model_" + i, "color_" + i)));
+                myHashMap.getValue(new Bus("model_" + i, "color_" + i)));
         }
     }
 
@@ -231,10 +231,10 @@ public class MyHashMapTest {
             myHashMap.put(plane, i);
         }
         Assert.assertEquals("Test failed! The size isn't correct. Expected 1000 but was "
-                + myHashMap.getSize(), 1000, myHashMap.getSize());
+            + myHashMap.getSize(), 1000, myHashMap.getSize());
         for (int i = 0; i < 1000; i++) {
             Assert.assertEquals(Integer.valueOf(i),
-                    myHashMap.getValue(new Plane("model_" + i, "color_" + i)));
+                myHashMap.getValue(new Plane("model_" + i, "color_" + i)));
         }
     }
 
@@ -249,7 +249,7 @@ public class MyHashMapTest {
             }
         }
         Assert.assertEquals("Class MyHashMap shouldn't consist more then one array as a field",
-                1, count);
+            1, count);
     }
 
     @Test
@@ -261,7 +261,7 @@ public class MyHashMapTest {
         }
         for (int i = 0; i < 14; i++) {
             Assert.assertEquals(Integer.valueOf(i),
-                    myHashMap.getValue(new Car("model_" + i, "color_" + i)));
+                myHashMap.getValue(new Car("model_" + i, "color_" + i)));
         }
         Field[] declaredFields = myHashMap.getClass().getDeclaredFields();
         for (Field field : declaredFields) {
@@ -269,7 +269,7 @@ public class MyHashMapTest {
                 field.setAccessible(true);
                 int length = Array.getLength(field.get(myHashMap));
                 Assert.assertEquals("After first resizing, length of array should be " + 32,
-                        32, length);
+                    32, length);
             }
         }
     }
