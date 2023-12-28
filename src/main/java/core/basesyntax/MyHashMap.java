@@ -1,5 +1,9 @@
 package core.basesyntax;
 
+import static java.util.Objects.hash;
+
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
@@ -19,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[bucketIndex] == null) {
             add(newNode, bucketIndex);
         } else {
-            put(newNode, bucketIndex);
+            putNew(newNode, bucketIndex);
         }
         if (size >= threshold) {
             resize();
@@ -44,12 +48,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void add(Node<K, V> node, int bucketIndex) {
+    public void add(Node<K, V> node, int bucketIndex) {
         table[bucketIndex] = node;
         size++;
     }
 
-    private void putNew(Node<K, V> node, int bucketIndex) {
+    public void putNew(Node<K, V> node, int bucketIndex) {
         Node<K, V> currentNode = table[bucketIndex];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, node.key)) {
@@ -64,7 +68,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int calculateIndex(K key) {
+    public int calculateIndex(K key) {
         if (key == null) {
             return 0;
         } else {
@@ -72,7 +76,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void resize() {
+    public void resize() {
         final Node<K, V> oldTable = table;
         int length = table.length;
         int currentCapacity = 2 * length;
@@ -82,11 +86,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         transfer(oldTable);
     }
 
-    private void transfer(Node<K, V>[] table) {
-        for (Node<K, V> each : table) {
-            while (each != null) {
-                put(each.key, each.value);
-                each = each.next;
+    public void transfer(Node<K, V>[] table) {
+        for (Node<K, V> node : table) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
             }
         }
     }
