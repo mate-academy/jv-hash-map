@@ -81,7 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int length = table.length;
         int currentCapacity = 2 * length;
         table = new Node[currentCapacity];
-        threshold =  2 * threshold;
+        threshold *= 2;
         size = 0;
         transfer(oldTable);
     }
