@@ -1,48 +1,49 @@
 package core.basesyntax;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
-    private List<Entry<K, V>>[] table;
+    private static final double LOAD_FACTOR = 0.75;
+    private Entry<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        this.table = new ArrayList[INITIAL_CAPACITY];
-        this.size = 0;
+        table = new Entry[INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        int hash = hash(key);
-        int index = getIndex(hash);
+        int index = getIndex(key);
         if (table[index] == null) {
-            table[index] = new ArrayList<>();
-        }
-        for (Entry<K, V> entry : table[index]) {
-            if (isEqual(entry.getKey(), key)) {
-                entry.setValue(value);
-                return;
+            table[index] = new Entry<>(key, value);
+            size++;
+        } else {
+            Entry<K, V> current = table[index];
+            while (current != null) {
+                if (isEqual(current.key, key)) {
+                    current.value = value;
+                    return;
+                }
+                current = current.next;
             }
+            Entry<K, V> newEntry = new Entry<>(key, value);
+            newEntry.next = table[index];
+            table[index] = newEntry;
+            size++;
         }
-        table[index].add(new Entry<>(key, value));
-        size++;
-        if (size > table.length * 0.75) {
+        if (size > table.length * LOAD_FACTOR) {
             rehash();
         }
     }
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key);
-        int index = getIndex(hash);
-        if (table[index] != null) {
-            for (Entry<K, V> entry : table[index]) {
-                if (isEqual(entry.getKey(), key)) {
-                    return entry.getValue();
-                }
+        int index = getIndex(key);
+        Entry<K, V> current = table[index];
+        while (current != null) {
+            if (isEqual(current.key, key)) {
+                return current.value;
             }
+            current = current.next;
         }
         return null;
     }
@@ -56,19 +57,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : key.hashCode();
     }
 
-    private int getIndex(int hash) {
-        return (hash & 0x7FFFFFFF) % table.length;
+    private int getIndex(K key) {
+        return hash(key) & (table.length - 1);
     }
 
     private void rehash() {
-        List<Entry<K, V>>[] oldTable = table;
-        table = new ArrayList[2 * oldTable.length];
+        Entry<K, V>[] oldTable = table;
+        table = new Entry[2 * oldTable.length];
         size = 0;
-        for (List<Entry<K, V>> bucket : oldTable) {
-            if (bucket != null) {
-                for (Entry<K, V> entry : bucket) {
-                    put(entry.getKey(), entry.getValue());
-                }
+        for (Entry<K, V> entry : oldTable) {
+            while (entry != null) {
+                put(entry.key, entry.value);
+                entry = entry.next;
             }
         }
     }
@@ -83,22 +83,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Entry<K, V> {
         private final K key;
         private V value;
+        private Entry<K, V> next;
 
         public Entry(K key, V value) {
             this.key = key;
             this.value = value;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
+            this.next = null;
         }
     }
 }
