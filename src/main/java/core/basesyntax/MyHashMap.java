@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import static java.util.Objects.hash;
-
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
