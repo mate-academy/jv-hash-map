@@ -14,10 +14,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR);
     }
 
-    public MyHashMap(int initialCapacity, float loadFactor) {
-        this.capacity = initialCapacity;
-        this.loadFactor = loadFactor;
-        this.table = new Node[capacity];
+    public MyHashMap(int initialCapacity, float initialLoadFactor) {
+        capacity = initialCapacity;
+        loadFactor = initialLoadFactor;
+        table = new Node[capacity];
     }
 
     @Override
@@ -66,7 +66,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public int getSize() {
         return size;
     }
-    /* ------- private methods ------- */
 
     private void putForNullKey(V value) {
         Node<K, V> nullKeyNode = table[0];
@@ -110,7 +109,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resizeTable() {
-        int newCapacity = capacity * INCREASE_FACTOR;
+        int newCapacity = table.length * INCREASE_FACTOR;
         Node<K, V>[] newTable = new Node[newCapacity];
         for (Node<K, V> oldNode : table) {
             while (oldNode != null) {
