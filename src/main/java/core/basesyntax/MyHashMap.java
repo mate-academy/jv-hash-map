@@ -25,8 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             buckets[index] = bucket;
         }
         for (Entry<K, V> entry : bucket) {
-            if (key == null && entry.key == null
-                    || key != null && key.equals(entry.key)) {
+            if (keysEqual(key, entry.key)) {
                 entry.value = value;
                 return;
             }
@@ -41,8 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         List<Entry<K, V>> bucket = buckets[index];
         if (bucket != null) {
             for (Entry<K, V> entry : bucket) {
-                if (key == null && entry.key == null
-                        || key != null && key.equals(entry.key)) {
+                if (keysEqual(key, entry.key)) {
                     return entry.value;
                 }
             }
@@ -68,12 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             for (List<Entry<K, V>> bucket : oldBuckets) {
                 if (bucket != null) {
                     for (Entry<K, V> entry : bucket) {
-                        int index = getIndexFromKey(entry.key.hashCode(), newCapacity);
-                        if (buckets[index] == null) {
-                            buckets[index] = new ArrayList<>();
-                        }
-                        buckets[index].add(entry);
-                        size++;
+                        put(entry.key, entry.value);
                     }
                 }
             }
@@ -82,6 +75,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static <K, V> int getIndexFromKey(int key, int newCapacity) {
         return Math.abs(key) % newCapacity;
+    }
+
+    private boolean keysEqual(K key1, K key2) {
+        return key1 == null ? key2 == null : key1.equals(key2);
     }
 
     private static class Entry<K, V> {
