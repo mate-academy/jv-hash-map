@@ -5,24 +5,20 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
     private static final int BASE_CAPACITY = 16;
-    private int capacity;
-    private int threshold;
     private int size;
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        capacity = BASE_CAPACITY;
-        threshold = (int) (capacity * LOAD_FACTOR);
         size = 0;
-        table = new Node[capacity];
+        table = new Node[BASE_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if ((size + 1) > threshold) {
+        if ((size + 1) > table.length * LOAD_FACTOR) {
             resize();
         }
-        if (putNode(key, value, table, capacity)) {
+        if (putNode(key, value, table)) {
             size++;
         }
     }
@@ -30,13 +26,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int hashKey = key == null ? 0 : Math.abs(key.hashCode());
-        Node<K, V> currentNode = table[hashKey % capacity];
+        Node<K, V> currentNode = table[hashKey % table.length];
+
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.nextNode;
         }
+
         return null;
     }
 
@@ -46,21 +44,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        capacity = capacity << 1;
-        threshold = threshold << 1;
+        int newCapacity = table.length << 1;
 
-        Node<K, V>[] newTable = new Node[capacity];
+        Node<K, V>[] newTable = new Node[newCapacity];
 
         for (Node<K, V> node : table) {
             while (node != null) {
-                putNode(node.key, node.value, newTable, capacity);
+                putNode(node.key, node.value, newTable);
                 node = node.nextNode;
             }
         }
         table = newTable;
     }
 
-    private boolean putNode(K key, V value, Node<K, V>[] currentTable, int capacity) {
+    private boolean putNode(K key, V value, Node<K, V>[] currentTable) {
+        int capacity = currentTable.length;
         Node<K, V> node = new Node<>(key, value, null);
         Node<K, V> currentNode = currentTable[node.hash % capacity];
 
