@@ -12,13 +12,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        this.buckets = new ArrayList[DEFAULT_CAPACITY];
+        buckets = new ArrayList[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         ensureCapacity();
-        int index = Math.abs(hash(key)) % buckets.length;
+        int index = getIndexFromKey(hash(key), buckets.length);
         List<Entry<K, V>> bucket = buckets[index];
         if (bucket == null) {
             bucket = new ArrayList<>();
@@ -37,12 +37,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = Math.abs(hash(key)) % buckets.length;
+        int index = getIndexFromKey(hash(key), buckets.length);
         List<Entry<K, V>> bucket = buckets[index];
         if (bucket != null) {
             for (Entry<K, V> entry : bucket) {
-                if ((key == null && entry.key == null)
-                        || (key != null && key.equals(entry.key))) {
+                if (key == null && entry.key == null
+                        || key != null && key.equals(entry.key)) {
                     return entry.value;
                 }
             }
@@ -62,31 +62,33 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void ensureCapacity() {
         if ((double) size / buckets.length > LOAD_FACTOR) {
             int newCapacity = buckets.length * GROW_FACTOR;
-            List<Entry<K, V>>[] newBuckets = new ArrayList[newCapacity];
-            getIndexFromKey(newBuckets, newCapacity);
-            buckets = newBuckets;
-        }
-    }
-
-    private void getIndexFromKey(List<Entry<K, V>>[] newBuckets, int newCapacity) {
-        for (List<Entry<K, V>> bucket : buckets) {
-            if (bucket != null) {
-                for (Entry<K, V> entry : bucket) {
-                    int index = Math.abs(entry.key.hashCode()) % newCapacity;
-                    if (newBuckets[index] == null) {
-                        newBuckets[index] = new ArrayList<>();
+            List<Entry<K, V>>[] oldBuckets = buckets;
+            buckets = new ArrayList[newCapacity];
+            size = 0;
+            for (List<Entry<K, V>> bucket : oldBuckets) {
+                if (bucket != null) {
+                    for (Entry<K, V> entry : bucket) {
+                        int index = getIndexFromKey(entry.key.hashCode(), newCapacity);
+                        if (buckets[index] == null) {
+                            buckets[index] = new ArrayList<>();
+                        }
+                        buckets[index].add(entry);
+                        size++;
                     }
-                    newBuckets[index].add(entry);
                 }
             }
         }
+    }
+
+    private static <K, V> int getIndexFromKey(int key, int newCapacity) {
+        return Math.abs(key) % newCapacity;
     }
 
     private static class Entry<K, V> {
         private final K key;
         private V value;
 
-        public Entry(K key, V value) {
+        Entry(K key, V value) {
             this.key = key;
             this.value = value;
         }
