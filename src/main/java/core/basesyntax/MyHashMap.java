@@ -17,11 +17,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             putForNullKey(value);
             return;
         }
-        int hash = hash(key.hashCode());
+        int hash = hash(key);
         int index = indexFor(hash, table.length);
 
         for (Entry<K, V> entry = table[index]; entry != null; entry = entry.next) {
-            if ((entry.hash == hash) && (key.equals(entry.key))) {
+            if (key.equals(entry.key)) {
                 entry.value = value;
                 return;
             }
@@ -35,11 +35,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return getForNullKey();
         }
-        int hash = hash(key.hashCode());
+        int hash = hash(key);
         int index = indexFor(hash, table.length);
 
         for (Entry<K, V> entry = table[index]; entry != null; entry = entry.next) {
-            if ((entry.hash == hash) && (key.equals(entry.key))) {
+            if ((key.equals(entry.key))) {
                 return entry.value;
             }
         }
@@ -72,7 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void addEntry(int hash, K key, V value, int bucketIndex) {
         Entry<K, V> entry = table[bucketIndex];
-        table[bucketIndex] = new Entry<>(hash, key, value, entry);
+        table[bucketIndex] = new Entry<>(key, value, entry);
         size++;
 
         if (size > (DEFAULT_LOAD_FACTOR * table.length)) {
@@ -96,7 +96,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 src[j] = null;
                 do {
                     Entry<K, V> next = entry.next;
-                    int i = indexFor(entry.hash, newCapacity);
+                    int i = indexFor(hash(entry.key), newCapacity);
                     entry.next = newTable[i];
                     newTable[i] = entry;
                     entry = next;
@@ -105,23 +105,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    static final int hash(int h) {
-        h ^= (h >>> 20) ^ (h >>> 12);
-        return h ^ (h >>> 7) ^ (h >>> 4);
+    private int hash(K key) {
+        return key == null ? 0 : key.hashCode();
     }
 
-    static int indexFor(int h, int length) {
+    private int indexFor(int h, int length) {
         return h & (length - 1);
     }
 
     static class Entry<K, V> {
-        private final int hash;
+        private Entry<K, V> next;
         private final K key;
         private V value;
-        private Entry<K, V> next;
 
-        Entry(int hash, K key, V value, Entry<K, V> next) {
-            this.hash = hash;
+        Entry(K key, V value, Entry<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
