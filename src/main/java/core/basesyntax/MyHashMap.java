@@ -3,18 +3,18 @@ package core.basesyntax;
 import java.util.LinkedList;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private LinkedList<Node<K, V>>[] table;
     private static final int MULTIPLAYER_CAPACITY = 2;
-    private static final double LOAD_FACTOR = 0.75;
     private static final int DEFAULT_CAPACITY = 16;
+    private static final double LOAD_FACTOR = 0.75;
+    private LinkedList<Node<K, V>>[] table;
     private int size;
 
     public MyHashMap() {
         table = new LinkedList[DEFAULT_CAPACITY];
     }
-    @Override
-    public void Node() {
 
+    @Override
+    public void node() {
     }
 
     @Override
@@ -24,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = new LinkedList<>();
         }
         for (Node<K, V> entry : table[index]) {
-            if (entry.key == null && key == null){
+            if (entry.key == null && key == null) {
                 entry.value = value;
                 return;
             } else if (entry.key == null) {
@@ -47,7 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         LinkedList<Node<K, V>> bucket = table[index];
         if (bucket != null) {
             for (Node<K, V> entry : bucket) {
-                if (entry.key == null && key == null){
+                if (entry.key == null && key == null) {
                     return entry.value;
                 } else if (entry.key == null) {
                     continue;
@@ -70,7 +70,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             index = 0;
         } else {
             index = key.hashCode() % table.length;
-            if (index < 0) index *= -1;
+            if (index < 0) {
+                index *= -1;
+            }
         }
         return index;
     }
