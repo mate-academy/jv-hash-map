@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -9,44 +11,48 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        this.table = new Entry[DEFAULT_INITIAL_CAPACITY];
+        table = new Entry[DEFAULT_INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (key == null) {
-            putForNullKey(value);
-            return;
-        }
-
-        int hash = hash(key);
-        int index = indexFor(hash, table.length);
+        int index = (isNullKey(key)) ? 0 : getIndex(key);
 
         for (Entry<K, V> entry = table[index]; entry != null; entry = entry.next) {
-            if ((entry.hash == hash) && (key == entry.key || key.equals(entry.key))) {
-                entry.value = value; // Update the value if key already exists
+            if ((isNullKey(key) && isNullKey(entry.key))
+                    || (!isNullKey(key) && key.equals(entry.key))) {
+                entry.value = value;
                 return;
             }
         }
-        addEntry(hash, key, value, index);
+
+        addEntry(key, value, index);
+    }
+
+    private boolean isNullKey(K key) {
+        return key == null;
+    }
+
+    private int getIndex(K key) {
+        int hash = hash(key);
+        return indexFor(hash, table.length);
     }
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
+        if (isNullKey(key)) {
             return getForNullKey();
         }
 
-        int hash = hash(key);
-        int index = indexFor(hash, table.length);
+        int index = getIndex(key);
 
         for (Entry<K, V> entry = table[index]; entry != null; entry = entry.next) {
-            if ((entry.hash == hash) && (key == entry.key || key.equals(entry.key))) {
-                return entry.value; // Return the value if key is found
+            if (key.equals(entry.key)) {
+                return entry.value;
             }
         }
 
-        return null; // Return null if key is not found
+        return null;
     }
 
     @Override
@@ -54,44 +60,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    // method to handle null key
-    private void putForNullKey(V value) {
-        for (Entry<K, V> entry = table[0]; entry != null; entry = entry.next) {
-            if (entry.key == null) {
-                entry.value = value; // Update the value if null key already exists
-                return;
-            }
-        }
-        addEntry(0, null, value, 0);
-    }
-
-    // method to handle null key
     private V getForNullKey() {
         for (Entry<K, V> entry = table[0]; entry != null; entry = entry.next) {
             if (entry.key == null) {
-                return entry.value; // Return the value if null key is found
+                return entry.value;
             }
         }
-        return null; // Return null if null key is not found
+        return null;
     }
 
-    // method to calculate hash
     private int hash(Object key) {
         return key == null ? 0 : key.hashCode();
     }
 
-    // method to calculate index for the given hash and table length
     private int indexFor(int hash, int length) {
         return hash & (length - 1);
     }
 
-    // method to add a new entry to the table
-    private void addEntry(int hash, K key, V value, int index) {
+    private void addEntry(K key, V value, int index) {
         Entry<K, V> entry = table[index];
-        table[index] = new Entry<>(hash, key, value, entry);
+        table[index] = new Entry<>(key, value, entry);
         size++;
 
-        // Check if resizing is needed
         if (size > table.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
@@ -104,7 +94,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Entry<K, V> entry : table) {
             while (entry != null) {
                 Entry<K, V> next = entry.next;
-                int index = indexFor(entry.hash, newCapacity);
+                int index = indexFor(hash(entry.key), newCapacity);
                 entry.next = newTable[index];
                 newTable[index] = entry;
                 entry = next;
@@ -114,16 +104,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     static class Entry<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Entry<K, V> next;
 
-        Entry(int hash, K key, V value, Entry<K, V> next) {
-            this.hash = hash;
+        Entry(K key, V value, Entry<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
+            Entry<?, ?> entry = (Entry<?, ?>) obj;
+            return Objects.equals(key, entry.key)
+                    && Objects.equals(value, entry.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(key, value);
         }
     }
 }
