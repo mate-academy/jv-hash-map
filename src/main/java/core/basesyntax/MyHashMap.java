@@ -25,17 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
         }
-
         addEntry(key, value, index);
-    }
-
-    private boolean isNullKey(K key) {
-        return key == null;
-    }
-
-    private int getIndex(K key) {
-        int hash = hash(key);
-        return indexFor(hash, table.length);
     }
 
     @Override
@@ -43,9 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (isNullKey(key)) {
             return getForNullKey();
         }
-
         int index = getIndex(key);
-
         for (Entry<K, V> entry = table[index]; entry != null; entry = entry.next) {
             if (key.equals(entry.key)) {
                 return entry.value;
@@ -58,6 +46,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private boolean isNullKey(K key) {
+        return key == null;
+    }
+
+    private int getIndex(K key) {
+        int hash = hash(key);
+        return indexFor(hash, table.length);
     }
 
     private V getForNullKey() {
@@ -81,7 +78,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Entry<K, V> entry = table[index];
         table[index] = new Entry<>(key, value, entry);
         size++;
-
         if (size > table.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
