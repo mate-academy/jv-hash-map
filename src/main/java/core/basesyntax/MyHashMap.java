@@ -2,7 +2,7 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final float GROW_FACTOR = 0.75f;
 
     private Entry<K, V>[] table;
     private int size;
@@ -17,17 +17,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             putForNullKey(value);
             return;
         }
-        int hash = hash(key);
-        int index = indexFor(hash, table.length);
-
-        for (Entry<K, V> entry = table[index]; entry != null; entry = entry.next) {
+        for (Entry<K, V> entry = table[calculateIndex(hash(key))];
+                entry != null; entry = entry.next) {
             if (key.equals(entry.key)) {
                 entry.value = value;
                 return;
             }
         }
-
-        addEntry(hash, key, value, index);
+        addEntry(hash(key), key, value, calculateIndex(hash(key)));
     }
 
     @Override
@@ -35,10 +32,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return getForNullKey();
         }
-        int hash = hash(key);
-        int index = indexFor(hash, table.length);
-
-        for (Entry<K, V> entry = table[index]; entry != null; entry = entry.next) {
+        for (Entry<K, V> entry = table[calculateIndex(hash(key))];
+                entry != null; entry = entry.next) {
             if ((key.equals(entry.key))) {
                 return entry.value;
             }
@@ -75,7 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table[bucketIndex] = new Entry<>(key, value, entry);
         size++;
 
-        if (size > (DEFAULT_LOAD_FACTOR * table.length)) {
+        if (size > (GROW_FACTOR * table.length)) {
             resize(2 * table.length);
         }
     }
@@ -109,11 +104,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : key.hashCode();
     }
 
-    private int indexFor(int h, int length) {
-        return h & (length - 1);
+    public int calculateIndex(int hash) {
+        return indexFor(hash, table.length);
     }
 
-    static class Entry<K, V> {
+    private int indexFor(int value, int length) {
+        return value & (length - 1);
+    }
+
+    private static class Entry<K, V> {
         private Entry<K, V> next;
         private final K key;
         private V value;
@@ -122,14 +121,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
         }
     }
 }
