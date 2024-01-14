@@ -1,24 +1,29 @@
 package core.basesyntax;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int MULTIPLAYER_CAPACITY = 2;
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
-    private LinkedList<Node<K, V>>[] table;
+    private List<Node<K, V>>[] table;
     private int size;
 
     public MyHashMap() {
-        table = new LinkedList[DEFAULT_CAPACITY];
+        table = new List[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
+        if ((double) size / table.length > LOAD_FACTOR) {
+            resize();
+        }
         int index = getHashIndex(key);
         if (table[index] == null) {
-            table[index] = new LinkedList<>();
+            table[index] = new ArrayList<>();
         }
         for (Node<K, V> node : table[index]) {
             if (Objects.equals(key, node.key)) {
@@ -28,15 +33,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         table[index].add(new Node<>(key, value));
         size++;
-        if ((double) size / table.length > LOAD_FACTOR) {
-            resize();
-        }
     }
 
     @Override
     public V getValue(K key) {
         int index = getHashIndex(key);
-        LinkedList<Node<K, V>> bucket = table[index];
+        List<Node<K, V>> bucket = table[index];
         if (bucket != null) {
             for (Node<K, V> entry : bucket) {
                 if (Objects.equals(entry.key, key)) {
@@ -67,13 +69,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         int newCapacity = table.length * MULTIPLAYER_CAPACITY;
-        LinkedList<Node<K, V>>[] newTable = new LinkedList[newCapacity];
+        List<Node<K, V>>[] newTable = new List[newCapacity];
 
-        for (LinkedList<Node<K, V>> bucket : table) {
+        for (List<Node<K, V>> bucket : table) {
             if (bucket != null) {
                 for (Node<K, V> node : bucket) {
                     int newIndex = Math.abs(node.key.hashCode() % newCapacity);
-                    LinkedList<Node<K, V>> newBucket = newTable[newIndex];
+                    List<Node<K, V>> newBucket = newTable[newIndex];
                     if (newBucket == null) {
                         newBucket = new LinkedList<>();
                         newTable[newIndex] = newBucket;
@@ -88,6 +90,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Node<K, V> {
         private K key;
         private V value;
+        private Node<K, V> next;
 
         public Node(K key, V value) {
             this.key = key;
