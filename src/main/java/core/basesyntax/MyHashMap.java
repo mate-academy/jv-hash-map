@@ -1,23 +1,20 @@
 package core.basesyntax;
 
-import java.sql.Array;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private final static int DEFAULT_INITIAL_CAPACITY = 16;
-    private final static double DEFAULT_LOAD_FACTORY = 0.75;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final double DEFAULT_LOAD_FACTORY = 0.75;
     private int capacity;
     private int size;
     private int threshold;
-    private Node<K, V>[] testArray = new Node[]{};
-    private List<Node<K, V>> myHashMap;
+    private Node<K, V>[] myHashMap;
 
     private static class Node<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         public Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
@@ -29,8 +26,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         capacity = DEFAULT_INITIAL_CAPACITY;
-        myHashMap = new ArrayList<>();
-        fillNull(myHashMap);
+        myHashMap = new Node[capacity];
+        //fillNull(myHashMap);
         threshold = (int) (DEFAULT_LOAD_FACTORY * DEFAULT_INITIAL_CAPACITY);
     }
 
@@ -40,11 +37,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (checkSize()) {
             resize();
         }
-        if (myHashMap.get(node.hash) == null) {
-            myHashMap.set(node.hash, node);
+        if (myHashMap[node.hash] == null) {
+            myHashMap[node.hash] = node;
             size++;
         } else {
-            Node oldNode = myHashMap.get(node.hash);
+            Node oldNode = myHashMap[node.hash];
             while (oldNode.next != null) {
                 if (oldNode.key == null && node.key == null
                         || oldNode.key != null && oldNode.key.equals(node.key)) {
@@ -66,10 +63,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         V value = null;
-        if (myHashMap.get(hash(key)) == null) {
+        if (myHashMap[hash(key)] == null) {
             return null;
         }
-        Node<K, V> tempNode = myHashMap.get(hash(key));
+        Node<K, V> tempNode = myHashMap[hash(key)];
         while (tempNode != null) {
             if (tempNode.key == null && key == null
                     || tempNode.key != null && tempNode.key.equals(key)) {
@@ -101,13 +98,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         grow();
-        List<Node<K, V>> oldMap = myHashMap;
-        myHashMap = new ArrayList<>();
-        fillNull(myHashMap);
+        Node<K, V>[] oldMap = myHashMap;
+        myHashMap = new Node[capacity];
         Node<K, V> tempNode;
         size = 0;
-        for (int i = 0; i < oldMap.size(); i++) {
-            tempNode = oldMap.get(i);
+        for (int i = 0; i < oldMap.length; i++) {
+            tempNode = oldMap[i];
             if (tempNode != null) {
                 if (tempNode != null) {
                     while (tempNode != null) {
@@ -126,14 +122,3 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (DEFAULT_LOAD_FACTORY * capacity);
     }
 }
-
-/*
-Put
-1) Add if null
-2) Add if node
-3) change if key equals
-4) checkSize
-5) resize
-Get
-6) getValue
-*/
