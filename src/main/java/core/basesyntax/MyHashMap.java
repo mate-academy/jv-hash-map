@@ -111,7 +111,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean checkEquals(Object first, Object second) {
-        return first == null && second == null
-                || first != null && first.equals(second);
+        return first == second || first != null && first.equals(second);
     }
 }
