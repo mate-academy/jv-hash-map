@@ -25,7 +25,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         capacity = DEFAULT_INITIAL_CAPACITY;
         table = new Node[capacity];
-        //fillNull(myHashMap);
         threshold = (int) (DEFAULT_LOAD_FACTORY * DEFAULT_INITIAL_CAPACITY);
     }
 
@@ -41,15 +40,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node oldNode = table[node.hash];
             while (oldNode.next != null) {
-                if (oldNode.key == null && node.key == null
-                        || oldNode.key != null && oldNode.key.equals(node.key)) {
+                if (checkEquals(oldNode.key, key)) {
                     oldNode.value = node.value;
                     return;
                 }
                 oldNode = oldNode.next;
             }
-            if (oldNode.key == null && node.key == null
-                    || oldNode.key != null && oldNode.key.equals(node.key)) {
+            if (checkEquals(oldNode.key, key)) {
                 oldNode.value = node.value;
                 return;
             }
@@ -66,8 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K, V> tempNode = table[hash(key)];
         while (tempNode != null) {
-            if (tempNode.key == null && key == null
-                    || tempNode.key != null && tempNode.key.equals(key)) {
+            if (checkEquals(tempNode.key, key)) {
                 return tempNode.value;
             }
             tempNode = tempNode.next;
@@ -112,5 +108,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void grow() {
         capacity *= 2;
         threshold = (int) (DEFAULT_LOAD_FACTORY * capacity);
+    }
+
+    private boolean checkEquals(Object first, Object second) {
+        return first == null && second == null
+                || first != null && first.equals(second);
     }
 }
