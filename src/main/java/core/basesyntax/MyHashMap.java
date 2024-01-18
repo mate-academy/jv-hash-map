@@ -3,35 +3,20 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final double DEFAULT_LOAD_FACTORY = 0.75;
-    private int capacity;
+    private static final int CAPACITY_MULTIPLIER = 2;
     private int size;
     private int threshold;
     private Node<K, V>[] table;
 
-    private static class Node<K, V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     public MyHashMap() {
-        capacity = DEFAULT_INITIAL_CAPACITY;
-        table = new Node[capacity];
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
         threshold = (int) (DEFAULT_LOAD_FACTORY * DEFAULT_INITIAL_CAPACITY);
     }
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> node = new Node<>(hash(key), key, value, null);
-        if (checkSize()) {
+        Node<K, V> node = new Node<>(key, value, getIndex(key));
+        if (needToResize()) {
             resize();
         }
         if (table[node.hash] == null) {
@@ -58,10 +43,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         V value = null;
-        if (table[hash(key)] == null) {
+        if (table[getIndex(key)] == null) {
             return null;
         }
-        Node<K, V> tempNode = table[hash(key)];
+        Node<K, V> tempNode = table[getIndex(key)];
         while (tempNode != null) {
             if (checkEquals(tempNode.key, key)) {
                 return tempNode.value;
@@ -76,41 +61,50 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode()) % capacity;
+    public int getIndex(K key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
-    private boolean checkSize() {
-        return size + 1 > threshold;
-    }
+    private boolean needToResize() {
+        return size > threshold;
+    } // изменено
 
     private void resize() {
+        Node<K, V>[] oldTable = table.clone();
+        table = new Node[oldTable.length * CAPACITY_MULTIPLIER];
         grow();
-        Node<K, V>[] oldTable = table;
-        table = new Node[capacity];
         Node<K, V> tempNode;
         size = 0;
         for (int i = 0; i < oldTable.length; i++) {
             tempNode = oldTable[i];
             if (tempNode != null) {
-                if (tempNode != null) {
-                    while (tempNode != null) {
-                        put(tempNode.key, tempNode.value);
-                        tempNode = tempNode.next;
-                    }
-                } else {
+                while (tempNode != null) {
                     put(tempNode.key, tempNode.value);
+                    tempNode = tempNode.next;
                 }
             }
         }
     }
 
     private void grow() {
-        capacity *= 2;
-        threshold = (int) (DEFAULT_LOAD_FACTORY * capacity);
+        threshold = (int) (DEFAULT_LOAD_FACTORY * table.length);
     }
 
     private boolean checkEquals(Object first, Object second) {
         return first == second || first != null && first.equals(second);
+    }
+
+    private static class Node<K, V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value, int hash) {
+            this.key = key;
+            this.value = value;
+            this.hash = hash;
+            next = null;
+        }
     }
 }
