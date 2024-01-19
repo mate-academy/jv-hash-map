@@ -15,22 +15,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        Node<K, V> node = new Node<>(key, value, getIndex(key));
-        if (needToResize()) {
-            resize();
-        }
-        if (table[node.hash] == null) {
-            table[node.hash] = node;
+        Node<K, V> node = new Node<>(key, value);
+        resize();
+        if (table[getIndex(key)] == null) {
+            table[getIndex(key)] = node;
             size++;
         } else {
-            Node oldNode = table[node.hash];
-            while (oldNode.next != null) {
-                if (checkEquals(oldNode.key, key)) {
-                    oldNode.value = node.value;
-                    return;
-                }
-                oldNode = oldNode.next;
-            }
+            Node<K, V> oldNode = table[getIndex(key)];
+            oldNode = getRightNode(oldNode, key);
             if (checkEquals(oldNode.key, key)) {
                 oldNode.value = node.value;
                 return;
@@ -47,13 +39,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         Node<K, V> tempNode = table[getIndex(key)];
-        while (tempNode != null) {
-            if (checkEquals(tempNode.key, key)) {
-                return tempNode.value;
-            }
-            tempNode = tempNode.next;
-        }
-        return value;
+        tempNode = getRightNode(tempNode, key);
+        return tempNode.value;
     }
 
     @Override
@@ -67,20 +54,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private boolean needToResize() {
         return size > threshold;
-    } // изменено
+    }
 
     private void resize() {
-        Node<K, V>[] oldTable = table.clone();
-        table = new Node[oldTable.length * CAPACITY_MULTIPLIER];
-        grow();
-        Node<K, V> tempNode;
-        size = 0;
-        for (int i = 0; i < oldTable.length; i++) {
-            tempNode = oldTable[i];
-            if (tempNode != null) {
-                while (tempNode != null) {
-                    put(tempNode.key, tempNode.value);
-                    tempNode = tempNode.next;
+        if (needToResize()) {
+            Node<K, V>[] oldTable = new Node[table.length];
+            System.arraycopy(table, 0, oldTable, 0, table.length);
+            table = new Node[oldTable.length * CAPACITY_MULTIPLIER];
+            grow();
+            Node<K, V> tempNode;
+            size = 0;
+            for (int i = 0; i < oldTable.length; i++) {
+                tempNode = oldTable[i];
+                if (tempNode != null) {
+                    while (tempNode != null) {
+                        put(tempNode.key, tempNode.value);
+                        tempNode = tempNode.next;
+                    }
                 }
             }
         }
@@ -94,16 +84,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return first == second || first != null && first.equals(second);
     }
 
+    private Node<K, V> getRightNode(Node<K, V> node, K key) {
+        while (node.next != null) {
+            if (checkEquals(node.key, key)) {
+                return node;
+            }
+            node = node.next;
+        }
+        return node;
+    }
+
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, int hash) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.hash = hash;
             next = null;
         }
     }
