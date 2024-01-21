@@ -88,8 +88,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private V handleNullKey() {
-        int bucketIndex = 0;
-        LinkedList<Node<K, V>> bucket = bucketArray[bucketIndex];
+        LinkedList<Node<K, V>> bucket = bucketArray[0];
         if (bucket != null) {
             for (Node<K, V> node : bucket) {
                 if (node.key == null) {
