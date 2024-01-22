@@ -1,23 +1,19 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+    static final int DEFAULT_INITIAL_CAPACITY = 16;
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     static final int RESIZE_FACTOR = 2;
     private Node<K,V>[] table;
-    private int threshold;
     private int size;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size > threshold) {
-            resize();
-        }
+        resizeIfNeeded();
         putToTable(key, value);
     }
 
@@ -28,13 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (currentNode == null) {
             return null;
         }
-        do {
-            if (currentNode.key == key || currentNode.key != null && currentNode.key.equals(key)) {
-                return currentNode.value;
-            }
-            currentNode = currentNode.next;
-        } while (currentNode != null);
-        return null;
+        return findNodeByKey(key, currentNode).value;
     }
 
     @Override
@@ -42,24 +32,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resize() {
-        Node<K,V>[] oldTable = table;
-        table = new Node[table.length * RESIZE_FACTOR];
-        size = 0;
-        for (int i = 0; i < oldTable.length; i++) {
-            if (oldTable[i] != null) {
-                Node<K, V> curentNode = oldTable[i];
-                Node<K, V> curentNodeNext;
-                do {
-                    curentNodeNext = curentNode.next;
-                    putToTable(curentNode.key, curentNode.value);
-                    curentNode = curentNodeNext;
-
-                } while (curentNode != null);
+    private void resizeIfNeeded() {
+        if (size > (int) (table.length * DEFAULT_LOAD_FACTOR)) {
+            Node<K, V>[] oldTable = table;
+            table = new Node[table.length * RESIZE_FACTOR];
+            size = 0;
+            for (Node<K, V> headNode : oldTable) {
+                while (headNode != null) {
+                    putToTable(headNode.key, headNode.value);
+                    headNode = headNode.next;
+                }
             }
-
         }
-        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
     }
 
     private void putToTable(K key, V value) {
@@ -69,14 +53,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> currentNode = table[index];
             while (currentNode.next != null) {
-                if (currentNode.key == key
-                        || currentNode.key != null && currentNode.key.equals(key)) {
+                if (isEqualsKey(key, currentNode)) {
                     currentNode.value = value;
                     return;
                 }
                 currentNode = currentNode.next;
             }
-            if (currentNode.key == key || currentNode.key != null && currentNode.key.equals(key)) {
+            if (isEqualsKey(key, currentNode)) {
                 currentNode.value = value;
                 return;
             }
@@ -85,16 +68,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
+    private static <K, V> boolean isEqualsKey(K key, Node<K, V> currentNode) {
+        return currentNode.key == key || currentNode.key != null && currentNode.key.equals(key);
+    }
+
     private int getIndex(K key) {
-        int index = Math.abs(hash(key) % table.length);
-        return index;
+        return Math.abs(hash(key) % table.length);
     }
 
     private int hash(K key) {
         return key == null ? 0 : key.hashCode();
     }
 
-    static class Node<K, V> {
+    private Node<K, V> findNodeByKey(K key, Node<K, V> currentNode) {
+        do {
+            if (isEqualsKey(key, currentNode)) {
+                return currentNode;
+            }
+            currentNode = currentNode.next;
+        } while (currentNode != null);
+        return null;
+    }
+
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
