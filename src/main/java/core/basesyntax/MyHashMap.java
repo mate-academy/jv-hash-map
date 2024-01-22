@@ -1,18 +1,15 @@
 package core.basesyntax;
 
-import java.util.LinkedList;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
 
     private int size;
 
-    private LinkedList<Node<K, V>>[] bucketArray;
+    private Node<K, V>[] bucketArray;
 
     public MyHashMap() {
-        bucketArray = new LinkedList[INITIAL_CAPACITY];
-        size = 0;
+        bucketArray = new Node[INITIAL_CAPACITY];
     }
 
     @Override
@@ -24,20 +21,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         int bucketIndex = getBucketIndex(key);
         if (bucketArray[bucketIndex] == null) {
-            bucketArray[bucketIndex] = new LinkedList<>();
-        }
-
-        LinkedList<Node<K, V>> bucket = bucketArray[bucketIndex];
-        for (Node<K, V> node : bucket) {
-            if (key.equals(node.key)) {
-                node.value = value;
-                return;
+            bucketArray[bucketIndex] = new Node<>(key, value);
+        } else {
+            Node<K, V> current = bucketArray[bucketIndex];
+            while (current != null) {
+                if (key.equals(current.key)) {
+                    current.value = value;
+                    return;
+                }
+                if (current.next == null) {
+                    break;
+                }
+                current = current.next;
             }
+            current.next = new Node<>(key, value);
         }
 
-        bucket.add(new Node<>(key, value));
         size++;
-
         sizeCheck();
     }
 
@@ -48,15 +48,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         int bucketIndex = getBucketIndex(key);
-
-        LinkedList<Node<K, V>> bucket = bucketArray[bucketIndex];
-        if (bucket != null) {
-            for (Node<K, V> node : bucket) {
-                if (key.equals(node.key)) {
-                    return node.value;
-                }
+        Node<K, V> current = bucketArray[bucketIndex];
+        while (current != null) {
+            if (key.equals(current.key)) {
+                return current.value;
             }
+            current = current.next;
         }
+
         return null;
     }
 
@@ -67,8 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void handleNullKey(V value) {
         if (bucketArray[0] == null) {
-            bucketArray[0] = new LinkedList<>();
-            bucketArray[0].add(new Node<>(null, value)); // Add a new node with null key
+            bucketArray[0] = new Node<>(null, value); // Add a new node with null key
             size++;
             if ((double) size / bucketArray.length > LOAD_FACTOR) {
                 resize();
@@ -76,25 +74,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
 
-        LinkedList<Node<K, V>> bucket = bucketArray[0];
-        for (Node<K, V> node : bucket) {
-            if (node.key == null) {
-                node.value = value;
+        Node<K, V> current = bucketArray[0];
+        while (true) {
+            if (current.key == null) {
+                current.value = value;
                 return;
             }
+            if (current.next == null) {
+                break;
+            }
+            current = current.next;
         }
-        bucket.add(new Node<>(null, value));
+
+        current.next = new Node<>(null, value);
         size++;
     }
 
     private V handleNullKey() {
-        LinkedList<Node<K, V>> bucket = bucketArray[0];
-        if (bucket != null) {
-            for (Node<K, V> node : bucket) {
-                if (node.key == null) {
-                    return node.value;
-                }
+        Node<K, V> current = bucketArray[0];
+        while (current != null) {
+            if (current.key == null) {
+                return current.value;
             }
+            current = current.next;
         }
         return null;
     }
@@ -111,22 +113,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         int newCapacity = bucketArray.length * 2;
-        LinkedList<Node<K, V>>[] newBuckets = new LinkedList[newCapacity];
+        Node<K, V>[] newBucketArray = new Node[newCapacity];
 
-        for (LinkedList<Node<K, V>> bucket : bucketArray) {
-            if (bucket != null) {
-                for (Node<K, V> node : bucket) {
-                    int newBucketIndex = (node.key == null) ? 0 :
-                            Math.abs((node.key.hashCode() % newCapacity));
-                    if (newBuckets[newBucketIndex] == null) {
-                        newBuckets[newBucketIndex] = new LinkedList<>();
+        for (Node<K, V> kvNode : bucketArray) {
+            Node<K, V> current = kvNode;
+            while (current != null) {
+                int newBucketIndex = (current.key == null)
+                        ? 0 : Math.abs(current.key.hashCode() % newCapacity);
+                if (newBucketArray[newBucketIndex] == null) {
+                    newBucketArray[newBucketIndex] = new Node<>(current.key, current.value);
+                } else {
+                    Node<K, V> newCurrent = newBucketArray[newBucketIndex];
+                    while (newCurrent.next != null) {
+                        newCurrent = newCurrent.next;
                     }
-                    newBuckets[newBucketIndex].add(node);
+                    newCurrent.next = new Node<>(current.key, current.value);
                 }
+                current = current.next;
             }
         }
 
-        bucketArray = newBuckets;
+        bucketArray = newBucketArray;
     }
 
     private static class Node<K, V> {
@@ -139,6 +146,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.hash = (key == null) ? 0 : key.hashCode();
             this.key = key;
             this.value = value;
+            this.next = null;
         }
     }
 }
