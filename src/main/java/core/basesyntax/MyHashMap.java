@@ -5,9 +5,8 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
-
+    private static final int GROWTH_FACTOR = 2;
     private int size;
-
     private Node<K, V>[] bucketArray;
 
     public MyHashMap() {
@@ -17,6 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int bucketIndex = getBucketIndex(key);
+        sizeCheck();
         if (bucketArray[bucketIndex] == null) {
             bucketArray[bucketIndex] = new Node<>(key, value);
         } else {
@@ -35,7 +35,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         size++;
-        sizeCheck();
     }
 
     @Override
@@ -69,7 +68,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldBucketArray = bucketArray;
-        bucketArray = new Node[oldBucketArray.length * 2];
+        bucketArray = new Node[oldBucketArray.length * GROWTH_FACTOR];
         size = 0;
         for (Node<K, V> kvNode : oldBucketArray) {
             while (kvNode != null) {
@@ -87,7 +86,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = null;
         }
     }
 }
