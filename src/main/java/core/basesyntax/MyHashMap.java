@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             bucketArray[bucketIndex] = new Node<>(key, value);
         } else {
             Node<K, V> current = bucketArray[bucketIndex];
-            while (current != null) {
+            while (true) {
                 if (Objects.equals(key, current.key)) {
                     current.value = value;
                     return;
