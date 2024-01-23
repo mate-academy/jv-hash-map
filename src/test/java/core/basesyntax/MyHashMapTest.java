@@ -181,6 +181,9 @@ public class MyHashMapTest {
     public void checkTheHashMapIncrease() {
         MyMap<Car, Integer> myHashMap = new MyHashMap<>();
         for (int i = 0; i < 1000; i++) {
+            if (i == 1) {
+                System.out.println("Breakpoint");
+            }
             Car car = new Car("model_" + i, "color_" + i);
             myHashMap.put(car, i);
         }
@@ -228,6 +231,10 @@ public class MyHashMapTest {
         MyMap<Plane, Integer> myHashMap = new MyHashMap<>();
         for (int i = 0; i < 1000; i++) {
             Plane plane = new Plane("model_" + i, "color_" + i);
+            if (i == 10) {
+                System.out.println("Breakpoint");
+            }
+            System.out.println(i);
             myHashMap.put(plane, i);
         }
         Assert.assertEquals("Test failed! The size isn't correct. Expected 1000 but was "
