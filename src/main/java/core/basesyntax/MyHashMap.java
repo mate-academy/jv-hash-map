@@ -108,7 +108,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        Node(final K key, final V value) {
+        public Node(final K key, final V value) {
             this.key = key;
             this.value = value;
         }
