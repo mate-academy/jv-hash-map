@@ -10,13 +10,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int elementsInTableNum = 0;
     // Wondering if there is a better way to initialize this nodes array
     @SuppressWarnings("unchecked")
-    private Node<K, V>[] nodes = (Node<K, V>[]) new Node[tableSize + 1];
-    // Increasing size by one, so we can place our null-key guy "outside" of the array
-    // But still maintain access to him (calcIndex(null) -> tableSize+1)
+    private Node<K, V>[] nodes = (Node<K, V>[]) new Node[tableSize];
 
     @Override
     public void put(final K keyToPut, final V valueToPut) {
-
+        checkForRehash();
         // Return arrayLen if null key was passed, otherwise return normal index based on hashCode
         int index = calcIndex(keyToPut);
 
@@ -33,8 +31,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                         // Same keys but diff values, want to update that value or what
                         currentNode.value = valueToPut;
                         // Key is found and value is updated, proceed to return.
-                        return;
                     }
+                    return;
                     // ELSE: There is already this node in the table you are to pointless action
                 }
 
@@ -91,18 +89,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private boolean checkForRehash() {
+    private void checkForRehash() {
         double fillPercent = (double) (elementsInTableNum + 1) / tableSize;
         if (fillPercent >= REHASHING_FACTOR) {
             rehash();
-            return true;
         }
-        return false;
     }
 
     private int calcIndex(final K key) {
         if (key == null) {
-            return tableSize;
+            return 0;
         }
         return Math.abs(key.hashCode()) % tableSize;
     }
