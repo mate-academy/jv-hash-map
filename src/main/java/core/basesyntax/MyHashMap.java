@@ -4,18 +4,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int EMPTY_SIZE = 0;
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int GROW_FACTOR = 2;
     private Node<K, V>[] table;
-    private int threshold;
     private int size;
 
     public MyHashMap() {
-        this.size = EMPTY_SIZE;
-        this.table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
-        this.threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
+        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
+        int threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
         if (replaceExistingNode(key, value)) {
             return;
         }
@@ -58,8 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldTable = table;
-        table = (Node<K, V>[]) new Node[oldTable.length * 2];
-        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
+        table = (Node<K, V>[]) new Node[oldTable.length * GROW_FACTOR];
         copyAllNodes(oldTable);
     }
 
@@ -115,10 +113,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        public final String toString() {
-            return key + "=" + value;
         }
     }
 }
