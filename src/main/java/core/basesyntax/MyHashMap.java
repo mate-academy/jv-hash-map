@@ -7,12 +7,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_SIZE = 16;
     private static final int GROW_FACTOR = 2;
     private static int size;
-    private int capacity;
     private Node<K,V>[] table;
 
     public MyHashMap() {
         table = new Node[DEFAULT_SIZE];
-        size = DEFAULT_SIZE;
+        size = 0;
     }
 
     @Override
@@ -24,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (current == null) {
             table[index] = newNode;
         } else {
-            current = findNodeInCollisium(key);
+            current = findNodeBy(key);
             if (Objects.equals(current.key, key)) {
                 current.value = value;
                 return;
@@ -32,15 +31,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 current.next = newNode;
             }
         }
-        this.capacity++;
+        this.size++;
+    }
+
+    @Override
+    public V getValue(K key) {
+        Node<K,V> current = findNodeBy(key);
+        return current == null ? null : current.value;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
     }
 
     private void resize() {
-        if ((float)capacity / size > LOAD_FACTOR) {
-            size = size * GROW_FACTOR;
-            capacity = 0;
+        float capacity = (float)size / table.length;
+        if (capacity > LOAD_FACTOR) {
+            int newCapacity = table.length * GROW_FACTOR;
+            size = 0;
             Node<K, V>[] oldTable = table;
-            table = new Node[size];
+            table = new Node[newCapacity];
             copyAllNodes(oldTable);
         }
     }
@@ -57,18 +68,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    @Override
-    public V getValue(K key) {
-        Node<K,V> current = findNodeInCollisium(key);
-        return current == null ? null : current.value;
-    }
-
-    @Override
-    public int getSize() {
-        return capacity;
-    }
-
-    private Node<K,V> findNodeInCollisium(K key) {
+    private Node<K,V> findNodeBy(K key) {
         int index = hash(key);
         Node<K,V> current = table[index];
         if (current == null) {
@@ -84,7 +84,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        int hash = key == null ? 0 : (key.hashCode() % size);
+        int hash = key == null ? 0 : (key.hashCode() % table.length);
         return hash < 0 ? hash * -1 : hash;
     }
 
