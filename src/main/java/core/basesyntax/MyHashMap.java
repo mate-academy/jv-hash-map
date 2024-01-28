@@ -1,41 +1,36 @@
 package core.basesyntax;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
     private static final int DEFAULT_CAPACITY = 16;
-    private List<Node<K, V>>[] table;
+    private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        table = new ArrayList[DEFAULT_CAPACITY];
-        for (int i = 0; i < DEFAULT_CAPACITY; ++i) {
-            table[i] = new ArrayList<>();
-        }
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        int hash = (key != null) ? key.hashCode() : 0;
-        int insertIndex = Math.abs(hash) % table.length;
+        int hashCode = (key != null) ? key.hashCode() : 0;
+        int insertIndex = Math.abs(hashCode) % table.length;
 
-        List<Node<K, V>> bucket = table[insertIndex];
-        if (bucket == null) {
-            bucket = new ArrayList<>();
-            table[insertIndex] = bucket;
-        }
+        Node<K, V> newNode = new Node<>(key, value, null);
 
-        for (Node<K, V> node : bucket) {
-            if ((node.key == null && key == null) || (node.key != null && node.key.equals(key))) {
-                node.value = value;
+        Node<K, V> current = table[insertIndex];
+        while (current != null) {
+            if ((current.key == null && key == null)
+                    || (current.key != null && current.key.equals(key))) {
+                current.value = value;
                 return;
             }
+            current = current.next;
         }
 
-        bucket.add(0, new Node<>(hash, key, value));
+        newNode.next = table[insertIndex];
+        table[insertIndex] = newNode;
         size++;
+
         if ((double) size / table.length > DEFAULT_LOAD_FACTOR) {
             resize();
         }
@@ -46,16 +41,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = (key != null) ? key.hashCode() : 0;
         int index = Math.abs(hash) % table.length;
 
-        List<Node<K, V>> bucket = table[index];
+        Node<K, V> node = table[index];
 
-        if (bucket != null) {
-            for (Node<K, V> node : bucket) {
-                if ((node.key == null && key == null)
-                        || (node.key != null && node.key.equals(key))) {
-                    return node.value;
-                }
+        while (node != null) {
+            if ((node.key == null && key == null) || (node.key != null && node.key.equals(key))) {
+                return node.value;
             }
+            node = node.next;
         }
+
         return null;
     }
 
@@ -66,33 +60,37 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         int newCapacity = table.length << 1;
-        List<Node<K, V>>[] newTable = new ArrayList[newCapacity];
+        Node<K, V>[] newTable = new Node[newCapacity];
 
-        for (List<Node<K, V>> nodes : table) {
-            if (nodes != null) {
-                for (Node<K, V> node : nodes) {
-                    int newHash = node.hash;
-                    int newIndex = Math.abs(newHash) % newCapacity;
+        int newSize = 0;
 
-                    if (newTable[newIndex] == null) {
-                        newTable[newIndex] = new ArrayList<>();
-                    }
-                    newTable[newIndex].add(0, node);
-                }
+        for (Node<K, V> node : table) {
+            while (node != null) {
+                Node<K, V> next = node.next;
+
+                int newHash = (node.key != null) ? node.key.hashCode() : 0;
+                int newIndex = Math.abs(newHash) % newCapacity;
+                node.next = newTable[newIndex];
+                newTable[newIndex] = node;
+
+                node = next;
+                newSize++;
             }
         }
+
         table = newTable;
+        size = newSize;
     }
 
     private static class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
+        private Node<K, V> next;
 
-        public Node(int hash, K key, V value) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
+            this.next = next;
         }
     }
 }
