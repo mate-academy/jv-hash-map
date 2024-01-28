@@ -5,9 +5,14 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private Node<K, V>[] table = new Node[DEFAULT_CAPACITY];
-    private int threshold = (int) (DEFAULT_LOAD_FACTOR * DEFAULT_CAPACITY);
+    private Node<K, V>[] table;
+    private int threshold;
     private int size;
+
+    public MyHashMap() {
+        this.table = new Node[DEFAULT_CAPACITY];
+        this.threshold = (int) (DEFAULT_LOAD_FACTOR * DEFAULT_CAPACITY);
+    }
 
     @Override
     public void put(K key, V value) {
@@ -31,30 +36,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         addNode(index, new Node<>(hash, key, value));
     }
 
-    private void addNode(int index, Node<K,V> node) {
-        node.next = table[index % table.length];
-        table[index % table.length] = node;
-        size++;
-    }
-
-    private void resize() {
-        Node<K, V>[] oldTable = table;
-        table = new Node[oldTable.length << 1];
-        size = 0;
-        threshold <<= 1;
-
-        for (int i = 0; i < oldTable.length; i++) {
-            Node<K, V> node = oldTable[i];
-
-            while (node != null) {
-                Node<K, V> nextNode = node.next;
-                addNode(node.hash % table.length, node);
-
-                node = nextNode;
-            }
-        }
-    }
-
     @Override
     public V getValue(K key) {
         int hash = hash(key);
@@ -67,9 +48,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
             node = node.next;
         }
-
         return null;
-
     }
 
     @Override
@@ -77,18 +56,36 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    static final int hash(Object key) {
+    private void addNode(int index, Node<K,V> node) {
+        node.next = table[index % table.length];
+        table[index % table.length] = node;
+        size++;
+    }
+
+    private void resize() {
+        Node<K, V>[] oldTable = table;
+        table = new Node[oldTable.length << 1];
+        size = 0;
+        threshold = (int) (DEFAULT_LOAD_FACTOR * table.length);
+
+        for (Node<K, V> current : oldTable) {
+            while (current != null) {
+                put(current.key, current.value);
+                current = current.next;
+            }
+        }
+    }
+
+    private int hash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
     private class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
         public Node(int hash, K key, V value) {
-            this.hash = hash;
             this.key = key;
             this.value = value;
         }
