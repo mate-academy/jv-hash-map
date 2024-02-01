@@ -1,12 +1,14 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final int GROW_FACTOR = 2;
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        table = (Node<K, V>[]) new Node[16];
+        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -17,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int bucketIndex = calculatorIndexOfBucket(key);
+        int bucketIndex = calculateBucketIndex(key);
         Node<K, V> node = table[bucketIndex];
         while (node != null) {
             if (key == node.key || key != null && key.equals(node.key)) {
@@ -33,24 +35,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
-    private int calculatorIndexOfBucket(K key) {
+    private int calculateBucketIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void putNode(K key, V value) {
-        int bucketIndex = calculatorIndexOfBucket(key);
+        int bucketIndex = calculateBucketIndex(key);
         Node<K, V> node = table[bucketIndex];
         while (node != null) {
             if (key == node.key || key != null && key.equals(node.key)) {
@@ -76,7 +66,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void copyArrayInNewBiggerArray() {
-        int newCapacity = table.length * 2;
+        int newCapacity = table.length * GROW_FACTOR;
         Node<K, V>[] copyTable = table;
         table = (Node<K, V>[]) new Node[newCapacity];
         size = 0;
@@ -85,6 +75,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 putNode(node.key, node.value);
                 node = node.next;
             }
+        }
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
         }
     }
 }
