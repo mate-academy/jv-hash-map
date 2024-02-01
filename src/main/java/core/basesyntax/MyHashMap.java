@@ -2,21 +2,16 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
-    private int capacity = 16;
-    private int threshold;
     private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        table = (Node<K, V>[]) new Node[capacity];
-        threshold = (int) (capacity * LOAD_FACTOR);
+        table = (Node<K, V>[]) new Node[16];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size > threshold) {
-            copyArrayInNewBiggerArray();
-        }
+        growIfNeeded();
         putNode(key, value);
     }
 
@@ -43,7 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -51,7 +46,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int calculatorIndexOfBucket(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void putNode(K key, V value) {
@@ -73,11 +68,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
+    private void growIfNeeded() {
+        int threshold = (int) (table.length * LOAD_FACTOR);
+        if (size > threshold) {
+            copyArrayInNewBiggerArray();
+        }
+    }
+
     private void copyArrayInNewBiggerArray() {
-        capacity = capacity << 1;
-        threshold = (int) (capacity * LOAD_FACTOR);
+        int newCapacity = table.length * 2;
         Node<K, V>[] copyTable = table;
-        table = (Node<K, V>[]) new Node[capacity];
+        table = (Node<K, V>[]) new Node[newCapacity];
         size = 0;
         for (Node<K, V> node : copyTable) {
             while (node != null) {
