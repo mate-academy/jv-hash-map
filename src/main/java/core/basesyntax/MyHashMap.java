@@ -57,17 +57,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        private Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-    }
-
     private void resize() {
         int newCapacity = table.length * SCALE_FACTOR;
         size = 0;
@@ -86,5 +75,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int getIndexForKey(K key) {
         int keyHash = (key == null) ? 0 : key.hashCode();
         return Math.abs(keyHash) % table.length;
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        private Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 }
