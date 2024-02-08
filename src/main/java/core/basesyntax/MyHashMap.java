@@ -24,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int bucketIndex = getBucketIndex(key);
         Node<K, V> node = table[bucketIndex];
         while (node != null) {
-            if (node.key == null && key == null || node.key != null && node.key.equals(key)) {
+            if (node.key == key || node.key != null && node.key.equals(key)) {
                 node.value = value;
                 return;
             }
@@ -38,7 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int bucketIndex = getBucketIndex(key);
         Node<K, V> node = table[bucketIndex];
         while (node != null) {
-            if (node.key == null && key == null || node.key != null && node.key.equals(key)) {
+            if (node.key == key || node.key != null && node.key.equals(key)) {
                 return node.value;
             }
             node = node.next;
@@ -61,27 +61,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucketIndex(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode() % table.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void resize() {
         int newCapacity = table.length * 2;
-        Node<K, V>[] oldTable = table;
-        table = new Node[newCapacity];
-        size = 0;
-        for (Node<K, V> oldNode : oldTable) {
+        MyHashMap<K, V> newHashMap = new MyHashMap<>(newCapacity, loadFactor);
+        for (Node<K, V> oldNode : table) {
             while (oldNode != null) {
-                int newIndex = getBucketIndex(oldNode.key);
-                Node<K, V> next = oldNode.next;
-                oldNode.next = table[newIndex];
-                table[newIndex] = oldNode;
-                size++;
-                oldNode = next;
+                newHashMap.put(oldNode.key, oldNode.value);
+                oldNode = oldNode.next;
             }
         }
+        this.table = newHashMap.table;
+        this.size = newHashMap.size;
     }
 
     private static class Node<K, V> {
