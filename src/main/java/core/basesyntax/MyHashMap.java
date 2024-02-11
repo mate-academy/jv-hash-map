@@ -24,11 +24,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
 
-        int keyHash = key == null ? 0 : key.hashCode();
-        int indexToPut = Math.abs(keyHash % capacity);
+        int indexToPut = getIndex(key);
 
         Node<K, V> currentNode = getNode(indexToPut, key);
-        Node<K, V> nodeToAdd = new Node<>(keyHash, key, value, null);
+        Node<K, V> nodeToAdd = new Node<>(key, value, null);
 
         if (currentNode == null) {
             table[indexToPut] = nodeToAdd;
@@ -44,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = Math.abs(key == null ? 0 : key.hashCode() % capacity);
+        int index = getIndex(key);
         Node<K, V> currentNode = getNode(index, key);
         return currentNode == null ? null : currentNode.value;
     }
@@ -55,13 +54,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K,V> {
-        private final int hash;
         private final K key;
         private V value;
         private MyHashMap.Node<K,V> next;
 
-        Node(int hash, K key, V value, MyHashMap.Node<K,V> next) {
-            this.hash = hash;
+        Node(K key, V value, MyHashMap.Node<K,V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -75,8 +72,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         for (Node<K, V> node : table) {
             while (node != null) {
-                int newIndex = Math.abs(node.hash % capacity);
-                Node<K, V> newNode = new Node<>(node.hash, node.key, node.value, null);
+                int newIndex = getIndex(node.key);
+                Node<K, V> newNode = new Node<>(node.key, node.value, null);
 
                 if (resizedTable[newIndex] == null) {
                     resizedTable[newIndex] = newNode;
@@ -110,5 +107,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         return currentNode;
+    }
+
+    private int getIndex(K key) {
+        int keyHash = key == null ? 0 : key.hashCode();
+        return Math.abs(keyHash % capacity);
     }
 }
