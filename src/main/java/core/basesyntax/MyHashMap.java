@@ -7,11 +7,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private Node<K, V>[] table;
 
+    @SuppressWarnings("unchecked")
+    public MyHashMap() {
+        table = (Node<K,V>[]) new Node[DEFAULT_CAPACITY];
+    }
+
     @Override
     public void put(K key, V value) {
-        if (table == null) {
-            resize();
-        }
         int hash = hash(key);
         Node<K, V> node = table[hash];
         if (node == null) {
@@ -37,14 +39,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (table != null) {
-            Node<K, V> node = table[hash(key)];
-            while (node != null) {
-                if (node.key == key || key != null && key.equals(node.key)) {
-                    return node.value;
-                }
-                node = node.next;
+        Node<K, V> node = table[hash(key)];
+        while (node != null) {
+            if (node.key == key || key != null && key.equals(node.key)) {
+                return node.value;
             }
+            node = node.next;
         }
         return null;
     }
@@ -52,6 +52,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private int hash(K key) {
+        return (key == null) ? 0 : (Math.abs(key.hashCode()) % table.length);
+    }
+
+    private void resize() {
+        Node<K, V>[] oldTable = table;
+        @SuppressWarnings("unchecked")
+        Node<K, V>[] newTable = (Node<K,V>[]) new Node[table.length * GROW_FACTOR];
+        table = newTable;
+        size = 0;
+        transfer(oldTable);
+    }
+
+    private void transfer(Node<K,V>[] oldTable) {
+        for (int j = 0; j < oldTable.length; j++) {
+            Node<K, V> node = oldTable[j];
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
+        }
     }
 
     private static class Node<K, V> {
@@ -63,37 +86,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-    }
-
-    private int hash(K key) {
-        return (key == null) ? 0 : (Math.abs(key.hashCode()) % table.length);
-    }
-
-    private void resize() {
-        int newCapacity = 0;
-        if (table == null) {
-            newCapacity = DEFAULT_CAPACITY;
-        } else {
-            newCapacity = table.length * GROW_FACTOR;
-        }
-        Node<K, V>[] oldTable = table;
-        @SuppressWarnings("unchecked")
-        Node<K, V>[] newTable = (Node<K,V>[]) new Node[newCapacity];
-        table = newTable;
-        transfer(oldTable);
-    }
-
-    private void transfer(Node<K,V>[] oldTable) {
-        if (oldTable != null) {
-            size = 0;
-            for (int j = 0; j < oldTable.length; j++) {
-                Node<K, V> node = oldTable[j];
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
-            }
         }
     }
 }
