@@ -2,6 +2,7 @@ package core.basesyntax;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
@@ -25,11 +26,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             buckets[index] = new ArrayList<>();
         }
         for (Entry<K, V> entry : buckets[index]) {
-            if (entry.getKey() == null) {
-                continue;
-            }
-            if (entry.getKey().equals(key)) {
-                entry.setValue(value);
+            if (Objects.equals(entry.key, key)) {
+                entry.value = value;
                 return;
             }
         }
@@ -42,11 +40,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         if (buckets[index] != null) {
             for (Entry<K, V> entry : buckets[index]) {
-                if (entry.getKey() == null && key == null) {
-                    return entry.getValue();
-                }
-                if (key.equals(entry.getKey())) {
-                    return entry.getValue();
+                if (Objects.equals(entry.key, key)) {
+                    return entry.value;
                 }
             }
         }
@@ -59,10 +54,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode() % buckets.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % buckets.length);
     }
 
     private void resize() {
@@ -72,7 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (List<Entry<K, V>> bucket : oldBuckets) {
             if (bucket != null) {
                 for (Entry<K, V> entry : bucket) {
-                    put(entry.getKey(), entry.getValue());
+                    put(entry.key, entry.value);
                 }
             }
         }
@@ -82,22 +74,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private final K key;
         private V value;
 
-        public Entry(K key, V value) {
+        Entry(K key, V value) {
             this.key = key;
             this.value = value;
         }
 
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
-        }
     }
 }
 
