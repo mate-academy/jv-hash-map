@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final int GROW_FACTOR = 2;
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
 
@@ -58,13 +59,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        List<Entry<K, V>>[] oldBuckets = buckets;
-        buckets = new ArrayList[oldBuckets.length * 2];
-        size = 0;
-        for (List<Entry<K, V>> bucket : oldBuckets) {
-            if (bucket != null) {
-                for (Entry<K, V> entry : bucket) {
-                    put(entry.key, entry.value);
+        if ((double) size / buckets.length > LOAD_FACTOR) {
+            List<Entry<K, V>>[] oldBuckets = buckets;
+            buckets = new ArrayList[oldBuckets.length * GROW_FACTOR];
+            size = 0;
+            for (List<Entry<K, V>> bucket : oldBuckets) {
+                if (bucket != null) {
+                    for (Entry<K, V> entry : bucket) {
+                        put(entry.key, entry.value);
+                    }
                 }
             }
         }
@@ -81,4 +84,3 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     }
 }
-
