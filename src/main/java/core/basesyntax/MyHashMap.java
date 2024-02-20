@@ -5,7 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static int DEFAULT_CAPACITY = 16;
     private static double LOAD_FACTOR = 0.75;
-    private static int CONSTTANT = 2;
+    private static int DOUBLE_BUCKET = 2;
     private int size;
     private Node<K,V>[] bucket;
     private int threshold = 0;
@@ -74,7 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resizeIfNedeed() {
         if (size >= threshold) {
             Node<K,V>[] prevTable = bucket;
-            bucket = new Node[prevTable.length * CONSTTANT];
+            bucket = new Node[prevTable.length * DOUBLE_BUCKET];
             size = 0;
             threshold = (int) (bucket.length * LOAD_FACTOR);
             for (Node<K,V> curr: prevTable) {
