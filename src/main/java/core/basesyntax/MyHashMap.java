@@ -29,17 +29,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         newNode.next = table[index];
         table[index] = newNode;
         size++;
-
-        if ((double) size / table.length > DEFAULT_LOAD_FACTOR) {
-            resize();
-        }
+        resize();
     }
 
     @Override
     public V getValue(K key) {
         Node<K, V> node = table[getIndex(key, table.length)];
         while (node != null) {
-            if ((node.key == null && key == null) || (node.key != null && node.key.equals(key))) {
+            if (Objects.equals(node.key, key)) {
                 return node.value;
             }
             node = node.next;
@@ -54,27 +51,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key, int tableLength) {
-        int hashCode = (key != null)
-                ? key.hashCode()
-                : 0;
-        int index = Math.abs(hashCode) % tableLength;
-        return index;
+        return key == null ? 0 : Math.abs(key.hashCode()) % tableLength;
     }
 
     private void resize() {
-        int newCapacity = table.length * DEFAULT_RESIZE_COEFFICIENT;
-        Node<K, V>[] newTable = new Node[newCapacity];
-        for (Node<K, V> node : table) {
-            while (node != null) {
-                Node<K, V> next = node.next;
-                int newIndex = getIndex(node.key, newCapacity);
-                node.next = newTable[newIndex];
-                newTable[newIndex] = node;
-                node = next;
+        if ((double) size / table.length > DEFAULT_LOAD_FACTOR) {
+            int newCapacity = table.length * DEFAULT_RESIZE_COEFFICIENT;
+            Node<K, V>[] newTable = new Node[newCapacity];
+            for (Node<K, V> node : table) {
+                while (node != null) {
+                    Node<K, V> next = node.next;
+                    int newIndex = getIndex(node.key, newCapacity);
+                    node.next = newTable[newIndex];
+                    newTable[newIndex] = node;
+                    node = next;
+                }
             }
-        }
 
-        table = newTable;
+            table = newTable;
+        }
     }
 
     private static class Node<K,V> {
