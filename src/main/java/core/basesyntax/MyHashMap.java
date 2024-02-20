@@ -5,7 +5,8 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static int DEFAULT_CAPACITY = 16;
     private static double LOAD_FACTOR = 0.75;
-    private int size = 0;
+    private static int CONSTTANT = 2;
+    private int size;
     private Node<K,V>[] bucket;
     private int threshold = 0;
 
@@ -17,8 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resizeIfNedeed();
-        int hash = getHash(key);
-        int index = hash % bucket.length;
+        int index = getIndex(key);
         Node<K, V> node = bucket[index];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
@@ -28,10 +28,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             node = node.next;
         }
         if (key == null) {
-            addNewNode(0, new Node<>(hash, key, value));
+            addNewNode(0, new Node<>(key, value));
             return;
         }
-        addNewNode(index, new Node<>(hash, key, value));
+        addNewNode(index, new Node<>(key, value));
     }
 
     @Override
@@ -39,20 +39,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = getHash(key);
         int index = hash % bucket.length;
         Node<K, V> node = bucket[index];
-        if (key == null) {
-            Node<K,V> node1 = bucket[0];
-            while (node != null) {
-                if (Objects.equals(key, node1.key)) {
-                    return node1.value;
-                }
-                node1 = node1.next;
-            }
-        }
+        Node<K,V> node1 = bucket[0];
         while (node != null) {
-            if (key != null && Objects.equals(key, node.key)) {
+            if (key != null && Objects.equals(node.key, key)) {
                 return node.value;
             }
             node = node.next;
+        }
+        for (int i = 0; i < bucket.length; i++) {
+            if (key == null && Objects.equals(node1.key, key)) {
+                return node1.value;
+            }
+            if (node1 == null) {
+                break;
+            }
+            node1 = node1.next;
         }
         return null;
     }
@@ -62,6 +63,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private int getIndex(K key) {
+        return getHash(key) % bucket.length;
+    }
+
     private int getHash(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
@@ -69,7 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resizeIfNedeed() {
         if (size >= threshold) {
             Node<K,V>[] prevTable = bucket;
-            bucket = new Node[prevTable.length * 2];
+            bucket = new Node[prevTable.length * CONSTTANT];
             size = 0;
             threshold = (int) (bucket.length * LOAD_FACTOR);
             for (Node<K,V> curr: prevTable) {
@@ -92,7 +97,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
         }
