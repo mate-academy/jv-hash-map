@@ -8,7 +8,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static int DOUBLE_BUCKET = 2;
     private int size;
     private Node<K,V>[] bucket;
-    private int threshold = 0;
+    private int threshold;
 
     public MyHashMap() {
         this.bucket = new Node[DEFAULT_CAPACITY];
@@ -27,33 +27,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node = node.next;
         }
-        if (key == null) {
-            addNewNode(0, new Node<>(key, value));
-            return;
-        }
         addNewNode(index, new Node<>(key, value));
     }
 
     @Override
     public V getValue(K key) {
-        int hash = getHash(key);
-        int index = hash % bucket.length;
+        int index = getIndex(key);
         Node<K, V> node = bucket[index];
-        Node<K,V> node1 = bucket[0];
         while (node != null) {
-            if (key != null && Objects.equals(node.key, key)) {
+            if (Objects.equals(node.key, key)) {
                 return node.value;
             }
             node = node.next;
-        }
-        for (int i = 0; i < bucket.length; i++) {
-            if (key == null && Objects.equals(node1.key, key)) {
-                return node1.value;
-            }
-            if (node1 == null) {
-                break;
-            }
-            node1 = node1.next;
         }
         return null;
     }
