@@ -7,7 +7,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_SIZE = 0;
     private static final int SIMPLE_NUMBER_FOR_HASHCODE = 17;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private Object[] table = new Object[DEFAULT_INITIAL_CAPACITY];
+    private Node<K, V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
     private int size = 0;
 
     @Override
@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int keyHashCode = getHashCode(key);
         int indexOfBucket = Math.abs(findBucket(keyHashCode));
         if (table[indexOfBucket] != null) {
-            Node<K, V> currentNode = (Node<K, V>) table[indexOfBucket];
+            Node<K, V> currentNode = table[indexOfBucket];
             while (true) {
                 if (Objects.equals(currentNode.key, key)) {
                     return currentNode.value;
@@ -45,17 +45,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resizeTable() {
-        Object[] newTable = new Object[table.length * 2];
-        Object[] oldTable = table;
+        Node<K, V>[] newTable = new Node[table.length * 2];
+        Node<K, V>[] oldTable = table;
         table = newTable;
         size = DEFAULT_SIZE;
         copyNodeFromOldTable(oldTable);
     }
 
-    private void copyNodeFromOldTable(Object[] oldTable) {
-        for (Object nodeFromOldTable : oldTable) {
+    private void copyNodeFromOldTable(Node<K, V>[] oldTable) {
+        for (Node<K, V> nodeFromOldTable : oldTable) {
             if (nodeFromOldTable != null) {
-                Node<K, V> currentNode = (Node<K, V>) nodeFromOldTable;
+                Node<K, V> currentNode = nodeFromOldTable;
                 while (true) {
                     put(currentNode.key, currentNode.value);
                     if (currentNode.next == null) {
@@ -71,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> newNode = new Node<>(getHashCode(key), key, value, null);
         int indexOfBucket = Math.abs(findBucket(newNode.hash));
         if (table[indexOfBucket] != null) {
-            Node<K, V> currentNode = (Node<K, V>) table[indexOfBucket];
+            Node<K, V> currentNode = table[indexOfBucket];
             while (true) {
                 if (Objects.equals(currentNode.key, key)) {
                     currentNode.value = value;
