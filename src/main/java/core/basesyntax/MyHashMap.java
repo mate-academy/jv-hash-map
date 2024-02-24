@@ -24,14 +24,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int keyHashCode = getHashCode(key);
         int indexOfBucket = Math.abs(findBucket(keyHashCode));
-        if (table[indexOfBucket] != null) {
-            Node<K, V> currentNode = table[indexOfBucket];
-            while (true) {
-                if (Objects.equals(currentNode.key, key)) {
-                    return currentNode.value;
-                }
-                currentNode = currentNode.next != null ? currentNode.next : null;
+        Node<K, V> currentNode = table[indexOfBucket];
+        while (table[indexOfBucket] != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode.value;
             }
+            currentNode = currentNode.next != null ? currentNode.next : null;
         }
         return null;
     }
@@ -58,15 +56,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void copyNodeFromOldTable(Node<K, V>[] oldTable) {
         for (Node<K, V> nodeFromOldTable : oldTable) {
-            if (nodeFromOldTable != null) {
-                Node<K, V> currentNode = nodeFromOldTable;
-                while (true) {
-                    put(currentNode.key, currentNode.value);
-                    if (currentNode.next == null) {
-                        break;
-                    }
-                    currentNode = currentNode.next;
+            Node<K, V> currentNode = nodeFromOldTable;
+            while (nodeFromOldTable != null) {
+                put(currentNode.key, currentNode.value);
+                if (currentNode.next == null) {
+                    break;
                 }
+                currentNode = currentNode.next;
             }
         }
     }
