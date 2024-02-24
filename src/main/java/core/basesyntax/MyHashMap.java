@@ -25,11 +25,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int keyHashCode = getHashCode(key);
         int indexOfBucket = Math.abs(findBucket(keyHashCode));
         Node<K, V> currentNode = table[indexOfBucket];
-        while (table[indexOfBucket] != null) {
+        while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
             }
-            currentNode = currentNode.next != null ? currentNode.next : null;
+            currentNode = currentNode.next;
         }
         return null;
     }
@@ -55,13 +55,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void copyNodeFromOldTable(Node<K, V>[] oldTable) {
-        for (Node<K, V> nodeFromOldTable : oldTable) {
-            Node<K, V> currentNode = nodeFromOldTable;
-            while (nodeFromOldTable != null) {
+        for (Node<K, V> currentNode : oldTable) {
+            while (currentNode != null) {
                 put(currentNode.key, currentNode.value);
-                if (currentNode.next == null) {
-                    break;
-                }
                 currentNode = currentNode.next;
             }
         }
@@ -70,8 +66,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void addNodeToTable(K key, V value) {
         Node<K, V> newNode = new Node<>(getHashCode(key), key, value, null);
         int indexOfBucket = Math.abs(findBucket(newNode.hash));
-        if (table[indexOfBucket] != null) {
-            Node<K, V> currentNode = table[indexOfBucket];
+        Node<K, V> currentNode = table[indexOfBucket];
+        if (currentNode != null) {
             while (true) {
                 if (Objects.equals(currentNode.key, key)) {
                     currentNode.value = value;
@@ -91,8 +87,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHashCode(K key) {
-        return (key == null ? 0 : key.hashCode() + SIMPLE_NUMBER_FOR_HASHCODE
-                * SIMPLE_NUMBER_FOR_HASHCODE);
+        return (key == null ? 0 : key.hashCode() * SIMPLE_NUMBER_FOR_HASHCODE);
     }
 
     private int findBucket(int hashCode) {
