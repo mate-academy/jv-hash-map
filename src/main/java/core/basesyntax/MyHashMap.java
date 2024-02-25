@@ -13,13 +13,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @SuppressWarnings("unchecked")
     public MyHashMap() {
         nodes = new Node[DEFAULT_INITIAL_CAPACITY];
-        size = 0;
     }
 
     public void put(K key, V value) {
         int hash = (key == null) ? 0 : hash(key);
         int index = hash % nodes.length;
-        Node<K, V> newNode = new Node<>(key, value, hash);
+        Node<K, V> newNode = new Node<>(key, value);
         if (nodes[index] == null) {
             nodes[index] = newNode;
             size++;
@@ -67,8 +66,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V>[] newNodes = new Node[newCapacity];
             for (Node<K, V> node : nodes) {
                 while (node != null) {
-                    int newIndex = (node.key == null) ? 0 : node.hash % newCapacity;
-                    Node<K, V> newNode = new Node<>(node.key, node.value, node.hash);
+                    int newIndex = (node.key == null) ? 0 : hash(node.key) % newCapacity;
+                    Node<K, V> newNode = new Node<>(node.key, node.value);
                     insertNode(newNodes, newIndex, newNode);
                     node = node.next;
                 }
@@ -94,16 +93,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     static class Node<K,V> {
-        private final int hash;
         private final K key;
         private V value;
-
         private Node<K, V> next;
 
-        public Node(K key, V value, int hash) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.hash = hash;
             next = null;
         }
     }
