@@ -5,7 +5,8 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final int DEFAULT_SIZE = 0;
-    private static final int SIMPLE_NUMBER_FOR_HASHCODE = 17;
+    private static final int PRIME_NUMBER = 17;
+    private static final int RESIZE_COEFFICIENT = 2;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size = 0;
@@ -46,7 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resizeTable() {
-        Node<K, V>[] newTable = new Node[table.length * 2];
+        Node<K, V>[] newTable = new Node[table.length * RESIZE_COEFFICIENT];
         Node<K, V>[] oldTable = table;
         table = newTable;
         size = DEFAULT_SIZE;
@@ -86,7 +87,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHashCode(K key) {
-        return (key == null ? 0 : key.hashCode() * SIMPLE_NUMBER_FOR_HASHCODE);
+        return (key == null ? 0 : key.hashCode() * PRIME_NUMBER);
     }
 
     private int findIndexOfBucket(int hashCode) {
