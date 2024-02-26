@@ -1,5 +1,6 @@
 package core.basesyntax;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -20,9 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == loadFactor) {
             resize();
         }
-        size++;
-        int hash = key == null ? 0 : key.hashCode();
-        int index = Math.abs(hash % storage.length);
+        int index = Math.abs(getHash(key) % storage.length);
         Node<K, V> currentNode = storage[index];
         Node<K, V> newNode = new Node<>(key, value, null);
         if (currentNode == null) {
@@ -31,8 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             while (true) {
                 if (Objects.equals(key, currentNode.key)) {
                     currentNode.value = value;
-                    size--;
-                    break;
+                    return;
                 } else if (!currentNode.hasNext()) {
                     currentNode.next = newNode;
                     break;
@@ -40,20 +38,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode = getNextNode(currentNode);
             }
         }
+        size++;
     }
 
     @Override
     public V getValue(K key) {
-        int hash = key == null ? 0 : key.hashCode();
-        int index = Math.abs(hash % storage.length);
-        Node<K, V> currentNode = storage[index];
-        while (currentNode != null) {
-            if (Objects.equals(currentNode.key, key)) {
-                return currentNode.value;
-            }
-            currentNode = getNextNode(currentNode);
-        }
-        return null;
+        Node<K, V> node = getNodeByKey(key);
+        return node != null ? node.value : null;
     }
 
     @Override
@@ -61,7 +52,59 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static <K, V> Node<K, V> getNextNode(Node<K, V> currentNode) {
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    public boolean containsKey(K key) {
+        return getNodeByKey(key) != null;
+    }
+
+    public boolean containsValue(V value) {
+        for (Node<K, V> node : storage) {
+            while (node != null) {
+                if (Objects.equals(node.value, value)) {
+                    return true;
+                }
+                node = node.next;
+            }
+        }
+        return false;
+    }
+
+    public K remove(K key) {
+        Node<K, V> node = getNodeByKey(key);
+        if (node != null) {
+            int index = Math.abs(getHash(key) % storage.length);
+            if (storage[index].key.equals(key)) {
+                storage[index] = node.next;
+            } else {
+                while (node.hasNext()) {
+                    if (node.next.key.equals(key)) {
+                        node.next = node.next.next;
+                        break;
+                    }
+                    node = node.next;
+                }
+            }
+            size--;
+            return key;
+        }
+        return null;
+    }
+
+    public void putAll(Map<K, V> m) {
+        for (Map.Entry<K, V> value : m.entrySet()) {
+            put(value.getKey(), value.getValue());
+        }
+    }
+
+    public void clear() {
+        storage = new Node[DEFAULT_CAPACITY];
+        size = 0;
+    }
+
+    private Node<K, V> getNextNode(Node<K, V> currentNode) {
         return currentNode.next == null ? null : currentNode.next;
     }
 
@@ -76,6 +119,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node = node.next;
             }
         }
+    }
+
+    private Node<K, V> getNodeByKey(K key) {
+        int index = Math.abs(getHash(key) % storage.length);
+        Node<K, V> currentNode = storage[index];
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                return currentNode;
+            }
+            currentNode = getNextNode(currentNode);
+        }
+        return null;
+    }
+
+    private int getHash(K key) {
+        return key == null ? 0 : key.hashCode();
     }
 
     private static class Node<K, V> {
