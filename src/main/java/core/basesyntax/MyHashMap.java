@@ -7,7 +7,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private static final int GROW_FACTOR = 2;
 
-    private MyEntry<K, V>[] table;
+    private MyEntry[] table;
     private int size;
 
     public MyHashMap() {
@@ -48,6 +48,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    @Override
+    public V getValue(K key) {
+        int index = getIndex(key);
+        MyEntry<K, V> entry = table[index];
+        while (entry != null) {
+            if (Objects.equals(entry.key, key)) {
+                return entry.value;
+            }
+            entry = entry.next;
+        }
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
     private void putForNullKey(V value) {
         MyEntry<K, V> entry = new MyEntry<>(null, value);
         if (table[0] == null) {
@@ -71,24 +89,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    @Override
-    public V getValue(K key) {
-        int index = getIndex(key);
-        MyEntry<K, V> entry = table[index];
-        while (entry != null) {
-            if (Objects.equals(entry.key, key)) {
-                return entry.value;
-            }
-            entry = entry.next;
-        }
-        return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
-    }
-
     private int getIndex(K key) {
         if (key == null) {
             return 0;
@@ -108,12 +108,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    static class MyEntry<K, V> {
+    private static class MyEntry<K, V> {
         private final K key;
         private V value;
         private MyEntry<K, V> next;
 
-        public MyEntry(K key, V value) {
+        MyEntry(K key, V value) {
             this.key = key;
             this.value = value;
         }
