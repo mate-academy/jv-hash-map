@@ -16,8 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold
-                || table == null) {
+        if (size >= threshold) {
             resize();
         }
         putValue(key, value);
@@ -25,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> current = table[hash(key)];
+        Node<K, V> current = table[getIndex(key)];
         while (current != null) {
             if (Objects.equals(current.key, key)) {
                 return current.value;
@@ -40,12 +39,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int hash(K key) {
+    private int getIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void putValue(K key, V value) {
-        Node<K, V> current = table[hash(key)];
+        Node<K, V> current = table[getIndex(key)];
         Node<K, V> nodeNew = new Node<>(key, value);
         while (current != null) {
             if (Objects.equals(current.key, nodeNew.key)) {
@@ -58,7 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             current = current.next;
         }
-        table[hash(key)] = nodeNew;
+        table[getIndex(key)] = nodeNew;
         ++size;
     }
 
