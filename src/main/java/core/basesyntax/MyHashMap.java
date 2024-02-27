@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
@@ -18,18 +20,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Entry<K, V> current = table[index];
         if (current == null) {
-            table[index] = new Entry<>(key, value, null);
+            table[index] = new Entry<>(key, value);
             size++;
             return;
         }
         while (current != null) {
-            if ((key == null && current.key == null)
-                    || (key != null && key.equals(current.key))) {
+            if (key == current.key
+                    || key != null && key.equals(current.key)) {
                 current.value = value;
                 return;
             }
             if (current.next == null) {
-                current.next = new Entry<>(key, value, null);
+                current.next = new Entry<>(key, value);
                 size++;
                 return;
             }
@@ -42,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Entry<K, V> current = table[index];
         while (current != null) {
-            if ((key == null && current.key == null) || (key != null && key.equals(current.key))) {
+            if (Objects.equals(key, current.key)) {
                 return current.value;
             }
             current = current.next;
@@ -80,10 +82,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Entry<K, V> next;
 
-        public Entry(K key, V value, Entry<K, V> next) {
+        public Entry(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
