@@ -2,45 +2,42 @@ package core.basesyntax;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_CAPACITY = 0.75f;
+    private static final int GROW_CONSTANT = 2;
     private List<Node<K, V>>[] buckets;
     private int size;
 
     public MyHashMap() {
         buckets = new List[INITIAL_CAPACITY];
-        size = 0;
     }
 
     @Override
     public void put(K key, V value) {
+        resizeIfNeeded();
         int index = getIndex(key);
         if (buckets[index] != null) {
             Node<K, V> lastNode = null;
             for (Node<K, V> node : buckets[index]) {
                 lastNode = node;
-                if (node.key == null && key == null) {
-                    node.value = value;
-                    return;
-                } else if (node.key == null || key == null) {
-                    continue;
-                } else if (node.key.equals(key)) {
+                if (Objects.equals(node.key, key)) {
                     node.value = value;
                     return;
                 }
             }
             Node<K, V> newNode = createNewNode(key, value);
             buckets[index].add(newNode);
-            lastNode.next = newNode;
-        }
-        if (buckets[index] == null) {
+            if (lastNode != null) {
+                lastNode.next = newNode;
+            }
+        } else {
             buckets[index] = new LinkedList<>();
             buckets[index].add(createNewNode(key, value));
         }
         size++;
-        resizeIfNeeded();
     }
 
     @Override
@@ -48,13 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         if (buckets[index] != null) {
             for (Node<K, V> node : buckets[index]) {
-                if (key == null && node.key == null) {
-                    return node.value;
-                }
-                if (node.key == null) {
-                    continue;
-                }
-                if (node.key.equals(key)) {
+                if (Objects.equals(node.key, key)) {
                     return node.value;
                 }
             }
@@ -74,7 +65,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int newCapacity = buckets.length << 1;
+        int newCapacity = buckets.length * GROW_CONSTANT;
         List<Node<K, V>>[] newBuckets = new List[newCapacity];
         for (List<Node<K, V>> bucket : buckets) {
             if (bucket != null) {
@@ -101,19 +92,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHashCode(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode());
+        return key != null ? Math.abs(key.hashCode()) : 0;
     }
 
-    private class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
         private int hash;
 
-        public Node(K key, V value) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
             this.next = null;
