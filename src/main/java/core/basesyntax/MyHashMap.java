@@ -4,20 +4,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private static final int RESIZE_FACTOR = 2;
-    private Node<K, V> []table;
+    private Node<K, V>[] table;
     private int size;
-    private int threshold;
-    private int capacity;
 
     public MyHashMap() {
-        this.table = new Node[DEFAULT_CAPACITY];
-        this.capacity = DEFAULT_CAPACITY;
-        this.threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size == threshold) {
+        if (size >= table.length * LOAD_FACTOR) {
             resize();
         }
         int hash = hash(key);
@@ -55,7 +51,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
+    }
+
+    private void resize() {
+        int capacity = table.length * RESIZE_FACTOR;
+        Node<K, V>[] oldTable = table;
+        table = new Node[capacity];
+        size = 0;
+        for (Node<K, V> nodes : oldTable) {
+            while (nodes != null) {
+                put(nodes.key, nodes.value);
+                nodes = nodes.next;
+            }
+        }
     }
 
     @Override
@@ -68,24 +77,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K,V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-    }
-
-    public void resize() {
-        capacity *= RESIZE_FACTOR;
-        threshold = (int) (capacity * LOAD_FACTOR);
-        Node<K, V>[] oldTable = table;
-        table = new Node[capacity];
-        size = 0;
-        for (Node<K, V> nodes : oldTable) {
-            while (nodes != null) {
-                put(nodes.key, nodes.value);
-                nodes = nodes.next;
-            }
         }
     }
 }
