@@ -6,14 +6,12 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final int DEFAULT_SIZE_MULTIPLAYER = 2;
-    private static final int DEFAULT_SIZE = 0;
     private int loadFactor = 12;
     private Node<K, V>[] storage;
     private int size;
 
     public MyHashMap() {
         storage = new Node[DEFAULT_CAPACITY];
-        size = DEFAULT_SIZE;
     }
 
     @Override
@@ -21,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == loadFactor) {
             resize();
         }
-        int index = Math.abs(getHash(key) % storage.length);
+        int index = getIndex(key);
         Node<K, V> currentNode = storage[index];
         Node<K, V> newNode = new Node<>(key, value, null);
         if (currentNode == null) {
@@ -75,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public K remove(K key) {
         Node<K, V> node = getNodeByKey(key);
         if (node != null) {
-            int index = Math.abs(getHash(key) % storage.length);
+            int index = getIndex(key);
             if (storage[index].key.equals(key)) {
                 storage[index] = node.next;
             } else {
@@ -110,7 +108,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         loadFactor = loadFactor * DEFAULT_SIZE_MULTIPLAYER;
-        size = DEFAULT_SIZE;
+        size = 0;
         Node<K, V>[] oldStorage = storage;
         storage = new Node[storage.length * DEFAULT_SIZE_MULTIPLAYER];
         for (Node<K, V> node : oldStorage) {
@@ -122,8 +120,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> getNodeByKey(K key) {
-        int index = Math.abs(getHash(key) % storage.length);
-        Node<K, V> currentNode = storage[index];
+        Node<K, V> currentNode = storage[getIndex(key)];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode;
@@ -133,8 +130,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private int getHash(K key) {
-        return key == null ? 0 : key.hashCode();
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % storage.length;
     }
 
     private static class Node<K, V> {
