@@ -75,10 +75,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        addToBacketNextNode(key, value, keyHash, bucketNumber);
+        addToBucketNextNode(key, value, keyHash, bucketNumber);
     }
 
-    private void addToBacketNextNode(K key, V value, int keyHash, int bucketNumber) {
+    private void addToBucketNextNode(K key, V value, int keyHash, int bucketNumber) {
         Node node = table[bucketNumber];
         Node previousNode = null;
         while (node != null) {
@@ -98,14 +98,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void ifFullResize(Node<K,V>[] table) {
         if (size >= table.length * DEFAULT_LOAD_FACTOR) {
-            resize();
+            Node<K,V>[] fullTable = table;
+            table = (Node<K, V>[]) new Node[table.length * 2];
+            transfer(fullTable);
         }
-    }
-
-    private void resize() {
-        Node<K,V>[] fullTable = table;
-        table = (Node<K, V>[]) new Node[table.length * 2];
-        transfer(fullTable);
     }
 
     private void transfer(Node<K, V>[] oldTable) {
