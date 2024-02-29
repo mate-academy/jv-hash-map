@@ -21,23 +21,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         if (buckets[index] == null) {
             buckets[index] = new Node<>(key, value);
-            resizeIfThresholdExceeded(size++);
+            resizeIfThresholdExceeded();
             return;
         }
         Node<K, V> bucket = buckets[index];
-        while (true) {
-            if ((bucket.key != null && bucket.key.equals(key))
-                    || bucket.key == key) {
-                bucket.value = value;
+        Node<K, V> nextBucket = bucket;
+        do {
+            if (shouldReplaceValue(nextBucket, key)) {
+                nextBucket.value = value;
                 return;
             }
-            if (bucket.next == null) {
-                bucket.next = new Node<>(key, value);
-                resizeIfThresholdExceeded(size++);
-                return;
-            }
-            bucket = bucket.next;
-        }
+            bucket = nextBucket;
+            nextBucket = nextBucket.next;
+        } while (nextBucket != null);
+        bucket.next = new Node<>(key, value);
+        resizeIfThresholdExceeded();
     }
 
     @Override
@@ -48,8 +46,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K, V> bucket = buckets[index];
         while (bucket != null) {
-            if ((bucket.key != null && bucket.key.equals(key))
-                    || bucket.key == key) {
+            if (shouldReplaceValue(bucket, key)) {
                 return bucket.value;
             }
             bucket = bucket.next;
@@ -80,7 +77,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key.hashCode() >= 0 ? key.hashCode() % capacity : (key.hashCode() * -1) % capacity;
     }
 
-    private void resizeIfThresholdExceeded(int size) {
+    private void resizeIfThresholdExceeded() {
+        size++;
         if (size == threshold) {
             resize();
         }
@@ -106,5 +104,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         return nodes;
+    }
+
+    private boolean shouldReplaceValue(Node<K, V> bucket, K key) {
+        return (bucket.key != null && bucket.key.equals(key))
+                || bucket.key == key;
     }
 }
