@@ -16,13 +16,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int keyHash = hash(key);
-        addNode(key, value, keyHash);
+        int bucketNumber = getIndex(keyHash);
+        if (size == 0 || table[bucketNumber] == null) {
+            ifFullResize(table);
+            table[bucketNumber] = new Node<>(keyHash, key, value, null);
+            size++;
+            return;
+        }
+        addToBucketNextNode(key, value, keyHash, bucketNumber);
     }
 
     @Override
     public V getValue(K key) {
-        int keyHash = hash(key);
-        int position = keyHash % table.length;
+        int position = getIndex(hash(key));
         Node node = table[position];
         if (node == null) {
             return null;
@@ -38,6 +44,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             return null;
         }
+    }
+
+    private int getIndex(int keyHash) {
+        return keyHash % table.length;
     }
 
     @Override
@@ -60,7 +70,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-
     }
 
     private int hash(K key) {
@@ -69,14 +78,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void addNode(K key, V value, int keyHash) {
-        int bucketNumber = keyHash % table.length;
-        if (size == 0 || table[bucketNumber] == null) {
-            ifFullResize(table);
-            table[bucketNumber] = new Node<>(keyHash, key, value, null);
-            size++;
-            return;
-        }
-        addToBucketNextNode(key, value, keyHash, bucketNumber);
+
     }
 
     private void addToBucketNextNode(K key, V value, int keyHash, int bucketNumber) {
@@ -112,12 +114,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 continue;
             }
             if (node.next == null) {
-                this.put(node.key, node.value);
+                put(node.key, node.value);
                 continue;
             }
             Node<K, V> tempNode = node;
             do {
-                this.put(tempNode.key, tempNode.value);
+                put(tempNode.key, tempNode.value);
                 tempNode = tempNode.next;
             } while (tempNode != null);
         }
