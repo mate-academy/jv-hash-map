@@ -15,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         nodes = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
-    public void put(K key, V value) {;
+    public void put(K key, V value) {
         resizeIfNeeded();
         int index = findBucketIndex(key);
         Node<K, V> newNode = new Node<>(key, value);
@@ -76,7 +76,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int findBucketIndex(K key) {
-            int hash = PRIME_NUMBER * PRIME_NUMBER + (key == null ? 0 : Math.abs(key.hashCode()));
+        int hash = PRIME_NUMBER * PRIME_NUMBER + (key == null ? 0 : Math.abs(key.hashCode()));
         return (key == null) ? 0 : hash % nodes.length;
     }
 
