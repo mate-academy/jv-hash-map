@@ -6,6 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private static final int GROWTH_COEFFICIENT = 2;
     private static final int DEFAULT_CAPACITY = 16;
+    private static final int DEFAULT_SIZE = 0;
 
     private Node<K, V>[] table;
     private int size;
@@ -22,10 +23,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (size == 0) {
-            return null;
-        }
-
         int index = getIndex(key);
         Node<K, V> node = table[index];
 
@@ -76,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         Node<K, V>[] oldTable = table;
         table = new Node[table.length * GROWTH_COEFFICIENT];
-        size = 0;
+        size = DEFAULT_SIZE;
 
         for (Node<K, V> node : oldTable) {
             while (node != null) {
