@@ -5,8 +5,9 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final int DEFAULT_SIZE_MULTIPLAYER = 2;
-    private int loadFactor = 12;
+    private static final int DEFAULT_GROWTH_MULTIPLAYER = 2;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private int threshold = 12;
     private Node<K, V>[] storage;
     private int size;
 
@@ -16,8 +17,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size == loadFactor) {
-            resize();
+        if (size == threshold) {
+            resize(storage.length * DEFAULT_GROWTH_MULTIPLAYER);
         }
         int index = getIndex(key);
         Node<K, V> currentNode = storage[index];
@@ -33,7 +34,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     currentNode.next = newNode;
                     break;
                 }
-                currentNode = getNextNode(currentNode);
+                currentNode = currentNode.next;
             }
         }
         size++;
@@ -92,6 +93,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public void putAll(Map<K, V> m) {
+        if (m.size() + size > threshold) {
+            resize((m.size() + storage.length) * DEFAULT_GROWTH_MULTIPLAYER);
+        }
         for (Map.Entry<K, V> value : m.entrySet()) {
             put(value.getKey(), value.getValue());
         }
@@ -102,15 +106,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
     }
 
-    private Node<K, V> getNextNode(Node<K, V> currentNode) {
-        return currentNode.next == null ? null : currentNode.next;
-    }
-
-    private void resize() {
-        loadFactor = loadFactor * DEFAULT_SIZE_MULTIPLAYER;
+    private void resize(int newCapacity) {
+        threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
         size = 0;
         Node<K, V>[] oldStorage = storage;
-        storage = new Node[storage.length * DEFAULT_SIZE_MULTIPLAYER];
+        storage = new Node[newCapacity];
         for (Node<K, V> node : oldStorage) {
             while (node != null) {
                 put(node.key, node.value);
@@ -125,7 +125,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode;
             }
-            currentNode = getNextNode(currentNode);
+            currentNode = currentNode.next;
         }
         return null;
     }
