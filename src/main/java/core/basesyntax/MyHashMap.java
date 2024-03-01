@@ -77,7 +77,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         for (Node<K, V> node : oldTable) {
             while (node != null) {
-                put(node.key, node.value);
+                addNode(node.key, node.value);
                 node = node.next;
             }
         }
