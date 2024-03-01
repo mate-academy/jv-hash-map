@@ -15,9 +15,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         nodes = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
-    public void put(K key, V value) {
-        int hash = (key == null) ? 0 : hash(key);
-        int index = hash % nodes.length;
+    public void put(K key, V value) {;
+        resizeIfNeeded();
+        int index = findBucketIndex(key);
         Node<K, V> newNode = new Node<>(key, value);
         if (nodes[index] == null) {
             nodes[index] = newNode;
@@ -37,12 +37,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 current = current.next;
             }
         }
-        resizeIfNeeded();
     }
 
     @Override
     public V getValue(K key) {
-        int index = (key == null) ? 0 : hash(key) % nodes.length;
+        int index = findBucketIndex(key);
         Node<K, V> current = nodes[index];
         while (current != null) {
             if (Objects.equals(key, current.key)) {
@@ -64,32 +63,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == sizeForResize) {
             int newCapacity = nodes.length * COEFFICIENT_OF_EXPANSION;
             Node<K, V>[] newNodes = new Node[newCapacity];
-            for (Node<K, V> node : nodes) {
+            Node<K, V>[] tempNodes = nodes;
+            nodes = newNodes;
+            size = 0;
+            for (Node<K, V> node : tempNodes) {
                 while (node != null) {
-                    int newIndex = (node.key == null) ? 0 : hash(node.key) % newCapacity;
-                    Node<K, V> newNode = new Node<>(node.key, node.value);
-                    insertNode(newNodes, newIndex, newNode);
+                    put(node.key,node.value);
                     node = node.next;
                 }
             }
-            nodes = newNodes;
         }
     }
 
-    private void insertNode(Node<K, V>[] nodes, int index, Node<K, V> newNode) {
-        if (nodes[index] == null) {
-            nodes[index] = newNode;
-        } else {
-            Node<K, V> current = nodes[index];
-            while (current.next != null) {
-                current = current.next;
-            }
-            current.next = newNode;
-        }
-    }
-
-    private int hash(K key) {
-        return PRIME_NUMBER * PRIME_NUMBER + (key == null ? 0 : Math.abs(key.hashCode()));
+    private int findBucketIndex(K key) {
+            int hash = PRIME_NUMBER * PRIME_NUMBER + (key == null ? 0 : Math.abs(key.hashCode()));
+        return (key == null) ? 0 : hash % nodes.length;
     }
 
     static class Node<K,V> {
