@@ -4,6 +4,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int GROW_FACTOR = 2;
+    private static final int ZERO_SIZE = 0;
     private int capacity;
     private int threshold;
     private Node<K, V>[] elementsStorage;
@@ -21,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         resizeIfThresholdReached();
         int hashCode = getHash(key);
         int bucketIndex = getIndexByHash(hashCode);
-        Node<K, V> node = new Node<>(hashCode, key, value, null);
+        Node<K, V> node = new Node<>(key, value, null);
         Node<K, V> currentNode = elementsStorage[bucketIndex];
         if (currentNode == null) {
             elementsStorage[bucketIndex] = node;
@@ -83,9 +84,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldStorage = elementsStorage;
         elementsStorage = new Node[capacity];
         Node<K, V> currentNode;
-        size = 0;
-        for (Node<K, V> kvNode : oldStorage) {
-            currentNode = kvNode;
+        size = ZERO_SIZE;
+        for (Node<K, V> node : oldStorage) {
+            currentNode = node;
             while (currentNode != null) {
                 put(currentNode.key, currentNode.value);
                 currentNode = currentNode.next;
@@ -94,13 +95,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
