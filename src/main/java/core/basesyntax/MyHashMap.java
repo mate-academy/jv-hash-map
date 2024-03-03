@@ -5,9 +5,10 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final int NUMBER_TO_MULTIPLY = 2;
+    private static final int ZERO = 0;
     private Node<K, V>[] initialArray;
     private int size;
-    private int DEFAULT_TREEIFY_THRESHOLD = 12;
+    private int threshold = 12;
 
     public MyHashMap() {
         initialArray = new Node[DEFAULT_INITIAL_CAPACITY];
@@ -21,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K, V> node = newNode(key, value);
         int index = Math.abs(getHash(key)) % initialArray.length;
-        int loader = DEFAULT_TREEIFY_THRESHOLD;
+        int loader = threshold;
         if (initialArray[index] == null) {
             initialArray[index] = node;
             size++;
@@ -46,31 +47,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void putNullKey(V value) {
-        if (initialArray[0] == null) {
-            initialArray[0] = newNode(null, value);
-            size++;
-        } else {
-            Node<K, V> current = initialArray[0];
-            while (current.next != null) {
-                if (current.key == null) {
-                    current.value = value;
-                    return;
-                }
-                current = current.next;
-            }
-            if (current.key == null) {
-                current.value = value;
-            } else {
-                current.next = newNode(null, value);
-                size++;
-            }
-        }
-        if (size > DEFAULT_TREEIFY_THRESHOLD) {
-            resize();
-        }
-    }
-
     @Override
     public V getValue(K key) {
         if (key == null) {
@@ -78,7 +54,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int index = getHash(key);
         V value = null;
-
         Node<K, V> currentNode = initialArray[index];
         while (currentNode != null) {
             if (currentNode.key != null && currentNode.key.equals(key)) {
@@ -88,17 +63,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             currentNode = currentNode.next;
         }
         return value;
-    }
-
-    private V getNullKey() {
-        Node<K, V> currentNode = initialArray[0];
-        while (currentNode != null) {
-            if (currentNode.key == null) {
-                return currentNode.value;
-            }
-            currentNode = currentNode.next;
-        }
-        return null;
     }
 
     @Override
@@ -120,7 +84,43 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         initialArray = newArray;
-        DEFAULT_TREEIFY_THRESHOLD *= NUMBER_TO_MULTIPLY;
+        threshold *= NUMBER_TO_MULTIPLY;
+    }
+
+    private V getNullKey() {
+        Node<K, V> currentNode = initialArray[ZERO];
+        while (currentNode != null) {
+            if (currentNode.key == null) {
+                return currentNode.value;
+            }
+            currentNode = currentNode.next;
+        }
+        return null;
+    }
+
+    private void putNullKey(V value) {
+        if (initialArray[ZERO] == null) {
+            initialArray[ZERO] = newNode(null, value);
+            size++;
+        } else {
+            Node<K, V> current = initialArray[0];
+            while (current.next != null) {
+                if (current.key == null) {
+                    current.value = value;
+                    return;
+                }
+                current = current.next;
+            }
+            if (current.key == null) {
+                current.value = value;
+            } else {
+                current.next = newNode(null, value);
+                size++;
+            }
+        }
+        if (size > threshold) {
+            resize();
+        }
     }
 
     private Node<K, V> newNode(K key, V value) {
@@ -128,7 +128,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHash(K key) {
-        return key == null ? 0 : key.hashCode() % DEFAULT_INITIAL_CAPACITY;
+        return key == null ? ZERO
+                : Math.abs(key.hashCode()) % DEFAULT_INITIAL_CAPACITY;
     }
 
     static class Node<K, V> {
@@ -151,8 +152,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Node<?, ?> node = (Node<?, ?>) o;
             return hash == node.hash && Objects.equals(key, node.key)
                     && Objects.equals(value, node.value) && Objects.equals(next, node.next);
