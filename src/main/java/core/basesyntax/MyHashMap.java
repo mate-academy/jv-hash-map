@@ -3,9 +3,10 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    public static final int DEFAULT_CAPACITY = 16;
-    private static final double LOAD_FACTOR = 0.75;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75f;
     private static final int SCALE_FACTOR = 2;
+    private int threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     private Node<K, V>[] table;
     private int size;
 
@@ -32,7 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             } while (bucketNode != null);
         }
         size++;
-        if (table.length * LOAD_FACTOR < size) {
+        if (size > threshold) {
             resize();
         }
     }
@@ -63,6 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = table;
         size = 0;
         table = (Node<K, V>[]) new Node[oldTable.length * SCALE_FACTOR];
+        threshold = (int) (table.length * LOAD_FACTOR);
         for (var bucketItem : oldTable) {
             while (bucketItem != null) {
                 put(bucketItem.key, bucketItem.value);
