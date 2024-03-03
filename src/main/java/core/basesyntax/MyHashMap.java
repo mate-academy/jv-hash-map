@@ -1,7 +1,6 @@
 package core.basesyntax;
 
 import java.util.Objects;
-import java.util.StringJoiner;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
@@ -16,19 +15,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        resizeIfNeeded();
         int index = getBucketIndex(key);
-        Node<K, V> node = table[index];
-        while (node != null) {
-            if (Objects.equals(node.key, key)) {
-                node.value = value;
+        Node<K, V> current = table[index];
+        while (current != null) {
+            if (Objects.equals(current.key, key)) {
+                current.value = value;
                 return;
             }
-            node = node.next;
+            current = current.next;
         }
-        table[index] = new Node<>(key, value, table[index]);
+        Node<K, V> newNode = new Node<>(key, value);
+        put(newNode, index);
         size++;
-        if (size >= table.length * DEFAULT_LOAD_FACTOR) {
-            resize();
+    }
+
+    private void put(Node<K, V> node, int index) {
+        if (table[index] == null) {
+            table[index] = node;
+        } else {
+            Node<K, V> current = table[index];
+            while (current.next != null) {
+                current = current.next;
+            }
+            current.next = node;
         }
     }
 
@@ -50,19 +60,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    @Override
-    public String toString() {
-        String delimiter = ", ";
-        String prefix = "[";
-        String suffix = "]";
-        StringJoiner stringJoiner = new StringJoiner(delimiter, prefix, suffix);
-        for (Node<K, V> node : table) {
-            while (node != null) {
-                stringJoiner.add(node.toString());
-                node = node.next;
-            }
+    private void resizeIfNeeded() {
+        int threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
+        if (size >= threshold) {
+            resize();
         }
-        return stringJoiner.toString();
     }
 
     private int getBucketIndex(K key) {
@@ -84,17 +86,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Node<K, V> {
         private final K key;
         private V value;
-        private final Node<K, V> next;
+        private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
+    }
 
-        @Override
-        public String toString() {
-            return key + "=" + value;
-        }
+    public static void main(String[] args) {
+        MyHashMap<Integer, Integer> map = new MyHashMap<>();
+        map.put(17, 1);
+        map.put(33, 2);
     }
 }
