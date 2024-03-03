@@ -48,12 +48,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void growIfArrayFull() {
         if (size == threshold) {
-            Node<K, V>[] temporaryArray = internalArray;
+            size = 0;
             int newCapacity = internalArray.length * RESIZE_CONSTANT;
+            Node<K, V>[] temporaryArray = internalArray;
             internalArray = new Node[newCapacity];
             threshold = (int) (newCapacity * LOAD_FACTOR);
 
-            size = 0;
             for (int i = 0; i < temporaryArray.length; i++) {
                 Node<K, V> iterator = temporaryArray[i];
                 while (iterator != null) {
