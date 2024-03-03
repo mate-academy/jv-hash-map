@@ -16,30 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resizeIfNeeded();
-        int index = getBucketIndex(key);
-        Node<K, V> current = table[index];
-        while (current != null) {
-            if (Objects.equals(current.key, key)) {
-                current.value = value;
-                return;
-            }
-            current = current.next;
-        }
-        Node<K, V> newNode = new Node<>(key, value);
-        put(newNode, index);
-        size++;
-    }
-
-    private void put(Node<K, V> node, int index) {
-        if (table[index] == null) {
-            table[index] = node;
-        } else {
-            Node<K, V> current = table[index];
-            while (current.next != null) {
-                current = current.next;
-            }
-            current.next = node;
-        }
+        addNewNode(key, value);
     }
 
     @Override
@@ -58,6 +35,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private void addNewNode(K key, V value) {
+        int index = getBucketIndex(key);
+        Node<K, V> current = table[index];
+        Node<K, V> newNode = new Node<>(key, value);
+        if (current != null) {
+            while (true) {
+                if (Objects.equals(current.key, key)) {
+                    current.value = value;
+                    return;
+                }
+                if (current.next == null) {
+                    current.next = newNode;
+                    size++;
+                    return;
+                }
+                current = current.next;
+            }
+        } else {
+            table[index] = newNode;
+            size++;
+        }
     }
 
     private void resizeIfNeeded() {
