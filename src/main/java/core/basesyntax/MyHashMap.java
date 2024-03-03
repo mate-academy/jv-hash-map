@@ -93,10 +93,4 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
         }
     }
-
-    public static void main(String[] args) {
-        MyHashMap<Integer, Integer> map = new MyHashMap<>();
-        map.put(17, 1);
-        map.put(33, 2);
-    }
 }
