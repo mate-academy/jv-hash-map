@@ -81,9 +81,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resizeIfNeed() {
-        if ((double) size / table.length >= LOAD_FACTOR) {
+        threshold = (int) (table.length * LOAD_FACTOR);
+        if ((double) size >= threshold) {
             reSize();
-            threshold = (int) (table.length * LOAD_FACTOR);
             if (threshold > MAXIMUM_CAPACITY) {
                 threshold = MAXIMUM_CAPACITY;
             }
