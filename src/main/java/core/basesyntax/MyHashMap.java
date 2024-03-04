@@ -2,7 +2,7 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final double LOAD_FACTOR = 0.75;
+    private static final float LOAD_FACTOR = 0.75F;
     private static final int GROW_FACTOR = 2;
     private Node<K, V>[] table = new Node[DEFAULT_CAPACITY];
     private int threshold;
@@ -11,14 +11,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resizeIfReachesThreshold();
-        int position = Math.abs(getIndex(key));
+        int position = getIndex(key);
         Node<K, V> newNode = new Node<>(key, value, null);
         addToTable(newNode, position);
     }
 
     @Override
     public V getValue(K key) {
-        int position = Math.abs(getIndex(key));
+        int position = getIndex(key);
         Node<K, V> current = new Node<>(key, null, null);
         return getValueByKey(position, current);
     }
@@ -49,13 +49,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         while (oldNode.nextNode != null) {
-            if (oldNode.equals(currentNode)) {
+            if (oldNode.key == null ? currentNode.key == null
+                    : oldNode.key.equals(currentNode.key)) {
                 oldNode.value = currentNode.value;
                 return;
             }
             oldNode = oldNode.nextNode;
         }
-        if (oldNode.equals(currentNode)) {
+        if (oldNode.key == null ? currentNode.key == null
+                : oldNode.key.equals(currentNode.key)) {
             oldNode.value = currentNode.value;
             return;
         }
@@ -66,7 +68,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private V getValueByKey(int position, Node<K, V> lookForNode) {
         Node<K, V> oldNode = table[position];
         while (oldNode != null) {
-            if (oldNode.key == lookForNode.key || oldNode.equals(lookForNode)) {
+            if (oldNode.key == null ? lookForNode.key == null
+                    : oldNode.key.equals(lookForNode.key)) {
                 return oldNode.value;
             }
             oldNode = oldNode.nextNode;
@@ -81,7 +84,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return hash(key) % table.length;
+        return Math.abs(hash(key) % table.length);
     }
 
     private int hash(K key) {
@@ -97,32 +100,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.nextNode = nextNode;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-
-            if (!o.getClass().equals(this.getClass())) {
-                return false;
-            }
-            Node<K, V> node = ((Node<K, V>) o);
-            if (node.key == null && key == null || (node.key != null
-                    && key != null && key.equals(node.key))) {
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            int prime = 31;
-            int result = 1;
-            result = result * prime + (key == null ? 0 : key.hashCode());
-            result = result * prime + (value == null ? 0 : value.hashCode());
-            return result;
         }
     }
 }
