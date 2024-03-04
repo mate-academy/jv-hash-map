@@ -4,10 +4,11 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final double LOAD_FACTOR = 0.75f;
+    private static final float LOAD_FACTOR = 0.75f;
     private static final int RESIZE_INDEX = 2;
     private Node<K, V> [] table;
     private int size;
+    private int threshold;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
@@ -16,7 +17,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value);
-        int threshold = (int) (table.length * LOAD_FACTOR);
         if (size > threshold) {
             resize();
         }
@@ -64,6 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         Node<K, V>[] lastBuckets = table;
         int newCapacity = table.length * RESIZE_INDEX;
+        threshold = (int) (newCapacity * LOAD_FACTOR);
         size = 0;
         table = new Node[newCapacity];
         for (Node<K, V> node : lastBuckets) {
