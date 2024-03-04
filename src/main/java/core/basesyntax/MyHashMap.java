@@ -12,11 +12,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[DEFAULT_CAPACITY];
     }
 
-    public int getHash (K key) {
+    public int getHash(K key) {
         return (key == null) ? 0 : key.hashCode();
     }
 
-    public void put (K key, V value) {
+    public void put(K key, V value) {
         if (size > table.length * LOAD_FACTOR) {
             resizeTable();
         }
