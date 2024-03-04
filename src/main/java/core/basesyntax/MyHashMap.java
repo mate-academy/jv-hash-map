@@ -1,39 +1,42 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
-    private int capacity;
+    private int threshold;
     private int size;
 
     public MyHashMap() {
-        this.table = new Node[DEFAULT_CAPACITY];
-        this.capacity = table.length;
+        table = new Node[DEFAULT_CAPACITY];
+        threshold = (int) (table.length * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        int threshold = (int) (capacity * LOAD_FACTOR);
         if (size > threshold) {
             resize();
         }
 
         int bucketIndex = getIndex(key);
-        if (table[bucketIndex] != null) {
+        if (table[bucketIndex] == null) {
+            table[bucketIndex] = new Node<>(key, value);
+        } else {
             Node<K, V> currentNode = table[bucketIndex];
 
             while (currentNode != null) {
-                if (areKeysEqual(key, currentNode.key)) {
+                if (Objects.equals(key, currentNode.key)) {
                     currentNode.value = value;
                     return;
+                } else if (currentNode.next == null) {
+                    currentNode.next = new Node<>(key, value);
+                    break;
                 }
                 currentNode = currentNode.next;
             }
         }
-
-        Node<K, V> newNode = new Node<>(key, value);
-        addNode(table, newNode);
         size++;
     }
 
@@ -43,7 +46,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> currentNode = table[bucketIndex];
 
         while (currentNode != null) {
-            if (areKeysEqual(key, currentNode.key)) {
+            if (Objects.equals(key, currentNode.key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
@@ -57,40 +60,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] newTable = new Node[capacity << 1];
-        capacity = newTable.length;
+        Node<K, V>[] oldTable = table;
+        table = new Node[table.length << 1];
+        size = 0;
 
-        for (Node<K, V> currentNode : table) {
+        for (Node<K, V> currentNode : oldTable) {
             while (currentNode != null) {
-                Node<K, V> nextNode = currentNode.next;
-                currentNode.next = null;
-                addNode(newTable, currentNode);
-                currentNode = nextNode;
+                put(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
             }
         }
-        table = newTable;
-    }
-
-    private void addNode(Node<K, V>[] table, Node<K, V> node) {
-        int nodeIndex = getIndex(node.key);
-
-        if (table[nodeIndex] == null) {
-            table[nodeIndex] = node;
-        } else {
-            Node<K, V> tempNode = table[nodeIndex];
-            while (tempNode.next != null) {
-                tempNode = tempNode.next;
-            }
-            tempNode.next = node;
-        }
+        threshold = (int) (table.length * LOAD_FACTOR);
     }
 
     private int getIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
-    }
-
-    private boolean areKeysEqual(K firstKey, K secondKey) {
-        return firstKey == null ? secondKey == null : firstKey.equals(secondKey);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private static class Node<K, V> {
