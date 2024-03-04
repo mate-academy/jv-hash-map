@@ -12,6 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
+        size = DEFAULT_INITIAL_SIZE;
     }
 
     @Override
@@ -89,10 +90,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        private boolean hasNext() {
-            return next != null;
         }
     }
 }
