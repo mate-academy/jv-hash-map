@@ -94,10 +94,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            };
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            };
             Node<?, ?> node = (Node<?, ?>) o;
-            return Objects.equals(key, node.key) && Objects.equals(value, node.value) && Objects.equals(next, node.next);
+            return Objects.equals(key, node.key) && Objects.equals(value, node.value)
+                    && Objects.equals(next, node.next);
         }
 
         @Override
