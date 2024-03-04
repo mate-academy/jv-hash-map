@@ -62,11 +62,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] lastBuckets = table;
+        final Node<K, V>[] lastBuckets = table;
         int newCapacity = table.length * RESIZE_INDEX;
         threshold = (int) (newCapacity * LOAD_FACTOR);
-        size = 0;
         table = new Node[newCapacity];
+        size = 0;
         for (Node<K, V> node : lastBuckets) {
             while (node != null) {
                 put(node.key, node.value);
