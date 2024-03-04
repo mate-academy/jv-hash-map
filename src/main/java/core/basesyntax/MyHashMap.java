@@ -5,7 +5,6 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
     private static final int DEFAULT_CAPACITY = 16;
-    private static final int MAXIMUM_CAPACITY = 1 << 30;
     private static final int RESIZE_COEFFICIENT = 2;
 
     private int threshold;
@@ -19,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        resizeIfNeed();
+        resizeIfExcedeCapacity();
         int index = findIndex(key);
         Node<K, V> node = table[index];
         while (node != null) {
@@ -52,19 +51,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static class Node<K, V> {
-        private K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
-    private void reSize() {
+    private void resize() {
         Node<K, V>[] oldTable = table;
         table = new Node[oldTable.length * RESIZE_COEFFICIENT];
         size = 0;
@@ -80,13 +67,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
-    private void resizeIfNeed() {
+    private void resizeIfExcedeCapacity() {
         threshold = (int) (table.length * LOAD_FACTOR);
         if ((double) size >= threshold) {
-            reSize();
-            if (threshold > MAXIMUM_CAPACITY) {
-                threshold = MAXIMUM_CAPACITY;
-            }
+            resize();
+        }
+    }
+
+    private static class Node<K, V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        private Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
         }
     }
 }
