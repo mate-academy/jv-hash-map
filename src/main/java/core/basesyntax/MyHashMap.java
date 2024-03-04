@@ -16,10 +16,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : key.hashCode();
     }
 
-    public void put(K key, V value) {
+    public void put (K key, V value) {
         if (size > table.length * LOAD_FACTOR) {
-        resizeTable();
-    }
+            resizeTable();
+        }
         int hash = getHash(key);
         int index = (key == null) ? 0 : getIndex(hash, table.length);
         if (table[index] == null) {
