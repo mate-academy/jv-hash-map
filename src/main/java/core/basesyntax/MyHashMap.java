@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -9,34 +7,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75F;
     private static final int GROW_CONSTANT = 2;
 
-    private List<Node<K, V>>[] buckets;
+    private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        buckets = new List[DEFAULT_INITIAL_CAPACITY];
+        table = new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         resizeIfNeeded();
+        Node<K, V> newNode = new Node<>(key, value);
         int index = getIndex(key);
-        if (buckets[index] != null) {
-            Node<K, V> lastNode = null;
-            for (Node<K, V> node : buckets[index]) {
-                lastNode = node;
-                if (Objects.equals(node.key, key)) {
-                    node.value = value;
-                    return;
-                }
-            }
-            Node<K, V> newNode = createNewNode(key, value);
-            buckets[index].add(newNode);
-            if (lastNode != null) {
-                lastNode.next = newNode;
-            }
+        Node<K, V> tempNode = table[index];
+        if (tempNode == null) {
+            table[index] = newNode;
         } else {
-            buckets[index] = new LinkedList<>();
-            buckets[index].add(createNewNode(key, value));
+            while (true) {
+                if (Objects.equals(tempNode.key, key)) {
+                    tempNode.value = value;
+                    return;
+                } else if (tempNode.next == null) {
+                    tempNode.next = newNode;
+                    break;
+                }
+                tempNode = tempNode.next;
+            }
         }
         size++;
     }
@@ -44,12 +40,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = getIndex(key);
-        if (buckets[index] != null) {
-            for (Node<K, V> node : buckets[index]) {
-                if (Objects.equals(node.key, key)) {
-                    return node.value;
-                }
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return node.value;
             }
+            node = node.next;
         }
         return null;
     }
@@ -60,36 +56,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resizeIfNeeded() {
-        if ((float) size / buckets.length > DEFAULT_LOAD_FACTOR) {
+        if (((float) size / table.length) > DEFAULT_LOAD_FACTOR) {
             resize();
         }
     }
 
     private void resize() {
-        int newCapacity = buckets.length * GROW_CONSTANT;
-        List<Node<K, V>>[] newBuckets = new List[newCapacity];
-        for (List<Node<K, V>> bucket : buckets) {
-            if (bucket != null) {
-                for (Node<K, V> node : bucket) {
-                    int newIndex = getHashCode(node.key) % newCapacity;
-                    if (newBuckets[newIndex] == null) {
-                        newBuckets[newIndex] = new LinkedList<>();
-                    }
-                    newBuckets[newIndex].add(node);
-                }
+        int newCapacity = table.length * GROW_CONSTANT;
+        Node<K, V>[] newTable = new Node[newCapacity];
+        for (Node<K, V> oldNode : table) {
+            while (oldNode != null) {
+                int newIndex = getHashCode(oldNode.key) % newCapacity;
+                Node<K, V> newNode = new Node<>(oldNode.key, oldNode.value);
+                newNode.next = newTable[newIndex];
+                newTable[newIndex] = newNode;
+                oldNode = oldNode.next;
             }
         }
-        buckets = newBuckets;
-    }
-
-    private Node<K, V> createNewNode(K key, V value) {
-        Node<K, V> node = new Node<>(key, value);
-        node.hash = getHashCode(key);
-        return node;
+        table = newTable;
     }
 
     private int getIndex(K key) {
-        return getHashCode(key) % buckets.length;
+        return getHashCode(key) % table.length;
     }
 
     private int getHashCode(K key) {
