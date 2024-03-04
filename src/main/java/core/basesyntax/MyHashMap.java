@@ -60,9 +60,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private boolean compareKeys (K key, Node<K, V> currentNode) {
-        return (key == currentNode.key) || (key != null && key.equals(
-                currentNode.key));
+    private boolean compareKeys(K key, Node<K, V> currentNode) {
+        return (key == currentNode.key) || (key != null && key.equals(currentNode.key));
     }
 
     private int defineIndexByKey(K key) {
