@@ -15,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        resizeIfNeeded();
+        resizeIfExceedCapacity();
         addNewNode(key, value);
     }
 
@@ -60,7 +60,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void resizeIfNeeded() {
+    private void resizeIfExceedCapacity() {
         int threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
         if (size >= threshold) {
             resize();
@@ -88,7 +88,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
         }
