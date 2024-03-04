@@ -5,14 +5,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int GROW_FACTOR = 2;
     private static final int ZERO_SIZE = 0;
-    private int capacity;
     private int threshold;
     private Node<K, V>[] elementsStorage;
     private int size;
 
     @SuppressWarnings("unchecked")
     public MyHashMap() {
-        capacity = DEFAULT_INITIAL_CAPACITY;
         threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
         elementsStorage = new Node[DEFAULT_INITIAL_CAPACITY];
     }
@@ -20,8 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         resizeIfThresholdReached();
-        int hashCode = getHash(key);
-        int bucketIndex = getIndexByHash(hashCode);
+        int bucketIndex = calculateIndex(key);
         Node<K, V> node = new Node<>(key, value, null);
         Node<K, V> currentNode = elementsStorage[bucketIndex];
         if (currentNode == null) {
@@ -45,8 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hashCode = getHash(key);
-        int bucketIndex = getIndexByHash(hashCode);
+        int bucketIndex = calculateIndex(key);
         Node<K, V> currentNode = elementsStorage[bucketIndex];
         while (currentNode != null) {
             if (isKeysEquals(currentNode.key, key)) {
@@ -62,12 +58,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getHash(K key) {
-        return key == null ? 0 : key.hashCode();
-    }
-
-    private int getIndexByHash(int hashCode) {
-        return Math.abs(hashCode) % capacity;
+    private int calculateIndex(K key) {
+        int hash = key == null ? 0 : key.hashCode();
+        return Math.abs(hash) % elementsStorage.length;
     }
 
     private boolean isKeysEquals(K key1, K key2) {
@@ -76,13 +69,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @SuppressWarnings("unchecked")
     private void resizeIfThresholdReached() {
-        if (!(size == threshold)) {
+        if (size != threshold) {
             return;
         }
-        capacity *= GROW_FACTOR;
         threshold *= GROW_FACTOR;
+        int newCapacity = elementsStorage.length * GROW_FACTOR;
         Node<K, V>[] oldStorage = elementsStorage;
-        elementsStorage = new Node[capacity];
+        elementsStorage = new Node[newCapacity];
         Node<K, V> currentNode;
         size = ZERO_SIZE;
         for (Node<K, V> node : oldStorage) {
