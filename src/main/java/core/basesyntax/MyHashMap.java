@@ -4,22 +4,20 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final int DEFAULT_GROWTH_FACTOR = 2;
-    private static final int DEFAULT_INITIAL_SIZE = 0;
     private int size;
     private Node<K, V>[] table;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        size = DEFAULT_INITIAL_SIZE;
     }
 
     @Override
     public void put(K key, V value) {
-        checkSize();
+        resizeIfExcedeCapacity();
         Node<K, V> newNode = new Node<>(key, value, null);
-        int index = getIndexByKey(key);
+        int index = getIndex(key);
         Node<K, V> nodeTemp = table[index];
 
         if (nodeTemp == null) {
@@ -41,7 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = getIndexByKey(key);
+        int index = getIndex(key);
         Node<K,V> nodeTemp = table[index];
         while (nodeTemp != null) {
             if (Objects.equals(nodeTemp.key, key)) {
@@ -57,18 +55,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getIndexByKey(K key) {
+    private int getIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
-    private void checkSize() {
+    private void resizeIfExcedeCapacity() {
         if (size >= table.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
     }
 
     private void resize() {
-        size = DEFAULT_INITIAL_SIZE;
+        size = 0;
         int newLength = table.length * DEFAULT_GROWTH_FACTOR;
         Node<K, V>[] tableStorage = table;
         table = new Node[newLength];
@@ -86,7 +84,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
