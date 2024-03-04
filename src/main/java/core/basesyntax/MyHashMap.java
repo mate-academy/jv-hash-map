@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final int DEFAULT_GROW_FACTOR = 2;
@@ -88,6 +90,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private Node(K key, V value) {
             this.key = key;
             this.value = value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Node<?, ?> node = (Node<?, ?>) o;
+            return Objects.equals(key, node.key) && Objects.equals(value, node.value) && Objects.equals(next, node.next);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(key, value, next);
         }
     }
 }
