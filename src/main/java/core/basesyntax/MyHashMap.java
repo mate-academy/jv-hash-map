@@ -3,7 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
-    private static final int GROW_FACTOR = 2;
+    private static final int CAPACITY_GROW_FACTOR = 2;
 
     private Node<K, V>[] table;
     private double loadFactor;
@@ -11,13 +11,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        this(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR);
-    }
-
-    public MyHashMap(int initialCapacity, double loadFactor) {
-        this.table = new Node[initialCapacity];
-        this.loadFactor = loadFactor;
-        this.threshold = (int) (initialCapacity * loadFactor);
+        this.table = new Node[DEFAULT_CAPACITY];
+        this.loadFactor = DEFAULT_LOAD_FACTOR;
+        this.threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
@@ -111,7 +107,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         int oldCapacity = table.length;
-        int newCapacity = oldCapacity * GROW_FACTOR;
+        int newCapacity = oldCapacity * CAPACITY_GROW_FACTOR;
         threshold = (int) (newCapacity * loadFactor);
         Node<K, V>[] oldTable = table;
         table = new Node[newCapacity];
