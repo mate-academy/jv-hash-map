@@ -83,7 +83,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private class Node<K, V> {
         private final K key;
         private V value;
-        private int hash;
+
         private Node<K, V> next;
 
         public Node(K key, V value) {
