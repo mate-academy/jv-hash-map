@@ -23,11 +23,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (key == null) {
-            putForNullKey(value);
-            return;
-        }
-
         int hash = hash(key);
         int index = Math.floorMod(hash, table.length);
         if (table[index] == null) {
@@ -58,9 +53,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
-            return getForNullKey();
-        }
         int hash = hash(key);
         int index = Math.floorMod(hash, table.length);
         Node<K, V> current = table[index];
@@ -72,30 +64,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return current.value;
             }
             current = current.next;
-        }
-        return null;
-    }
-
-    private void putForNullKey(V value) {
-        Node<K, V> node = table[0];
-        while (node != null) {
-            if (node.key == null) {
-                node.value = value;
-                return;
-            }
-            node = node.next;
-        }
-        table[0] = new Node<>(0, null, value, table[0]);
-        size++;
-    }
-
-    private V getForNullKey() {
-        Node<K, V> node = table[0];
-        while (node != null) {
-            if (node.key == null) {
-                return node.value;
-            }
-            node = node.next;
         }
         return null;
     }
