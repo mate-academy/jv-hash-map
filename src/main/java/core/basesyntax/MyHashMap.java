@@ -24,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> currentNode = table[bucketIndex];
 
             while (currentNode != null) {
-                if (keyEquals(key, currentNode.key)) {
+                if (areKeysEqual(key, currentNode.key)) {
                     currentNode.value = value;
                     return;
                 }
@@ -43,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> currentNode = table[bucketIndex];
 
         while (currentNode != null) {
-            if (keyEquals(key, currentNode.key)) {
+            if (areKeysEqual(key, currentNode.key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
@@ -86,11 +86,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        int hash = (key == null) ? 0 : Math.abs(key.hashCode());
-        return hash % capacity;
+        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
-    private boolean keyEquals(K firstKey, K secondKey) {
+    private boolean areKeysEqual(K firstKey, K secondKey) {
         return firstKey == null ? secondKey == null : firstKey.equals(secondKey);
     }
 
