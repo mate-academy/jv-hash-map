@@ -20,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = defineIndexByKey(key);
         Node<K,V> currentNode = table[index];
         while (currentNode != null) {
-            if ((key == currentNode.key) || (key != null && key.equals(currentNode.key))) {
+            if (compareKeys(key, currentNode)) {
                 currentNode.value = value;
                 return;
             }
@@ -60,6 +60,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private boolean compareKeys (K key, Node<K, V> currentNode) {
+        return (key == currentNode.key) || (key != null && key.equals(
+                currentNode.key));
+    }
+
     private int defineIndexByKey(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % capacity);
     }
@@ -68,8 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = defineIndexByKey(key);
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
-            if ((key == currentNode.key) || (key != null && key.equals(
-                    currentNode.key))) {
+            if (compareKeys(key, currentNode)) {
                 return currentNode;
             }
             currentNode = currentNode.next;
