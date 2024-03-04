@@ -16,11 +16,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        resizeIfNeed();
-        int hash = hashFunction(key);
+        resizeIfExcedeCapacity();
+        int hash = calculateHashCode(key);
         Node<K, V> node = table[hash];
         while (node != null) {
-            if (Objects.equals(node.key,key)) {
+            if (Objects.equals(node.key, key)) {
                 node.value = value;
                 return;
             }
@@ -33,10 +33,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = hashFunction(key);
+        int hash = calculateHashCode(key);
         Node<K, V> node = table[hash];
         while (node != null) {
-            if (Objects.equals(node.key,key)) {
+            if (Objects.equals(node.key, key)) {
                 return node.value;
             }
             node = node.next;
@@ -49,19 +49,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static class Node<K, V> {
-        private K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
-    private void reSize() {
+    private void resize() {
         Node<K, V>[] oldTable = table;
         table = new Node[oldTable.length * RESIZE_COEFFICIENT];
         size = 0;
@@ -73,13 +61,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int hashFunction(K key) {
+    private int calculateHashCode(K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
-    private void resizeIfNeed() {
+    private void resizeIfExcedeCapacity() {
         if ((double) size / table.length >= LOAD_FACTOR) {
-            reSize();
+            resize();
+        }
+    }
+
+    private static class Node<K, V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        private Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
         }
     }
 }
