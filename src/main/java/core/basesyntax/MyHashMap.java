@@ -6,7 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final int DEFAULT_GROW_FACTOR = 2;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
-    private Node<K,V>[] table;
+    private Node<K, V>[] table;
     private int capacity;
     private int size;
     private int threshold;
@@ -20,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int index = defineIndexByKey(key);
-        Node<K,V> currentNode = table[index];
+        Node<K, V> currentNode = table[index];
         while (currentNode != null) {
             if (compareKeys(key, currentNode)) {
                 currentNode.value = value;
@@ -96,10 +96,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public boolean equals(Object o) {
             if (this == o) {
                 return true;
-            };
+            }
             if (o == null || getClass() != o.getClass()) {
                 return false;
-            };
+            }
             Node<?, ?> node = (Node<?, ?>) o;
             return Objects.equals(key, node.key) && Objects.equals(value, node.value)
                     && Objects.equals(next, node.next);
