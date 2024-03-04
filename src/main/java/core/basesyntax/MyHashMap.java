@@ -19,10 +19,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = defineIndexByKey(key);
+        int index = findIndexByKey(key);
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
-            if (compareKeys(key, currentNode)) {
+            if (compareKeys(key, currentNode.key)) {
                 currentNode.value = value;
                 return;
             }
@@ -39,7 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        Node<K, V> node = searchNodeByKey(key);
+        Node<K, V> node = findNodeByKey(key);
         return (node == null) ? null : node.value;
     }
 
@@ -62,19 +62,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private boolean compareKeys(K key, Node<K, V> currentNode) {
-        return (key == currentNode.key) || (key != null && key.equals(currentNode.key));
+    private boolean compareKeys(K key, K currentNodeKey) {
+        return (key == currentNodeKey) || (key != null && key.equals(currentNodeKey));
     }
 
-    private int defineIndexByKey(K key) {
+    private int findIndexByKey(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
-    private Node<K, V> searchNodeByKey(K key) {
-        int index = defineIndexByKey(key);
+    private Node<K, V> findNodeByKey(K key) {
+        int index = findIndexByKey(key);
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
-            if (compareKeys(key, currentNode)) {
+            if (compareKeys(key, currentNode.key)) {
                 return currentNode;
             }
             currentNode = currentNode.next;
