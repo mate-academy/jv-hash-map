@@ -13,8 +13,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public int getHash (K key) {
-        int hash = (key == null) ? 0 : key.hashCode();
-        return hash;
+        return (key == null) ? 0 : key.hashCode();
     }
 
     public void put(K key, V value) {
