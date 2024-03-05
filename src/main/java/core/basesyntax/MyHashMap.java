@@ -8,18 +8,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Entry<K, V>[] table;
     private int size;
 
-    private static class Entry<K, V> {
-        private final K key;
-        private V value;
-        private final Entry<K, V> next;
-
-        private Entry(K key, V value, Entry<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     public MyHashMap() {
         this.table = new Entry[DEFAULT_CAPACITY];
     }
@@ -79,5 +67,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void add(int index, K key, V value, Entry<K,V> entry) {
         table[index] = new Entry<>(key, value, entry);
         size++;
+    }
+
+    private static class Entry<K, V> {
+        private final K key;
+        private V value;
+        private final Entry<K, V> next;
+
+        private Entry(K key, V value, Entry<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
