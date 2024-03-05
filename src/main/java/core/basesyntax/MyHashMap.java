@@ -12,11 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         checkThreshold();
-        if (key == null) {
-            putForNullKey(value);
-            return;
-        }
-        int bucketIndex = getBucketIndex(hash(key));
+        int bucketIndex = key == null ? 0 : getBucketIndex(hash(key));
         Node<K, V> newNode = new Node<>(key, value, null);
         if (table[bucketIndex] == null) {
             table[bucketIndex] = newNode;
@@ -25,7 +21,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         Node<K, V> currentNode = table[bucketIndex];
-        if (currentNode.key.equals(key)) {
+        if (bucketIndex == 0
+                || currentNode.key.equals(key)) {
             currentNode.value = value;
         } else {
             currentNode.next = newNode;
@@ -104,28 +101,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int hash(K key) {
         return key == null ? 0 : key.hashCode();
-    }
-
-    private void putForNullKey(V value) {
-        if (table[0] == null) {
-            table[0] = new Node<>(null, value, null);
-            size++;
-        } else {
-            Node<K, V> currentNode = table[0];
-            while (currentNode.next != null) {
-                if (currentNode.key == null) {
-                    currentNode.value = value;
-                    return;
-                }
-                currentNode = currentNode.next;
-            }
-            if (currentNode.key == null) {
-                currentNode.value = value;
-            } else {
-                currentNode.next = new Node<>(null, value, null);
-                size++;
-            }
-        }
     }
 
     private static class Node<K, V> {
