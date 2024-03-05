@@ -3,8 +3,9 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    public static final int INITIAL_CAPACITY = 16;
-    public static final float LOAD_FACTOR = 0.75f;
+    private static final int INITIAL_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75f;
+    private static final int GROW_FACTOR = 2;
     private int size;
     private Node<K, V>[] table;
 
@@ -20,17 +21,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (current == null) {
             table[index] = new Node<>(key, value, null);
         } else {
-            while (true) {
+            Node<K,V> prev = null;
+            while (current != null) {
                 if (Objects.equals(current.key, key)) {
                     current.value = value;
                     return;
                 }
-                if (current.next == null) {
-                    break;
-                }
+                prev = current;
                 current = current.next;
             }
-            current.next = new Node<>(key, value, null);
+            prev.next = new Node<>(key, value, null);
         }
         size++;
         resize();
@@ -47,7 +47,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             } while ((node = node.next) != null);
         }
         return null;
-
     }
 
     @Override
@@ -60,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
 
-        Node<K, V>[] newTable = new Node[table.length << 1];
+        Node<K, V>[] newTable = new Node[table.length * GROW_FACTOR];
 
         int i = 1;
         Node<K, V> current;
@@ -103,7 +102,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-
         private int hash;
         private K key;
         private V value;
