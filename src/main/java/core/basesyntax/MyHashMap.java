@@ -5,18 +5,17 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
+    private static final int GROW_FACTOR = 2;
     private Entry<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        this.table = new Entry[DEFAULT_CAPACITY];
+        table = new Entry[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= LOAD_FACTOR * table.length) {
-            resize();
-        }
+        resize();
         int index = hashIndex(key);
         Entry<K, V> entry = table[index];
         while (entry != null) {
@@ -53,13 +52,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Entry<K, V>[] oldTable = table;
-        table = new Entry[table.length * 2];
-        size = 0;
-        for (Entry<K, V> entry : oldTable) {
-            while (entry != null) {
-                put(entry.key, entry.value);
-                entry = entry.next;
+        if (size >= LOAD_FACTOR * table.length) {
+            Entry<K, V>[] oldTable = table;
+            table = new Entry[table.length * GROW_FACTOR];
+            size = 0;
+            for (Entry<K, V> entry : oldTable) {
+                while (entry != null) {
+                    put(entry.key, entry.value);
+                    entry = entry.next;
+                }
             }
         }
     }
