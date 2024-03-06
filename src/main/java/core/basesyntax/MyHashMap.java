@@ -24,21 +24,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         if (table[index] == null) {
             table[index] = newNode;
-        } else {
-            Node<K, V> node = table[index];
-            while (node != null) {
-                if (Objects.equals(key, node.key)) {
-                    node.value = value;
-                    return;
-                }
-                if (node.next == null) {
-                    break;
-                }
-                node = node.next;
-            }
-            node.next = newNode;
+            size++;
+            return;
         }
-        size++;
+        Node<K, V> node = table[index];
+        while (true) {
+            if (Objects.equals(key, node.key)) {
+                node.value = value;
+                return;
+            }
+            if (node.next == null) {
+                node.next = newNode;
+                size++;
+                return;
+            }
+            node = node.next;
+        }
     }
 
     public V getValue(K key) {
@@ -66,8 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] tempTable = table;
         table = new Node[table.length * GROW_FACTOR];
         threshold = (int) (table.length * LOAD_FACTOR);
-        for (int i = 0; i < tempTable.length; i++) {
-            Node<K, V> node = tempTable[i];
+        for (Node<K, V> node : tempTable) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
@@ -80,7 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
