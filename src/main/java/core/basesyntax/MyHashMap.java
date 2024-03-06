@@ -35,11 +35,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public V getValue(K key) {
+        int indexInTable = getIndex(key);
+
         if (table != null) {
-            for (Node<K, V> element = table[getIndex(key)]; element != null; element = element.next) {
-                if ((element.hash == hash(key)) && (Objects.equals(element.key, key))) {
+            Node<K, V> element = table[indexInTable];
+
+            while (element != null) {
+                if (element.hash == hash(key) && Objects.equals(element.key, key)) {
                     return element.value;
                 }
+                element = element.next;
             }
         }
 
@@ -53,11 +58,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K,V>[] resize() {
         int oldCapacity = (table == null) ? 0 : table.length;
-        int newCapacity = (oldCapacity > 0) ? oldCapacity << 1 : DEFAULT_CAPACITY;
-        int newThreshold = (threshold > 0) ? threshold << 1 : (int) (DEFAULT_LOAD_FACTOR * newCapacity);
+        int newCapacity = (oldCapacity > 0)
+                ? oldCapacity << 1 : DEFAULT_CAPACITY;
+        int newThreshold = (threshold > 0)
+                ? threshold << 1 : (int) (DEFAULT_LOAD_FACTOR * newCapacity);
 
         if (newThreshold == 0) {
-            newThreshold = (newCapacity < MAXIMUM_CAPACITY) ? (int) (newCapacity * DEFAULT_LOAD_FACTOR) : Integer.MAX_VALUE;
+            newThreshold = (newCapacity < MAXIMUM_CAPACITY)
+                    ? (int) (newCapacity * DEFAULT_LOAD_FACTOR) : Integer.MAX_VALUE;
         }
 
         threshold = newThreshold;
@@ -80,7 +88,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = newTable;
         return newTable;
     }
-
 
     private int hash(K key) {
         return key == null ? 0 : key.hashCode();
