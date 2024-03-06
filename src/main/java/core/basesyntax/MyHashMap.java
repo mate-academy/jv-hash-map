@@ -22,13 +22,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        int index = Math.abs(Objects.hashCode(key) % buckets.length);
+        int index = getIndexForEntry(key, buckets.length);
         Entry<K, V> e = buckets[index];
-        if (e == null) {
-            buckets[index] = new Entry<>(key, value);
-            size++;
-            return;
-        }
         while (e != null) {
             if (Objects.equals(e.key,key)) {
                 e.value = value;
@@ -39,13 +34,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             e = e.next;
         }
-        e.next = new Entry<>(key, value);
+        if (e == null) {
+            buckets[index] = new Entry<>(key, value);
+        } else {
+            e.next = new Entry<>(key, value);
+        }
         size++;
     }
 
     @Override
     public V getValue(K key) {
-        int index = Math.abs(Objects.hashCode(key) % buckets.length);
+        int index = getIndexForEntry(key, buckets.length);
         Entry<K, V> e = buckets[index];
         while (e != null) {
             if (Objects.equals(e.key, key)) {
@@ -61,6 +60,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private void resize() {
+        int newCapacity = buckets.length * GROW_FACTOR;
+        Entry<K, V>[] newBuckets = new Entry[newCapacity];
+        for (Entry<K, V> entry : buckets) {
+            while (entry != null) {
+                Entry<K, V> next = entry.next;
+                int index = (entry.key == null
+                        ? 0 : getIndexForEntry(entry.key,newCapacity));
+                entry.next = newBuckets[index];
+                newBuckets[index] = entry;
+                entry = next;
+            }
+        }
+        buckets = newBuckets;
+    }
+
+    private int getIndexForEntry(K key, int capacity) {
+        return Math.abs(Objects.hashCode(key) % capacity);
+    }
+
     private static class Entry<K, V> {
         private final K key;
         private V value;
@@ -70,21 +89,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
         }
-    }
-
-    private void resize() {
-        int newCapacity = buckets.length * GROW_FACTOR;
-        Entry<K, V>[] newBuckets = new Entry[newCapacity];
-        for (Entry<K, V> entry : buckets) {
-            while (entry != null) {
-                Entry<K, V> next = entry.next;
-                int index = (entry.key == null
-                        ? 0 : Math.abs(Objects.hashCode(entry.key) % newCapacity));
-                entry.next = newBuckets[index];
-                newBuckets[index] = entry;
-                entry = next;
-            }
-        }
-        buckets = newBuckets;
     }
 }
