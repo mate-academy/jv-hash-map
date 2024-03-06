@@ -5,7 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private static final int MAXIMUM_CAPACITY = 1 << 30;
+    private static final int ENCREASE_FACTOR = 2;
     private Node<K,V>[] table;
     private int threshold;
     private int size;
@@ -56,37 +56,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private Node<K,V>[] resize() {
-        int oldCapacity = (table == null) ? 0 : table.length;
-        int newCapacity = (oldCapacity > 0)
-                ? oldCapacity << 1 : DEFAULT_CAPACITY;
-        int newThreshold = (threshold > 0)
-                ? threshold << 1 : (int) (DEFAULT_LOAD_FACTOR * newCapacity);
+    private void resize() {
+        final Node<K, V>[] oldTable = table;
+        table = (Node<K, V>[]) new Node[table.length * ENCREASE_FACTOR];
+        threshold *= ENCREASE_FACTOR;
+        size = 0;
 
-        if (newThreshold == 0) {
-            newThreshold = (newCapacity < MAXIMUM_CAPACITY)
-                    ? (int) (newCapacity * DEFAULT_LOAD_FACTOR) : Integer.MAX_VALUE;
-        }
-
-        threshold = newThreshold;
-        Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
-
-        if (table != null) {
-            for (int j = 0; j < oldCapacity; ++j) {
-                Node<K, V> element;
-                while ((element = table[j]) != null) {
-                    table[j] = element.next;
-                    int hash = element.hash;
-                    int indexInNewTable = hash & (newTable.length - 1);
-
-                    element.next = newTable[indexInNewTable];
-                    newTable[indexInNewTable] = element;
-                }
+        for (Node<K, V> currentNode : oldTable) {
+            while (currentNode != null) {
+                put(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
             }
         }
-
-        table = newTable;
-        return newTable;
     }
 
     private int hash(K key) {
