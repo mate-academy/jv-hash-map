@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import java.util.Arrays;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -25,13 +23,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             while (processingNode.next != null) {
-                if (areValuesEqual(processingNode.key, key)) {
+                if (areKeysEqual(processingNode.key, key)) {
                     processingNode.value = value;
                     return;
                 }
                 processingNode = processingNode.next;
             }
-            if (areValuesEqual(processingNode.key, key)) {
+            if (areKeysEqual(processingNode.key, key)) {
                 processingNode.value = value;
                 return;
             }
@@ -44,15 +42,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int index = getIndex(key);
         Node<K, V> processingNode = table[index];
-        while (true) {
-            if (processingNode == null) {
-                return null;
-            } else if (areValuesEqual(processingNode.key, key)) {
+        while (processingNode != null) {
+            if (areKeysEqual(processingNode.key, key)) {
                 return processingNode.getValue();
             } else {
                 processingNode = processingNode.next;
             }
         }
+        return null;
     }
 
     @Override
@@ -60,7 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private boolean areValuesEqual(K key, K current) {
+    private boolean areKeysEqual(K key, K current) {
         return (current != null && current.equals(key))
                 || (current == null && key == null);
     }
@@ -71,21 +68,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = table;
         table = new Node[newCapacity];
         threshold = Math.round(newCapacity * DEFAULT_LOAD_FACTOR);
-        for (Node<K, V> kvNode : oldTable) {
-            while (kvNode != null) {
-                this.put(kvNode.key, kvNode.value);
-                kvNode = kvNode.next;
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                this.put(node.key, node.value);
+                node = node.next;
             }
         }
-    }
-
-    @Override
-    public String toString() {
-        return "MyHashMap{"
-                + ", table = "
-                + Arrays.toString(table)
-                + ", size = " + size
-                + '}';
     }
 
     private static class Node<K, V> {
