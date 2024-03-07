@@ -6,28 +6,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final int CAPACITY_INCREASE = 2;
     private static final float LOAD_FACTOR = 0.75f;
-    private Node<K,V>[] table = new Node[DEFAULT_CAPACITY];
+    private Node<K,V>[] table;
     private int size;
+
+    public MyHashMap() {
+        table = new Node[DEFAULT_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
-        checkThreshold();
-        int bucketIndex = key == null ? 0 : getBucketIndex(hash(key));
-        Node<K, V> newNode = new Node<>(key, value, null);
+        if (checkThreshold()) {
+            resize();
+        }
+        int bucketIndex = getBucketIndex(hash(key));
+        Node<K, V> newNode = new Node<>(key, value);
         if (table[bucketIndex] == null) {
             table[bucketIndex] = newNode;
+
+            size++;
         } else {
             connectNode(newNode, bucketIndex);
-            return;
         }
-        Node<K, V> currentNode = table[bucketIndex];
-        if (bucketIndex == 0
-                || currentNode.key.equals(key)) {
-            currentNode.value = value;
-        } else {
-            currentNode.next = newNode;
-        }
-        size++;
     }
 
     @Override
@@ -58,24 +57,35 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void checkThreshold() {
-        if (size > DEFAULT_CAPACITY * LOAD_FACTOR) {
-            resize();
-        }
+    private boolean checkThreshold() {
+        return size == table.length * LOAD_FACTOR;
     }
 
     private void resize() {
-        Node<K, V>[] newTable = new Node[DEFAULT_CAPACITY * CAPACITY_INCREASE];
-        for (Node<K, V> node : table) {
+        Node<K, V>[] oldTable = table;
+        table = new Node[table.length * CAPACITY_INCREASE];
+        size = 0;
+        for (Node<K, V> node : oldTable) {
             while (node != null) {
-                int bucketIndex = getBucketIndex(hash(node.key));
                 Node<K, V> next = node.next;
-                node.next = newTable[bucketIndex];
-                newTable[bucketIndex] = node;
+                putInResize(node.key, node.value);
                 node = next;
             }
         }
-        table = newTable;
+    }
+
+    public void putInResize(K key, V value) {
+        if (checkThreshold()) {
+            resize();
+        }
+        int bucketIndex = getBucketIndex(hash(key));
+        Node<K, V> newNode = new Node<>(key, value);
+        if (table[bucketIndex] == null) {
+            table[bucketIndex] = newNode;
+            size++;
+        } else {
+            connectNode(newNode, bucketIndex);
+        }
     }
 
     private void connectNode(Node<K, V> node, int bucket) {
@@ -108,10 +118,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
