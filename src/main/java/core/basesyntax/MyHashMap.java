@@ -18,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (checkThreshold()) {
             resize();
         }
-        int bucketIndex = getBucketIndex(hash(key));
+        int bucketIndex = getBucketIndex(key);
         Node<K, V> newNode = new Node<>(key, value);
         if (table[bucketIndex] == null) {
             table[bucketIndex] = newNode;
@@ -40,7 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode = currentNode.next;
             }
         } else {
-            int bucketIndex = getBucketIndex(hash(key));
+            int bucketIndex = getBucketIndex(key);
             Node<K, V> currentNode = table[bucketIndex];
             while (currentNode != null) {
                 if (Objects.equals(currentNode.key, key)) {
@@ -74,11 +74,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public void putInResize(K key, V value) {
+    private void putInResize(K key, V value) {
         if (checkThreshold()) {
             resize();
         }
-        int bucketIndex = getBucketIndex(hash(key));
+        int bucketIndex = getBucketIndex(key);
         Node<K, V> newNode = new Node<>(key, value);
         if (table[bucketIndex] == null) {
             table[bucketIndex] = newNode;
@@ -105,8 +105,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private int getBucketIndex(int hash) {
-        return Math.abs(hash) % DEFAULT_CAPACITY;
+    private int getBucketIndex(K key) {
+        return Math.abs(hash(key)) % DEFAULT_CAPACITY;
     }
 
     private int hash(K key) {
