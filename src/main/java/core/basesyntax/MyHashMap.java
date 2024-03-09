@@ -16,7 +16,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = hash(key) % table.length;
+        resize();
+        int index = findIndex(key);
         if (table[index] == null) {
             table[index] = new Node<>(hash(key), key, value, null);
             size++;
@@ -29,19 +30,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> currentNode = findNodeByKey(key, index);
             currentNode.value = value;
         }
-
-        if (size > (table.length * LOAD_FACTOR)) {
-            resize();
-        }
-
     }
 
     @Override
     public V getValue(K key) {
-        int index = hash(key) % table.length;
+        int index = findIndex(key);
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
-            if (Objects.equals(currentNode.key, key)) {
+            if (isMatchingKey(currentNode, key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
@@ -54,10 +50,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private int findIndex(K key) {
+        return hash(key) % table.length;
+    }
+
+    private boolean isMatchingKey(Node<K, V> node, K key) {
+        return Objects.equals(node.key, key);
+    }
+
     private Node<K, V> findNodeByKey(K key, int index) {
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
-            if (Objects.equals(currentNode.key, key)) {
+            if (isMatchingKey(currentNode, key)) {
                 return currentNode;
             }
             currentNode = currentNode.next;
@@ -66,9 +70,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] oldTable = table;
-        table = new Node[table.length * GROWTH_FACTOR];
-        transfer(oldTable);
+        if (size > (table.length * LOAD_FACTOR)) {
+            Node<K, V>[] oldTable = table;
+            table = new Node[table.length * GROWTH_FACTOR];
+            transfer(oldTable);
+        }
     }
 
     private void transfer(Node<K, V>[] oldNodes) {
