@@ -1,7 +1,7 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_INITIAL_CAPACITY= 1 << 4;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int capacity;
     private Node<K, V> [] table;
@@ -57,12 +57,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int oldcapasity = capacity;
-        capacity *= 2;
         Node<K, V> [] oldTable = table;
-        table = new Node[capacity];
         size = 0;
-        for (int i = 0; i < oldcapasity; i++) {
+        int oldcapacity = capacity;
+        capacity *= 2;
+        table = new Node[capacity];
+        for (int i = 0; i < oldcapacity; i++) {
             if (oldTable[i] != null) {
                 Node<K, V> node = oldTable[i];
                 while (node != null) {
