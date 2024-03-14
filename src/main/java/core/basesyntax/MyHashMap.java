@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
     private static final float LOAD_FACTOR = 0.75f;
@@ -56,9 +55,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         private Node(K key, V value) {
             this.key = key;
