@@ -9,7 +9,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int capacity;
     private int size;
     private int threshold;
-    private Node<K,V>[] nodes;
+    private Node<K, V>[] nodes;
 
     public MyHashMap() {
         this.capacity = DEFAULT_START_CAPACITY;
@@ -25,17 +25,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         int hashcode = hashCode(key);
-        Node<K,V> newNode = new Node<>(key, value);
+        Node<K, V> newNode = new Node<>(key, value);
         if (key == null && nodes[0] == null) {
             nodes[0] = newNode;
             size++;
             return;
-        } else if (key == null) {
+        }
+        if (key == null) {
             nodes[0] = newNode;
             return;
         }
         int index = defineIndex(hashcode);
-        Node<K,V> lastNode = getLastCollisionNode(index);
+        Node<K, V> lastNode = getLastCollisionNode(index);
         if (lastNode == null) {
             nodes[index] = newNode;
             size++;
@@ -51,14 +52,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int hashcode = hashCode(key);
         int index = defineIndex(hashcode);
-        Node<K,V> firsNodeOnIndex = nodes[index];
+        Node<K, V> firsNodeOnIndex = nodes[index];
         if (firsNodeOnIndex == null) {
             return null;
         }
         if (firsNodeOnIndex.next == null) {
             return firsNodeOnIndex.getValue();
         }
-        Node<K,V> foundNode = getCollisionNode(firsNodeOnIndex, key);
+        Node<K, V> foundNode = getCollisionNode(firsNodeOnIndex, key);
         return foundNode.getValue();
     }
 
@@ -110,25 +111,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return hashcode % capacity;
     }
 
-    private Node<K,V> getLastCollisionNode(int index) {
+    private Node<K, V> getLastCollisionNode(int index) {
         if (nodes[index] == null) {
             return null;
         }
-        Node<K,V> lastNode = nodes[index];
+        Node<K, V> lastNode = nodes[index];
         while (lastNode.next != null) {
             lastNode = lastNode.next;
         }
         return lastNode;
     }
 
-    private Node<K,V> getCollisionNode(Node<K,V> nextNode, K key) {
+    private Node<K, V> getCollisionNode(Node<K, V> nextNode, K key) {
         if (nextNode.next != null && !nextNode.equals(key)) {
             nextNode = getCollisionNode(nextNode.next, key);
         }
         return nextNode;
     }
 
-    private void reassignSameKeyValues(Node<K,V> newNode, Node<K,V> currentNode) {
+    private void reassignSameKeyValues(Node<K, V> newNode, Node<K, V> currentNode) {
         if (currentNode == null) {
             return;
         }
@@ -149,9 +150,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.capacity = capacity * INCREASE_CAPACITY_VALUE;
         this.threshold = (int) (DEFAULT_LOAD_FACTOR * capacity);
         this.size = 0;
-        Node<K,V>[] prevNodes = nodes;
+        Node<K, V>[] prevNodes = nodes;
         this.nodes = new Node[capacity];
-        for (Node<K,V> node : prevNodes) {
+        for (Node<K, V> node : prevNodes) {
             if (node != null) {
                 reassignValues(node);
             }
@@ -159,7 +160,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         put(key, value);
     }
 
-    private void reassignValues(Node<K,V> node) {
+    private void reassignValues(Node<K, V> node) {
         put(node.getKey(), node.getValue());
         if (node.next != null) {
             reassignValues(node.next);
