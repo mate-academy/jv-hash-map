@@ -23,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> newNode = new Node<>(key, value, null);
         Node<K, V> current = table[index];
         while (current != null) {
-            if ((key == null && current.key == null) || (key != null && key.equals(current.key))) {
+            if (checkKeys(key, current)) {
                 current.value = value;
                 return;
             }
@@ -39,12 +39,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Node<K, V> current = table[index];
         while (current != null) {
-            if ((key == null && current.key == null) || (key != null && key.equals(current.key))) {
+            if (checkKeys(key, current)) {
                 return current.value;
             }
             current = current.next;
         }
         return null;
+    }
+
+    private <K, V> boolean checkKeys(K key, Node<K, V> current) {
+        return (key == null && current.key == null) || (key != null && key.equals(current.key));
     }
 
     @Override
@@ -86,3 +90,4 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 }
+
