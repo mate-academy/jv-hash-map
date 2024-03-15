@@ -48,7 +48,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         if (key == null) {
-            return nodes[0] != null ? nodes[0].getValue() : null;
+            return nodes[0] != null ? nodes[0].value : null;
         }
         int hashcode = hashCode(key);
         int index = defineIndex(hashcode);
@@ -57,10 +57,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         if (firsNodeOnIndex.next == null) {
-            return firsNodeOnIndex.getValue();
+            return firsNodeOnIndex.value;
         }
         Node<K, V> foundNode = getCollisionNode(firsNodeOnIndex, key);
-        return foundNode.getValue();
+        return foundNode.value;
     }
 
     @Override
@@ -83,22 +83,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = null;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
-        }
-
-        public void setNext(Node<K, V> next) {
-            this.next = next;
         }
 
         @Override
@@ -133,9 +117,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (currentNode == null) {
             return;
         }
-        K currentNodeKey = (K) currentNode.getKey();
+        K currentNodeKey = (K) currentNode.key;
         if (newNode.equals(currentNodeKey)) {
-            currentNode.setValue(newNode.getValue());
+            currentNode.value = newNode.value;
             return;
         }
         if (currentNode.next == null) {
@@ -161,7 +145,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void reassignValues(Node<K, V> node) {
-        put(node.getKey(), node.getValue());
+        put(node.key, node.value);
         if (node.next != null) {
             reassignValues(node.next);
         }
