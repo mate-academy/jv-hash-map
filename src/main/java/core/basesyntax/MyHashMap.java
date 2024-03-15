@@ -21,8 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (size >= threshold) {
-            resizeList(key, value);
-            return;
+            resizeList();
         }
         int hashcode = hashCode(key);
         Node<K, V> newNode = new Node<>(key, value);
@@ -41,14 +40,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             nodes[index] = newNode;
             size++;
         } else {
-            reassignSameKeyValues(newNode, nodes[index]);
+            putNewNode(newNode, nodes[index]);
         }
     }
 
     @Override
     public V getValue(K key) {
         if (key == null) {
-            return nodes[0] != null ? nodes[0].value : null;
+            return nodes[0].value;
         }
         int hashcode = hashCode(key);
         int index = defineIndex(hashcode);
@@ -59,7 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (firsNodeOnIndex.next == null) {
             return firsNodeOnIndex.value;
         }
-        Node<K, V> foundNode = getCollisionNode(firsNodeOnIndex, key);
+        Node<K, V> foundNode = findNestedNode(firsNodeOnIndex, key);
         return foundNode.value;
     }
 
@@ -106,18 +105,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return lastNode;
     }
 
-    private Node<K, V> getCollisionNode(Node<K, V> nextNode, K key) {
+    private Node<K, V> findNestedNode(Node<K, V> nextNode, K key) {
         if (nextNode.next != null && !nextNode.equals(key)) {
-            nextNode = getCollisionNode(nextNode.next, key);
+            nextNode = findNestedNode(nextNode.next, key);
         }
         return nextNode;
     }
 
-    private void reassignSameKeyValues(Node<K, V> newNode, Node<K, V> currentNode) {
+    private void putNewNode(Node<K, V> newNode, Node<K, V> currentNode) {
         if (currentNode == null) {
             return;
         }
-        K currentNodeKey = (K) currentNode.key;
+        K currentNodeKey = currentNode.key;
         if (newNode.equals(currentNodeKey)) {
             currentNode.value = newNode.value;
             return;
@@ -127,10 +126,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        reassignSameKeyValues(newNode, currentNode.next);
+        putNewNode(newNode, currentNode.next);
     }
 
-    private void resizeList(K key, V value) {
+    private void resizeList() {
         this.capacity = capacity * INCREASE_CAPACITY_VALUE;
         this.threshold = (int) (DEFAULT_LOAD_FACTOR * capacity);
         this.size = 0;
@@ -138,16 +137,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.nodes = new Node[capacity];
         for (Node<K, V> node : prevNodes) {
             if (node != null) {
-                reassignValues(node);
+                reassignNodesPositions(node);
             }
         }
-        put(key, value);
     }
 
-    private void reassignValues(Node<K, V> node) {
+    private void reassignNodesPositions(Node<K, V> node) {
         put(node.key, node.value);
         if (node.next != null) {
-            reassignValues(node.next);
+            reassignNodesPositions(node.next);
         }
     }
 }
