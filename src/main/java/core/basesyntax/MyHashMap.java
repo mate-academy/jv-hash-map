@@ -13,7 +13,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         this.capacity = DEFAULT_START_CAPACITY;
-        this.size = 0;
         this.threshold = (int) (DEFAULT_LOAD_FACTOR * capacity);
         this.nodes = new Node[capacity];
     }
@@ -23,18 +22,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resizeList();
         }
-        int hashcode = hashCode(key);
         Node<K, V> newNode = new Node<>(key, value);
-        if (key == null && nodes[0] == null) {
-            nodes[0] = newNode;
-            size++;
-            return;
-        }
-        if (key == null) {
-            nodes[0] = newNode;
-            return;
-        }
-        int index = defineIndex(hashcode);
+        int index = getIndex(key);
         Node<K, V> lastNode = getLastCollisionNode(index);
         if (lastNode == null) {
             nodes[index] = newNode;
@@ -46,11 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
-            return nodes[0].value;
-        }
-        int hashcode = hashCode(key);
-        int index = defineIndex(hashcode);
+        int index = getIndex(key);
         Node<K, V> firsNodeOnIndex = nodes[index];
         if (firsNodeOnIndex == null) {
             return null;
@@ -67,31 +52,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    @Override
-    public int hashCode(K key) {
-        int hashcode = Objects.hash(key);
-        return hashcode < 0 ? (hashcode * -1) : hashcode;
-    }
-
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-            this.next = null;
+    private int getIndex(K key) {
+        if (key == null) {
+            return 0;
         }
-
-        @Override
-        public boolean equals(Object key) {
-            return Objects.equals(key, this.key);
-        }
-    }
-
-    private int defineIndex(int hashcode) {
-        return hashcode % capacity;
+        return Math.abs(key.hashCode() % capacity);
     }
 
     private Node<K, V> getLastCollisionNode(int index) {
@@ -113,9 +78,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putNewNode(Node<K, V> newNode, Node<K, V> currentNode) {
-        if (currentNode == null) {
-            return;
-        }
         K currentNodeKey = currentNode.key;
         if (newNode.equals(currentNodeKey)) {
             currentNode.value = newNode.value;
@@ -146,6 +108,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         put(node.key, node.value);
         if (node.next != null) {
             reassignNodesPositions(node.next);
+        }
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        @Override
+        public boolean equals(Object key) {
+            return Objects.equals(key, this.key);
         }
     }
 }
