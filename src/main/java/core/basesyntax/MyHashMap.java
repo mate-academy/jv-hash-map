@@ -19,11 +19,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(hash);
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
-            if (Objects.equals(currentNode.key, key)) {
-                currentNode.value = value;
-                return;
-            }
-            if (key == null && currentNode.key == null) {
+            if (Objects.equals(currentNode.key, key)
+                    || key == null && currentNode.key == null) {
                 currentNode.value = value;
                 return;
             }
