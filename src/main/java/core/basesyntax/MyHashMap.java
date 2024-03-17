@@ -3,13 +3,14 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private final float loadFactor = 0.75f;
-    private final int defaultCapacity = 16;
+    private static final float LOAD_FACTOR = 0.75f;
+    private static final int GROW_FACTOR = 2;
+    private static final int DEFAULT_CAPACITY = 16;
     private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        table = (Node<K, V>[]) new Node<?, ?>[defaultCapacity];
+        table = (Node<K, V>[]) new Node<?, ?>[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -61,15 +62,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getIndex(int hash) {
         if (hash < 0) {
-            hash *= (-1);
+            hash = Math.abs(hash);
         }
         return hash % table.length;
     }
 
     private void resize() {
-        if (size == table.length * loadFactor) {
+        if (size == table.length * LOAD_FACTOR) {
             Node<K, V>[] oldTable = table;
-            table = (Node<K,V>[])new Node[table.length * 2];
+            table = (Node<K,V>[])new Node[table.length * GROW_FACTOR];
             size = 0;
             for (Node<K, V> node : oldTable) {
                 while (node != null) {
