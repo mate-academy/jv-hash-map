@@ -18,34 +18,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = hash(key);
         int index = getIndex(hash);
         Node<K, V> currentNode = table[index];
-        if (currentNode == null) {
-            table[index] = new Node<>(hash, key, value, null);
-            size++;
-        } else if (key == null) {
-            while (currentNode != null) {
-                if (currentNode.key == null) {
-                    currentNode.value = value;
-                    return;
-                }
-                currentNode = currentNode.next;
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.key, key)) {
+                currentNode.value = value;
+                return;
             }
-            currentNode = table[index];
-            table[index] = new Node<>(hash, key, value, currentNode);
-            size++;
-        } else {
-            while (currentNode != null) {
-                if (Objects.equals(currentNode.key, key)) {
-                    currentNode.value = value;
-                    return;
-                }
-                if (currentNode.next == null) {
-                    currentNode.next = new Node<>(hash, key, value, null);
-                    size++;
-                    return;
-                }
-                currentNode = currentNode.next;
+            if (key == null && currentNode.key == null) {
+                currentNode.value = value;
+                return;
             }
+            if (currentNode.next == null) {
+                currentNode.next = new Node<>(hash, key, value, null);
+                size++;
+                return;
+            }
+            currentNode = currentNode.next;
         }
+
+        currentNode = table[index];
+        table[index] = new Node<>(hash, key, value, currentNode);
+        size++;
     }
 
     @Override
