@@ -20,8 +20,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int index = getIndex(key);
         for (Node<K, V> e = table[index]; e != null; e = e.next) {
-            if (e.key == key || (key != null && key.equals(e.key))) {
-                e.value = value;
+            if (e.getKey().equals(key) || key == null) {
+                e.setValue(value);
                 return;
             }
         }
@@ -32,18 +32,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> newNode = new Node<>(key, value, table[bucketIndex]);
         table[bucketIndex] = newNode;
         size++;
+        if (size >= threshold) {
+            resize();
+        }
     }
 
     @Override
     public V getValue(K key) {
         Node<K, V> node = getNode(key);
-        return node == null ? null : node.value;
+        return node == null ? null : node.getValue();
     }
 
     private Node<K, V> getNode(K key) {
         int index = getIndex(key);
         for (Node<K, V> e = table[index]; e != null; e = e.next) {
-            if (e.key == key || (key != null && key.equals(e.key))) {
+            if (e.getKey().equals(key) || key == null) {
                 return e;
             }
         }
@@ -57,30 +60,50 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldTable = table;
-        int newCapacity = oldTable.length * RESIZE_MULTIPLIER;
-        threshold = (int) (newCapacity * LOAD_FACTOR);
-        table = new Node[newCapacity];
+        table = new Node[oldTable.length * RESIZE_MULTIPLIER];
+        threshold = (int) (table.length * LOAD_FACTOR);
         size = 0;
-        for (Node<K, V> e : oldTable) {
-            while (e != null) {
-                put(e.key, e.value);
-                e = e.next;
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.getKey(), node.getValue());
+                node = node.getNext();
             }
         }
     }
 
     private int getIndex(K key) {
-        return (key == null) ? 0 : (key.hashCode() & (table.length - 1));
+        int hashCode = (key == null) ? 0 : key.hashCode();
+        return Math.abs(hashCode) % table.length;
     }
 
     private static class Node<K, V> {
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
+            this.next = next;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public V getValue() {
+            return value;
+        }
+
+        public void setValue(V value) {
+            this.value = value;
+        }
+
+        public Node<K, V> getNext() {
+            return next;
+        }
+
+        public void setNext(Node<K, V> next) {
             this.next = next;
         }
     }
