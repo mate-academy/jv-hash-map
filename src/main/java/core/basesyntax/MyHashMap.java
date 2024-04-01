@@ -6,22 +6,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_SIZE = 16;
     private static final int RESIZE_CONSTANT = 2;
     private static final float LOAD_FACTOR = 0.75f;
-    private int threshold;
     private int size;
     private Node<K, V>[] arrayNode;
 
     public MyHashMap() {
         arrayNode = new Node[DEFAULT_SIZE];
-        threshold = (int) (DEFAULT_SIZE * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size == threshold) {
-            resize();
-        }
-        System.out.println(arrayNode.length + " " + key);
-        Node<K, V> newNode = new Node<>(key, value, null);
+        resize();
         putElement(key, value);
     }
 
@@ -54,39 +48,38 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (arrayNode[index] == null) {
             arrayNode[index] = newNode;
             size++;
+            return;
+        }
+
+        Node<K, V> current = arrayNode[index];
+        while (current.next != null && !Objects.equals(current.key, key)) {
+            current = current.next;
+        }
+        if (Objects.equals(current.key, key)) {
+            current.value = value;
         } else {
-            Node<K, V> current = arrayNode[index];
-            while (current.next != null && !Objects.equals(current.key, key)) {
-                current = current.next;
-            }
-            if (Objects.equals(current.key, key)) {
-                current.value = value;
-            } else {
-                current.next = newNode;
-                size++;
-            }
+            current.next = newNode;
+            size++;
         }
     }
 
     private void resize() {
-        int newCapacity = arrayNode.length * RESIZE_CONSTANT;
-        Node<K, V>[] tempArrayNode = arrayNode;
-        arrayNode = new Node[newCapacity];
-        threshold = (int) (newCapacity * LOAD_FACTOR);
-
-        for (int i = 0; i < tempArrayNode.length; i++) {
-            Node<K, V> node = tempArrayNode[i];
-            while (node != null) {
-                Node<K, V> next = node.next;
-                int index = (node.key == null) ? 0 : getIndex(node.key);
-                node.next = arrayNode[index];
-                arrayNode[index] = node;
-                node = next;
+        int threshold = (int) (arrayNode.length * LOAD_FACTOR);
+        if (size == threshold) {
+            int newCapacity = arrayNode.length * RESIZE_CONSTANT;
+            Node<K, V>[] tempArrayNode = arrayNode;
+            arrayNode = new Node[newCapacity];
+            size = 0;
+            for (Node<K, V> node : tempArrayNode) {
+                while (node != null) {
+                    putElement(node.key, node.value);
+                    node = node.next;
+                }
             }
         }
     }
 
-    private class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -95,26 +88,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-
-            Node<?, ?> node = (Node<?, ?>) o;
-
-            if (!Objects.equals(key, node.key)) {
-                return false;
-            }
-            if (!Objects.equals(value, node.value)) {
-                return false;
-            }
-            return Objects.equals(next, node.next);
         }
     }
 }
