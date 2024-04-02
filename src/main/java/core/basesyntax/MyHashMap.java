@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = (key == null) ? 0 : getIndex(key);
+        int index = getIndex(key);
         Node<K, V> current = arrayNode[index];
         while (current != null) {
             if (Objects.equals(current.key, key)) {
@@ -42,8 +42,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void putElement(K key, V value) {
-        Node<K, V> newNode = new Node<>(key, value, null);
-        int index = (key == null) ? 0 : getIndex(key);
+        Node<K, V> newNode = new Node<>(key, value);
+        int index = getIndex(key);
 
         if (arrayNode[index] == null) {
             arrayNode[index] = newNode;
@@ -84,10 +84,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        Node(K key, V value, Node<K, V> next) {
+        Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
