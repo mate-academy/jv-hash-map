@@ -7,6 +7,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] buckets;
 
     private int size;
+    private int capacity = DEFAULT_CAPACITY;
+    private double threshold = capacity * LOAD_FACTOR;
 
     public MyHashMap() {
         buckets = new Node[DEFAULT_CAPACITY];
@@ -57,10 +59,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             current.next = newNode;
         }
-
-        if ((double) size / buckets.length > LOAD_FACTOR) {
+        if (size >= threshold) {
             resize();
         }
+
         size++;
     }
 
@@ -89,34 +91,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return 0;
         }
-        return Math.abs(key.hashCode() % buckets.length);
+        int hash = key.hashCode();
+        return Math.abs(hash) % capacity;
     }
 
     private void resize() {
-        int newCapacity = buckets.length * 2;
+        int newCapacity = capacity * 2;
         Node<K, V>[] newBuckets = new Node[newCapacity];
-        int newSize = -1;
+        threshold = newCapacity * LOAD_FACTOR;
+        capacity = newCapacity;
 
-        for (Node<K, V> bucket : buckets) {
-            Node<K, V> current = bucket;
-            while (current != null) {
-                int index = getIndex(current.key);
-                Node<K, V> newNode = new Node<>(current.key, current.value);
-                if (newBuckets[index] == null) {
-                    newBuckets[index] = newNode;
-                } else {
-                    Node<K, V> temp = newBuckets[index];
-                    while (temp.next != null) {
-                        temp = temp.next;
-                    }
-                    temp.next = newNode;
-                }
-                current = current.next;
-                newSize++;
+        for (Node<K, V> node : buckets) {
+            while (node != null) {
+                Node<K, V> next = node.next;
+                int index = getIndex(node.key);
+                node.next = newBuckets[index];
+                newBuckets[index] = node;
+                node = next;
             }
         }
+
         buckets = newBuckets;
-        size = newSize;
     }
 
     private static class Node<K, V> {
