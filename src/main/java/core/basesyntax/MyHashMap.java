@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
+    private static final int CAPACITY_MULTIPLIER = 2;
 
     private Node<K, V>[] buckets;
 
@@ -70,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        final int newCapacity = capacity * 2;
+        final int newCapacity = capacity * CAPACITY_MULTIPLIER;
         Node<K, V>[] newBuckets = new Node[newCapacity];
         threshold = newCapacity * LOAD_FACTOR;
         capacity = newCapacity;
