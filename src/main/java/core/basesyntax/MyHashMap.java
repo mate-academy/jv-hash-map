@@ -20,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (size >= threshold) {
-            resizeList();
+            resize();
         }
         Node<K, V> newNode = new Node<>(key, value);
         int index = getIndex(key);
@@ -39,9 +39,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> firsNodeOnIndex = nodes[index];
         if (firsNodeOnIndex == null) {
             return null;
-        }
-        if (firsNodeOnIndex.next == null) {
-            return firsNodeOnIndex.value;
         }
         Node<K, V> foundNode = findNestedNode(firsNodeOnIndex, key);
         return foundNode.value;
@@ -91,7 +88,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         putNewNode(newNode, currentNode.next);
     }
 
-    private void resizeList() {
+    private void resize() {
         this.capacity = capacity * INCREASE_CAPACITY_VALUE;
         this.threshold = (int) (DEFAULT_LOAD_FACTOR * capacity);
         this.size = 0;
@@ -105,9 +102,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void reassignNodesPositions(Node<K, V> node) {
-        put(node.key, node.value);
-        if (node.next != null) {
-            reassignNodesPositions(node.next);
+        Node<K, V> nextNode = node;
+        while (nextNode != null) {
+            put(nextNode.key, nextNode.value);
+            nextNode = nextNode.next;
         }
     }
 
