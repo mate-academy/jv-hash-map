@@ -68,7 +68,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V> findNestedNode(Node<K, V> nextNode, K key) {
-        if (nextNode.next != null && !nextNode.equals(key)) {
+        if (nextNode.next != null && !Objects.equals(nextNode.key, key)) {
             nextNode = findNestedNode(nextNode.next, key);
         }
         return nextNode;
@@ -76,7 +76,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void putNewNode(Node<K, V> newNode, Node<K, V> currentNode) {
         K currentNodeKey = currentNode.key;
-        if (newNode.equals(currentNodeKey)) {
+        if (Objects.equals(newNode.key, currentNodeKey)) {
             currentNode.value = newNode.value;
             return;
         }
@@ -117,11 +117,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public Node(K key, V value) {
             this.key = key;
             this.value = value;
-        }
-
-        @Override
-        public boolean equals(Object key) {
-            return Objects.equals(key, this.key);
         }
     }
 }
