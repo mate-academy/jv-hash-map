@@ -2,13 +2,13 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACYTY = 16;
+    private static final int GROW_CONSTANT = 2;
     private static final double GROWE_INDEX = 0.75;
     private int size;
     private Node<K, V>[] hashMap;
 
     public MyHashMap() {
         hashMap = new Node[DEFAULT_CAPACYTY];
-        size = 0;
     }
 
     @Override
@@ -60,16 +60,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHash(K key) {
-        int hash = (key == null) ? 0 : key.hashCode();
-        if (hash < 0) {
-            hash = hash * -1;
-        }
-        return hash;
+        return Math.abs((key == null) ? 0 : key.hashCode());
     }
 
     private void grow() {
         Node<K, V>[] oldHashMap = hashMap;
-        hashMap = new Node[hashMap.length * 2];
+        hashMap = new Node[hashMap.length * GROW_CONSTANT];
         size = 0;
         for (Node<K, V> current : oldHashMap) {
             while (current != null) {
