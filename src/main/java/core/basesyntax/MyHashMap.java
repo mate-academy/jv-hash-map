@@ -19,22 +19,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int bucket = getBucket(key);
-        Node<K, V> last = table[bucket];
-        if (last == null) {
-            table[bucket] = new Node<>(key, value, null);
+        Node<K, V> current = table[bucket];
+        if (current == null) {
+            table[bucket] = new Node<>(key, value);
             size++;
         } else {
-            while (last != null) {
-                if (Objects.equals(last.key, key)) {
-                    last.value = value;
+            while (current != null) {
+                if (Objects.equals(current.key, key)) {
+                    current.value = value;
                     return;
-                } else if (last.next == null) {
-                    last.next = new Node<>(key, value, null);
+                } else if (current.next == null) {
+                    current.next = new Node<>(key, value);
                     size++;
-                    break;
-                } else {
-                    last = last.next;
+                    return;
                 }
+                current = current.next;
             }
         }
     }
@@ -63,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[table.length * CAPACITY_INCREASE];
         for (Node<K, V> old : oldTable) {
             while (old != null) {
-                this.put(old.key, old.value);
+                put(old.key, old.value);
                 old = old.next;
             }
         }
@@ -82,10 +81,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        private Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.next = next;
         }
     }
 }
