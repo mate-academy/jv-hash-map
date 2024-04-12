@@ -6,14 +6,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int RESIZE_FACTOR = 2;
     private Entry<K, V>[] buckets;
     private int size;
+    private int capacity;
+    private int resizeCount;
 
     public MyHashMap() {
         this(DEFAULT_CAPACITY);
     }
 
     public MyHashMap(int initialCapacity) {
+        capacity = initialCapacity;
         buckets = new Entry[initialCapacity];
-        size = 0;
     }
 
     @Override
@@ -31,7 +33,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         newEntry.next = buckets[index];
         buckets[index] = newEntry;
         size++;
-        if ((double) size / buckets.length > LOAD_FACTOR) {
+        if (size > getThreshold()) {
             resize();
         }
     }
@@ -55,6 +57,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private double getThreshold() {
+        return LOAD_FACTOR * (double) DEFAULT_CAPACITY * Math.pow(RESIZE_FACTOR, resizeCount);
+    }
+
     private void resize() {
         int newCapacity = buckets.length * RESIZE_FACTOR;
         Entry<K, V>[] newBuckets = new Entry[newCapacity];
@@ -64,12 +70,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             while (entry != null) {
                 Entry<K, V> next = entry.next;
                 entry.next = null;
-                int index = getIndex(entry.key);
+                int index = getIndex(entry.key, newCapacity);
                 putInNewBucket(newBuckets, entry.key, entry.value);
                 entry = next;
             }
         }
         buckets = newBuckets;
+        capacity = newCapacity;
+        resizeCount++;
     }
 
     private void putInNewBucket(Entry<K, V>[] newBuckets, K key, V value) {
