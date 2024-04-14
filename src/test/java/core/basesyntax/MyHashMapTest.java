@@ -24,7 +24,6 @@ public class MyHashMapTest {
 
     @Test
     public void getByNonExistedKey() {
-        System.out.println(1);
         MyMap<Car, Integer> myHashMap = new MyHashMap<>();
         myHashMap.put(secondCar, 5);
         Assert.assertNull("Test failed! If key doesn't exist, we should return null.",
