@@ -23,9 +23,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = newNode;
             size++;
         } else {
-            Node<K, V> nodeToUpdate = updateIfValidKey(currentNode, key, value);
-            if (nodeToUpdate != null) {
-                nodeToUpdate.next = newNode;
+            Node<K, V> nodeWithUniqueKey = updateIfKeysEqual(currentNode, key, value);
+            if (nodeWithUniqueKey != null) {
+                nodeWithUniqueKey.next = newNode;
                 size++;
             }
         }
@@ -65,7 +65,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : key.hashCode() % capacity;
     }
 
-    private Node<K, V> updateIfValidKey(Node<K, V> node, K key, V value) {
+    private Node<K, V> updateIfKeysEqual(Node<K, V> node, K key, V value) {
         while (node.next != null) {
             if (Objects.equals(key, node.key)) {
                 node.value = value;
@@ -103,18 +103,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (newNodePosition == null) {
                 newTable[index] = newNode;
             } else {
-                Node<K, V> lastNode = getLastNode(newNodePosition);
-                lastNode.next = newNode;
+                Node<K, V> tailNode = getTailNode(newNodePosition);
+                tailNode.next = newNode;
             }
             oldNode = oldNode.next;
         }
     }
 
-    private Node<K, V> getLastNode(Node<K, V> lastNode) {
-        while (lastNode.next != null) {
-            lastNode = lastNode.next;
+    private Node<K, V> getTailNode(Node<K, V> node) {
+        while (node.next != null) {
+            node = node.next;
         }
-        return lastNode;
+        return node;
     }
 
     private static class Node<K, V> {
