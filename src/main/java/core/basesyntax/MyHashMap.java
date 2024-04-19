@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final double MAX_LOAD_INDEX = 0.75;
+    private static final double DEFAULT_LOAD_FACTOR = 0.75;
     private static final int DOUBLE_INCREASE = 2;
     private Node<K, V>[] table;
     private int size;
@@ -18,7 +18,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value);
-
         resizeIfFull();
 
         int index = getIndex(key);
@@ -59,30 +58,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resizeIfFull() {
-        if (size > capacity * MAX_LOAD_INDEX) {
-            resize();
-        }
-    }
-
-    private void resize() {
-        size = 0;
-        int newCapacity = capacity * DOUBLE_INCREASE;
-        Node<K, V>[] oldTable = table;
-        table = (Node<K, V>[]) new Node[newCapacity];
-        for (Node<K, V> node : oldTable) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+        if (size > capacity * DEFAULT_LOAD_FACTOR) {
+            size = 0;
+            int newCapacity = capacity * DOUBLE_INCREASE;
+            Node<K, V>[] oldTable = table;
+            table = (Node<K, V>[]) new Node[newCapacity];
+            for (Node<K, V> node : oldTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
             }
+            capacity = newCapacity;
         }
-        capacity = newCapacity;
     }
 
     private int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
-    public static class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
