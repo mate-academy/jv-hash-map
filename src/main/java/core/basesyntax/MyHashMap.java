@@ -22,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = key == null ? 0 : Math.abs(key.hashCode() % capacity);
         Node<K,V> node = table[index];
         while (node != null) {
-            if (key == node.key || key != null && key.equals(node.key)) {
+            if (Objects.equals(key, node.key)) {
                 node.value = value;
                 return;
             }
