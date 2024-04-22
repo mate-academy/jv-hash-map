@@ -19,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (capacity * DEFAULT_LOAD_FACTOR <= size) {
             resize();
         }
-        int index = key == null ? 0 : Math.abs(key.hashCode() % capacity);
+        int index = getIndexByKey(key);
         Node<K,V> node = table[index];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
@@ -39,7 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = key == null ? 0 : Math.abs(key.hashCode() % capacity);
+        int index = getIndexByKey(key);
         Node<K, V> node = table[index];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
@@ -66,6 +66,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node = node.next;
             }
         }
+    }
+
+    private int getIndexByKey(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % capacity);
     }
 
     private static class Node<K,V> {
