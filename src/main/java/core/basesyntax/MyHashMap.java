@@ -16,24 +16,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         growIfHashMapFull();
-        int index = getValidIndex(key, table.length);
+        int index = getIndex(key, table.length);
         Node<K, V> currentNode = table[index];
-        Node<K, V> newNode = new Node<>(key, value, null);
         if (currentNode == null) {
-            table[index] = newNode;
+            table[index] = new Node<>(key, value, null);
             size++;
         } else {
-            Node<K, V> nodeWithUniqueKey = updateIfKeysEqual(currentNode, key, value);
-            if (nodeWithUniqueKey != null) {
-                nodeWithUniqueKey.next = newNode;
-                size++;
-            }
+            updateIfKeysEqual(currentNode, key, value);
         }
     }
 
     @Override
     public V getValue(K key) {
-        int index = getValidIndex(key, table.length);
+        int index = getIndex(key, table.length);
         Node<K, V> node = getNode(index);
         if (node != null) {
             while (node != null) {
@@ -57,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getValidIndex(K key, int capacity) {
+    private int getIndex(K key, int capacity) {
         return (capacity - 1) & hash(key,capacity);
     }
 
@@ -65,19 +60,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : key.hashCode() % capacity;
     }
 
-    private Node<K, V> updateIfKeysEqual(Node<K, V> node, K key, V value) {
+    private void updateIfKeysEqual(Node<K, V> node, K key, V value) {
         while (node.next != null) {
             if (Objects.equals(key, node.key)) {
                 node.value = value;
-                return null;
+                return;
             }
             node = node.next;
         }
         if (Objects.equals(key, node.key)) {
             node.value = value;
-            return null;
+            return;
         }
-        return node;
+        node.next = new Node<>(key, value, null);
+        size++;
     }
 
     private Node<K, V> getNode(int index) {
@@ -97,7 +93,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void moveToNewTable(Node<K, V> oldNode, Node<K, V>[] newTable) {
         while (oldNode != null) {
-            int index = getValidIndex(oldNode.key, newTable.length);
+            int index = getIndex(oldNode.key, newTable.length);
             Node<K, V> newNodePosition = newTable[index];
             Node<K, V> newNode = new Node<>(oldNode.key, oldNode.value, null);
             if (newNodePosition == null) {
