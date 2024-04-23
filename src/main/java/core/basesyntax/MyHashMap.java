@@ -26,14 +26,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node.value = value;
                 return;
             }
-            if (node.next == null) {
-                node.next = new Node<>(key, value, null);
-                ++size;
-                return;
-            }
             node = node.next;
         }
-        table[index] = new Node<>(key, value, null);
+        Node<K,V> newNode = new Node<>(key, value, null);
+        newNode.next = table[index];
+        table[index] = newNode;
         ++size;
     }
 
