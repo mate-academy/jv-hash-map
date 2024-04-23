@@ -16,21 +16,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (++size > threshold) {
+        if (size > threshold) {
             resize();
         }
-        placeNode(table, key, value, hash(key));
+        int index = getNodeIndex(hash(key), table);
+        placeNode(index, key, value);
     }
 
     @Override
     public V getValue(K key) {
-        int keyPosition = getNodeIndex(hash(key), table);
-        Node<K, V> foundNode = table[keyPosition];
-        while (foundNode != null) {
-            if (keysAreEqual(foundNode.key, key)) {
-                return foundNode.value;
+        int index = getNodeIndex(hash(key), table);
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if ((node.key == key) || (node.key != null && node.key.equals(key))) {
+                return node.value;
             }
-            foundNode = foundNode.next;
+            node = node.next;
         }
         return null;
     }
@@ -41,44 +42,37 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] newTable = (Node<K, V>[]) new Node[table.length * 2];
-        threshold = (int) (newTable.length * DEFAULT_LOAD_FACTOR);
-        for (Node<K, V> node : table) {
-            if (node == null) {
-                continue;
-            }
+        size = 0;
+        Node<K, V>[] copyTable = table.clone();
+        table = (Node<K, V>[]) new Node[table.length * 2];
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
+        for (Node<K, V> node: copyTable) {
             while (node != null) {
-                placeNode(newTable, node.key, node.value, node.keyHash);
+                put(node.key, node.value);
                 node = node.next;
             }
         }
-        table = newTable;
     }
 
-    private void placeNode(Node<K, V>[] table, K key, V value, int keyHash) {
-        int nodePosition = getNodeIndex(keyHash, table);
-
+    private void placeNode(int index, K key, V value) {
         Node<K,V> newNode = new Node<>(key, value);
-        Node<K,V> placedNode = table[nodePosition];
-        if (placedNode == null) {
-            table[nodePosition] = newNode;
-            return;
-        }
+        Node<K,V> node = table[index];
 
-        while (placedNode != null) {
-            if (keysAreEqual(placedNode.key, key)) {
-                placedNode.value = value;
-                size--;
+        while (node != null) {
+            if ((node.key == key) || (node.key != null && node.key.equals(key))) {
+                node.value = value;
+                return;
+            }
+            if (node.next == null) {
+                node.next = newNode;
+                size++;
                 return;
             }
 
-            if (placedNode.next == null) {
-                placedNode.next = newNode;
-                return;
-            }
-
-            placedNode = placedNode.next;
+            node = node.next;
         }
+        table[index] = newNode;
+        size++;
     }
 
     private int hash(K key) {
@@ -87,10 +81,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getNodeIndex(int keyHash, Node<K, V>[] table) {
         return Math.abs(keyHash % table.length);
-    }
-
-    private boolean keysAreEqual(K key1, K key2) {
-        return (key1 == key2) || (key1 != null && key1.equals(key2));
     }
 
     private static class Node<K, V> {
