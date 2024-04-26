@@ -11,14 +11,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        this.table = (Node<K, V>[]) new Node<?, ?>[DEFAULT_CAPACITY];
+        this.table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         resize();
-        int hash = hash(key);
-        int index = getIndex(hash);
+        int index = getIndex(key);
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
@@ -26,14 +25,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             if (currentNode.next == null) {
-                currentNode.next = new Node<>(hash, key, value, null);
+                currentNode.next = new Node<>(key, value, null);
                 size++;
                 return;
             }
             currentNode = currentNode.next;
         }
         currentNode = table[index];
-        table[index] = new Node<>(hash, key, value, currentNode);
+        table[index] = new Node<>(key, value, currentNode);
         size++;
     }
 
@@ -42,8 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size == 0) {
             return null;
         }
-        int hash = hash(key);
-        int index = getIndex(hash);
+        int index = getIndex(key);
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
             if (Objects.equals(key, currentNode.key)) {
@@ -59,8 +57,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getIndex(int hash) {
-        return Math.abs(hash % table.length);
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
     }
 
     private void resize() {
@@ -78,17 +76,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return (key == null) ? 0 : key.hashCode();
+        return key == null ? 0 : key.hashCode();
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
