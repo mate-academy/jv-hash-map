@@ -17,6 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int bucketIndex = getBucketIndex(key);
         Node<K, V> current = buckets[bucketIndex];
         Node<K, V> newNode = new Node<>(key, value);
+
         if (current == null) {// Jeśli nie ma jeszcze elementów w tym kubełku
             buckets[bucketIndex] = newNode;
             size++;
@@ -29,13 +30,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             current = current.next;
         }
-        while (current.next != null) { // dodawanie nowej value
-            current = current.next;
-        }
         current.next = newNode;
         size++;
 
-        if (size > buckets.length * LOAD_FACTOR) {
+        if ((double) size / buckets.length > LOAD_FACTOR) {
             resize();
         }
 
