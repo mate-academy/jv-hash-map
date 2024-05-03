@@ -37,21 +37,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         current.next = newNode;
         size++;
 
-        if ((double) size / buckets.length > LOAD_FACTOR) {
+        if (size > buckets.length * LOAD_FACTOR) {
             resize();
         }
-
     }
 
 
     @Override
     public V getValue(K key) {
-        Node<K, V> current = buckets[getBucketIndex(key)];
+        int bucketIndex = getBucketIndex(key);
+        Node<K, V> current = buckets[bucketIndex];
 
         while (current != null) {
-            if (current.key == null && key == null) {
-                return current.value;
-            } else if (current.key != null && current.key.equals(key)) {
+            if (current.key == null ? key == null : current.key.equals(key)) { // Sprawdź, czy klucz już istnieje
                 return current.value;
             }
             current = current.next;
