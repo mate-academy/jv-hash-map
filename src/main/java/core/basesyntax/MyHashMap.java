@@ -18,20 +18,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> current = buckets[bucketIndex];
         Node<K, V> newNode = new Node<>(key, value);
 
-        if (current == null) {// Jeśli nie ma jeszcze elementów w tym kubełku
+        if (current == null) {
+            // Jeśli nie ma jeszcze elementów w tym kubełku
             buckets[bucketIndex] = newNode;
             size++;
             return;
         }
-        while (current != null) { //badanie czy są powtórki i podmiana value
-            if (current.key == null ? key == null : current.key.equals(key)) { // Sprawdź, czy klucz już istnieje
-                current.value = value; // Podmień wartość
+
+        while (current != null) {
+            //badanie czy są powtórki i podmiana value
+            if (current.key == null ? key == null : current.key.equals(key)) {
+                // Sprawdź, czy klucz już istnieje
+                current.value = value;
+                // Podmień wartość
                 return;
             }
             current = current.next;
         }
+
         current = buckets[bucketIndex];
-        while (current.next != null) { //dodanie warości na sam koniec tablicy
+        while (current.next != null) {
+            //dodanie warości na sam koniec tablicy
             current = current.next;
         }
         current.next = newNode;
@@ -42,14 +49,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-
     @Override
     public V getValue(K key) {
         int bucketIndex = getBucketIndex(key);
         Node<K, V> current = buckets[bucketIndex];
 
         while (current != null) {
-            if (current.key == null ? key == null : current.key.equals(key)) { // Sprawdź, czy klucz już istnieje
+            if (current.key == null ? key == null : current.key.equals(key)) {
+                // Sprawdź, czy klucz już istnieje
                 return current.value;
             }
             current = current.next;
@@ -64,15 +71,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getBucketIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % buckets.length);
+        //obliczanie kodu hash
     }
 
     private void resize() {
         Node<K, V>[] oldBuckets = buckets;
         buckets = new Node[oldBuckets.length * GROW_FACTOR];
         size = 0;
-
+        //size do zera by dzięki metodzie put dodać ten size
         for (Node<K, V> node : oldBuckets) {
+            //przepisanie starej tablicy do nowej
             while (node != null) {
+                //buckets jest powiększoną tablicą i oldbuckets -> buckets
                 put(node.key, node.value);
                 node = node.next;
             }
