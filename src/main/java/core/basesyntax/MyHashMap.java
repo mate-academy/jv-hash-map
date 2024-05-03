@@ -23,11 +23,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
             return;
         }
-        while (current.next != null) { //badanie czy są powtórki i podmiana value
+        while (current != null) { //badanie czy są powtórki i podmiana value
             if (current.key == null ? key == null : current.key.equals(key)) { // Sprawdź, czy klucz już istnieje
                 current.value = value; // Podmień wartość
                 return;
             }
+            current = current.next;
+        }
+        current = buckets[bucketIndex];
+        while (current.next != null) { //dodanie warości na sam koniec tablicy
             current = current.next;
         }
         current.next = newNode;
