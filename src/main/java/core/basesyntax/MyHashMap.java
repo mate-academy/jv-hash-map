@@ -45,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
 
         if (size > buckets.length * LOAD_FACTOR) {
-            resize();
+            resizeIfNeed();
         }
     }
 
@@ -55,7 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> current = buckets[bucketIndex];
 
         while (current != null) {
-            if (current.key == null ? key == null : current.key.equals(key)) {
+            if (current.key == null ? current.key == key : current.key.equals(key)) {
                 // Sprawdź, czy klucz już istnieje
                 return current.value;
             }
@@ -74,7 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         //obliczanie kodu hash
     }
 
-    private void resize() {
+    private void resizeIfNeed() {
         Node<K, V>[] oldBuckets = buckets;
         buckets = new Node[oldBuckets.length * GROW_FACTOR];
         size = 0;
