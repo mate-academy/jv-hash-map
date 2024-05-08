@@ -39,13 +39,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (node == null) {
                 continue;
             }
-            do {
-                if (Objects.equals(node.hash, hash(key)) && Objects.equals(key, node.key)) {
+            while (node != null) {
+                if (Objects.equals(key, node.key)) {
                     return node.value;
                 }
                 node = node.next;
-
-            } while (node != null);
+            }
         }
         return null;
     }
