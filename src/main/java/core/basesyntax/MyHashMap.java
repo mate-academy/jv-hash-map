@@ -6,6 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int GROW_FACTOR = 2;
     private Node<K, V>[] buckets;
     private int size;
+    private int threshold;
 
     public MyHashMap() {
         buckets = new Node[INITIAL_CAPACITY];
@@ -14,38 +15,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int bucketIndex = getBucketIndex(key);
-        Node<K, V> current = buckets[bucketIndex];
-        Node<K, V> newNode = new Node<>(key, value);
-
-        if (current == null) {
-            // Jeśli nie ma jeszcze elementów w tym kubełku
-            buckets[bucketIndex] = newNode;
+        resizeIfNeeded();
+        if (buckets[getBucketIndex(key)] == null) {
+            buckets[getBucketIndex(key)] = new Node<>(key, value);
             size++;
-            return;
+        } else {
+            putIfCollision(key, value);
         }
+    }
 
-        while (current != null) {
-            //badanie czy są powtórki i podmiana value
-            if (current.key == null ? key == null : current.key.equals(key)) {
-                // Sprawdź, czy klucz już istnieje
-                current.value = value;
-                // Podmień wartość
+    private void putIfCollision(K key, V value) {
+        Node<K, V> node = buckets[getBucketIndex(key)];
+        while (node != null) {
+            if (key == node.key || key != null && key.equals(node.key)) {
+                node.value = value;
                 return;
             }
-            current = current.next;
-        }
-
-        current = buckets[bucketIndex];
-        while (current.next != null) {
-            //dodanie warości na sam koniec tablicy
-            current = current.next;
-        }
-        current.next = newNode;
-        size++;
-
-        if (size > buckets.length * LOAD_FACTOR) {
-            resizeIfNeed();
+            if (node.next == null) {
+                node.next = new Node<K, V>(key, value);
+                size++;
+                return;
+            }
+            node = node.next;
         }
     }
 
@@ -74,17 +65,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         //obliczanie kodu hash
     }
 
-    private void resizeIfNeed() {
-        Node<K, V>[] oldBuckets = buckets;
-        buckets = new Node[oldBuckets.length * GROW_FACTOR];
-        size = 0;
-        //size do zera by dzięki metodzie put dodać ten size
-        for (Node<K, V> node : oldBuckets) {
-            //przepisanie starej tablicy do nowej
-            while (node != null) {
-                //buckets jest powiększoną tablicą i oldbuckets -> buckets
-                put(node.key, node.value);
-                node = node.next;
+    private void resizeIfNeeded() {
+        threshold = buckets.length * GROW_FACTOR;
+        if (size == threshold) {
+            Node<K, V>[] oldBuckets = buckets;
+            buckets = new Node[oldBuckets.length * GROW_FACTOR];
+            size = 0;
+            //size do zera by dzięki metodzie put dodać ten size
+            for (Node<K, V> node : oldBuckets) {
+                //przepisanie starej tablicy do nowej
+                while (node != null) {
+                    //buckets jest powiększoną tablicą i oldbuckets -> buckets
+                    put(node.key, node.value);
+                    node = node.next;
+                }
             }
         }
     }
