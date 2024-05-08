@@ -47,7 +47,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         while (current != null) {
             if (current.key == null ? current.key == key : current.key.equals(key)) {
-                // Sprawdź, czy klucz już istnieje
+                // Check if the key already exists
                 return current.value;
             }
             current = current.next;
@@ -62,20 +62,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getBucketIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % buckets.length);
-        //obliczanie kodu hash
+        //hash code calculation
     }
 
     private void resizeIfNeeded() {
-        threshold = buckets.length * GROW_FACTOR;
+        threshold = (int) (buckets.length * LOAD_FACTOR);
         if (size == threshold) {
             Node<K, V>[] oldBuckets = buckets;
             buckets = new Node[oldBuckets.length * GROW_FACTOR];
             size = 0;
-            //size do zera by dzięki metodzie put dodać ten size
+            //size zero to be able to increase it thanks to the put method
             for (Node<K, V> node : oldBuckets) {
-                //przepisanie starej tablicy do nowej
+                //rewriting the old board to the new one
                 while (node != null) {
-                    //buckets jest powiększoną tablicą i oldbuckets -> buckets
+                    //buckets is an enlarged array and oldbuckets -> buckets
                     put(node.key, node.value);
                     node = node.next;
                 }
