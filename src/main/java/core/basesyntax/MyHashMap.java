@@ -34,6 +34,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
+        Node<K, V> node = getNode(key);
+        return (node == null) ? null : node.value;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    private Node<K, V> getNode(K key) {
         for (Node<K, V> kvNode : table) {
             Node<K, V> node = kvNode;
             if (node == null) {
@@ -41,17 +51,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             while (node != null) {
                 if (Objects.equals(key, node.key)) {
-                    return node.value;
+                    return node;
                 }
                 node = node.next;
             }
         }
         return null;
-    }
-
-    @Override
-    public int getSize() {
-        return size;
     }
 
     private int hash(K key) {
