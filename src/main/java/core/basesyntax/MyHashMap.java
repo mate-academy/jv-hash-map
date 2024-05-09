@@ -2,6 +2,7 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
+    private static final int DEFAULT_INCREASE = 2;
     private static final double LOAD_FACTOR = 0.75;
 
     private Node<K, V>[] table;
@@ -22,7 +23,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node = node.next;
         }
-        addNode(index, key, value);
+        if (size >= table.length * LOAD_FACTOR) {
+            resize();
+            index = getIndex(key);
+        }
+        Node<K, V> newNode = new Node<>(key, value, table[index]);
+        table[index] = newNode;
+        size++;
     }
 
     @Override
@@ -51,17 +58,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key1 == null) ? key1 == key2 : key1.equals(key2);
     }
 
-    private void addNode(int index, K key, V value) {
-        Node<K, V> newNode = new Node<>(key, value, table[index]);
-        table[index] = newNode;
-        size++;
-        if (size >= table.length * LOAD_FACTOR) {
-            resize();
-        }
-    }
-
     private void resize() {
-        int newCapacity = table.length * 2;
+        int newCapacity = table.length * DEFAULT_INCREASE;
         Node<K, V>[] newTable = new Node[newCapacity];
         for (Node<K, V> node : table) {
             while (node != null) {
