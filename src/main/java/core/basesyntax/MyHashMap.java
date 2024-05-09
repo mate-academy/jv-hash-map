@@ -32,6 +32,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         resize();
     }
 
+    //    index = hash(key) % table.length; and mentor implementation still not working for me,
+    //    it made even more errors.
+    //    indexes are out of bounds or not pointing to the right bucket
+
+    //     @Override
+    //     public V getValue(K key) {
+    //        int index = getIndex(key);
+    //        Node<K, V> entry = table[index];
+    //        while (entry != null) {
+    //            if (Objects.equals(entry.key, key)) {
+    //                return entry.value;
+    //            }
+    //            entry = entry.next;
+    //        }
+    //        return null;
+    //     }
     @Override
     public V getValue(K key) {
         Node<K, V> node = getNode(key);
@@ -58,6 +74,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         return null;
     }
+
+    //    private int getIndex(K key) {
+    //        return hash(key) % table.length;
+    //    }
 
     private int hash(K key) {
         int h;
