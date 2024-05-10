@@ -6,7 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private static final int DEFAULT_RESIZE_FACTOR = 2;
+    private static final int DEFAULT_RESIZE_MAP_FACTOR = 2;
     private int size;
     private Node<K, V>[] table;
 
@@ -55,7 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldTable = table;
-        table = new Node[oldTable.length * DEFAULT_RESIZE_FACTOR];
+        table = new Node[oldTable.length * DEFAULT_RESIZE_MAP_FACTOR];
         size = 0;
         for (Node<K, V> bucket : oldTable) {
             if (bucket != null) {
