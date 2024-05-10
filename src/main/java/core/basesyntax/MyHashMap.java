@@ -16,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int hash = hash(key);
-        int index = hash & table.length - 1;
+        int index = getIndex(key);
         Node<K, V> node = table[index];
         while (node != null) {
             if (Objects.equals(key, node.key)) {
@@ -32,26 +32,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         resize();
     }
 
-    //    index = hash(key) % table.length; and mentor implementation still not working for me,
-    //    it made even more errors.
-    //    indexes are out of bounds or not pointing to the right bucket
-
-    //     @Override
-    //     public V getValue(K key) {
-    //        int index = getIndex(key);
-    //        Node<K, V> entry = table[index];
-    //        while (entry != null) {
-    //            if (Objects.equals(entry.key, key)) {
-    //                return entry.value;
-    //            }
-    //            entry = entry.next;
-    //        }
-    //        return null;
-    //     }
     @Override
     public V getValue(K key) {
-        Node<K, V> node = getNode(key);
-        return (node == null) ? null : node.value;
+        int index = getIndex(key);
+        Node<K, V> entry = table[index];
+        while (entry != null) {
+            if (Objects.equals(entry.key, key)) {
+                return entry.value;
+            }
+            entry = entry.next;
+        }
+        return null;
     }
 
     @Override
@@ -59,25 +50,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private Node<K, V> getNode(K key) {
-        for (Node<K, V> kvNode : table) {
-            Node<K, V> node = kvNode;
-            if (node == null) {
-                continue;
-            }
-            while (node != null) {
-                if (Objects.equals(key, node.key)) {
-                    return node;
-                }
-                node = node.next;
-            }
-        }
-        return null;
+    private int getIndex(K key) {
+        return hash(key) & table.length - 1;
     }
-
-    //    private int getIndex(K key) {
-    //        return hash(key) % table.length;
-    //    }
 
     private int hash(K key) {
         int h;
@@ -92,14 +67,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V>[] transfer(Node<K, V>[] newTable) {
-        for (int i = 0; i < table.length; i++) {
-            Node<K, V> node = table[i];
+        for (Node<K, V> kvNode : table) {
+            Node<K, V> node = kvNode;
             while (node != null) {
                 Node<K, V> next = node.next;
-                node.next = newTable[i];
-                newTable[i] = node;
+                int hash = hash(node.key);
+                int index = hash & newTable.length - 1;
+                Node<K, V> newNode = new Node<>(node.key, node.value, hash, null);
+                newNode.next = newTable[index];
+                newTable[index] = newNode;
                 node = next;
             }
+
         }
         return newTable;
     }
