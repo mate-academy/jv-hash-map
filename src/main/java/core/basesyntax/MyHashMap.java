@@ -25,7 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node = node.next;
         }
-        Node<K, V> newNode = new Node<>(key, value, hash, null);
+        Node<K, V> newNode = new Node<>(key, value, hash);
         newNode.next = table[index];
         table[index] = newNode;
         size++;
@@ -73,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 Node<K, V> next = node.next;
                 int hash = hash(node.key);
                 int index = hash & newTable.length - 1;
-                Node<K, V> newNode = new Node<>(node.key, node.value, hash, null);
+                Node<K, V> newNode = new Node<>(node.key, node.value, hash);
                 newNode.next = newTable[index];
                 newTable[index] = newNode;
                 node = next;
@@ -89,11 +89,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private final int hash;
         private Node<K, V> next;
 
-        Node(K key, V value, int hash, Node<K, V> next) {
+        Node(K key, V value, int hash) {
             this.key = key;
             this.value = value;
             this.hash = hash;
-            this.next = next;
         }
     }
 }
