@@ -36,7 +36,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 prevNode = currentNode;
                 currentNode = currentNode.next;
             }
-
             prevNode.next = new Node<>(key, value);
             size++;
         }
@@ -84,17 +83,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private V getValueFromNullNode() {
-        Node<K, V> nullNode = table[0];
-        while (nullNode != null) {
-            if (nullNode.key == null) {
-                return nullNode.value;
-            }
-            nullNode = nullNode.next;
-        }
-        return null;
-    }
-
     private int getBucketIndex(K key) {
         return Math.abs(Objects.hashCode(key)) % table.length;
     }
@@ -103,15 +91,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = table;
         table = new Node[table.length * 2];
         size = 0;
-
         for (Node<K, V> currentNode : oldTable) {
             while (currentNode != null) {
-                Node<K, V> nextNode = currentNode.next;
-                int index = getBucketIndex(currentNode.key);
-                currentNode.next = table[index];
-                table[index] = currentNode;
-                currentNode = nextNode;
-                size++;
+                put(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
             }
         }
     }
