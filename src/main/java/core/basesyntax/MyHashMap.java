@@ -24,7 +24,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         if (table[index] == null) {
             table[index] = new Node<>(key, value);
-            size++;
         } else {
             Node<K, V> currentNode = table[index];
             Node<K, V> prevNode = null;
@@ -37,8 +36,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode = currentNode.next;
             }
             prevNode.next = new Node<>(key, value);
-            size++;
         }
+        size++;
 
         if (size >= table.length * LOAD_FACTOR) {
             resize();
