@@ -24,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         for (Node<K, V> node = this.table[index]; node != null;
-             node = node.next) {
+                node = node.next) {
             if (Objects.equals(key, node.key)) {
                 node.value = value;
                 return;
@@ -52,7 +52,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public int getSize() {
         return this.size;
     }
-
 
     private int getIndex(K key) {
         return (key == null ? 0 : ((int)(Math.pow(key.hashCode(), 2)))) % capacity;
