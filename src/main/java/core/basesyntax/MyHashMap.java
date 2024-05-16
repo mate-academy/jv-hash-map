@@ -16,32 +16,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= (capacity * DEFAULT_LOAD_FACTOR)) {
-            resize();
-        }
-        int hash = getHash(key);
-        int index = hash % capacity;
+        resizeIfRequired();
+        int index = getIndex(key);
         if (this.table[index] == null) {
-            this.table[index] = new Node<>(key, value, null, hash);
+            this.table[index] = new Node<>(key, value, null);
             size++;
-        } else {
-            for (Node<K, V> node = this.table[index]; node != null;
-                    node = node.next) {
-                if (node.hash == hash && Objects.equals(key, node.key)) {
-                    node.value = value;
-                    return;
-                }
-                if (node.next == null) {
-                    node.next = new Node(key, value, null, hash);
-                    size++;
-                }
+            return;
+        }
+        for (Node<K, V> node = this.table[index]; node != null;
+             node = node.next) {
+            if (Objects.equals(key, node.key)) {
+                node.value = value;
+                return;
+            }
+            if (node.next == null) {
+                node.next = new Node(key, value, null);
+                size++;
             }
         }
     }
 
     @Override
     public V getValue(K key) {
-        int index = getHash(key) % capacity;
+        int index = getIndex(key);
         for (Node<K, V> currentNode = this.table[index]; currentNode != null;
                 currentNode = currentNode.next) {
             if (Objects.equals(currentNode.key, key)) {
@@ -56,35 +53,35 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return this.size;
     }
 
-    private int getHash(K key) {
 
-        return key == null ? 0 : ((int)(Math.pow(key.hashCode(), 2)));
+    private int getIndex(K key) {
+        return (key == null ? 0 : ((int)(Math.pow(key.hashCode(), 2)))) % capacity;
     }
 
-    private void resize() {
-        this.capacity = capacity * RESIZE_FACTOR;
-        size = 0;
-        Node<K, V>[] oldTab = this.table;
-        this.table = new Node[capacity];
-        for (Node<K,V> bucket : oldTab) {
-            while (bucket != null) {
-                put(bucket.key,bucket.value);
-                bucket = bucket.next;
+    private void resizeIfRequired() {
+        if (size >= (capacity * DEFAULT_LOAD_FACTOR)) {
+            this.capacity = capacity * RESIZE_FACTOR;
+            size = 0;
+            Node<K, V>[] oldTab = this.table;
+            this.table = new Node[capacity];
+            for (Node<K, V> bucket : oldTab) {
+                while (bucket != null) {
+                    put(bucket.key, bucket.value);
+                    bucket = bucket.next;
+                }
             }
         }
     }
 
     private class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        Node(K key, V value, Node<K, V> next, int hash) {
+        Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
-            this.hash = hash;
         }
     }
 }
