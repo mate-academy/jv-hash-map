@@ -70,8 +70,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = this.table;
         this.table = new Node[this.capacity * MAGNIFICATION_MULTIPLIER];
         this.capacity = this.table.length;
-        this.size = 0;
-
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 this.put(node.key, node.value);
@@ -88,10 +86,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode()) % this.capacity;
     }
 
-    static class Node<K, V>{
-        K key;
-        V value;
-        Node<K, V> next;
+    static class Node<K, V> {
+        protected K key;
+        protected V value;
+        protected Node<K, V> next;
 
         public Node(K key, V value) {
             this.key = key;
