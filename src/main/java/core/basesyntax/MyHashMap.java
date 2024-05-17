@@ -67,10 +67,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        // i setted this.size = 0; at start of method because 'Distance between variable 'oldTable' declaration and its first usage is 4, but allowed 3.'
+        this.size = 0;
         Node<K, V>[] oldTable = this.table;
         this.table = new Node[this.capacity * MAGNIFICATION_MULTIPLIER];
         this.capacity = this.table.length;
-        this.size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 this.put(node.key, node.value);
