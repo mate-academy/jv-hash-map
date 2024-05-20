@@ -17,8 +17,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (this.shouldMapBeResized()) {
-            this.resize();
+        if (shouldMapBeResized()) {
+            resize();
         }
         int index = countIndexWithKey(key);
 
@@ -27,7 +27,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         if (currentNode == null) {
             this.table[index] = newNode;
-            size++;
         } else {
             Node<K, V> previousNode = null;
             while (currentNode != null) {
@@ -44,8 +43,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode = currentNode.next;
             }
             previousNode.next = newNode;
-            this.size++;
         }
+        size++;
     }
 
     @Override
