@@ -5,11 +5,12 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private boolean isResizeExecuting;
     private int size;
     private int capacity;
     private Node<K, V>[] table;
 
-    MyHashMap() {
+    public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
         capacity = DEFAULT_CAPACITY;
     }
@@ -25,7 +26,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (node == null) {
             Node<K, V> newNode = new Node<>(key, getHash(key), value);
             table[index] = newNode;
-            size++;
+            if (!isResizeExecuting) {
+                size++;
+            }
             return;
         }
         while (node != null) {
@@ -34,7 +37,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             } else if (!Objects.equals(node.key, key) && node.next == null) {
                 node.next = new Node<>(key, getHash(key), value);
-                size++;
+                if (!isResizeExecuting) {
+                    size++;
+                }
                 return;
             }
             node = node.next;
@@ -74,6 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        isResizeExecuting = true;
         Node<K, V>[] oldTable = table;
         int oldCapacity = capacity;
         capacity = capacity * 2;
@@ -82,30 +88,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (int i = 0; i < oldCapacity; i++) {
             Node<K, V> node = oldTable[i];
             while (node != null) {
-                putToNewTable(node.key, node.value);
+                put(node.key, node.value);
                 node = node.next;
             }
         }
-    }
-
-    private void putToNewTable(K key, V value) {
-        int index = getHash(key);
-        Node<K, V> node = table[index];
-        if (node == null) {
-            Node<K, V> newNode = new Node<>(key, getHash(key), value);
-            table[index] = newNode;
-            return;
-        }
-        while (node != null) {
-            if (Objects.equals(node.key, key)) {
-                node.value = value;
-                return;
-            } else if (!Objects.equals(node.key, key) && node.next == null) {
-                node.next = new Node<>(key, getHash(key), value);
-                return;
-            }
-            node = node.next;
-        }
+        isResizeExecuting = false;
     }
 
     private class Node<K, V> {
