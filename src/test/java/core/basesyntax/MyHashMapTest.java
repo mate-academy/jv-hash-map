@@ -5,7 +5,7 @@ import org.junit.Test;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 
-public class  MyHashMapTest {
+public class MyHashMapTest {
     private static final Car firstCar = new Car("Audi", "black");
     private static final Car secondCar = new Car("Bmw", "red");
     private static final Car thirdCar = new Car("Mercedes", "grey");

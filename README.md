@@ -9,10 +9,3 @@ Be attentive to basic requirements for the implementation of the map (initial ca
 P.S.: you can implement other methods of the Map interface.
 
 [Try to avoid these common mistakes while solving task](./checklist.md)
-
-0. Создать класс НОДА--------------
-1. Нужен метод Resize, при добавлении элемента проверять не привысил ли лимит 0.75 capacity
-2. -done---
-3. ---done---
-4. ---done----
-5. --done--

@@ -14,21 +14,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int index = getBucketIndex(key);
-        for (Node<K, V> node = table[index]; node != null; node = node.getNext()) {
-            if ((node.getKey() == key) || (key != null && key.equals(node.getKey()))) {
-                node.setValue(value);
+        for (Node<K, V> node = table[index]; node != null; node = node.next) {
+            if ((node.key == key) || (key != null && key.equals(node.key))) {
+                node.value = value;
                 return;
             }
         }
+        if (++size > (int) (table.length * DEFAULT_LOAD_FACTOR)) {
+            resize();
+        }
+        index = getBucketIndex(key);
         addMyNode(key, value, index);
     }
 
     @Override
     public V getValue(K key) {
         int index = getBucketIndex(key);
-        for (Node<K, V> node = table[index]; node != null; node = node.getNext()) {
-            if (node.getKey() == key || (key != null && key.equals(node.getKey()))) {
-                return node.getValue();
+        for (Node<K, V> node = table[index]; node != null; node = node.next) {
+            if (node.key == key || (key != null && key.equals(node.key))) {
+                return node.value;
             }
         }
         return null;
@@ -42,19 +46,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void addMyNode(K key, V value, int index) {
         Node<K, V> firstNode = table[index];
         table[index] = new Node<>(key, value, firstNode);
-        if (++size > (int) (table.length * DEFAULT_LOAD_FACTOR)) {
-            resize();
-        }
     }
 
-    public void transfer(Node<K, V>[] newTable) {
+    private void transfer(Node<K, V>[] newTable) {
         for (Node<K, V> currentNode : table) {
-            while (currentNode != null) {
-                Node<K, V> nextNode = currentNode.getNext();
-                int index = getNewBucketIndex(currentNode.getKey(), newTable.length);
-                currentNode.setNext(newTable[index]);
-                newTable[index] = currentNode;
-                currentNode = nextNode;
+            for (Node<K, V> node = currentNode; node != null;) {
+                Node<K, V> nextNode = node.next;
+                int index = getNewBucketIndex(node.key, newTable.length);
+                node.next = newTable[index];
+                newTable[index] = node;
+                node = nextNode;
             }
         }
     }
@@ -69,7 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (hash & 0x7fffffff) % table.length;
     }
 
-    public void resize() {
+    private void resize() {
         int newCapacity = table.length * CAPACITY_MULTIPLIER;
         Node<K, V>[] newTable = new Node[newCapacity];
         transfer(newTable);
@@ -77,33 +78,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     static class Node<K, V> {
-        private K key;
-        private V value;
-        private Node<K, V> next;
+        K key;
+        V value;
+        Node<K, V> next;
 
         Node(K key, V value, Node<K,V> next) {
             this.key = key;
             this.value = value;
-            this.next = next;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V newValue) {
-            value = newValue;
-        }
-
-        public Node<K, V> getNext() {
-            return next;
-        }
-
-        public void setNext(Node<K, V> next) {
             this.next = next;
         }
     }
