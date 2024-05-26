@@ -13,7 +13,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = getBucketIndex(key);
+        int index = getNewBucketIndex(key, table.length);
         Node<K, V> node = table[index];
         while (node != null) {
             if (node.key == key || key != null && key.equals(node.key)) {
@@ -24,13 +24,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         size++;
         resize();
-        index = getBucketIndex(key);
+        index = getNewBucketIndex(key, table.length);
         addNode(key, value, index);
     }
 
     @Override
     public V getValue(K key) {
-        int index = getBucketIndex(key);
+        int index = getNewBucketIndex(key, table.length);
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
             if (node.key == key || key != null && key.equals(node.key)) {
                 return node.value;
@@ -44,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public void addNode(K key, V value, int index) {
+    private void addNode(K key, V value, int index) {
         Node<K, V> firstNode = table[index];
         table[index] = new Node<>(key, value, firstNode);
     }
@@ -61,12 +61,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getNewBucketIndex(K key, int newTableLength) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % newTableLength);
-    }
-
-    private int getBucketIndex(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
+    private int getNewBucketIndex(K key, int tableLength) {
+        return (key == null) ? 0 : Math.abs(key.hashCode() % tableLength);
     }
 
     private void resize() {
@@ -78,7 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    static class Node<K, V> {
+    private class Node<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
