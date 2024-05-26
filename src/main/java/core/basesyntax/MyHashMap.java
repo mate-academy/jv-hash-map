@@ -24,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         index = getBucketIndex(key);
-        addMyNode(key, value, index);
+        addNode(key, value, index);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public void addMyNode(K key, V value, int index) {
+    public void addNode(K key, V value, int index) {
         Node<K, V> firstNode = table[index];
         table[index] = new Node<>(key, value, firstNode);
     }
@@ -61,13 +61,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getNewBucketIndex(K key, int newTableLength) {
-        int hash = (key == null) ? 0 : key.hashCode();
-        return (hash & 0x7fffffff) % newTableLength;
+        return (key == null) ? 0 : Math.abs(key.hashCode() % newTableLength);
     }
 
     private int getBucketIndex(K key) {
-        int hash = (key == null) ? 0 : key.hashCode();
-        return (hash & 0x7fffffff) % table.length;
+        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void resize() {
