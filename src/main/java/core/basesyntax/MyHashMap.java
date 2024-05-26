@@ -14,15 +14,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int index = getBucketIndex(key);
-        for (Node<K, V> node = table[index]; node != null; node = node.next) {
-            if ((node.key == key) || (key != null && key.equals(node.key))) {
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (node.key == key || key != null && key.equals(node.key)) {
                 node.value = value;
                 return;
             }
+            node = node.next;
         }
-        if (++size > (int) (table.length * DEFAULT_LOAD_FACTOR)) {
-            resize();
-        }
+        size++;
+        resize();
         index = getBucketIndex(key);
         addNode(key, value, index);
     }
@@ -31,7 +32,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int index = getBucketIndex(key);
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
-            if (node.key == key || (key != null && key.equals(node.key))) {
+            if (node.key == key || key != null && key.equals(node.key)) {
                 return node.value;
             }
         }
@@ -69,10 +70,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int newCapacity = table.length * CAPACITY_MULTIPLIER;
-        Node<K, V>[] newTable = new Node[newCapacity];
-        transfer(newTable);
-        table = newTable;
+        if (size > (int) (table.length * DEFAULT_LOAD_FACTOR)) {
+            int newCapacity = table.length * CAPACITY_MULTIPLIER;
+            Node<K, V>[] newTable = new Node[newCapacity];
+            transfer(newTable);
+            table = newTable;
+        }
     }
 
     static class Node<K, V> {
