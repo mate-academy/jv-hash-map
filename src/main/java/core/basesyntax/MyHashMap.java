@@ -3,6 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
+    private static final int MULTIPLIER = 2;
     private int threshold;
     private int size;
     private Node<K, V>[] table;
@@ -14,12 +15,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        resize();
         int index = calculateIndex(key);
-
-        if (size > threshold) {
-            resize();
-        }
-
         Node<K, V> newNode = new Node<>(key, value, null);
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
@@ -61,16 +58,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        threshold *= 2;
-        Node<K, V>[] tempNode = table;
-        table = new Node[table.length * 2];
-        size = 0;
-        Node<K, V> currentNode;
-        for (Node<K, V> node: tempNode) {
-            currentNode = node;
-            while (currentNode != null) {
-                put(currentNode.key, currentNode.value);
-                currentNode = currentNode.next;
+        if (size > threshold) {
+            threshold *= MULTIPLIER;
+            Node<K, V>[] tempNode = table;
+            table = new Node[table.length * MULTIPLIER];
+            size = 0;
+            Node<K, V> currentNode;
+            for (Node<K, V> node: tempNode) {
+                currentNode = node;
+                while (currentNode != null) {
+                    put(currentNode.key, currentNode.value);
+                    currentNode = currentNode.next;
+                }
             }
         }
     }
