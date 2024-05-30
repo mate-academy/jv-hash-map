@@ -167,7 +167,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
 
             for (Node<K, V> bucketNode : bucketNodes) {
-                int index = Math.abs(bucketNode.hash % capacity);
+                int index = Math.abs(bucketNode.key != null ? bucketNode.key.hashCode() % capacity
+                        : 0);
                 bucket = newBuckets[index];
                 while (true) {
                     if (bucket == null) {
@@ -187,13 +188,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
         private Node(K key, V value) {
-            this.hash = key != null ? key.hashCode() : 0;
             this.key = key;
             this.value = value;
         }
