@@ -10,21 +10,16 @@ import java.util.Set;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
+    private static final int CAPACITY_DELTA = 2;
     private int capacity;
     private int size;
     private Node<K, V>[] buckets;
     private double threshold;
-    private Set<K> keySet;
-    private Collection<V> values;
-    private Set<Map.Entry<K,V>> entrySet;
 
     public MyHashMap() {
         capacity = DEFAULT_CAPACITY;
         buckets = new Node[DEFAULT_CAPACITY];
         threshold = capacity * LOAD_FACTOR;
-        keySet = new HashSet<>();
-        values = new HashSet<>();
-        entrySet = new HashSet<>();
     }
 
     @Override
@@ -32,9 +27,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size > threshold) {
             resize();
         }
-        keySet.add(key);
-        values.add(value);
-        entrySet.add(new AbstractMap.SimpleEntry<>(key, value));
         int index = key != null ? Math.abs(key.hashCode() % capacity) : 0;
         if (buckets[index] == null) {
             buckets[index] = new Node<>(key, value);
@@ -85,18 +77,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public boolean containsKey(K key) {
-        for (K existedKey : keySet) {
-            if (existedKey.equals(key)) {
-                return true;
+        for (Node<K, V> bucket : buckets) {
+            while (bucket != null) {
+                if (bucket.key.equals(key)) {
+                    return true;
+                }
+                bucket = bucket.next;
             }
         }
         return false;
     }
 
     public boolean containsValue(V value) {
-        for (K existedValue : keySet) {
-            if (existedValue.equals(value)) {
-                return true;
+        for (Node<K, V> bucket : buckets) {
+            while (bucket != null) {
+                if (bucket.value.equals(value)) {
+                    return true;
+                }
+                bucket = bucket.next;
             }
         }
         return false;
@@ -106,9 +104,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         capacity = DEFAULT_CAPACITY;
         buckets = new Node[DEFAULT_CAPACITY];
         threshold = capacity * LOAD_FACTOR;
-        keySet = new HashSet<>();
-        values = new HashSet<>();
-        entrySet = new HashSet<>();
     }
 
     public V remove(K key) {
@@ -117,13 +112,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         V value = getValue(key);
         if (Objects.equals(buckets[index].key, key)) {
             buckets[index] = buckets[index].next;
-            keySet.remove(key);
             return value;
         }
         while (bucket != null) {
             if (Objects.equals(bucket.next.key, key)) {
                 bucket.next = bucket.next.next;
-                keySet.remove(key);
                 return value;
             } else {
                 bucket = bucket.next;
@@ -133,19 +126,40 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public Set<K> keySet() {
+        Set<K> keySet = new HashSet<>();
+        for (Node<K, V> bucket : buckets) {
+            while (bucket != null) {
+                keySet.add(bucket.key);
+                bucket = bucket.next;
+            }
+        }
         return keySet;
     }
 
     public Collection<V> values() {
+        Collection<V> values = new HashSet<>();
+        for (Node<K, V> bucket : buckets) {
+            while (bucket != null) {
+                values.add(bucket.value);
+                bucket = bucket.next;
+            }
+        }
         return values;
     }
 
     public Set<Map.Entry<K,V>> entrySet() {
+        Set<Map.Entry<K, V>> entrySet = new HashSet<>();
+        for (Node<K, V> bucket : buckets) {
+            while (bucket != null) {
+                entrySet.add(new AbstractMap.SimpleEntry<>(bucket.key, bucket.value));;
+                bucket = bucket.next;
+            }
+        }
         return entrySet;
     }
 
     private void resize() {
-        capacity *= 2;
+        capacity *= CAPACITY_DELTA;
         Node<K, V>[] newBuckets = new Node[capacity];
         for (Node<K, V> bucket : buckets) {
             if (bucket == null) {
