@@ -22,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        int hash = key == null ? 0 : Math.abs(key.hashCode());
+        int hash = getHashCode(key);
         int index = hash % table.length;
         Node<K, V> node = table[index];
 
@@ -125,7 +125,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] currentTable;
         Node<K, V> firstNode;
         Node<K, V> nextNode;
-        int hash = key == null ? 0 : Math.abs(key.hashCode());
+        int hash = getHashCode(key);
 
         if ((currentTable = table) != null && currentTable.length > 0) {
             firstNode = currentTable[hash % currentTable.length];
@@ -142,5 +142,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         return null;
+    }
+
+    private int getHashCode(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode());
     }
 }
