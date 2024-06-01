@@ -6,7 +6,7 @@ import java.util.Set;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final double LOAD_FACTOR= 0.75;
+    private static final double LOAD_FACTOR = 0.75;
     private static final int SCALE = 2;
     private int capacity;
     private int size;
@@ -27,7 +27,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         HashSet<Node<K, V>> backet = backets[index];
         for (Node<K, V> element : backet) {
-            K elementKey  = element.key;
+            K elementKey = element.key;
             V oldValue = element.value;
             if (Objects.equals(elementKey, key)) {
                 element.value = value;
@@ -64,7 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         int newCapasity = capacity * SCALE;
         threshold = (int) (newCapasity * LOAD_FACTOR);
-        HashSet<Node<K, V>> newBackets[] = new HashSet[newCapasity];
+        HashSet<Node<K, V>>[] newBackets = new HashSet[newCapasity];
         for (int i = 0; i < newCapasity; i++) {
             newBackets[i] = new HashSet<Node<K, V>>();
         }
@@ -103,8 +103,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o)  {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Node<?, ?> node = (Node<?, ?>) o;
             return Objects.equals(key, node.key) && Objects.equals(value, node.value);
         }
