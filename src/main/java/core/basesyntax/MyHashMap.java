@@ -159,45 +159,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        capacity *= CAPACITY_DELTA;
-        Node<K, V>[] newBuckets = new Node[capacity];
+        Node<K, V>[] nodes = new Node[(int) threshold + 1];
+        int nodesSize = 0;
         for (Node<K, V> bucket : buckets) {
             if (bucket == null) {
                 continue;
             }
-
-            int nodesNumber = 1;
-            Node<K, V> countBucket = bucket;
-            while (countBucket.next != null) {
-                nodesNumber++;
-                countBucket = countBucket.next;
-            }
-
-            Node<K, V>[] bucketNodes = new Node[nodesNumber];
-            for (int i = 0; bucket != null; i++) {
-                bucketNodes[i] = bucket;
+            while (bucket != null) {
+                nodes[nodesSize] = bucket;
                 bucket = bucket.next;
-                bucketNodes[i].next = null;
-            }
-
-            for (Node<K, V> bucketNode : bucketNodes) {
-                int index = Math.abs(bucketNode.key != null ? bucketNode.key.hashCode() % capacity
-                        : 0);
-                bucket = newBuckets[index];
-                while (true) {
-                    if (bucket == null) {
-                        newBuckets[index] = bucketNode;
-                        break;
-                    } else if (bucket.next == null) {
-                        bucket.next = bucketNode;
-                        break;
-                    } else {
-                        bucket = bucket.next;
-                    }
-                }
+                nodes[nodesSize].next = null;
+                nodesSize++;
             }
         }
-        buckets = newBuckets;
+
+        capacity *= CAPACITY_DELTA;
+        buckets = new Node[capacity];
+        size = 0;
+        for (Node<K, V> node : nodes) {
+            put(node.key, node.value);
+        }
+
         threshold = capacity * LOAD_FACTOR;
     }
 
