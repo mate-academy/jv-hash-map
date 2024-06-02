@@ -6,7 +6,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int GROW_FACTOR = 2;
-    private Node<K, V>[] table;
+    private Node[] table;
     private int size;
 
     public MyHashMap() {
@@ -82,7 +82,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private K key;
+        private final K key;
         private V value;
         private Node<K, V> next;
 
