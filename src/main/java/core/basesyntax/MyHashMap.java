@@ -1,57 +1,56 @@
 package core.basesyntax;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
     private static final int SCALE = 2;
-    private int capacity;
     private int size;
-    private int threshold;
-    private HashSet<Node<K, V>>[] backets;
+    private Entry<K, V> table[];
 
     public MyHashMap() {
-        capacity = DEFAULT_CAPACITY;
-        threshold = (int) (LOAD_FACTOR * capacity);
-        backets = new HashSet[capacity];
-        for (int i = 0; i < capacity; i++) {
-            backets[i] = new HashSet<Node<K, V>>();
-        }
+        table = new Entry[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
         int index = getIndex(key);
-        HashSet<Node<K, V>> backet = backets[index];
-        for (Node<K, V> element : backet) {
-            K elementKey = element.key;
-            V oldValue = element.value;
-            if (Objects.equals(elementKey, key)) {
-                element.value = value;
+        Entry<K, V> entry = table[index];
+        if (entry == null) {
+            table[index] = new Entry<K, V>(key, value);
+            size++;
+            grow();
+        } else {
+            while (entry.next != null) {
+                if (Objects.equals(entry.key, key)) {
+                    entry.value = value;
+                    return;
+                }
+                entry = entry.next;
+            }
+            if (Objects.equals(entry.key, key)) {
+                entry.value = value;
                 return;
             }
-        }
-        Node<K, V> newNode = new Node<>(key, value);
-        backet.add(newNode);
-        ++size;
-        if (size == threshold) {
-            resize();
+            entry.next = new Entry<K, V>(key, value);
+            size++;
+            grow();
         }
     }
 
     @Override
     public V getValue(K key) {
         int index = getIndex(key);
-        HashSet<Node<K, V>> bucket = backets[index];
-        for (Node<K, V> node : bucket) {
-            K currentKey = node.key;
-            V value = node.value;
-            if (Objects.equals(currentKey, key)) {
-                return value;
+        Entry<K, V> entry = table[index];
+        if (entry == null) {
+            return null;
+        }
+        while (entry != null) {
+            if (Objects.equals(entry.key, key)) {
+                return entry.value;
             }
+            entry = entry.next;
         }
         return null;
     }
@@ -61,61 +60,48 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resize() {
-        int newCapasity = capacity * SCALE;
-        threshold = (int) (newCapasity * LOAD_FACTOR);
-        HashSet<Node<K, V>>[] newBackets = new HashSet[newCapasity];
-        for (int i = 0; i < newCapasity; i++) {
-            newBackets[i] = new HashSet<Node<K, V>>();
-        }
-        Set<Node<K, V>> tmp = new HashSet<>();
-        for (HashSet<Node<K, V>> backet : backets) {
-            tmp.addAll(backet);
-        }
-        backets = newBackets;
-        capacity = newCapasity;
-        size = 0;
-        for (Node<K, V> kvNode : tmp) {
-            put(kvNode.key, kvNode.value);
-        }
-    }
-
-    private int getIndex(K key) {
-        if (key == null) {
-            return 0;
-        }
-        int index = key.hashCode() % capacity;
-        index = index < 0 ? -index : index;
+    private <K> int getIndex(K key) {
+        int hash = key == null ? 0 : key.hashCode() % table.length;
+        int index = hash >= 0 ? hash : -hash;
         return index;
     }
 
-    private static class Node<K, V> {
-        private K key;
-        private V value;
-
-        public Node() {
+    private void grow() {
+        int treshold = (int) (LOAD_FACTOR * table.length);
+        if (size < treshold) {
+            return;
         }
+        int oldCapasity = table.length;
+        int newCapasity = oldCapasity * SCALE;
+        Entry<K, V>[] newTable = new Entry[newCapasity];
+        Entry<K, V>[] entries = getArray();
+        table = newTable;
+        size = 0;
+        for (Entry<K, V> entry : entries) {
+            put(entry.key, entry.value);
+        }
+    }
 
-        public Node(K key, V value) {
+    private Entry<K,V>[] getArray() {
+        Entry<K, V>[] entries = new Entry[size];
+        int i = 0;
+        for (Entry<K, V> entry : table) {
+            while (entry != null) {
+                entries[i++] = entry;
+                entry = entry.next;
+            }
+        }
+        return entries;
+    }
+
+    private static class Entry<K, V> {
+        private final K key;
+        private V value;
+        private Entry<K, V> next;
+
+        public Entry(K key, V value) {
             this.key = key;
             this.value = value;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            Node<?, ?> node = (Node<?, ?>) o;
-            return Objects.equals(key, node.key) && Objects.equals(value, node.value);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(key);
         }
     }
 }
