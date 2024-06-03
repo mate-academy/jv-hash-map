@@ -8,7 +8,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @SuppressWarnings("unchecked")
     public MyHashMap() {
-        this.node = new Node[DEFAULT_CAPACITY];
+        this.node = (Node<K, V>[])new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -78,7 +78,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         int newCapacity = node.length * 2;
         Node<K, V>[] oldNode = node;
-        node = new Node[newCapacity];
+        node = (Node<K, V>[])new Node[newCapacity];
         size = 0;
         for (Node<K, V> kvNode : oldNode) {
             Node<K, V> current = kvNode;
