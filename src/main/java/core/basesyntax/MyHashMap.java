@@ -15,12 +15,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        grow();
         int index = getIndex(key);
         Entry<K, V> entry = table[index];
         if (entry == null) {
             table[index] = new Entry<K, V>(key, value);
             size++;
-            grow();
         } else {
             while (entry.next != null) {
                 if (Objects.equals(entry.key, key)) {
@@ -35,7 +35,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             entry.next = new Entry<K, V>(key, value);
             size++;
-            grow();
         }
     }
 
