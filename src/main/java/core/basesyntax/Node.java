@@ -1,14 +1,20 @@
 package core.basesyntax;
 
 public class Node<K, V> {
+    private final int hash;
     private final K key;
     private V value;
     private Node<K, V> next;
 
-    public Node(K key, V value, Node<K, V> next) {
+    public Node(int hash, K key, V value, Node<K, V> next) {
+        this.hash = hash;
         this.key = key;
         this.value = value;
         this.next = next;
+    }
+
+    public int getHash() {
+        return hash;
     }
 
     public K getKey() {

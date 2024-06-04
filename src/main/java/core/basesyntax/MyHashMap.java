@@ -1,80 +1,60 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-
     private static final int DEFAULT_CAPACITY = 16;
-    private static final double LOAD_FACTOR = 0.75;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
-    private Node<K, V>[] buckets;
+    private Node<K, V>[] table;
     private int size;
     private int capacity;
-    private Node<K, V> nullKeyNode; // Special node to handle the null key
+    private final float loadFactor;
+    private int threshold;
 
     @SuppressWarnings("unchecked")
     public MyHashMap() {
         this.capacity = DEFAULT_CAPACITY;
-        this.buckets = new Node[capacity];
+        this.loadFactor = DEFAULT_LOAD_FACTOR;
+        this.table = (Node<K, V>[]) new Node[capacity];
         this.size = 0;
-        this.nullKeyNode = null; // Initialize the special null key node to null
+        this.threshold = (int) (capacity * loadFactor);
     }
 
-    private int hash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
+    private int hash(Object key) {
+        return (key == null) ? 0 : (key.hashCode()) ^ (key.hashCode() >>> 16);
     }
 
     @Override
     public void put(K key, V value) {
-        if (key == null) {
-            if (nullKeyNode == null) {
-                nullKeyNode = new Node<>(key, value, null);
-                size++;
-            } else {
-                nullKeyNode.setValue(value);
+        int hash = hash(key);
+        int index = (capacity - 1) & hash;
+
+        for (Node<K, V> node = table[index]; node != null; node = node.getNext()) {
+            if (node.getHash() == hash && (node.getKey() == key
+                    || (key != null && key.equals(node.getKey())))) {
+                node.setValue(value);
+                return;
             }
-            return;
         }
 
-        int index = hash(key);
-        Node<K, V> newNode = new Node<>(key, value, null);
-
-        if (buckets[index] == null) {
-            buckets[index] = newNode;
-        } else {
-            Node<K, V> current = buckets[index];
-            Node<K, V> prev = null;
-            while (current != null) {
-                if (current.getKey().equals(key)) {
-                    current.setValue(value);
-                    return;
-                }
-                prev = current;
-                current = current.getNext();
-            }
-            if (prev == null) {
-                buckets[index] = newNode;
-            } else {
-                prev.setNext(newNode);
-            }
-        }
+        Node<K, V> newNode = new Node<>(hash, key, value, table[index]);
+        table[index] = newNode;
         size++;
-        if (size >= capacity * LOAD_FACTOR) {
+
+        if (size > threshold) {
             resize();
         }
     }
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
-            return nullKeyNode == null ? null : nullKeyNode.getValue();
-        }
+        int hash = hash(key);
+        int index = (capacity - 1) & hash;
 
-        int index = hash(key);
-        Node<K, V> current = buckets[index];
-        while (current != null) {
-            if (current.getKey().equals(key)) {
-                return current.getValue();
+        for (Node<K, V> node = table[index]; node != null; node = node.getNext()) {
+            if (node.getHash() == hash && (node.getKey() == key
+                    || (key != null && key.equals(node.getKey())))) {
+                return node.getValue();
             }
-            current = current.getNext();
         }
         return null;
     }
@@ -84,68 +64,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public boolean containsKey(K key) {
-        if (key == null) {
-            return nullKeyNode != null;
-        }
-
-        int index = hash(key);
-        Node<K, V> current = buckets[index];
-        while (current != null) {
-            if (current.getKey().equals(key)) {
-                return true;
-            }
-            current = current.getNext();
-        }
-        return false;
-    }
-
-    public V remove(K key) {
-        if (key == null) {
-            if (nullKeyNode != null) {
-                V value = nullKeyNode.getValue();
-                nullKeyNode = null;
-                size--;
-                return value;
-            }
-            return null;
-        }
-
-        int index = hash(key);
-        Node<K, V> current = buckets[index];
-        Node<K, V> prev = null;
-
-        while (current != null) {
-            if (current.getKey().equals(key)) {
-                if (prev == null) {
-                    buckets[index] = current.getNext();
-                } else {
-                    prev.setNext(current.getNext());
-                }
-                size--;
-                return current.getValue();
-            }
-            prev = current;
-            current = current.getNext();
-        }
-        return null;
-    }
-
     @SuppressWarnings("unchecked")
     private void resize() {
-        capacity *= 2;
-        Node<K, V>[] newBuckets = new Node[capacity];
+        int newCapacity = capacity * 2;
+        Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
+        threshold = (int) (newCapacity * loadFactor);
 
-        for (Node<K, V> bucket : buckets) {
-            Node<K, V> current = bucket;
-            while (current != null) {
-                int newIndex = hash(current.getKey());
-                Node<K, V> next = current.getNext();
-                current.setNext(newBuckets[newIndex]);
-                newBuckets[newIndex] = current;
-                current = next;
+        for (Node<K, V> node : table) {
+            while (node != null) {
+                Node<K, V> next = node.getNext();
+                int index = (newCapacity - 1) & node.getHash();
+                node.setNext(newTable[index]);
+                newTable[index] = node;
+                node = next;
             }
         }
-        buckets = newBuckets;
+
+        table = newTable;
+        capacity = newCapacity;
     }
 }

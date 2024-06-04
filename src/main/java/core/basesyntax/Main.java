@@ -2,19 +2,13 @@ package core.basesyntax;
 
 public class Main {
     public static void main(String[] args) {
-        MyHashMap<String, Integer> map = new MyHashMap<>();
-        map.put("One", 1);
-        map.put("Two", 2);
-        map.put("Three", 3);
+        MyMap<String, Integer> map = new MyHashMap<>();
+        map.put("one", 1);
+        map.put("two", 2);
+        map.put("three", 3);
 
-        System.out.println("Value for key 'One': " + map.getValue("One"));
-        System.out.println("Value for key 'Two': " + map.getValue("Two"));
-        System.out.println("Value for key 'Three': " + map.getValue("Three"));
-        System.out.println("Size of the map: " + map.getSize());
-
-        System.out.println("Contains key 'Two': " + map.containsKey("Two"));
-        System.out.println("Removed value for key 'Two': " + map.remove("Two"));
-        System.out.println("Contains key 'Two' after removal: " + map.containsKey("Two"));
-        System.out.println("Size of the map after removal: " + map.getSize());
+        System.out.println("Value for key 'one': " + map.getValue("one"));
+        System.out.println("Value for key 'four': " + map.getValue("four"));
+        System.out.println("Size of map: " + map.getSize());
     }
 }
