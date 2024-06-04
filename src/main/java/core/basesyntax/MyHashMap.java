@@ -67,7 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         int newCapacity = table.length * 2;
         Node<K, V>[] oldNode = table;
-        table = new Node[newCapacity];
+        table = (Node<K, V>[])new Node[newCapacity];
         size = 0;
         for (Node<K, V> kvNode : oldNode) {
             Node<K, V> current = kvNode;
