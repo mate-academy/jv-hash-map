@@ -9,7 +9,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
 
     public MyHashMap() {
-        this.table = new Node[DEFAULT_CAPACITY];
+        this.table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
         this.threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
