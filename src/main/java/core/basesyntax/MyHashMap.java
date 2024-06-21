@@ -25,25 +25,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node = node.next;
         }
-        Node<K, V> newNode = new Node<K, V>(key, value, hash, null);
-        newNode.next = table[index];
-        table[index] = newNode;
+        node = new Node<>(key, value, hash, null);
+        node.next = table[index];
+        table[index] = node;
         size++;
-        resize(key);
+        resize();
     }
 
     @Override
     public V getValue(K key) {
-        for (Node<K, V> node : table) {
-            if (node == null) {
-                continue;
+        int hash = hash(key);
+        int index = hash & (table.length - 1);
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (Objects.equals(key, node.key)) {
+                return node.value;
             }
-            while (node != null) {
-                if (Objects.equals(key, node.key)) {
-                    return node.value;
-                }
-                node = node.next;
-            }
+            node = node.next;
         }
         return null;
     }
@@ -58,14 +56,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
 
-    private void resize(K key) {
+    private void resize() {
         if ((float) size / table.length >= DEFAULT_LOAD_FACTOR) {
             Node[] newTable = (Node<K, V>[]) new Node[(table.length * MULTIPLIER)];
             for (int i = 0; i < table.length; i++) {
                 Node<K, V> node = table[i];
                 while (node != null) {
-                    Node<K, V> next = newTable[i];
-                    newTable[i] = node;
+                    int newIndex = node.hash & (newTable.length - 1);
+                    Node<K, V> next = node.next;
+                    node.next = newTable[newIndex];
+                    newTable[newIndex] = node;
                     node = next;
                 }
             }
