@@ -15,26 +15,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int hash = hash(key);
-        int index = indexFor(hash, table.length);
+        int[] hashAndIndex = getHashAndIndex(key);
 
-        for (Node<K, V> node = table[index]; node != null; node = node.next) {
-            if (node.hash == hash && (node.key == key || (key != null && key.equals(node.key)))) {
+        for (Node<K, V> node = table[hashAndIndex[1]]; node != null; node = node.next) {
+            if (isMatchingNode(node, hashAndIndex[0], key)) {
                 node.value = value;
                 return;
             }
         }
 
-        addNode(hash, key, value, index);
+        addNode(hashAndIndex[0], key, value, hashAndIndex[1]);
     }
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key);
-        int index = indexFor(hash, table.length);
+        int[] hashAndIndex = getHashAndIndex(key);
 
-        for (Node<K, V> node = table[index]; node != null; node = node.next) {
-            if (node.hash == hash && (node.key == key || (key != null && key.equals(node.key)))) {
+        for (Node<K, V> node = table[hashAndIndex[1]]; node != null; node = node.next) {
+            if (isMatchingNode(node, hashAndIndex[0], key)) {
                 return node.value;
             }
         }
@@ -44,20 +42,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
-    }
-
-    public static class Node<K, V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
     }
 
     private void addNode(int hash, K key, V value, int index) {
@@ -91,5 +75,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int indexFor(int hash, int length) {
         return hash & (length - 1);
+    }
+
+    private boolean isMatchingNode(Node<K, V> node, int hash, K key) {
+        return node.hash == hash && (node.key == key || (key != null && key.equals(node.key)));
+    }
+
+    private int[] getHashAndIndex(K key) {
+        int hash = hash(key);
+        int index = indexFor(hash, table.length);
+        return new int[] { hash, index };
+    }
+
+    private static class Node<K, V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(int hash, K key, V value, Node<K, V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
