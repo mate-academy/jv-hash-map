@@ -17,11 +17,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int hash = getHash(key);
-        int position = hash % table.length;
+        int position = getPosition(hash, table.length);
         if (table[position] == null) {
             table[position] = new Node<>(hash, key, value, null);
         } else {
-            // check of existing nodes
             Node<K, V> current = table[position];
             if (current.key == key || current.key.equals(key)) {
                 current.value = value;
@@ -51,7 +50,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         int hash = getHash(key);
-        int position = hash % table.length;
+        int position = getPosition(hash, table.length);
         Node<K, V> current = table[position];
         while (!(current.key == key || current.key != null && current.key.equals(key))) {
             current = current.next;
@@ -88,7 +87,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void putNode(Node<K, V>[] newTable, Node<K, V> node, int capacity) {
         int hash = node.hash;
-        int position = hash % capacity;
+        int position = getPosition(hash, capacity);
         if (newTable[position] == null) {
             newTable[position] = new Node<>(hash, node.key, node.value, null);
         } else {
@@ -106,6 +105,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             hash *= -1;
         }
         return hash;
+    }
+
+    private int getPosition(int hash, int capacity) {
+        int position = hash % capacity;
+        return position;
     }
 
     private class Node<K, V> {
