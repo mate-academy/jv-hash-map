@@ -3,21 +3,20 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
     private int threshold;
 
+    public MyHashMap() {
+        table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
+        threshold = (int) (DEFAULT_LOAD_FACTOR * table.length);
+    }
+
     @Override
     public void put(K key, V value) {
-        if (table == null) {
-            resize();
-        }
-        int hash = key == null ? 0 : key.hashCode();
-        if (hash < 0) {
-            hash *= -1;
-        }
+        int hash = getHash(key);
         int position = hash % table.length;
         if (table[position] == null) {
             table[position] = new Node<>(hash, key, value, null);
@@ -35,7 +34,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 current = current.next;
             }
-            // check the last node
             if (current.key == key || current.key != null && current.key.equals(key)) {
                 current.value = value;
                 return;
@@ -49,13 +47,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (table == null) {
+        if (size == 0) {
             return null;
         }
-        int hash = key == null ? 0 : key.hashCode();
-        if (hash < 0) {
-            hash *= -1;
-        }
+        int hash = getHash(key);
         int position = hash % table.length;
         Node<K, V> current = table[position];
         while (!(current.key == key || current.key != null && current.key.equals(key))) {
@@ -64,10 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 break;
             }
         }
-        if (current == null) {
-            return null;
-        }
-        return current.value;
+        return current == null ? null : current.value;
     }
 
     @Override
@@ -77,43 +69,43 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldTab = table;
-        int oldCap = (oldTab == null) ? 0 : oldTab.length;
         int newCap;
-        int newThr;
         Node<K, V>[] newTab;
-        if (oldCap == 0) {
-            table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
-            threshold = (int) (DEFAULT_LOAD_FACTOR * table.length);
-        } else {
-            newCap = oldTab.length * 2;
-            newThr = (int) (DEFAULT_LOAD_FACTOR * newCap);
-            newTab = (Node<K, V>[]) new Node[newCap];
-            threshold = newThr;
-            for (Node<K, V> node : table) {
-                if (node != null) {
-                    while (node.next != null) {
-                        putNode(newTab, node, newCap);
-                        node = node.next;
-                    }
+        newCap = oldTab.length * 2;
+        threshold = (int) (DEFAULT_LOAD_FACTOR * newCap);
+        newTab = (Node<K, V>[]) new Node[newCap];
+        for (Node<K, V> node : table) {
+            if (node != null) {
+                while (node.next != null) {
                     putNode(newTab, node, newCap);
+                    node = node.next;
                 }
+                putNode(newTab, node, newCap);
             }
-            table = newTab;
         }
+        table = newTab;
     }
 
-    private void putNode(Node<K, V>[] table, Node<K,V> node, int capacity) {
+    private void putNode(Node<K, V>[] newTable, Node<K, V> node, int capacity) {
         int hash = node.hash;
         int position = hash % capacity;
-        if (table[position] == null) {
-            table[position] = new Node<>(hash, node.key, node.value, null);
+        if (newTable[position] == null) {
+            newTable[position] = new Node<>(hash, node.key, node.value, null);
         } else {
-            Node<K, V> current = table[position];
+            Node<K, V> current = newTable[position];
             while (current.next != null) {
                 current = current.next;
             }
             current.next = new Node<>(hash, node.key, node.value, null);
         }
+    }
+
+    private int getHash(K key) {
+        int hash = key == null ? 0 : key.hashCode();
+        if (hash < 0) {
+            hash *= -1;
+        }
+        return hash;
     }
 
     private class Node<K, V> {
