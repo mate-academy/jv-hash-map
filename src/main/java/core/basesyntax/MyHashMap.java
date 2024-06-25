@@ -16,87 +16,34 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int hash = getHash(key);
-        int position = getPosition(hash, table.length);
-        if (table[position] == null) {
-            table[position] = new Node<>(hash, key, value, null);
-        } else {
-            Node<K, V> current = table[position];
-            if (current.key == key || current.key.equals(key)) {
-                current.value = value;
-                return;
-            }
-            while (current.next != null) {
-                if (current.key == key) {
-                    current.value = value;
-                    return;
-                }
-                current = current.next;
-            }
-            if (current.key == key || current.key != null && current.key.equals(key)) {
-                current.value = value;
-                return;
-            }
-            current.next = new Node<>(hash, key, value, null);
+        if (size >= threshold) {
+            resizeTables();
         }
-        if (++size > threshold) {
-            resize();
+        Node<K, V> newNode = new Node<>(getHash(key),key, value,null);
+        int bucketIndex = getBucketIndex(key);
+        if (table[bucketIndex] == null) {
+            table[bucketIndex] = newNode;
+            size++;
+        } else {
+            linkNode(table[bucketIndex], newNode);
         }
     }
 
     @Override
     public V getValue(K key) {
-        if (size == 0) {
-            return null;
-        }
-        int hash = getHash(key);
-        int position = getPosition(hash, table.length);
-        Node<K, V> current = table[position];
-        while (!(current.key == key || current.key != null && current.key.equals(key))) {
-            current = current.next;
-            if (current == null) {
-                break;
+        Node<K, V> current = table[getBucketIndex(key)];
+        while (current != null) {
+            if (Objects.equals(current.key, key)) {
+                return current.value;
             }
+            current = current.next;
         }
-        return current == null ? null : current.value;
+        return null;
     }
 
     @Override
     public int getSize() {
         return size;
-    }
-
-    private void resize() {
-        Node<K, V>[] oldTab = table;
-        int newCap;
-        Node<K, V>[] newTab;
-        newCap = oldTab.length * 2;
-        threshold = (int) (DEFAULT_LOAD_FACTOR * newCap);
-        newTab = (Node<K, V>[]) new Node[newCap];
-        for (Node<K, V> node : table) {
-            if (node != null) {
-                while (node.next != null) {
-                    putNode(newTab, node, newCap);
-                    node = node.next;
-                }
-                putNode(newTab, node, newCap);
-            }
-        }
-        table = newTab;
-    }
-
-    private void putNode(Node<K, V>[] newTable, Node<K, V> node, int capacity) {
-        int hash = node.hash;
-        int position = getPosition(hash, capacity);
-        if (newTable[position] == null) {
-            newTable[position] = new Node<>(hash, node.key, node.value, null);
-        } else {
-            Node<K, V> current = newTable[position];
-            while (current.next != null) {
-                current = current.next;
-            }
-            current.next = new Node<>(hash, node.key, node.value, null);
-        }
     }
 
     private int getHash(K key) {
@@ -107,9 +54,46 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return hash;
     }
 
-    private int getPosition(int hash, int capacity) {
-        int position = hash % capacity;
+    private int getBucketIndex(K key) {
+        int position = getHash(key) % table.length;
         return position;
+    }
+
+    private void resizeTables() {
+        final Node<K, V>[] temp = table;
+        table = (Node<K, V>[]) new Node[table.length << 1];
+        size = 0;
+        updateThreshold();
+        for (Node<K, V> node : temp) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
+        }
+    }
+
+    private void updateThreshold() {
+        threshold = (int) (DEFAULT_LOAD_FACTOR * table.length);
+    }
+
+    private void linkNode(Node<K,V> kvNode, Node<K,V> newNode) {
+        if (kvNode.key == newNode.key || kvNode.key.equals(newNode.key)) {
+            kvNode.value = newNode.value;
+            return;
+        }
+        while (kvNode.next != null) {
+            if (kvNode.key == newNode.key) {
+                kvNode.value = newNode.value;
+                return;
+            }
+            kvNode = kvNode.next;
+        }
+        if (kvNode.key == newNode.key || kvNode.key != null && kvNode.key.equals(newNode.key)) {
+            kvNode.value = newNode.value;
+            return;
+        }
+        kvNode.next = new Node<>(getHash(newNode.key), newNode.key, newNode.value, null);
+        size++;
     }
 
     private class Node<K, V> {
