@@ -1,44 +1,22 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
-    private Node<K, V> nullKeyNode;
 
     public MyHashMap() {
         this.table = new Node[DEFAULT_CAPACITY];
     }
 
-    public static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-    }
-
-    private int getBucketIndex(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode() % table.length);
-    }
-
     @Override
     public void put(K key, V value) {
         if (key == null) {
-            if (nullKeyNode == null) {
-                nullKeyNode = new Node<>(key, value);
-                size++;
-            } else {
-                nullKeyNode.value = value;
-            }
+            putForNullKey(value);
             return;
         }
 
@@ -46,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> head = table[bucketIndex];
 
         while (head != null) {
-            if (head.key.equals(key)) {
+            if (Objects.equals(head.key, key)) {
                 head.value = value;
                 return;
             }
@@ -54,9 +32,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         size++;
-        head = table[bucketIndex];
         Node<K, V> newNode = new Node<>(key, value);
-        newNode.next = head;
+        newNode.next = table[bucketIndex];
         table[bucketIndex] = newNode;
 
         if (getLoadFactor() >= DEFAULT_LOAD_FACTOR) {
@@ -67,14 +44,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         if (key == null) {
-            return nullKeyNode == null ? null : nullKeyNode.value;
+            return getForNullKey();
         }
 
         int bucketIndex = getBucketIndex(key);
         Node<K, V> head = table[bucketIndex];
 
         while (head != null) {
-            if (head.key.equals(key)) {
+            if (Objects.equals(head.key, key)) {
                 return head.value;
             }
             head = head.next;
@@ -88,11 +65,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private int getBucketIndex(K key) {
+        return Math.abs(key.hashCode() % table.length);
+    }
+
+    private double getLoadFactor() {
+        return (double) size / table.length;
+    }
+
     private void resize() {
         Node<K, V>[] oldTable = table;
         table = new Node[oldTable.length * 2];
+
+        int oldSize = size;
         size = 0;
-        nullKeyNode = null;
 
         for (Node<K, V> headNode : oldTable) {
             while (headNode != null) {
@@ -100,9 +86,47 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 headNode = headNode.next;
             }
         }
+        size = oldSize;
     }
 
-    private double getLoadFactor() {
-        return (double) size / table.length;
+    private void putForNullKey(V value) {
+        Node<K, V> head = table[0];
+        while (head != null) {
+            if (head.key == null) {
+                head.value = value;
+                return;
+            }
+            head = head.next;
+        }
+        size++;
+        Node<K, V> newNode = new Node<>(null, value);
+        newNode.next = table[0];
+        table[0] = newNode;
+
+        if (getLoadFactor() >= DEFAULT_LOAD_FACTOR) {
+            resize();
+        }
+    }
+
+    private V getForNullKey() {
+        Node<K, V> node = table[0];
+        while (node != null) {
+            if (node.key == null) {
+                return node.value;
+            }
+            node = node.next;
+        }
+        return null;
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 }
