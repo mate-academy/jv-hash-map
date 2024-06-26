@@ -12,7 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.table = new Node[DEFAULT_CAPACITY];
     }
 
-    private static class Node<K, V> {
+    public static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -23,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    int getBucketIndex(K key) {
+    private int getBucketIndex(K key) {
         if (key == null) {
             return 0;
         }
@@ -88,10 +88,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    void resize() {
+    private void resize() {
         Node<K, V>[] oldTable = table;
         table = new Node[oldTable.length * 2];
         size = 0;
+        nullKeyNode = null;
 
         for (Node<K, V> headNode : oldTable) {
             while (headNode != null) {
