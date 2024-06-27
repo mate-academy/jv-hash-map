@@ -15,11 +15,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (key == null) {
-            putForNullKey(value);
-            return;
-        }
-
         int bucketIndex = getBucketIndex(key);
         Node<K, V> head = table[bucketIndex];
 
@@ -43,10 +38,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
-            return getForNullKey();
-        }
-
         int bucketIndex = getBucketIndex(key);
         Node<K, V> head = table[bucketIndex];
 
@@ -66,7 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucketIndex(K key) {
-        return Math.abs(key.hashCode() % table.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private double getLoadFactor() {
@@ -87,36 +78,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         size = oldSize;
-    }
-
-    private void putForNullKey(V value) {
-        Node<K, V> head = table[0];
-        while (head != null) {
-            if (head.key == null) {
-                head.value = value;
-                return;
-            }
-            head = head.next;
-        }
-        size++;
-        Node<K, V> newNode = new Node<>(null, value);
-        newNode.next = table[0];
-        table[0] = newNode;
-
-        if (getLoadFactor() >= DEFAULT_LOAD_FACTOR) {
-            resize();
-        }
-    }
-
-    private V getForNullKey() {
-        Node<K, V> node = table[0];
-        while (node != null) {
-            if (node.key == null) {
-                return node.value;
-            }
-            node = node.next;
-        }
-        return null;
     }
 
     private static class Node<K, V> {
