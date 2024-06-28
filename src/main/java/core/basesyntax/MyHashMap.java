@@ -3,10 +3,8 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-
     private Node<K, V>[] table;
     private int size;
 
@@ -23,17 +21,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public MyHashMap() {
-        this.table = createTable(DEFAULT_INITIAL_CAPACITY);
-        this.size = 0;
+        this.table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
     public MyHashMap(int initialCapacity) {
-        this.table = createTable(initialCapacity);
-        this.size = 0;
+        this.table = (Node<K, V>[]) new Node[initialCapacity];
     }
 
     @Override
     public void put(K key, V value) {
+        if (size >= table.length * DEFAULT_LOAD_FACTOR) {
+            resize();
+        }
+
         int index = getBucketIndex(key);
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
             if (Objects.equals(key, node.key)) {
@@ -64,14 +64,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> newNode = new Node<>(key, value, table[index]);
         table[index] = newNode;
         size++;
-        if (size >= table.length * DEFAULT_LOAD_FACTOR) {
-            resize();
-        }
     }
 
     private void resize() {
         int newCapacity = table.length * 2;
-        Node<K, V>[] newTable = createTable(newCapacity);
+        Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
         for (Node<K, V> node : table) {
             while (node != null) {
                 Node<K, V> next = node.next;
@@ -99,12 +96,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        int h = (key != null) ? key.hashCode() : 0;
-        return h ^ (h >>> 16);
-    }
-
-    @SuppressWarnings("unchecked")
-    private Node<K, V>[] createTable(int size) {
-        return (Node<K, V>[]) new Node[size];
+        return Math.abs(Objects.hashCode(key));
     }
 }
+
