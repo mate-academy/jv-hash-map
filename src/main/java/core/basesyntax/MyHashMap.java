@@ -4,11 +4,10 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final int GROW_FACTOR = 2;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
-    private V nullKeyValue = null;
-    private boolean nullKeyPresent = false;
 
     private static class Node<K, V> {
         private final K key;
@@ -23,23 +22,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public MyHashMap() {
-        this.table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
+        table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (key == null) {
-            if (!nullKeyPresent) {
-                size++;
-            }
-            nullKeyValue = value;
-            nullKeyPresent = true;
-            return;
-        }
         if (size >= table.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
-        int index = getBucketIndex(key);
+        int index = getBucketIndex(key, table.length);
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
             if (Objects.equals(key, node.key)) {
                 node.value = value;
@@ -51,10 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
-            return nullKeyPresent ? nullKeyValue : null;
-        }
-        int index = getBucketIndex(key);
+        int index = getBucketIndex(key, table.length);
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
             if (Objects.equals(key, node.key)) {
                 return node.value;
@@ -75,12 +63,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int newCapacity = table.length * 2;
+        int newCapacity = table.length * GROW_FACTOR;
         Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
         for (Node<K, V> node : table) {
             while (node != null) {
                 Node<K, V> next = node.next;
-                int index = getBucketIndexForNode(node.key, newCapacity);
+                int index = getBucketIndex(node.key, newCapacity);
                 node.next = newTable[index];
                 newTable[index] = node;
                 node = next;
@@ -89,14 +77,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = newTable;
     }
 
-    private int getBucketIndex(K key) {
+    private int getBucketIndex(K key, int length) {
         int hash = hash(key);
-        return indexFor(hash, table.length);
-    }
-
-    private int getBucketIndexForNode(K key, int capacity) {
-        int hash = hash(key);
-        return indexFor(hash, capacity);
+        return indexFor(hash, length);
     }
 
     private int indexFor(int hash, int length) {
@@ -107,4 +90,3 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.abs(Objects.hashCode(key));
     }
 }
-
