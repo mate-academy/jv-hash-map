@@ -7,6 +7,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
+    private V nullKeyValue = null;
+    private boolean nullKeyPresent = false;
 
     private static class Node<K, V> {
         private final K key;
@@ -24,16 +26,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
-    public MyHashMap(int initialCapacity) {
-        this.table = (Node<K, V>[]) new Node[initialCapacity];
-    }
-
     @Override
     public void put(K key, V value) {
+        if (key == null) {
+            if (!nullKeyPresent) {
+                size++;
+            }
+            nullKeyValue = value;
+            nullKeyPresent = true;
+            return;
+        }
         if (size >= table.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
-
         int index = getBucketIndex(key);
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
             if (Objects.equals(key, node.key)) {
@@ -46,6 +51,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
+        if (key == null) {
+            return nullKeyPresent ? nullKeyValue : null;
+        }
         int index = getBucketIndex(key);
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
             if (Objects.equals(key, node.key)) {
