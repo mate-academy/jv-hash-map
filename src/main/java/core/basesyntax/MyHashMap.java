@@ -8,8 +8,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private Node<K, V>[] table;
 
+    @SuppressWarnings("unchecked")
     public MyHashMap() {
-        table = new Node[DEFAULT_CAPACITY];
+        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -60,9 +61,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
+    @SuppressWarnings("unchecked")
     private void resize() {
         Node<K, V>[] oldTable = table;
-        table = new Node[oldTable.length * 2];
+        table = (Node<K, V>[]) new Node[oldTable.length * 2];
         size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
