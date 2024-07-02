@@ -60,7 +60,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public int getHashCode(K key) {
+    private int getHashCode(K key) {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
