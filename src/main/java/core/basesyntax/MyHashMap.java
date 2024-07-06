@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int DEFAULT_CAPACITY = 16;
@@ -29,7 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         while (currentNode != null) {
-            if (currentNode.key.equals(key)) {
+            if (Objects.equals(currentNode.key, key)) {
                 currentNode.value = value;
                 return;
             }
@@ -45,6 +47,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
+        int index = hashCode(key) % table.length;
+        Node<K, V> currentNode = table[index];
+        if (currentNode == null) {
+            return null;
+        }
+        while (currentNode.next != null) {
+            if (Objects.equals(currentNode.key,key)) {
+                return currentNode.value;
+            }
+            currentNode = currentNode.next;
+        }
+        if (Objects.equals(currentNode.key,key)) {
+            return currentNode.value;
+        }
         return null;
     }
 
@@ -59,7 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (int i = 0; i < table.length; i++) {
             Node<K, V> currentNode = table[i];
             while (currentNode != null) {
-                Node<K,V> nextNode = currentNode.next;
+                Node<K, V> nextNode = currentNode.next;
                 int newIndex = currentNode.key.hashCode() % newCapacity;
                 currentNode.next = newTable[newIndex];
                 newTable[newIndex] = currentNode;
