@@ -5,7 +5,8 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int DEFAULT_CAPACITY = 16;
-    Node<K, V>[] table;
+    private static final int CAPACITY_INCREASE = 2;
+    private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
@@ -15,10 +16,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
-        int index;
         if (size >= threshold) {
             resize();
         }
+        int index;
         if (key == null) {
             index = 0;
         } else {
@@ -42,7 +43,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             currentNode = currentNode.next;
         }
-
     }
 
     @Override
@@ -53,12 +53,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         while (currentNode.next != null) {
-            if (Objects.equals(currentNode.key,key)) {
+            if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
         }
-        if (Objects.equals(currentNode.key,key)) {
+        if (Objects.equals(currentNode.key, key)) {
             return currentNode.value;
         }
         return null;
@@ -70,13 +70,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int newCapacity = table.length * 2;
+        int newCapacity = table.length * CAPACITY_INCREASE;
         Node<K, V>[] newTable = new Node[newCapacity];
         for (int i = 0; i < table.length; i++) {
             Node<K, V> currentNode = table[i];
             while (currentNode != null) {
                 Node<K, V> nextNode = currentNode.next;
-                int newIndex = currentNode.key.hashCode() % newCapacity;
+                int newIndex = hashCode(currentNode.key) % newCapacity;
                 currentNode.next = newTable[newIndex];
                 newTable[newIndex] = currentNode;
                 currentNode = nextNode;
@@ -86,14 +86,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hashCode(Object kay) {
-        return (kay == null) ? 0 : kay.hashCode();
+        return (kay == null) ? 0 : (kay.hashCode() & 0x7fffffff);
     }
 
     static class Node<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         public Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
@@ -101,6 +101,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-
     }
 }
