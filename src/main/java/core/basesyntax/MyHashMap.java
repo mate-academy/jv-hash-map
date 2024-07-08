@@ -53,14 +53,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (currentNode == null) {
             return null;
         }
-        while (currentNode.next != null) {
+        while (currentNode != null) {
             if (Objects.equals(currentNode.key, key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
-        }
-        if (Objects.equals(currentNode.key, key)) {
-            return currentNode.value;
         }
         return null;
     }
@@ -94,13 +91,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : (key.hashCode() & 0x7fffffff);
     }
 
-    class Node<K, V> {
+    private static class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        Node(int hash, K key, V value, Node<K, V> next) {
+        public Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
             this.key = key;
             this.value = value;
