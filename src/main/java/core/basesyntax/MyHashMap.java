@@ -1,15 +1,18 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_SIZE = 16;
     private static final double LOAD_FACTOR = 0.75;
     private static final int MULTIPLIER = 2;
     private int size;
-    private Node<K,V>[] table;
+    private Node<K, V>[] table;
 
+    @SuppressWarnings("unchecked")
     public MyHashMap() {
-        table = new Node[DEFAULT_SIZE];
+        table = (Node<K, V>[]) new Node[DEFAULT_SIZE];
     }
 
     @Override
@@ -20,20 +23,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Node<K, V> currentNode = table[index];
         Node<K, V> newNode = new Node<>(key, value, null);
+
+        if (currentNode == null) {
+            table[index] = newNode;
+            size++;
+            return;
+        }
+
+        Node<K, V> previousNode = null;
         while (currentNode != null) {
-            if (currentNode.key == key
-                    || (currentNode.key != null && currentNode.key.equals(key))) {
+            if (Objects.equals(currentNode.key, key)) {
                 currentNode.value = value;
                 return;
             }
-            if (currentNode.next == null) {
-                currentNode.next = newNode;
-                size++;
-                return;
-            }
+            previousNode = currentNode;
             currentNode = currentNode.next;
         }
-        table[index] = newNode;
+
+        previousNode.next = newNode;
         size++;
     }
 
@@ -45,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Node<K, V> node = table[index];
         while (node != null) {
-            if (key == node.key || (node.key != null && node.key.equals(key))) {
+            if (Objects.equals(node.key, key)) {
                 return node.value;
             }
             node = node.next;
@@ -58,11 +65,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    @SuppressWarnings("unchecked")
     private void resize() {
+        Node<K, V>[] oldTable = table;
+        table = (Node<K, V>[]) new Node[oldTable.length * MULTIPLIER];
         size = 0;
-        Node<K, V>[] oldtable = table;
-        table = new Node[table.length * MULTIPLIER];
-        for (Node<K, V> currentNode: oldtable) {
+        for (Node<K, V> currentNode : oldTable) {
             while (currentNode != null) {
                 put(currentNode.key, currentNode.value);
                 currentNode = currentNode.next;
@@ -75,7 +83,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private K key;
+        private final K key;
         private V value;
         private Node<K, V> next;
 
