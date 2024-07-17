@@ -15,10 +15,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int hash = hash(key);
-        int index = indexFor(hash, table.length);
+        int index = calculateIndex(key);
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
-            if ((node.key == key || (key != null && key.equals(node.key)))) {
+            if (node.key == key || key != null && key.equals(node.key)) {
                 node.value = value;
                 return;
             }
@@ -28,10 +27,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key);
-        int index = indexFor(hash, table.length);
+        int index = calculateIndex(key);
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
-            if ((node.key == key || (key != null && key.equals(node.key)))) {
+            if (node.key == key || key != null && key.equals(node.key)) {
                 return node.value;
             }
         }
@@ -43,19 +41,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int indexFor(int hash, int size) {
-        return Math.abs(hash % size);
-    }
-
-    private int hash(K key) {
-        return (key == null) ? 0 : key.hashCode();
+    private int calculateIndex(K key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void addNode(K key, V value, int index) {
         Node<K, V> newNode = new Node<>(key, value, table[index]);
         table[index] = newNode;
         size++;
-        if (size > threshold) {
+        if (size >= threshold) {
             resize();
         }
     }
@@ -74,7 +68,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> node = table[i];
             while (node != null) {
                 Node<K, V> next = node.next;
-                int newIndex = indexFor(hash(node.key), newTable.length);
+                int newIndex = (node.key == null) ? 0
+                        : Math.abs(node.key.hashCode() % newTable.length);
                 node.next = newTable[newIndex];
                 newTable[newIndex] = node;
                 node = next;
