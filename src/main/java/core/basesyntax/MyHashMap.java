@@ -1,13 +1,12 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_INITIAL_CAPACITY = 1 << 4; // 16
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int CAPACITY_MULTIPLIER = 2;
     private Node<K, V>[] table;
     private int size;
     private int threshold;
-    private Node<K, V> nullKeyNode;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
@@ -16,38 +15,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (key == null) {
-            if (nullKeyNode == null) {
-                nullKeyNode = new Node<>(0, null, value, null);
-                size++;
-                return;
-            } else {
-                nullKeyNode.value = value;
-                return;
-            }
-        }
-
         int hash = hash(key);
         int index = indexFor(hash, table.length);
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
-            if (node.hash == hash && (node.key == key || node.key.equals(key))) {
+            if ((node.key == key || (key != null && key.equals(node.key)))) {
                 node.value = value;
                 return;
             }
         }
-        addNode(hash, key, value, index);
+        addNode(key, value, index);
     }
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
-            return nullKeyNode == null ? null : nullKeyNode.value;
-        }
-
         int hash = hash(key);
         int index = indexFor(hash, table.length);
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
-            if (node.hash == hash && (node.key == key || node.key.equals(key))) {
+            if ((node.key == key || (key != null && key.equals(node.key)))) {
                 return node.value;
             }
         }
@@ -67,8 +51,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return (key == null) ? 0 : key.hashCode();
     }
 
-    private void addNode(int hash, K key, V value, int index) {
-        Node<K, V> newNode = new Node<>(hash, key, value, table[index]);
+    private void addNode(K key, V value, int index) {
+        Node<K, V> newNode = new Node<>(key, value, table[index]);
         table[index] = newNode;
         size++;
         if (size > threshold) {
@@ -90,7 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> node = table[i];
             while (node != null) {
                 Node<K, V> next = node.next;
-                int newIndex = indexFor(node.hash, newTable.length);
+                int newIndex = indexFor(hash(node.key), newTable.length);
                 node.next = newTable[newIndex];
                 newTable[newIndex] = node;
                 node = next;
@@ -99,13 +83,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
