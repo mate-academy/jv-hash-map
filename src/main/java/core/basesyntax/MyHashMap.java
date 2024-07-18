@@ -15,18 +15,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
-    public V put(K key, V value) {
+    public void put(K key, V value) {
         Node<K, V> valueNode = getNode(key);
-        if (valueNode != null) {
-            valueNode.value = value;
-            return value;
-        }
         if (size == changeSize) {
             resize();
         }
+        if (valueNode != null) {
+            valueNode.value = value;
+            return;
+        }
         addNode(getHashCode(key), key, value);
         size++;
-        return null;
     }
 
     @Override
