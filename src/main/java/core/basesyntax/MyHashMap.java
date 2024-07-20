@@ -14,9 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public void put(K key, V value) {
-        if (size >= table.length * LOAD_FACTOR) {
-            resize();
-        }
+        resize();
         int index = getIndex(key);
         Node<K, V> newNode = new Node<>(key, value, null);
         Node<K, V> current = table[index];
@@ -76,7 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
