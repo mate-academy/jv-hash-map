@@ -20,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (!nullkey) {
                 size++;
                 nullkey = true;
-                }
+            }
             nullvalue = value;
             return;
         }
@@ -46,44 +46,44 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
 
-            if (size > buckets.length * LOAD_FACTOR) {
-                resize();
-            }
+        if (size > buckets.length * LOAD_FACTOR) {
+            resize();
         }
+    }
 
-        @Override
-        public V getValue (K key){
-            if (key == null) {
-                return nullvalue;
+    @Override
+        public V getValue(K key) {
+        if (key == null) {
+            return nullvalue;
+        }
+        int index = getBucketIndex(key);
+        Node<K, V> node = buckets[index];
+
+        while (node != null) {
+            if (node.key.equals(key)) {
+                return node.value;
             }
-            int index = getBucketIndex(key);
-            Node<K, V> node = buckets[index];
+            node = node.next;
+        }
+        return null;
+    }
 
+    @Override
+        public int getSize() {
+        return size;
+    }
+
+    private int getBucketIndex(K key) {
+        return Math.abs(key.hashCode() % buckets.length);
+    }
+
+    private void resize() {
+        Node<K, V>[] oldbuckets = buckets;
+        buckets = new Node[oldbuckets.length * DOUBLE_SIZE];
+        size = 0;
+
+        for (Node<K, V> node : oldbuckets) {
             while (node != null) {
-                if (node.key.equals(key)) {
-                    return node.value;
-                }
-                node = node.next;
-            }
-            return null;
-        }
-
-        @Override
-        public int getSize () {
-            return size;
-        }
-
-        private int getBucketIndex (K key) {
-            return Math.abs(key.hashCode() % buckets.length);
-        }
-
-        private void resize () {
-            Node<K, V>[] oldbuckets = buckets;
-            buckets = new Node[oldbuckets.length * DOUBLE_SIZE];
-            size = 0;
-
-            for (Node<K, V> node : oldbuckets) {
-                while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
             }
@@ -93,7 +93,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Node<K, V> {
         private K key;
         private V value;
-        Node<K, V> next;
+        private Node<K, V> next;
 
         Node(K key, V value, Node<K, V> next) {
             this.key = key;
