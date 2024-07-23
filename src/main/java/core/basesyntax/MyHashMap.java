@@ -1,89 +1,104 @@
 package core.basesyntax;
 
-import java.util.LinkedList;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT = 1 << 4;
+    private static final int DEFAULT = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private LinkedList<Entry<K,V>>[] buckets;
-    private V null1;
+    private static final int DOUBLE_SIZE = 2;
+    private Node<K, V>[] buckets;
+    private boolean nullkey = false;
+    private V nullvalue;
     private int size;
 
+    @SuppressWarnings("unchecked")
     public MyHashMap() {
-        buckets = new LinkedList[DEFAULT];
-        for (int i = 0; i < DEFAULT; i++) {
-            buckets[i] = new LinkedList<>();
-        }
-    }
-
-    private static class Entry<K, V> {
-        private K key;
-        private V value;
-
-        Entry(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
+        buckets = new Node[DEFAULT];
     }
 
     @Override
     public void put(K key, V value) {
         if (key == null) {
-            null1 = value;
+            if (!nullkey) {
+                size++;
+                nullkey = true;
+                }
+            nullvalue = value;
             return;
         }
         int index = getBucketIndex(key);
-        LinkedList<Entry<K,V>> bucket = buckets[index];
-        for (Entry<K,V> entry : bucket) {
-            if (entry.key.equals(key)) {
-                entry.value = value;
-                return;
+        Node<K, V> node = buckets[index];
+
+        if (node == null) {
+            buckets[index] = new Node<>(key, value, null);
+            size++;
+
+        } else {
+            while (node != null) {
+                if (node.key.equals(key)) {
+                    node.value = value;
+                    return;
+                }
+                if (node.next == null) {
+                    node.next = new Node<>(key, value, null);
+                    size++;
+                    break;
+                }
+                node = node.next;
             }
         }
-        bucket.add(new Entry<>(key, value));
-        size++;
 
-        if (size > buckets.length * LOAD_FACTOR) {
-            resize();
-        }
-    }
-
-    @Override
-    public V getValue(K key) {
-        if (key == null) {
-            return null1;
-        }
-        int index = getBucketIndex(key);
-        LinkedList<Entry<K,V>> bucket = buckets[index];
-        for (Entry<K,V> entry : bucket) {
-            if (entry.key.equals(key)) {
-                return entry.value;
+            if (size > buckets.length * LOAD_FACTOR) {
+                resize();
             }
         }
-        return null;
-    }
 
-    @Override
-    public int getSize() {
-        return size + (null1 != null ? 1 : 0);
-    }
-
-    private int getBucketIndex(K key) {
-        return Math.abs(key.hashCode() % buckets.length);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void resize() {
-        LinkedList<Entry<K,V>>[] oldbuckets = buckets;
-        buckets = new LinkedList[oldbuckets.length * 2];
-        for (int i = 0; i < buckets.length; i++) {
-            buckets[i] = new LinkedList<>();
-        }
-        size = 0;
-        for (LinkedList<Entry<K,V>> entry : oldbuckets) {
-            for (Entry<K, V> entry1 : entry) {
-                put(entry1.key, entry1.value);
+        @Override
+        public V getValue (K key){
+            if (key == null) {
+                return nullvalue;
             }
+            int index = getBucketIndex(key);
+            Node<K, V> node = buckets[index];
+
+            while (node != null) {
+                if (node.key.equals(key)) {
+                    return node.value;
+                }
+                node = node.next;
+            }
+            return null;
+        }
+
+        @Override
+        public int getSize () {
+            return size;
+        }
+
+        private int getBucketIndex (K key) {
+            return Math.abs(key.hashCode() % buckets.length);
+        }
+
+        private void resize () {
+            Node<K, V>[] oldbuckets = buckets;
+            buckets = new Node[oldbuckets.length * DOUBLE_SIZE];
+            size = 0;
+
+            for (Node<K, V> node : oldbuckets) {
+                while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
+        }
+    }
+
+    private static class Node<K, V> {
+        private K key;
+        private V value;
+        Node<K, V> next;
+
+        Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
         }
     }
 }
