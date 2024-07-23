@@ -5,25 +5,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double RESIZE_BOUND = 0.75;
     private int size;
     private int threshold;
-    private Node<K, V>[] nodeArray;
+    private Node<K, V>[] table;
 
     public MyHashMap() {
-        nodeArray = new Node[DEFAULT_SIZE];
-        threshold = (int) (nodeArray.length * RESIZE_BOUND);
+        table = new Node[DEFAULT_SIZE];
+        threshold = (int) (table.length * RESIZE_BOUND);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold) {
-            resize();
-        }
-        Node<K, V> newNode = new Node<>((K) key, (V) value, null);
-        int index = (key == null) ? 0 : key.hashCode() & (nodeArray.length - 1);
-        if (nodeArray[index] == null) {
-            nodeArray[index] = newNode;
+        resize();
+        Node<K, V> newNode = new Node<>(key, value, null);
+        int index = calculateIndex(key);
+        if (table[index] == null) {
+            table[index] = newNode;
             size++;
         } else {
-            Node current = nodeArray[index];
+            Node current = table[index];
             while (current != null) {
                 if (key == current.key || key != null && key.equals(current.key)) {
                     current.value = value;
@@ -41,10 +39,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = key == null ? 0 : key.hashCode() & (nodeArray.length - 1);
-        Node<K, V> current = nodeArray[index];
+        int index = calculateIndex(key);
+        Node<K, V> current = table[index];
         while (current != null) {
-            if (key == current.key || (key != null && key.equals(current.key))) {
+            if (key == current.key || key != null && key.equals(current.key)) {
                 return current.value;
             }
             current = current.next;
@@ -58,21 +56,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        size = 0;
-        Node<K, V>[] newArray = new Node[nodeArray.length * 2];
-        Node<K, V>[] oldArray = nodeArray;
-        nodeArray = newArray;
-        threshold = (int) (nodeArray.length * RESIZE_BOUND);
-        for (Node<K, V> node : oldArray) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+        if (size >= threshold) {
+            size = 0;
+            Node<K, V>[] newArray = new Node[table.length * 2];
+            Node<K, V>[] oldArray = table;
+            table = newArray;
+            threshold = (int) (table.length * RESIZE_BOUND);
+            for (Node<K, V> node : oldArray) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
             }
         }
     }
 
+    private int calculateIndex(K key) {
+        return key == null ? 0 : key.hashCode() & (table.length - 1);
+    }
+
     private static class Node<K, V> {
-        private K key;
+        private final K key;
         private V value;
         private Node<K, V> next;
 
