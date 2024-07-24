@@ -46,7 +46,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         Node<K, V> current = table[bucketIndex];
         while (current != null) {
-            if (current.hash == hashOfKey && (current.key == key || current.key.equals(key))) {
+            if (current.hash == hashOfKey && (current.key == key || Objects.equals(current.key, key))) {
                 return current;
             }
             current = current.next;
@@ -85,7 +85,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> previous = null;
         Node<K, V> current = table[bucketIndex];
         while (current != null) {
-            if (neededNode.equals(current)) {
+            if (Objects.equals(neededNode, current)) {
                 V oldValue = current.value;
                 if (previous != null) {
                     previous.next = current.next;
@@ -111,7 +111,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> node : table) {
             Node<K, V> current = node;
             while (current != null) {
-                if (current.value.equals(value)) {
+                if (Objects.equals(current.value, value)) {
                     return true;
                 }
                 current = current.next;
