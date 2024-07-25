@@ -12,19 +12,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         buckets = new Node[DEFAULT_SIZE];
     }
 
-    private void resize() {
-        Node<K, V>[] oldbuckets = buckets;
-        buckets = new Node[oldbuckets.length * DOUBLE_SIZE];
-        size = 0;
-
-        for (Node<K, V> node : oldbuckets) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
-            }
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key, value, null);
@@ -48,8 +35,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 node = node.next;
             }
+            resize();
         }
-        resizeifneeded();
     }
 
     @Override
@@ -75,9 +62,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode() % buckets.length);
     }
 
-    private void resizeifneeded() {
+    private void resize() {
         if (size > buckets.length * LOAD_FACTOR) {
-            resize();
+            Node<K, V>[] oldbuckets = buckets;
+            buckets = new Node[oldbuckets.length * DOUBLE_SIZE];
+            size = 0;
+
+            for (Node<K, V> node : oldbuckets) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
+            }
         }
     }
 
