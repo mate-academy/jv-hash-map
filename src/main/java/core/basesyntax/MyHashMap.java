@@ -25,7 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         } else {
             while (node != null) {
-                if ((node.key == null && key == null || node.key != null && node.key.equals(key))) {
+                if ((node.key == key|| node.key != null && node.key.equals(key))) {
                     node.value = value;
                     return;
                 }
@@ -45,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> node = buckets[index];
 
         while (node != null) {
-            if ((node.key == null && key == null || node.key != null && node.key.equals(key))) {
+            if ((node.key == key|| node.key != null && node.key.equals(key))) {
                 return node.value;
             }
             node = node.next;
