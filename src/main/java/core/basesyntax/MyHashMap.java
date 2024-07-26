@@ -7,6 +7,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] buckets;
     private int size;
 
+    @SuppressWarnings("unchecked")
+    public MyHashMap() {
+        buckets = new Node[DEFAULT_SIZE];
+    }
+
     private void resize() {
         if (size > buckets.length * LOAD_FACTOR) {
             Node<K, V>[] oldbuckets = buckets;
@@ -20,11 +25,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    public MyHashMap() {
-        buckets = new Node[DEFAULT_SIZE];
     }
 
     @Override
