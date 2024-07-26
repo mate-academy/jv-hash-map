@@ -7,6 +7,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] buckets;
     private int size;
 
+    private void resize() {
+        if (size > buckets.length * LOAD_FACTOR) {
+            Node<K, V>[] oldbuckets = buckets;
+            buckets = new Node[oldbuckets.length * DOUBLE_SIZE];
+            size = 0;
+
+            for (Node<K, V> node : oldbuckets) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
+            }
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public MyHashMap() {
         buckets = new Node[DEFAULT_SIZE];
@@ -40,7 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
-        public V getValue(K key) {
+    public V getValue(K key) {
         int index = getBucketIndex(key);
         Node<K, V> node = buckets[index];
 
@@ -62,23 +77,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode() % buckets.length);
     }
 
-    private void resize() {
-        if (size > buckets.length * LOAD_FACTOR) {
-            Node<K, V>[] oldbuckets = buckets;
-            buckets = new Node[oldbuckets.length * DOUBLE_SIZE];
-            size = 0;
-
-            for (Node<K, V> node : oldbuckets) {
-                while (node != null) {
-                    put(node.key, node.value);
-                    node = node.next;
-                }
-            }
-        }
-    }
-
     private static class Node<K, V> {
-        private K key;
+        private final K key;
         private V value;
         private Node<K, V> next;
 
