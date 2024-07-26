@@ -13,11 +13,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
     }
 
-    public int hash(K key) {
+    private int hash(K key) {
         return (key == null) ? 0 : key.hashCode() ^ (key.hashCode() >>> 16);
     }
 
-    public int indexFor(int hash, int length) {
+    private int indexFor(int hash, int length) {
         return hash & (length - 1);
     }
 
@@ -38,7 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         addNode(hash, key, value, bucketIndex);
     }
 
-    public void addNode(int hash, K key, V value, int bucketIndex) {
+    private void addNode(int hash, K key, V value, int bucketIndex) {
         Node<K, V> newNode = new Node<>(hash, key, value, table[bucketIndex]);
         table[bucketIndex] = newNode;
         if (++size >= threshold) {
