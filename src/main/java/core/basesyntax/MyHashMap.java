@@ -8,9 +8,46 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private int threshold;
 
+    @SuppressWarnings("unchecked")
     public MyHashMap() {
-        table = new Node[DEFAULT_INITIAL_CAPACITY];
+        table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
         threshold = (int) (DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
+    }
+
+    @Override
+    public void put(K key, V value) {
+        int hash = hash(key);
+        int bucketIndex = indexFor(hash, table.length);
+        for (Node<K, V> currentNode = table[bucketIndex]; currentNode != null;
+                currentNode = currentNode.next) {
+            if ((currentNode.key == key) || (key != null && key.equals(currentNode.key))) {
+                currentNode.value = value;
+                return;
+            }
+        }
+        addNode(hash, key, value, bucketIndex);
+    }
+
+    @Override
+    public V getValue(K key) {
+        int hash = hash(key);
+        int bucketIndex = indexFor(hash, table.length);
+        for (Node<K, V> currentNode = table[bucketIndex]; currentNode != null;
+                currentNode = currentNode.next) {
+            if ((currentNode.key == key) || (key != null && key.equals(currentNode.key))) {
+                return currentNode.value;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    public boolean isEmpty() {
+        return size == 0;
     }
 
     private int hash(K key) {
@@ -21,23 +58,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return hash & (length - 1);
     }
 
-    @Override
-    public void put(K key, V value) {
-        int hash = hash(key);
-        int bucketIndex = indexFor(hash, table.length);
-        for (Node<K, V> currentNode = table[bucketIndex]; currentNode != null;
-                currentNode = currentNode.next) {
-            boolean hashMatches = currentNode.hash == hash;
-            boolean keyMatches = (currentNode.key == key)
-                    || (key != null && key.equals(currentNode.key));
-            if (hashMatches && keyMatches) {
-                currentNode.value = value;
-                return;
-            }
-        }
-        addNode(hash, key, value, bucketIndex);
-    }
-
     private void addNode(int hash, K key, V value, int bucketIndex) {
         Node<K, V> newNode = new Node<>(hash, key, value, table[bucketIndex]);
         table[bucketIndex] = newNode;
@@ -46,46 +66,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    @Override
-    public V getValue(K key) {
-        int hash = hash(key);
-        int bucketIndex = indexFor(hash, table.length);
-        for (Node<K, V> currentNode = table[bucketIndex]; currentNode != null;
-                currentNode = currentNode.next) {
-            boolean hashMatches = currentNode.hash == hash;
-            boolean keyMatches = (currentNode.key == key)
-                    || (key != null && key.equals(currentNode.key));
-            if (hashMatches && keyMatches) {
-                return currentNode.value;
-            }
-        }
-        return null;
-    }
-
+    @SuppressWarnings("unchecked")
     private void resize(int newCapacity) {
         size = 0;
         Node<K, V>[] oldTable = table;
-        table = new Node[newCapacity];
+        table = (Node<K, V>[]) new Node[newCapacity];
         threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
         for (Node<K, V> node : oldTable) {
             while (node != null) {
-                Node<K, V> next = node.next;
-                int index = indexFor(node.hash, table.length);
-                node.next = table[index];
-                table[index] = node;
-                node = next;
-                size++;
+                put(node.key, node.value);
+                node = node.next;
             }
         }
-    }
-
-    @Override
-    public int getSize() {
-        return size;
-    }
-
-    public boolean isEmpty() {
-        return size == 0;
     }
 
     private static class Node<K,V> {
