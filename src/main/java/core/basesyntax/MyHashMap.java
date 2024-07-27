@@ -13,19 +13,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[INITIAL_CAPACITY];
     }
 
-    private void resize() {
-        Node<K, V>[] oldTable = table;
-        table = new Node[oldTable.length * GROW_FACTOR];
-        size = 0;
-
-        for (Node<K, V> node : oldTable) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
-            }
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         int index = getIndex(key);
@@ -69,6 +56,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private void resize() {
+        Node<K, V>[] oldTable = table;
+        table = new Node[oldTable.length * GROW_FACTOR];
+        size = 0;
+
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
+        }
     }
 
     private int getIndex(K key) {
