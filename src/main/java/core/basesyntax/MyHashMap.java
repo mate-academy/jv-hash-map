@@ -6,8 +6,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_CAPACITY = 16;
     private static final int DEFAULT_MULTIPLIER = 2;
-    private static final float LOAD_FACTOR = 0.75f;
     private static final int BIT_MASK = 0x7FFFFFFF;
+    private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
 
