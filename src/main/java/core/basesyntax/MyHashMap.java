@@ -45,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> node = buckets[index];
 
         while (node != null) {
-            if ((node.key == key || node.key != null && node.key.equals(key))) {
+            if (keyequals(node.key, key)) {
                 return node.value;
             }
             node = node.next;
@@ -60,6 +60,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getBucketIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode() % buckets.length);
+    }
+
+    private boolean keyequals(K key, K anotherkey) {
+        return (key == anotherkey || (key != null && key.equals(anotherkey)));
     }
 
     private void resize() {
