@@ -17,18 +17,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = findIndex(key);
-        Node<K, V> newNode = new Node<>(key, value, table[index]);
-        table[index] = newNode;
-        if (++size >= threshold) {
+        if (size >= threshold) {
             resize();
         }
+        int index = findIndex(key);
+        Node<K, V> newNode = new Node<>(key, value, table[index]);
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
             if (Objects.equals(key, node.key)) {
                 node.value = value;
                 return;
             }
         }
+        table[index] = newNode;
+        size++;
     }
 
     @Override
