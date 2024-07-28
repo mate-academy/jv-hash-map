@@ -19,15 +19,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         int index = findIndex(key);
         Node<K, V> newNode = new Node<>(key, value, table[index]);
+        table[index] = newNode;
+        if (++size >= threshold) {
+            resize();
+        }
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
             if (Objects.equals(key, node.key)) {
                 node.value = value;
                 return;
             }
-        }
-        table[index] = newNode;
-        if (++size >= threshold) {
-            resize();
         }
     }
 
@@ -70,7 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int findIndex(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private static class Node<K, V> {
