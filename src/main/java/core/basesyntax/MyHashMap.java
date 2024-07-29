@@ -3,14 +3,16 @@ package core.basesyntax;
 import java.util.LinkedList;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private int initialCapacity = 16;
-    private float loadFactor = 0.75f;
+    private static final int INITIAL_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75f;
+    private int capacity;
     private int size = 0;
     private LinkedList<Entry<K, V>>[] buckets;
     private Entry<K, V> nullKeyEntry;
 
     public MyHashMap() {
-        buckets = new LinkedList[initialCapacity];
+        this.capacity = INITIAL_CAPACITY;
+        buckets = new LinkedList[capacity];
     }
 
     private static class Entry<K, V> {
@@ -47,7 +49,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         buckets[index].add(new Entry<>(key, value));
         size++;
 
-        if (size >= initialCapacity * loadFactor) {
+        if (size >= capacity * LOAD_FACTOR) {
             resize();
         }
     }
@@ -78,17 +80,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucketIndex(K key) {
-        return Math.abs(key.hashCode() % initialCapacity);
+        return Math.abs(key.hashCode() % capacity);
     }
 
     private void resize() {
-        initialCapacity *= 2;
-        LinkedList<Entry<K, V>>[] newBuckets = new LinkedList[initialCapacity];
+        int newCapacity = capacity * 2;
+        LinkedList<Entry<K, V>>[] newBuckets = new LinkedList[newCapacity];
 
         for (LinkedList<Entry<K, V>> bucket : buckets) {
             if (bucket != null) {
                 for (Entry<K, V> entry : bucket) {
-                    int newIndex = Math.abs(entry.key.hashCode() % initialCapacity);
+                    int newIndex = Math.abs(entry.key.hashCode() % newCapacity);
                     if (newBuckets[newIndex] == null) {
                         newBuckets[newIndex] = new LinkedList<>();
                     }
@@ -98,5 +100,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         buckets = newBuckets;
+        capacity = newCapacity;
     }
 }
