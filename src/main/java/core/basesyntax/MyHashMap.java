@@ -1,17 +1,18 @@
 package core.basesyntax;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
 
-    private LinkedList<Node<K, V>>[] buckets;
+    private List<Node<K, V>>[] buckets;
     private int size;
     private int threshold;
 
     public MyHashMap() {
-        buckets = new LinkedList[INITIAL_CAPACITY];
+        buckets = new ArrayList[INITIAL_CAPACITY];
         threshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
     }
 
@@ -22,10 +23,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         int bucketIndex = getBucketIndex(key);
-        LinkedList<Node<K, V>> bucket = buckets[bucketIndex];
+        List<Node<K, V>> bucket = buckets[bucketIndex];
 
         if (bucket == null) {
-            bucket = new LinkedList<>();
+            bucket = new ArrayList<>();
             buckets[bucketIndex] = bucket;
         }
 
@@ -46,14 +47,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             bucket.add(new Node<>(key, value));
         }
-
         size++;
     }
 
     @Override
     public V getValue(K key) {
         int bucketIndex = getBucketIndex(key);
-        LinkedList<Node<K, V>> bucket = buckets[bucketIndex];
+        List<Node<K, V>> bucket = buckets[bucketIndex];
 
         if (bucket != null) {
             if (key == null) {
@@ -70,7 +70,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-
         return null;
     }
 
@@ -84,12 +83,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        LinkedList<Node<K, V>>[] oldBuckets = buckets;
-        buckets = new LinkedList[oldBuckets.length * 2];
+        List<Node<K, V>>[] oldBuckets = buckets;
+        buckets = new ArrayList[oldBuckets.length * 2];
         threshold = (int) (buckets.length * LOAD_FACTOR);
         size = 0;
 
-        for (LinkedList<Node<K, V>> bucket : oldBuckets) {
+        for (List<Node<K, V>> bucket : oldBuckets) {
             if (bucket != null) {
                 for (Node<K, V> node : bucket) {
                     put(node.key, node.value);
