@@ -20,14 +20,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         transferIfNeed();
-        int hashOfKey = calculateHash(key);
-        int bucketIndex = getBucketIndex(hashOfKey);
+        int bucketIndex = calculateIndex(key);
         Node<K, V> existingNode = getNode(key);
         if (existingNode != null) {
             existingNode.value = value;
         } else {
             Node<K, V> newNode = new Node<>(key, value, null);
-            newNode.hash = hashOfKey;
             insertNode(newNode, bucketIndex);
             size++;
         }
@@ -50,8 +48,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (neededNode == null) {
             return null;
         }
-        int hashOfKey = calculateHash(key);
-        int bucketIndex = getBucketIndex(hashOfKey);
+        int bucketIndex = calculateIndex(key);
         Node<K, V> previous = null;
         Node<K, V> current = table[bucketIndex];
         while (current != null) {
@@ -95,24 +92,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size == 0;
     }
 
-    private int calculateHash(K key) {
-        return key != null ? Objects.hash(key) : 0;
-    }
-
-    private int getBucketIndex(int hash) {
-        return Math.abs(hash % capacity);
+    private int calculateIndex(K key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private Node<K, V> getNode(K key) {
-        int hashOfKey = calculateHash(key);
-        int bucketIndex = getBucketIndex(hashOfKey);
+        int bucketIndex = calculateIndex(key);
         if (table[bucketIndex] == null) {
             return null;
         }
         Node<K, V> current = table[bucketIndex];
         while (current != null) {
-            if (current.hash == hashOfKey
-                    && current.key == key || Objects.equals(current.key, key)) {
+            if (current.key == key || Objects.equals(current.key, key)) {
                 return current;
             }
             current = current.next;
@@ -154,7 +145,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -173,13 +163,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (!(o instanceof Node<?, ?> node)) {
                 return false;
             }
-            return hash == node.hash && Objects.equals(key, node.key)
+            return Objects.equals(key, node.key)
                     && Objects.equals(value, node.value) && Objects.equals(next, node.next);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(hash, key, value, next);
+            return Objects.hash(key, value, next);
         }
     }
 }
