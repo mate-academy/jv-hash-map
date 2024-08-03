@@ -5,11 +5,13 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private int threshold = 12;
+    private static final int GROW_FACTOR = 2;
+    private int threshold;
     private int size;
     private Node<K, V>[] table;
 
     public MyHashMap() {
+        threshold = (int) (DEFAULT_INITIAL_CAPACITY * LOAD_FACTOR);
         table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
     }
 
@@ -65,7 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private Node<K, V>[] resize() {
-        int newCapacity = table.length * 2;
+        int newCapacity = table.length * GROW_FACTOR;
         threshold = (int) (LOAD_FACTOR * newCapacity);
         Node<K, V>[] oldTable = table;
         Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
