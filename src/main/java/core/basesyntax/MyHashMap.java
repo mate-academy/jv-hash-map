@@ -5,7 +5,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int MAXIMAL_CAPACITY = 1 << 30;
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int size = 0;
-
     private Node[] table;
     private float threshold;
 
@@ -75,10 +74,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         int oldCapacity = table.length;
         int newCapacity = oldCapacity * 2;
-
         Node<K, V>[] newTable = new Node[newCapacity];
         threshold = newCapacity * DEFAULT_LOAD_FACTOR;
-
         for (Node<K, V> bucket : table) {
             Node<K, V> current = bucket;
             while (current != null) {
@@ -90,8 +87,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 current = next;
             }
         }
-
         table = newTable;
     }
-
 }
