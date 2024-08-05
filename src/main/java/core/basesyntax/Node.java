@@ -5,11 +5,9 @@ import java.util.Objects;
 public class Node<K,V> {
     private K key;
     private V value;
-    Node next;
+    private Node next;
 
-
-    public Node () {
-
+    public Node() {
     }
 
     public Node(K key, V value) {
@@ -31,6 +29,10 @@ public class Node<K,V> {
         return this.value;
     }
 
+    public Node getNext() {
+        return next;
+    }
+
     public Node<K, V> setKey(K key) {
         this.key = key;
         return this;
@@ -38,6 +40,11 @@ public class Node<K,V> {
 
     public Node<K, V> setValue(V value) {
         this.value = value;
+        return this;
+    }
+
+    public Node<K, V> setNext(Node next) {
+        this.next = next;
         return this;
     }
 
