@@ -2,13 +2,21 @@ package core.basesyntax;
 
 import java.util.Objects;
 
-public class Entry<K,V> {
+public class Node<K,V> {
     private K key;
     private V value;
+    Node next;
+    Node head;
 
-    public Entry(K key, V value) {
+    public Node(K key, V value) {
         this.key = key;
         this.value = value;
+    }
+
+    public Node(K key, V value, Node next) {
+        this.key = key;
+        this.value = value;
+        this.next = next;
     }
 
     public K getKey() {
@@ -19,12 +27,12 @@ public class Entry<K,V> {
         return this.value;
     }
 
-    public Entry<K, V> setKey(K key) {
+    public Node<K, V> setKey(K key) {
         this.key = key;
         return this;
     }
 
-    public Entry<K, V> setValue(V value) {
+    public Node<K, V> setValue(V value) {
         this.value = value;
         return this;
     }
@@ -37,7 +45,7 @@ public class Entry<K,V> {
         if (object == null || getClass() != object.getClass()) {
             return false;
         }
-        Entry<?, ?> entry = (Entry<?, ?>) object;
+        Node<?, ?> entry = (Node<?, ?>) object;
         return Objects.equals(key, entry.key) && Objects.equals(value, entry.value);
     }
 
