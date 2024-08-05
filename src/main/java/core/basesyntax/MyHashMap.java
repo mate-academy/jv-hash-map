@@ -17,14 +17,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if (size > threshold) {
+            resize();
+        }
         int index = Math.abs(hash(key));
-        Node<K, V> newNode = new Node<>(hash(key), key, value, null);
+        Node<K, V> newNode = new Node<>(key, value, null);
         if (table[index] != null) {
             for (Node<K, V> currentNode = table[index]; currentNode != null;
                     currentNode = currentNode.next) {
-
-                if ((currentNode.hash == newNode.hash && currentNode.key == newNode.key)
-                        || (currentNode.key == newNode.key)
+                if ((currentNode.key == newNode.key)
                         || (currentNode.key != null && currentNode.key.equals(newNode.key))) {
 
                     currentNode.value = newNode.value;
@@ -38,10 +39,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = newNode;
             size++;
         }
-        if (size > threshold) {
-            table = resize();
-        }
-
     }
 
     @Override
@@ -66,40 +63,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : key.hashCode() % DEFAULT_INITIAL_CAPACITY;
     }
 
-    private Node<K, V>[] resize() {
+    private void resize() {
         int newCapacity = table.length * GROW_FACTOR;
         threshold = (int) (LOAD_FACTOR * newCapacity);
-        Node<K, V>[] oldTable = table;
-        Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
-        for (int i = 0; i < oldTable.length; i++) {
-            if (oldTable[i] != null) {
-                for (Node<K, V> currentNode = oldTable[i]; currentNode != null;
-                        currentNode = currentNode.next) {
-                    int newTableNodePosition = Math.abs(currentNode.hash) % newCapacity;
-                    newTable[newTableNodePosition] = currentNode;
-                    break;
-                }
+        final Node<K, V>[] oldTable = table;
+        size = 0;
+        table = (Node<K, V>[]) new Node[newCapacity];
+        for (Node<K, V> currentNode : oldTable) {
+            while (currentNode != null) {
+                put(currentNode.key, currentNode.value);
+                currentNode = currentNode.next;
             }
         }
-        return newTable;
     }
 
     private static class Node<K, V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(hash, key, value, next);
         }
     }
 }
