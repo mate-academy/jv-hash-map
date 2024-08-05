@@ -9,22 +9,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int MAXIMAL_CAPACITY = 1 << 30;
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int size = 0;
-    //private List<Entry<K,V>>[]table = new ArrayList[DEFAULT_INITIAL_CAPACITY];
-    //private float threshold = (table.length * DEFAULT_LOAD_FACTOR);
 
-    private List<Node<K, V>> table = new ArrayList<Node<K, V>>(DEFAULT_INITIAL_CAPACITY);
+    private List<Node<K, V>> table;
     private float threshold;
-
 
     public MyHashMap() {
         table = new ArrayList<>(DEFAULT_INITIAL_CAPACITY);
         for (int i = 0; i < DEFAULT_INITIAL_CAPACITY; i++) {
-            table.add(new Node<K,V>());
+            table.add(null);
         }
         threshold = DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR;
     }
-
-
 
     @Override
     public void put(K key, V value) {
@@ -32,60 +27,46 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         if (size >= threshold) {
             resize();
+            index = hash(key);
         }
 
-        for (Node<K,V> node : table) {
-            Node<K,V> current = node;
-            if (current.next != null) {
-                do {
-                    if ((key == null && current.getKey() == null)
-                            || (key != null && key.equals(current.getKey()))) {
-                        current.setValue(value);
-                        current.setKey(key);
-                        if (current.next != null) {
+        Node<K, V> current = table.get(index);
 
-                        }
-                        return;
-                    }
-                    current = current.next;
+        if (current == null) {
+            table.set(index, new Node<>(key, value));
+            size++;
+            return;
+        }
 
-                } while (current.next == null);
-
-
-            }
-
-            if ((key == null && node.getKey() == null)
-                    || (key != null && key.equals(node.getKey()))) {
-                node.setValue(value);
-                node.setKey(key);
+        while (current != null) {
+            if ((current.getKey() == null && key == null)
+                || (current.getKey() != null && current.getKey().equals(key))) {
+                current.setValue(value);
                 return;
             }
+            if (current.next == null) {
+                break;
+            }
+            current = current.next;
         }
-        table.add(index, new Node<>(key, value));
-        size++;
+        current.next = new Node<>(key,value);
+        size ++;
     }
 
     @Override
     public V getValue(K key) {
         int index = hash(key);
+        Node<K, V> current = table.get(index);
 
-        for (Node<K, V> entry : table) {
-            Node<K,V> current = entry;
-            if (current.next != null) {
-                do {
-                    if ((key == null && current.getKey() == null)
-                            || (key != null && key.equals(current.getKey()))) {
-                        return current.getValue();
-                    }
-                    current = current.next;
-                } while (current.next == null);
+        // Traverse the linked list at the correct index
+        while (current != null) {
+            if ((key == null && current.getKey() == null)
+                    || (key != null && key.equals(current.getKey()))) {
+                return current.getValue();
             }
-
-            if ((key == null && entry.getKey() == null)
-                    || (key != null && key.equals(entry.getKey()))) {
-                return entry.getValue();
-            }
+            current = current.next;
         }
+
         return null;
     }
 
@@ -99,7 +80,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        /*
         int oldCapacity = table.size();
         int newCapacity = oldCapacity * 2;
         if (newCapacity > MAXIMAL_CAPACITY) {
@@ -108,21 +88,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         List<Node<K, V>> newTable = new ArrayList<>(newCapacity);
         for (int i = 0; i < newCapacity; i++) {
-            newTable.add(new Node());
+            newTable.add(null); // Initialize with null
         }
 
         threshold = newCapacity * DEFAULT_LOAD_FACTOR;
 
-        for (Node<K, V> bucket : table) {
-            Node current = bucket;
-            if (current.next != null) {
-                int newIndex = current.getKey() == null ? 0 :
-                        Math.abs(current.getKey().hashCode()) % newCapacity;
-                newTable.add(newIndex,current);
+        for (Node<K, V> node : table) {
+            while (node != null) {
+                Node<K, V> nextNode = node.next;
+                int newIndex = (node.getKey() == null ? 0 : Math.abs(node.getKey().hashCode()) % newCapacity);
+
+                node.next = newTable.get(newIndex);
+                newTable.set(newIndex, node);
+
+                node = nextNode;
             }
         }
         table = newTable;
-         */
     }
 
 }
