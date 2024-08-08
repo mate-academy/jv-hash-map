@@ -40,6 +40,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private Node<K, V> getNode(K key) {
+        int index = getIndexFromHash(hash(key));
+
+        if (table[index] != null) {
+            Node<K, V> node = table[index];
+            do {
+                if (node.hash == hash(key) && Objects.equals(key, node.key)) {
+                    return node;
+                }
+                node = node.next;
+            } while (node != null);
+        }
+        return null;
+    }
+
     private void putVal(int hash, K key, V value) {
         Node<K, V> newNode = new Node<>(hash, key, value, null);
         int index = getIndexFromHash(hash);
@@ -49,7 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> node = table[index];
             do {
-                if (node.hash == hash(key) && Objects.equals(key, node.key)) {
+                if (node.hash == hash && Objects.equals(key, node.key)) {
                     node.value = value;
                     return;
                 }
@@ -71,16 +86,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         Node<K, V>[] oldTable = table;
         int oldTableLength = table.length;
-        int newLength = 0;
 
         if (oldTableLength >= MAXIMUM_CAPACITY) {
             threshold = Integer.MAX_VALUE;
         } else {
-            newLength = oldTableLength * GROW_CAPACITY_FACTOR;
+            int newLength = oldTableLength * GROW_CAPACITY_FACTOR;
             threshold = (int) (newLength * DEFAULT_LOAD_FACTOR);
+            table = new Node[newLength];
         }
-
-        table = new Node[newLength];
         relinkNodes(oldTable, oldTableLength);
     }
 
@@ -112,21 +125,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-    }
-
-    private Node<K, V> getNode(K key) {
-        int index = getIndexFromHash(hash(key));
-
-        if (table[index] != null) {
-            Node<K, V> node = table[index];
-            do {
-                if (node.hash == hash(key) && Objects.equals(key, node.key)) {
-                    return node;
-                }
-                node = node.next;
-            } while (node != null);
-        }
-        return null;
     }
 
     private static class Node<K, V> {
