@@ -45,6 +45,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.abs(hash % (length - 1));
     }
 
+    private Node<K, V> getNode(K key, int hash, int index) {
+        for (Node<K, V> node = table[index]; node != null; node = node.next) {
+            if (node.hash == hash
+                    && (node.key == key || node.key != null && node.key.equals(key))) {
+                return node;
+            }
+        }
+        return null;
+    }
+
     private void addNode(int hash, K key, V value, int index) {
         Node<K, V> newNode = new Node<>(hash, key, value, table[index]);
         table[index] = newNode;
@@ -66,16 +76,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         table = newTable;
         threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
-    }
-
-    private Node<K, V> getNode(K key, int hash, int index) {
-        for (Node<K, V> node = table[index]; node != null; node = node.next) {
-            if (node.hash == hash
-                    && (node.key == key || node.key != null && node.key.equals(key))) {
-                return node;
-            }
-        }
-        return null;
     }
 
     static class Node<K,V> {
