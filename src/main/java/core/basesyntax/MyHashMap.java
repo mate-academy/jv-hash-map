@@ -22,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        putVal(hash(key), key, value);
+        putValue(hash(key), key, value);
     }
 
     @Override
@@ -55,7 +55,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private void putVal(int hash, K key, V value) {
+    private void putValue(int hash, K key, V value) {
+        if (++size > threshold) {
+            resize();
+        }
+
         Node<K, V> newNode = new Node<>(hash, key, value, null);
         int index = getIndexFromHash(hash);
 
@@ -66,6 +70,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             do {
                 if (node.hash == hash && Objects.equals(key, node.key)) {
                     node.value = value;
+                    --size;
                     return;
                 }
                 if (node.next != null) {
@@ -73,9 +78,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             } while (node.next != null);
             node.next = newNode;
-        }
-        if (++size > threshold) {
-            resize();
         }
     }
 
