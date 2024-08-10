@@ -93,7 +93,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return next;
     }
 
-
     private boolean areEqual(Object object1, Object object2) {
         if (object1 == null || object2 == null) {
             return object1 == object2;
@@ -101,18 +100,40 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return object1.equals(object2);
     }
 
-
-
     private static class Node<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         private Node(K key, V value, int hash, Node<K, V> next) {
             this.hash = hash;
             this.key = key;
             this.value = value;
+            this.next = next;
+        }
+
+        public int getHash() {
+            return hash;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public V getValue() {
+            return value;
+        }
+
+        public Node<K, V> getNext() {
+            return next;
+        }
+
+        public void setValue(V value) {
+            this.value = value;
+        }
+
+        public void setNext(Node<K, V> next) {
             this.next = next;
         }
     }
