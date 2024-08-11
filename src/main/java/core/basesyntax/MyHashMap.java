@@ -3,8 +3,10 @@ package core.basesyntax;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
@@ -85,8 +87,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
-    public Collection<K> keySet() {
-        List<K> keys = new ArrayList<>();
+    public Set<K> keySet() {
+        Set<K> keys = new HashSet<>();
         for (Node<K, V> nodes : table) {
             Node<K, V> node = nodes;
             while (node != null) {

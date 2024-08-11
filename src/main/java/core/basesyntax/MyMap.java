@@ -1,6 +1,7 @@
 package core.basesyntax;
 
 import java.util.Collection;
+import java.util.Set;
 
 public interface MyMap<K, V> {
 
@@ -20,5 +21,5 @@ public interface MyMap<K, V> {
 
     Collection<V> values();
 
-    Collection<K> keySet();
+    Set<K> keySet();
 }
