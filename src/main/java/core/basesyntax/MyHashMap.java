@@ -24,7 +24,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Node<K, V> node = table[index];
 
-
         if (node == null) {
             table[index] = new Node<>(key, value, null);
         } else {
