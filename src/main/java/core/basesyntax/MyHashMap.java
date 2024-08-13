@@ -4,11 +4,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
     private Node<K, V>[] table;
-    private int size = 0;
+    private int size;
 
     @SuppressWarnings("unchecked")
     public MyHashMap() {
-        table = new Node[DEFAULT_CAPACITY];
+        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -25,7 +25,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
         while (current != null) {
-            if (current.key == null && key == null
+            if (current.key == key
                     || current.key != null && current.key.equals(key)) {
                 current.value = value;
                 return;
@@ -44,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         Node<K, V> current = table[index];
         while (current != null) {
-            if (current.key == null && key == null
+            if (current.key == key
                     || current.key != null && current.key.equals(key)) {
                 return current.value;
             }
@@ -76,7 +76,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
