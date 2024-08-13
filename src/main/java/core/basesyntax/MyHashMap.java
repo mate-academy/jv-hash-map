@@ -6,18 +6,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size = 0;
 
-    private class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
@@ -25,6 +13,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if (size >= table.length * LOAD_FACTOR) {
+            resize();
+        }
         int index = getIndex(key);
         Node<K, V> newNode = new Node<>(key, value, null);
         Node<K, V> current = table[index];
@@ -45,9 +36,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 break;
             }
             current = current.next;
-        }
-        if (size >= table.length * LOAD_FACTOR) {
-            resize();
         }
     }
 
@@ -85,6 +73,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 put(node.key, node.value);
                 node = node.next;
             }
+        }
+    }
+
+    private class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
         }
     }
 }
