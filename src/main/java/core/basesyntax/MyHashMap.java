@@ -20,6 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
+
         int index = getIndex(key);
         Node<K, V> node = table[index];
 
