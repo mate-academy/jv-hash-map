@@ -17,19 +17,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if (size >= threshold) {
+            resize();
+        }
         int index = getIndex(key);
         Node<K, V> node = table[index];
+
 
         if (node == null) {
             table[index] = new Node<>(key, value, null);
         } else {
             while (node != null) {
                 if (Objects.equals(node.key, key)) {
-                    node.value = value; // Replace the value if key is found
+                    node.value = value;
                     return;
                 }
                 if (node.next == null) {
-                    node.next = new Node<>(key, value, null); // Add new node at the end
+                    node.next = new Node<>(key, value, null);
                     break;
                 }
                 node = node.next;
@@ -37,9 +41,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         size++;
-        if (size >= threshold) {
-            resize();
-        }
     }
 
     @Override
