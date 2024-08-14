@@ -11,7 +11,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        this.table = new Node[DEFAULT_CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -57,7 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (size >= (int) (DEFAULT_CAPACITY * LOAD_FACTOR)) {
+        if (size >= (int) (table.length * LOAD_FACTOR)) {
             size = 0;
             Node<K, V>[] oldTable = table;
             table = new Node[table.length * GROWTH_FACTOR];
