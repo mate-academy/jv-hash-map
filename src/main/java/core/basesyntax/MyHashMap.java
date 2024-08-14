@@ -9,7 +9,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        table = (Node<K, V>[])(new Object[DEFAULT_BASE_SIZE]);
+        table = (Node<K, V>[]) new Node[DEFAULT_BASE_SIZE];
     }
 
     @Override
@@ -73,7 +73,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         if (size >= (int) (table.length * RESIZE_FACTOR)) {
-            Node<K, V>[] newTable = (Node<K, V>[])(new Object[table.length * RESIZE_COEFFICIENT]);
+            Node<K, V>[] newTable = (Node<K, V>[]) (new Node[table.length * RESIZE_COEFFICIENT]);
             for (int i = 0; i < table.length; i++) {
                 Node<K, V> node = table[i];
                 while (node != null) {
