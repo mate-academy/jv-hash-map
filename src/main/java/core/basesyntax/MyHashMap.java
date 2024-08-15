@@ -66,6 +66,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
+        if (key == null) {
+            return 0;
+        }
+
         int hashCode = key.hashCode();
         return Math.abs(hashCode) % table.length;
     }
