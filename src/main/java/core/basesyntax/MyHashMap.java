@@ -5,7 +5,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size = 0;
-    private Node<K, V> nullKeyNode = null;
+    private Node<K, V> nullKeyNode;
 
     public MyHashMap() {
         table = new Node[INITIAL_CAPACITY];
@@ -51,6 +51,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         nullKeyNode = new Node<>(null, value, null);
     }
 
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
+    }
+
     private void addOrUpdateNode(int index, K key, V value) {
         Node<K, V> newNode = new Node<>(key, value, null);
         Node<K, V> existingNode = table[index];
@@ -80,10 +84,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int getIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
-    }
-
     private void resize() {
         Node<K, V>[] oldTable = table;
         table = new Node[oldTable.length * 2];
@@ -94,10 +94,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 put(node.key, node.value);
                 node = node.next;
             }
-        }
-
-        if (nullKeyNode != null) {
-            size++;
         }
     }
 
