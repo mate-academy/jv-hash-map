@@ -54,7 +54,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private boolean putIntoTable(K key, V value) {
         int index = calculateIndex(key);
-        Node<K, V> newNode = new Node<>(key, value);
+        Node<K, V> newNode = new Node<>(key, value, null);
         if (table[index] == null) {
             table[index] = newNode;
             return true;
@@ -87,9 +87,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value) {
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
+            this.next = next;
         }
     }
 }
