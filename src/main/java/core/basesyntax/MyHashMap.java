@@ -59,7 +59,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         List<Entry<K, V>> bucket = buckets[index];
 
-        // Обробка ключа null
         if (key == null) {
             for (Entry<K, V> entry : bucket) {
                 if (entry.getKey() == null) {
