@@ -42,10 +42,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-
-        if (size == 0) {
-            return null;
-        }
         int bucket = getHash(key);
         Node<K, V> node = table[bucket];
         while (node != null) {
@@ -59,7 +55,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public int getSize() {
-
         return size;
     }
 
