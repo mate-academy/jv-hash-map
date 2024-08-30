@@ -4,10 +4,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
     private static final int MULTIPLIER = 2;
     private static final int INITIAL_CAPACITY = 16;
-    private int currentCapacity = INITIAL_CAPACITY;
+    private int currentCapacity;
     private int size;
-    private Node<K, V> [] elements;
-
+    private Node<K, V>[] elements;
     public MyHashMap() {
         elements = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
         this.size = 0;
@@ -60,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        currentCapacity = currentCapacity * MULTIPLIER;
+        currentCapacity = INITIAL_CAPACITY * MULTIPLIER;
         Node<K, V>[] newElements = (Node<K, V>[]) new Node[currentCapacity];
         Node<K, V>[] oldElements = elements;
         elements = newElements;
@@ -79,7 +78,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
