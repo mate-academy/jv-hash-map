@@ -7,9 +7,4 @@ public interface MyMap<K, V> {
 
     int getSize();
 
-    void remove(K key);
-
-    boolean isEmpty();
-
-    boolean containsKey(K key);
 }
