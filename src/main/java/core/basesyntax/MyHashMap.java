@@ -7,8 +7,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int currentCapacity;
     private int size;
     private Node<K, V>[] elements;
+
     public MyHashMap() {
-        elements = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
+        this.currentCapacity = INITIAL_CAPACITY; // Инициализация начальной емкости
+        elements = (Node<K, V>[]) new Node[currentCapacity];
         this.size = 0;
     }
 
@@ -55,11 +57,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return 0;
         }
-        return Math.abs(key.hashCode()) % currentCapacity;
+        return Math.abs(key.hashCode() % currentCapacity);
     }
 
     private void resize() {
-        currentCapacity = INITIAL_CAPACITY * MULTIPLIER;
+        currentCapacity *= MULTIPLIER; // Увеличиваем текущую емкость
         Node<K, V>[] newElements = (Node<K, V>[]) new Node[currentCapacity];
         Node<K, V>[] oldElements = elements;
         elements = newElements;
