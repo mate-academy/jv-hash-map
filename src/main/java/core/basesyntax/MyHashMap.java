@@ -4,24 +4,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private Entry<K, V>[] table;
-    private int size = 0;
+    private int size;
     private Entry<K, V> nullKeyEntry;
 
     @SuppressWarnings("unchecked")
     public MyHashMap() {
         table = (Entry<K, V>[]) new Entry[INITIAL_CAPACITY];
-    }
-    
-    private static class Entry<K, V> {
-        private K key;
-        private V value;
-        private Entry<K, V> next;
-
-        public Entry(K key, V value, Entry<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
     }
 
     @Override
@@ -101,5 +89,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int indexFor(int hash, int length) {
         return hash % length;
+    }
+
+    private static class Entry<K, V> {
+        private K key;
+        private V value;
+        private Entry<K, V> next;
+
+        public Entry(K key, V value, Entry<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
