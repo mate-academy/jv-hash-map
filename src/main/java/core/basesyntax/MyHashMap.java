@@ -6,7 +6,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int RESIZE_FACTOR = 2;
 
     private int size;
-    private int threshold;
     private Node<K, V>[] table;
 
     public MyHashMap() {
@@ -14,35 +13,34 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public MyHashMap(int capacity) {
-        this.table = new Node[capacity];
-        this.threshold = (int) (capacity * LOAD_FACTOR);
+        table = new Node[capacity];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold) {
+        if (size >= getThreshold()) {
             resize();
         }
         int index = getIndex(key);
-        Node<K,V> newNode = new Node<>(key, value);
+        Node<K, V> newNode = new Node<>(key, value);
 
         if (table[index] == null) {
             table[index] = newNode;
             size++;
-        } else {
-            Node<K, V> current = table[index];
-            while (current != null) {
-                if (key == current.key || key != null && key.equals(current.key)) {
-                    current.value = value;
-                    return;
-                }
-                if (current.next == null) {
-                    current.next = newNode;
-                    size++;
-                    return;
-                }
-                current = current.next;
+            return;
+        }
+        Node<K, V> current = table[index];
+        while (current != null) {
+            if (key == current.key || key != null && key.equals(current.key)) {
+                current.value = value;
+                return;
             }
+            if (current.next == null) {
+                current.next = newNode;
+                size++;
+                return;
+            }
+            current = current.next;
         }
     }
 
@@ -66,11 +64,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        if (key == null) {
-            return 0;
-        } else {
-            return Math.abs(key.hashCode()) % table.length;
-        }
+        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
+    }
+
+    private int getThreshold() {
+        return (int) (table.length * LOAD_FACTOR);
     }
 
     private void resize() {
@@ -88,7 +86,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         table = newTable;
-        threshold = (int) (newCapacity * LOAD_FACTOR);
     }
 
     private static class Node<K, V> {
