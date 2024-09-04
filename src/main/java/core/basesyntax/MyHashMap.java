@@ -5,7 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int MULTIPLIER_CAPACITY = 2;
+    private static final int MULTIPLIER_OF_CAPACITY = 2;
     private int size;
     private Node<K, V>[] table;
 
@@ -46,7 +46,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int newCapacity = table.length * MULTIPLIER_CAPACITY;
+        int newCapacity = table.length * MULTIPLIER_OF_CAPACITY;
         Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
         Node<K, V>[] oldTable = table;
         table = newTable;
