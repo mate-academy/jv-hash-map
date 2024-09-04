@@ -4,19 +4,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75;
     private static final int MULTIPLIER = 2;
     private static final int INITIAL_CAPACITY = 16;
-    private int currentCapacity;
     private int size;
     private Node<K, V>[] elements;
 
     public MyHashMap() {
-        this.currentCapacity = INITIAL_CAPACITY; // Инициализация начальной емкости
-        elements = (Node<K, V>[]) new Node[currentCapacity];
-        this.size = 0;
+        elements = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= currentCapacity * LOAD_FACTOR) {
+        if (size >= elements.length * LOAD_FACTOR) {
             resize();
         }
         int index = getIndex(key);
@@ -57,12 +54,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return 0;
         }
-        return Math.abs(key.hashCode() % currentCapacity);
+        return Math.abs(key.hashCode() % elements.length);
     }
 
     private void resize() {
-        currentCapacity *= MULTIPLIER; // Увеличиваем текущую емкость
-        Node<K, V>[] newElements = (Node<K, V>[]) new Node[currentCapacity];
+        Node<K, V>[] newElements = (Node<K, V>[]) new Node[elements.length * MULTIPLIER];
         Node<K, V>[] oldElements = elements;
         elements = newElements;
         size = 0;
