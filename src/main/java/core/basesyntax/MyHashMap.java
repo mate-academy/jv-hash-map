@@ -2,8 +2,8 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEAFULT_SIZE = 16;
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    int size;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private int size;
 
     private Entry<K, V>[] table;
 
@@ -13,11 +13,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Entry<K, V> {
-        K key;
-        V value;
-        Entry<K, V> next;
+        private K key;
+        private V value;
+        private Entry<K, V> next;
 
-        Entry(K key, V value, Entry<K, V> next) {
+        private Entry(K key, V value, Entry<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -31,7 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         if (key == null) {
             if (current == null) {
-                table[index] = new Entry<>(key, value, null);
+                table[index] = new Entry<K, V>(key, value, null);
                 size++;
                 return;
             } else {
@@ -42,7 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     }
                     current = current.next;
                 }
-                table[index] = new Entry<>(key, value, table[index]);
+                table[index] = new Entry<K, V>(key, value, table[index]);
                 size++;
                 return;
             }
@@ -56,7 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             current = current.next;
         }
 
-        Entry<K, V> newEntry = new Entry<>(key, value, table[index]);
+        Entry<K, V> newEntry = new Entry<K, V>(key, value, table[index]);
         table[index] = newEntry;
         size++;
 
