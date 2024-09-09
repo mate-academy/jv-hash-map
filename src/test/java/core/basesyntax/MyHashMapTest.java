@@ -5,7 +5,6 @@ import org.junit.Test;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.util.Map;
 
 public class MyHashMapTest {
     private static final Car firstCar = new Car("Audi", "black");
@@ -261,7 +260,6 @@ public class MyHashMapTest {
             Car car = new Car("model_" + i, "color_" + i);
             myHashMap.put(car, i);
         }
-
 
         for (int i = 0; i < 14; i++) {
             Assert.assertEquals(Integer.valueOf(i),

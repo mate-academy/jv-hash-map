@@ -1,39 +1,44 @@
 package core.basesyntax;
 
+import static core.basesyntax.MyHashMap.Node.hash;
+
 import java.util.Map;
 import java.util.Objects;
 
-import static core.basesyntax.MyHashMap.Node.hash;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private static int CAPACITY = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private Node<K, V>[] table;
     private int size;
+    private int newCapacity;
     private int threshold;
+    private boolean isResize;
 
     public MyHashMap() {
-        table = new Node[CAPACITY];
-        threshold = (int) (CAPACITY * DEFAULT_LOAD_FACTOR);
+        table = new Node[DEFAULT_CAPACITY];
+        threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
+        newCapacity = DEFAULT_CAPACITY * 2;
+        isResize = false;
     }
 
     @Override
     public void put(K key, V value) {
+        int index;
         if (size > threshold) {
-            // resize();
-            //return;
+            resize();
+            isResize = true;
         }
-        int index = hash(key);
+        if (isResize) {
+            index = hash(key, newCapacity / 2);
+        } else {
+            index = hash(key, DEFAULT_CAPACITY);
+        }
         Node<K, V> newNode = new Node<>(key, value, null);
         Node<K, V> node = table[index];
-        //linked list is empty
         if (node == null) {
             table[index] = newNode;
             size++;
-            //linked list isn't empty
         } else {
-            //оно не заходит сюда
-            //node.key.equals(key)
             while (node.next != null || checkKey(key, node)) {
                 if (checkKey(key, node)) {
                     node.value = value;
@@ -41,121 +46,78 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 node = node.next;
             }
-            //okay if we don't have the same keys -> we should put new pair
             node.next = newNode;
             size++;
         }
     }
 
-
     @Override
     public V getValue(K key) {
-        //maybe we should use next???
-        //should we check that key is present???
-        //if key == null
-        //if linkedList in hashmap isn't empty
-        int index = hash(key);
+        int index;
+        if (isResize) {
+            index = hash(key, newCapacity / 2);
+        } else {
+            index = hash(key, DEFAULT_CAPACITY);
+        }
         Node<K, V> node = table[index];
-        //it means that key isn't present
         if (node == null) {
             return null;
         }
-
-//        if (checkKey(key, node)) {
-//            return node.value;
-//        }
-
-//        //linked list has one element
-//        if (node.next == null) {
-//            return table[index].value;
-//        }
-
         while (node != null) {
             if (checkKey(key, node)) {
                 return node.value;
             }
             node = node.next;
         }
-
-
         return null;
     }
-
 
     @Override
     public int getSize() {
         return size;
     }
 
-    private void resize() {
-        int newCapacity = CAPACITY * 2;
-        Node<K, V>[] newTable = new Node[newCapacity];
-        int index = 0;
-        int sizeOfArr = CAPACITY;
-        CAPACITY = newCapacity;
-
-        for (int i = 0; i < sizeOfArr; i++) {
-            Node<K, V> node = table[i];
-            //linked list can be empty
-            //if node == null linked list is empty
-            if (node != null) {
-                index = hash(node.key);
-                newTable[index] = node;
-            } else {
-                //if node == null linked list is empty skip this
-                continue;
-            }
-
-            //old linked list isn't empty and has more than 1 elem-> we should go by all node until next == null
-            if (node.next != null) {
-                //if linked list has one element if it fails???
-                while (node.next != null) {
-                    Node<K, V> nextNode = node.next;
-                    //hash doesn't work correctly (the elements have the )
-                    index = hash(nextNode.key);
-                    //new linked list is empty
-                    if (newTable[index] == null) {
-                        newTable[index] = nextNode;
-                        //what should we do if not
-                    } else {
-                        //does it work correctly?
-                        //seems yes
-                        //newTable[index].next = nextNode;
-                    }
-                    node = node.next;
-                }
-            }
-
+    private Node<K, V> transfer(Node<K, V> node, Node<K, V>[] newTable) {
+        Node<K, V> tempNode = null;
+        if (node.next != null) {
+            tempNode = node.next;
         }
-
-        table = newTable;
-        threshold = (int) (CAPACITY * DEFAULT_LOAD_FACTOR);
+        node.next = null;
+        int index = hash(node.key, newCapacity);
+        if (newTable[index] == null) {
+            newTable[index] = node;
+        } else {
+            Node<K, V> nextNode = newTable[index].next;
+            Node<K, V> lastNode = newTable[index];
+            while (nextNode != null) {
+                if (nextNode.next == null) {
+                    lastNode = nextNode;
+                    break;
+                }
+                nextNode = nextNode.next;
+            }
+            lastNode.next = node;
+        }
+        return tempNode;
     }
 
-//    private void putPair(K key, V value) {
-//        int index = hash(key);
-//        Node<K, V> newNode = new Node<>(key, value, null);
-//        Node<K, V> node = table[index];
-//        //linked list is empty
-//        if (node == null) {
-//            table[index] = newNode;
-//            size++;
-//            //linked list isn't empty
-//        } else {
-//            //оно не заходит сюда
-//            //node.key.equals(key)
-//            while (node.next != null || checkKey(key, node)) {
-//                if (checkKey(key, node)) {
-//                    node.value = value;
-//                    return;
-//                }
-//                node = node.next;
-//            }
-//            //okay if we don't have the same keys -> we should put new pair
-//            node.next = newNode;
-//            size++;
-//        }
-//    }
+    private void resize() {
+        Node<K, V>[] newTable = new Node[newCapacity];
+        Node<K, V> nextNode = null;
+        for (Node<K, V> node : table) {
+            if (node == null) {
+                continue;
+            }
+            nextNode = transfer(node, newTable);
+
+            while (nextNode != null) {
+                nextNode = transfer(nextNode, newTable);
+            }
+        }
+        table = newTable;
+        newCapacity *= 2;
+        threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
+    }
 
     private boolean checkKey(K key, Node<K, V> node) {
         if (node.key == key || node.key != null && node.key.equals(key)) {
@@ -164,11 +126,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return false;
     }
 
-
     static class Node<K, V> implements Map.Entry<K, V> {
-        final K key;
-        V value;
-        Node<K, V> next;
+        private K key;
+        private V value;
+        private Node<K, V> next;
 
         Node(K key, V value, Node<K, V> next) {
             this.key = key;
@@ -195,24 +156,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         @Override
         public final int hashCode() {
-//            Random random = new Random();
-//            // int result = random.nextInt(1000);
-//            //int number = random.nextInt(1000);
-            // int hash = 88;
-            //if it won't work you will try without verify on null
-            //and without value
-//            hash = 35 * hash + (key == null ? 0 : key.hashCode());
-//            hash = 35 * hash + (value == null ? 0 : value.hashCode());
-//            return hash;
             return Objects.hashCode(key) ^ Objects.hashCode(value);
         }
 
-
-        public static int hash(Object key) {
-            //my hashcode isn't correct
-            return Math.abs((key == null) ? 0 : key.hashCode() % CAPACITY);
+        public static int hash(Object key, int capacity) {
+            return Math.abs((key == null) ? 0 : key.hashCode() % capacity);
         }
-
 
         @Override
         public final boolean equals(Object obj) {
