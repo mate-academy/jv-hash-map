@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import java.util.Objects;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
@@ -10,15 +8,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     public MyHashMap() {
-        table = new Node[INITIAL_CAPACITY];
+        table = (Node<K, V> []) new Node[INITIAL_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        resize();
-        if (putIntoTable(key, value)) {
-            size++;
+        if (size >= table.length * LOAD_FACTOR) {
+            resize();
         }
+        int index = hash(key);
+        Node<K, V> currentNode = table[index];
+        while (currentNode != null) {
+            if ((key == null && currentNode.key == null)
+                    || (key != null && key.equals(currentNode.key))) {
+                currentNode.value = value;
+                return;
+            }
+            currentNode = currentNode.next;
+        }
+        Node<K, V> newNode = new Node<>(key, value, table[index]);
+        table[index] = newNode;
+        size++;
     }
 
     @Override
@@ -26,7 +36,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = hash(key);
         Node<K, V> node = table[index];
         while (node != null) {
-            if (Objects.equals(node.key, key)) {
+            if ((key == null && node.key == null) || (key != null && key.equals(node.key))) {
                 return node.value;
             }
             node = node.next;
@@ -40,56 +50,33 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (size / (float) table.length >= LOAD_FACTOR) {
-            Node<K, V>[] temp = table;
-            table = new Node[(int) (temp.length * RESIZE_MULTIPLIER)];
-            for (Node<K, V> node : temp) {
-                while (node != null) {
-                    putIntoTable(node.key, node.value);
-                    node = node.next;
-                }
-            }
-        }
-    }
+        Node<K, V>[] newElements = (Node<K, V>[]) new Node[(int)
+                (table.length * RESIZE_MULTIPLIER)];
+        Node<K, V>[] temp = table;
+        table = newElements;
+        size = 0;
 
-    private boolean putIntoTable(K key, V value) {
-        int index = hash(key);
-        Node<K, V> newNode = new Node<>(key, value);
-        if (table[index] == null) {
-            table[index] = newNode;
-            return true;
-        }
-        Node<K, V> currentNode = table[index];
-        while (currentNode.next != null) {
-            if (Objects.equals(currentNode.key, key)) {
-                currentNode.value = value;
-                return false;
+        for (Node<K, V> headNode : temp) {
+            while (headNode != null) {
+                put(headNode.key, headNode.value);
+                headNode = headNode.next;
             }
-            currentNode = currentNode.next;
         }
-        if (Objects.equals(currentNode.key, key)) {
-            currentNode.value = value;
-            return false;
-        }
-        currentNode.next = newNode;
-        return true;
     }
 
     private int hash(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return (key.hashCode() & (table.length - 1));
+        return key == null ? 0 : (key.hashCode() & (table.length - 1));
     }
 
-    private static class Node<K, V> {
+    private class Node<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value) {
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
+            this.next = next;
         }
     }
 }
