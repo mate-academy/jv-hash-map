@@ -107,7 +107,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return false;
     }
 
-    private int hash(Object key, int capacity) {
+    private int hash(K key, int capacity) {
         return Math.abs((key == null) ? 0 : key.hashCode() % capacity);
     }
 
