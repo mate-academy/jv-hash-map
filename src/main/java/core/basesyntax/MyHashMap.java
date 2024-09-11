@@ -1,18 +1,15 @@
 package core.basesyntax;
 
-import static core.basesyntax.MyHashMap.Node.hash;
-
-import java.util.Map;
-import java.util.Objects;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final int INCREASE_SIZE_OF_ARR_TO = 2;
     private int capacity;
     private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        capacity = 16;
+        capacity = DEFAULT_CAPACITY;
         table = new Node[capacity];
     }
 
@@ -86,7 +83,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        int newCapacity = capacity * 2;
+        int newCapacity = capacity * INCREASE_SIZE_OF_ARR_TO;
         capacity = newCapacity;
         Node<K, V>[] newTable = new Node[newCapacity];
         Node<K, V> nextNode = null;
@@ -110,8 +107,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return false;
     }
 
-    static class Node<K, V> implements Map.Entry<K, V> {
-        private K key;
+    private int hash(Object key, int capacity) {
+        return Math.abs((key == null) ? 0 : key.hashCode() % capacity);
+    }
+
+    private static class Node<K, V> {
+        private final K key;
         private V value;
         private Node<K, V> next;
 
@@ -119,42 +120,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        @Override
-        public K getKey() {
-            return key;
-        }
-
-        @Override
-        public V getValue() {
-            return value;
-        }
-
-        @Override
-        public V setValue(V newValue) {
-            V oldValue = value;
-            value = newValue;
-            return oldValue;
-        }
-
-        @Override
-        public final int hashCode() {
-            return Objects.hashCode(key) ^ Objects.hashCode(value);
-        }
-
-        public static int hash(Object key, int capacity) {
-            return Math.abs((key == null) ? 0 : key.hashCode() % capacity);
-        }
-
-        @Override
-        public final boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-            return obj instanceof Map.Entry<?, ?> e
-                    && Objects.equals(key, e.getKey())
-                    && Objects.equals(value, e.getValue());
         }
 
     }
