@@ -2,24 +2,22 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int SHIFT_BITS = 16;
+    private static final float LOAD_FACTRO = 0.75f;
+    private static final int CAPACITY = 16;
     private Node<K, V>[] table;
     private int size;
-    private int capacity;
-    private final float loadFactor;
     private int threshold;
 
     public MyHashMap() {
-        this.capacity = 16;
-        this.table = (Node<K, V>[]) new Node[capacity];
-        this.loadFactor = 0.75f;
-        this.threshold = (int) (capacity * loadFactor);
+        this.table = (Node<K, V>[]) new Node[CAPACITY];
+        this.threshold = (int) (CAPACITY * LOAD_FACTRO);
     }
 
     @Override
     public void put(K key, V value) {
         int hashCode = hash(key);
         int index = Math.abs(hashCode) % table.length;
-        Node<K, V> newNode = new Node<>(hashCode, key, value, null);
+        Node<K, V> newNode = new Node<K, V>(hashCode, key, value, null);
         if (table[index] == null) {
             table[index] = newNode;
         } else {
@@ -68,12 +66,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    static final int hash(Object key) {
+    private static int hash(Object key) {
         int h;
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> SHIFT_BITS);
     }
 
-    public void resize() {
+    private void resize() {
         int newCapacity = table.length * 2;
         Node<K, V>[] newTable = new Node[newCapacity];
         for (Node<K, V> node: table) {
@@ -86,10 +84,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         table = newTable;
-        threshold = (int) (newCapacity * loadFactor);
+        threshold = (int) (newCapacity * LOAD_FACTRO);
     }
 
-    class Node<K, V> {
+    private class Node<K, V> {
         private int hash;
         private K key;
         private V value;
