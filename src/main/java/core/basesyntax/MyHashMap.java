@@ -7,32 +7,21 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private static final int DEFAULT_CAPACITY = 16;
+    private int capacity;
     private Node<K, V>[] table;
     private int size;
-    private int newCapacity;
-    private int threshold;
-    private boolean isResize;
 
     public MyHashMap() {
-        table = new Node[DEFAULT_CAPACITY];
-        threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
-        newCapacity = DEFAULT_CAPACITY * 2;
-        isResize = false;
+        capacity = 16;
+        table = new Node[capacity];
     }
 
     @Override
     public void put(K key, V value) {
-        int index;
-        if (size > threshold) {
+        if (size > capacity * DEFAULT_LOAD_FACTOR) {
             resize();
-            isResize = true;
         }
-        if (isResize) {
-            index = hash(key, newCapacity / 2);
-        } else {
-            index = hash(key, DEFAULT_CAPACITY);
-        }
+        int index = hash(key, capacity);
         Node<K, V> newNode = new Node<>(key, value, null);
         Node<K, V> node = table[index];
         if (node == null) {
@@ -53,12 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index;
-        if (isResize) {
-            index = hash(key, newCapacity / 2);
-        } else {
-            index = hash(key, DEFAULT_CAPACITY);
-        }
+        int index = hash(key, capacity);
         Node<K, V> node = table[index];
         if (node == null) {
             return null;
@@ -83,7 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             tempNode = node.next;
         }
         node.next = null;
-        int index = hash(node.key, newCapacity);
+        int index = hash(node.key, capacity);
         if (newTable[index] == null) {
             newTable[index] = node;
         } else {
@@ -102,6 +86,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        int newCapacity = capacity * 2;
+        capacity = newCapacity;
         Node<K, V>[] newTable = new Node[newCapacity];
         Node<K, V> nextNode = null;
         for (Node<K, V> node : table) {
@@ -115,8 +101,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         table = newTable;
-        newCapacity *= 2;
-        threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
     }
 
     private boolean checkKey(K key, Node<K, V> node) {
