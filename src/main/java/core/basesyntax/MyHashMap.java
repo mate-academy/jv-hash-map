@@ -4,26 +4,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int DEFAULT_CAPACITY = 16;
     private static final int INCREASE_SIZE_OF_ARR_TO = 2;
-    private int capacity;
     private Node<K, V>[] table;
     private int size;
+    private boolean isResizing = false;
 
     public MyHashMap() {
-        capacity = DEFAULT_CAPACITY;
-        table = new Node[capacity];
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
     public void put(K key, V value) {
-        if (size > capacity * DEFAULT_LOAD_FACTOR) {
-            resize();
-        }
-        int index = hash(key, capacity);
+        resize();
+        int index = hash(key, table.length);
         Node<K, V> newNode = new Node<>(key, value, null);
         Node<K, V> node = table[index];
         if (node == null) {
             table[index] = newNode;
-            size++;
+            if (!isResizing) {
+                size++;
+            }
         } else {
             while (node.next != null || checkKey(key, node)) {
                 if (checkKey(key, node)) {
@@ -33,13 +32,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node = node.next;
             }
             node.next = newNode;
-            size++;
+            if (!isResizing) {
+                size++;
+            }
         }
     }
 
     @Override
     public V getValue(K key) {
-        int index = hash(key, capacity);
+        int index = hash(key, table.length);
         Node<K, V> node = table[index];
         if (node == null) {
             return null;
@@ -58,46 +59,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private Node<K, V> transfer(Node<K, V> node, Node<K, V>[] newTable) {
-        Node<K, V> tempNode = null;
-        if (node.next != null) {
-            tempNode = node.next;
-        }
-        node.next = null;
-        int index = hash(node.key, capacity);
-        if (newTable[index] == null) {
-            newTable[index] = node;
-        } else {
-            Node<K, V> nextNode = newTable[index].next;
-            Node<K, V> lastNode = newTable[index];
-            while (nextNode != null) {
-                if (nextNode.next == null) {
-                    lastNode = nextNode;
-                    break;
-                }
-                nextNode = nextNode.next;
-            }
-            lastNode.next = node;
-        }
-        return tempNode;
-    }
-
     private void resize() {
-        int newCapacity = capacity * INCREASE_SIZE_OF_ARR_TO;
-        capacity = newCapacity;
-        Node<K, V>[] newTable = new Node[newCapacity];
-        Node<K, V> nextNode = null;
-        for (Node<K, V> node : table) {
-            if (node == null) {
-                continue;
+        if (size > table.length * DEFAULT_LOAD_FACTOR) {
+            isResizing = true;
+            int newCapacity = table.length * INCREASE_SIZE_OF_ARR_TO;
+            Node<K, V>[] newTable = new Node[newCapacity];
+            Node<K, V>[] tempTable = table;
+            table = newTable;
+            for (Node<K, V> node : tempTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
             }
-            nextNode = transfer(node, newTable);
-
-            while (nextNode != null) {
-                nextNode = transfer(nextNode, newTable);
-            }
+            isResizing = false;
         }
-        table = newTable;
     }
 
     private boolean checkKey(K key, Node<K, V> node) {

@@ -2,7 +2,6 @@ package core.basesyntax;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 
@@ -260,12 +259,10 @@ public class MyHashMapTest {
             Car car = new Car("model_" + i, "color_" + i);
             myHashMap.put(car, i);
         }
-
         for (int i = 0; i < 14; i++) {
             Assert.assertEquals(Integer.valueOf(i),
                     myHashMap.getValue(new Car("model_" + i, "color_" + i)));
         }
-
         Field[] declaredFields = myHashMap.getClass().getDeclaredFields();
         for (Field field : declaredFields) {
             if (field.getType().isArray()) {
