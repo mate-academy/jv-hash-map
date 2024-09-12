@@ -1,22 +1,21 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int SHIFT_BITS = 16;
-    private static final float LOAD_FACTRO = 0.75f;
-    private static final int CAPACITY = 16;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
     private int threshold;
 
     public MyHashMap() {
-        this.table = (Node<K, V>[]) new Node[CAPACITY];
-        this.threshold = (int) (CAPACITY * LOAD_FACTRO);
+        this.table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        this.threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
         int hashCode = hash(key);
-        int index = Math.abs(hashCode) % table.length;
+        int index = getIndex(hashCode);
         Node<K, V> newNode = new Node<K, V>(hashCode, key, value, null);
         if (table[index] == null) {
             table[index] = newNode;
@@ -47,7 +46,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int hashCode = hash(key);
-        int index = Math.abs(hashCode) % table.length;
+        int index = getIndex(hashCode);
         Node<K, V> current = table[index];
         while (current != null) {
             if (current.key == null && key == null) {
@@ -66,9 +65,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private static int hash(Object key) {
+    private static <K> int hash(K key) {
         int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> SHIFT_BITS);
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> DEFAULT_CAPACITY);
     }
 
     private void resize() {
@@ -84,7 +83,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         table = newTable;
-        threshold = (int) (newCapacity * LOAD_FACTRO);
+        threshold = (int) (newCapacity * LOAD_FACTOR);
+    }
+
+    private int getIndex(int hashCode) {
+        return Math.abs(hashCode) % table.length;
     }
 
     private class Node<K, V> {
