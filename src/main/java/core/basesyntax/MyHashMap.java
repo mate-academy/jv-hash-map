@@ -1,6 +1,8 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final int PRIME_INTEGER = 17;
+    private static final int ENLARGE_TABLE = 2;
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
@@ -14,9 +16,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if (size + 1 > threshold) {
+            resize();
+        }
         int hashCode = hash(key);
         int index = getIndex(hashCode);
-        Node<K, V> newNode = new Node<K, V>(hashCode, key, value, null);
+        Node<K, V> newNode = new Node<K, V>(key, value, null);
         if (table[index] == null) {
             table[index] = newNode;
         } else {
@@ -38,9 +43,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         size++;
-        if (size > threshold) {
-            resize();
-        }
     }
 
     @Override
@@ -49,10 +51,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(hashCode);
         Node<K, V> current = table[index];
         while (current != null) {
-            if (current.key == null && key == null) {
-                return current.value;
-            }
-            if (current.key != null && current.key.equals(key)) {
+            if (current.key == key || current.key != null && current.key.equals(key)) {
                 return current.value;
             }
             current = current.next;
@@ -66,17 +65,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static <K> int hash(K key) {
-        int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> DEFAULT_CAPACITY);
+        return (key == null) ? 0 : key.hashCode() * PRIME_INTEGER;
     }
 
     private void resize() {
-        int newCapacity = table.length * 2;
+        int newCapacity = table.length * ENLARGE_TABLE;
         Node<K, V>[] newTable = new Node[newCapacity];
         for (Node<K, V> node: table) {
             while (node != null) {
                 Node<K, V> next = node.next;
-                int index = Math.abs(node.hash) % newCapacity;
+                int index = Math.abs(hash(node.key)) % newCapacity;
                 node.next = newTable[index];
                 newTable[index] = node;
                 node = next;
@@ -91,13 +89,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
+        public Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
