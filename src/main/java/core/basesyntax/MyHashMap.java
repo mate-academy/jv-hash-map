@@ -18,7 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
     }
 
-    static class Entry<K, V> {
+    class Entry<K, V> {
         private K key;
         private V value;
 
@@ -28,6 +28,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    @Override
     public void put(K key, V value) {
         if (size >= table.length * LOAD_FACTOR) {
             resize();
@@ -45,10 +46,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
 
-        table[index].add(new Entry<>(key, value));
+        table[index].add(new Entry(key, value));
         size++;
     }
 
+    @Override
     public V getValue(K key) {
         int index = getIndex(key);
         if (table[index] != null) {
@@ -61,6 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
+    @Override
     public int getSize() {
         return size;
     }
