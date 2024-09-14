@@ -7,16 +7,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
-    private int threshold;
 
     public MyHashMap() {
         this.table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
-        this.threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size + 1 > threshold) {
+        if (size + 1 > LOAD_FACTOR * table.length) {
             resize();
         }
         int hashCode = hash(key);
@@ -81,19 +79,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         table = newTable;
-        threshold = (int) (newCapacity * LOAD_FACTOR);
+        int threshold = (int) (newCapacity * LOAD_FACTOR);
     }
 
     private int getIndex(int hashCode) {
         return Math.abs(hashCode) % table.length;
     }
 
-    private class Node<K, V> {
+    private static class Node<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
