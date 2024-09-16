@@ -18,16 +18,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
     }
 
-    class Entry<K, V> {
-        private K key;
-        private V value;
-
-        Entry(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         if (size >= table.length * LOAD_FACTOR) {
@@ -40,7 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         for (Entry<K, V> entry : table[index]) {
-            if ((key == null && entry.key == null) || (key != null && key.equals(entry.key))) {
+            if (key == entry.key || key != null && key.equals(entry.key)) {
                 entry.value = value;
                 return;
             }
@@ -55,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key);
         if (table[index] != null) {
             for (Entry<K, V> entry : table[index]) {
-                if ((key == null && entry.key == null) || (key != null && key.equals(entry.key))) {
+                if (key == entry.key || key != null && key.equals(entry.key)) {
                     return entry.value;
                 }
             }
@@ -83,6 +73,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     put(entry.key, entry.value);
                 }
             }
+        }
+    }
+
+    private static class Entry<K, V> {
+        private final K key;
+        private V value;
+
+        Entry(K key, V value) {
+            this.key = key;
+            this.value = value;
         }
     }
 }
