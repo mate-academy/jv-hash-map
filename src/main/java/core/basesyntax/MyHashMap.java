@@ -63,8 +63,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return hash % table.length;
     }
 
-    private boolean keysEqual(K key1, K key2) {
-        return key1 == key2 || (key1 != null && key1.equals(key2));
+    private boolean keysEqual(K firstKey, K secondKey) {
+        return firstKey == secondKey || firstKey != null && firstKey.equals(secondKey);
     }
 
     @SuppressWarnings("unchecked")
