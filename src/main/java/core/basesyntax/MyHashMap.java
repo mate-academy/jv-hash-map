@@ -4,13 +4,13 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double LOAD_FACTOR = 0.75f;
-    private int defaultCapacity = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private Node<K, V>[] table;
     private int size;
     private int threshold;
 
     public MyHashMap() {
-        table = new Node[defaultCapacity];
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -70,10 +70,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        defaultCapacity *= 2;
-        threshold = (int) (defaultCapacity * LOAD_FACTOR);
+        int newCapacity = table.length * 2;
+        threshold = (int) (newCapacity * LOAD_FACTOR);
         Node<K, V>[] oldTable = table;
-        table = new Node[defaultCapacity];
+        table = new Node[newCapacity];
         size = 0;
 
         for (Node<K, V> headNode : oldTable) {
@@ -91,7 +91,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public int getIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % defaultCapacity;
+        return key == null ? 0 : Math.abs(key.hashCode()) % DEFAULT_CAPACITY;
     }
 
     public static class Node<K, V> {
