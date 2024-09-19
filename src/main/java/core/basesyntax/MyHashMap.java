@@ -69,7 +69,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    public void resize() {
+    private void resize() {
         defaultCapacity *= 2;
         threshold = (int) (defaultCapacity * LOAD_FACTOR);
         Node<K, V>[] oldTable = table;
