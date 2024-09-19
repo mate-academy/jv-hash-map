@@ -90,7 +90,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table[index] = newNode;
     }
 
-    public int getIndex(K key) {
+    private int getIndex(K key) {
         return key == null ? 0 : Math.abs(key.hashCode()) % DEFAULT_CAPACITY;
     }
 
