@@ -32,7 +32,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> current = table[index];
             while (current != null) {
-                if (current.key != null && current.key.equals(key)) {
+                if (Objects.equals(current.key, key)) {
                     current.value = value;
                     return;
                 }
@@ -76,7 +76,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void reSize() {
         Node<K, V>[] helperArray = table;
-        table = new Node[table.length * 2];
+        table = (Node<K, V>[]) new Node<?,?>[table.length * 2];
         for (int i = 0; i < helperArray.length; i++) {
             Node<K, V> current = helperArray[i];
             while (current != null) {
@@ -86,7 +86,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
