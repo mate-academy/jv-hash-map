@@ -9,9 +9,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private final float loadFactor;
 
     static class Entry<K, V> {
-        final K key;
-        V value;
-        Entry<K, V> next;
+        private final K key;
+        private V value;
+        private Entry<K, V> next;
 
         public Entry(K key, V value, Entry<K, V> next) {
             this.key = key;
@@ -36,7 +36,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = indexFor(hash, table.length);
 
         for (Entry<K, V> entry = table[index]; entry != null; entry = entry.next) {
-            if ((entry.key == null && key == null) || (entry.key != null && entry.key.equals(key))) {
+            if ((entry.key == null && key == null) ||
+                (entry.key != null && entry.key.equals(key))) {
                 entry.value = value;
                 return;
             }
@@ -45,12 +46,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
     @Override
-    public V getValue (K key){
+    public V getValue (K key) {
         int hash = hash(key);
         int index = indexFor(hash, table.length);
 
         for (Entry<K, V> entry = table[index]; entry != null; entry = entry.next) {
-            if ((entry.key == null && key == null) || (entry.key != null && entry.key.equals(key))) {
+            if ((entry.key == null && key == null) ||
+                (entry.key != null && entry.key.equals(key))) {
                 return entry.value;
             }
         }
@@ -62,11 +64,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int indexFor ( int hash, int length){
+    private int indexFor ( int hash, int length) {
         return hash & (length - 1);
     }
 
-    private int hash (Object key){
+    private int hash (Object key) {
         return key == null ? 0 : key.hashCode() ^ (key.hashCode() >>> 16);
     }
 
