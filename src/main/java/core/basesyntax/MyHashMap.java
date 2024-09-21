@@ -1,21 +1,19 @@
 package core.basesyntax;
 
-import java.util.LinkedList;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_CAPACITY = 16;
+    private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
 
-    private LinkedList<Entry<K, V>>[] table;
+    private Entry<K, V>[] table;
     private int size;
 
     public MyHashMap() {
-        this(DEFAULT_CAPACITY);
+        this.table = new Entry[INITIAL_CAPACITY];
+        this.size = 0;
     }
 
-    public MyHashMap(int initialCapacity) {
-        table = new LinkedList[initialCapacity];
-        size = 0;
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     @Override
@@ -25,32 +23,59 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         int index = getIndex(key);
-        if (table[index] == null) {
-            table[index] = new LinkedList<>();
-        }
+        Entry<K, V> newEntry = new Entry<>(key, value);
 
-        for (Entry<K, V> entry : table[index]) {
-            if (key == entry.key || key != null && key.equals(entry.key)) {
-                entry.value = value;
-                return;
+        if (table[index] == null) {
+            table[index] = newEntry;
+        } else {
+            Entry<K, V> current = table[index];
+            while (current != null) {
+
+                if (isValue(current,key)) {
+                    current.value = value;
+                    return;
+                }
+
+                if (current.next == null) {
+                    current.next = newEntry;
+                    break;
+                }
+                current = current.next;
             }
         }
-
-        table[index].add(new Entry(key, value));
         size++;
+    }
+
+    private boolean isValue(Entry<K,V> current, K key) {
+        return (current.key == null && key == null) || (current.key != null && current.key.equals(key));
     }
 
     @Override
     public V getValue(K key) {
         int index = getIndex(key);
-        if (table[index] != null) {
-            for (Entry<K, V> entry : table[index]) {
-                if (key == entry.key || key != null && key.equals(entry.key)) {
-                    return entry.value;
-                }
+        Entry<K, V> current = table[index];
+
+        while (current != null) {
+            if (isValue(current,key)) {
+                return current.value;
+            }
+            current = current.next;
+        }
+
+        return null;
+    }
+
+    private void resize() {
+        Entry<K, V>[] oldTable = table;
+        table = new Entry[oldTable.length * 2];
+        size = 0;
+
+        for (Entry<K, V> entry : oldTable) {
+            while (entry != null) {
+                put(entry.key, entry.value);
+                entry = entry.next;
             }
         }
-        return null;
     }
 
     @Override
@@ -58,27 +83,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
-    }
-
-    private void resize() {
-        LinkedList<Entry<K, V>>[] oldTable = table;
-        table = new LinkedList[oldTable.length * 2];
-        size = 0;
-
-        for (LinkedList<Entry<K, V>> bucket : oldTable) {
-            if (bucket != null) {
-                for (Entry<K, V> entry : bucket) {
-                    put(entry.key, entry.value);
-                }
-            }
-        }
-    }
-
     private static class Entry<K, V> {
         private final K key;
         private V value;
+        private Entry<K, V> next;
 
         Entry(K key, V value) {
             this.key = key;
