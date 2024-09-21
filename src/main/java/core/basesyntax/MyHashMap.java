@@ -6,12 +6,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int DEFAULT_CAPACITY = 16;
     private int size;
-    private Node<K, V>[] table = new Node[DEFAULT_CAPACITY];
+    private Node<K, V>[] table = (Node<K, V>[]) new Node<?,?>[DEFAULT_CAPACITY];
     private Node<K, V> nullKeyNode;
 
     @Override
     public void put(K key, V value) {
-        if (getThreshold() >= size) {
+        if (size <= getThreshold()) {
             reSize();
         }
         if (key == null) {
@@ -53,7 +53,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key, table.length);
         Node<K, V> current = table[index];
         while (current != null) {
-            if (current.key.equals(key)) {
+            if (current.key != null && current.key.equals(key)) {
                 return current.value;
             }
             current = current.next;
@@ -80,9 +80,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (int i = 0; i < helperArray.length; i++) {
             Node<K, V> current = helperArray[i];
             while (current != null) {
-                if (current != null) {
-                    put(current.key, current.value);
-                }
+                put(current.key, current.value);
                 current = current.next;
             }
         }
@@ -94,7 +92,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value) {
+        private Node(K key, V value) {
             this.hash = key == null ? 0 : key.hashCode();
             this.key = key;
             this.value = value;
