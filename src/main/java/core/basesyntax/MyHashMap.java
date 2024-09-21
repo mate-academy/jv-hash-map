@@ -36,23 +36,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = indexFor(hash, table.length);
 
         for (Entry<K, V> entry = table[index]; entry != null; entry = entry.next) {
-            if ((entry.key == null && key == null) ||
-                (entry.key != null && entry.key.equals(key))) {
+            if ((entry.key == null && key == null)
+                || (entry.key != null && entry.key.equals(key))) {
                 entry.value = value;
                 return;
             }
         }
         addEntry(hash, key, value, index);
-        }
+    }
 
     @Override
-    public V getValue (K key) {
+    public V getValue(K key) {
         int hash = hash(key);
         int index = indexFor(hash, table.length);
 
         for (Entry<K, V> entry = table[index]; entry != null; entry = entry.next) {
-            if ((entry.key == null && key == null) ||
-                (entry.key != null && entry.key.equals(key))) {
+            if ((entry.key == null && key == null)
+                || (entry.key != null && entry.key.equals(key))) {
                 return entry.value;
             }
         }
@@ -60,15 +60,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     @Override
-    public int getSize () {
+    public int getSize() {
         return size;
     }
 
-    private int indexFor ( int hash, int length) {
+    private int indexFor( int hash, int length) {
         return hash & (length - 1);
     }
 
-    private int hash (Object key) {
+    private int hash(Object key) {
         return key == null ? 0 : key.hashCode() ^ (key.hashCode() >>> 16);
     }
 
