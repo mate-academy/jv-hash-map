@@ -12,10 +12,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.size = 0;
     }
 
-    private int getIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
-    }
-
     @Override
     public void put(K key, V value) {
         if (size >= table.length * LOAD_FACTOR) {
@@ -31,7 +27,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Entry<K, V> current = table[index];
             while (current != null) {
 
-                if (isValue(current,key)) {
+                if (isNullValue(current,key) || isValue(current,key)) {
                     current.value = value;
                     return;
                 }
@@ -46,23 +42,36 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private boolean isValue(Entry<K,V> current, K key) {
-        return (current.key == null && key == null) || (current.key != null && current.key.equals(key));
-    }
-
     @Override
     public V getValue(K key) {
         int index = getIndex(key);
         Entry<K, V> current = table[index];
 
         while (current != null) {
-            if (isValue(current,key)) {
+            if (isValue(current,key) || isNullValue(current,key)) {
                 return current.value;
             }
             current = current.next;
         }
 
         return null;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    private int getIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
+    }
+
+    private boolean isValue(Entry<K,V> current, K key) {
+        return (current.key != null && current.key.equals(key));
+    }
+
+    private boolean isNullValue(Entry<K,V> current, K key) {
+        return (current.key == null && key == null);
     }
 
     private void resize() {
@@ -76,11 +85,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 entry = entry.next;
             }
         }
-    }
-
-    @Override
-    public int getSize() {
-        return size;
     }
 
     private static class Entry<K, V> {
