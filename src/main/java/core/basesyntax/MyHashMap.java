@@ -1,10 +1,10 @@
 package core.basesyntax;
 
-import java.util.*;
+import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private final static int DEFAULT_CAPACITY = 16;
-    private final static float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_CAPACITY = 16;
     private int size;
     private Node<K, V>[] table = new Node[DEFAULT_CAPACITY];
     private Node<K, V> nullKeyNode;
@@ -20,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 size++;
                 return;
             } else {
-               nullKeyNode.value = value;
+                nullKeyNode.value = value;
                 return;
             }
         }
@@ -110,7 +110,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return false;
             }
             Node<K, V> current = (Node<K, V>) o;
-            return Objects.equals(this.key, current.key) && Objects.equals(this.value, current.value);
+            return Objects.equals(this.key, current.key)
+                    && Objects.equals(this.value, current.value);
         }
 
         @Override
