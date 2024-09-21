@@ -37,7 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         for (Entry<K, V> entry = table[index]; entry != null; entry = entry.next) {
             if ((entry.key == null && key == null)
-                || (entry.key != null && entry.key.equals(key))) {
+                    || (entry.key != null && entry.key.equals(key))) {
                 entry.value = value;
                 return;
             }
@@ -52,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         for (Entry<K, V> entry = table[index]; entry != null; entry = entry.next) {
             if ((entry.key == null && key == null)
-                || (entry.key != null && entry.key.equals(key))) {
+                    || (entry.key != null && entry.key.equals(key))) {
                 return entry.value;
             }
         }
@@ -64,7 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int indexFor( int hash, int length) {
+    private int indexFor(int hash, int length) {
         return hash & (length - 1);
     }
 
