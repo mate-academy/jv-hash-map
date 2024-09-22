@@ -6,13 +6,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int DEFAULT_CAPACITY = 16;
     private int size;
-    private Node<K, V>[] table = (Node<K, V>[]) new Node<?,?>[DEFAULT_CAPACITY];
+    private Node<K, V>[] table;
     private Node<K, V> nullKeyNode;
+
+    public MyHashMap() {
+        table = (Node<K, V>[]) new Node<?,?>[DEFAULT_CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
         if (size <= getThreshold()) {
-            reSize();
+            resize();
         }
         if (key == null) {
             if (nullKeyNode == null) {
@@ -74,7 +78,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.abs(key.hashCode() % length);
     }
 
-    private void reSize() {
+    private void resize() {
         Node<K, V>[] helperArray = table;
         table = (Node<K, V>[]) new Node<?,?>[table.length * 2];
         for (int i = 0; i < helperArray.length; i++) {
@@ -118,6 +122,3 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 }
-
-
-
