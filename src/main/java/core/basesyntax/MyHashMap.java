@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int DEFAULT_CAPACITY = 16;
+    private static final int GROW_FACTOR = 2;
     private int size;
     private Node<K, V>[] table;
     private Node<K, V> nullKeyNode;
@@ -15,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size <= getThreshold()) {
+        if (size >= getThreshold()) {
             resize();
         }
         if (key == null) {
@@ -71,7 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getThreshold() {
-        return (int) DEFAULT_LOAD_FACTOR * table.length;
+        return (int) (DEFAULT_LOAD_FACTOR * table.length);
     }
 
     private int getIndex(K key, int length) {
@@ -80,7 +81,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] helperArray = table;
-        table = (Node<K, V>[]) new Node<?,?>[table.length * 2];
+        table = (Node<K, V>[]) new Node<?,?>[table.length * GROW_FACTOR];
+        size = 0;
         for (int i = 0; i < helperArray.length; i++) {
             Node<K, V> current = helperArray[i];
             while (current != null) {
@@ -100,7 +102,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.hash = key == null ? 0 : key.hashCode();
             this.key = key;
             this.value = value;
-            this.next = null;
         }
 
         @Override
