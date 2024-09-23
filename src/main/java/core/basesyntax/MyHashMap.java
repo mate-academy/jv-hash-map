@@ -1,39 +1,25 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int DEFAULT_INITIAL_CAPACITY = 16;
-    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75f;
     private Entry<K, V>[] table;
     private int size;
-    private int threshold;
-    private final float loadFactor;
-
-    static class Entry<K, V> {
-        private final K key;
-        private V value;
-        private Entry<K, V> next;
-
-        public Entry(K key, V value, Entry<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
 
     public MyHashMap() {
-        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR);
+        this(DEFAULT_CAPACITY, LOAD_FACTOR);
     }
 
     public MyHashMap(int initialCapacity, float loadFactor) {
-        this.loadFactor = loadFactor;
-        this.threshold = (int) (initialCapacity * loadFactor);
-        this.table = new Entry[initialCapacity];
+        table = new Entry[initialCapacity];
     }
 
     @Override
     public void put(K key, V value) {
         int hash = hash(key);
-        int index = indexFor(hash, table.length);
+        int index = calculateIndex(key, table.length);
 
         for (Entry<K, V> entry = table[index]; entry != null; entry = entry.next) {
             if ((entry.key == null && key == null)
@@ -47,12 +33,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key);
-        int index = indexFor(hash, table.length);
+        int index = calculateIndex(key, table.length);
 
         for (Entry<K, V> entry = table[index]; entry != null; entry = entry.next) {
-            if ((entry.key == null && key == null)
-                    || (entry.key != null && entry.key.equals(key))) {
+            if (Objects.equals(entry.key, key)) {
                 return entry.value;
             }
         }
@@ -75,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void addEntry(int hash, K key, V value, int index) {
         Entry<K, V> newEntry = new Entry<>(key, value, table[index]);
         table[index] = newEntry;
-        if (++size >= threshold) {
+        if (++size >= calculateThreshold(table.length)) {
             resize(2 * table.length);
         }
     }
@@ -83,7 +67,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize(int newCapacity) {
         Entry<K, V>[] oldTable = table;
         table = new Entry[newCapacity];
-        threshold = (int) (newCapacity * loadFactor);
+        calculateThreshold(newCapacity);
 
         for (Entry<K, V> entry : oldTable) {
             while (entry != null) {
@@ -95,7 +79,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
     }
+
+    private int calculateThreshold(int capacity) {
+        return (int) (capacity * LOAD_FACTOR);
+    }
+
+    private int calculateIndex(K key, int tableLength) {
+        int hash = hash(key);
+        return indexFor(hash, tableLength);
+    }
+
+    private static class Entry<K, V> {
+        private final K key;
+        private V value;
+        private Entry<K, V> next;
+
+        public Entry(K key, V value, Entry<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+    }
 }
-
-
-
