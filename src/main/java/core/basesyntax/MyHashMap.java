@@ -53,14 +53,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V>[] transferData(Node<K, V>[] oldTab, Node<K, V>[] newTab) {
         Node<K, V> currentNode;
-        Node<K, V> transferedNode;
+        Node<K, V> transferredNode;
         int bucketIndex;
         for (int i = 0; i < oldTab.length; i++) {
             currentNode = oldTab[i];
             while (currentNode != null) {
-                transferedNode = getNewNode(currentNode);
-                bucketIndex = getBucketIndex(transferedNode.key);
-                putValue(bucketIndex, transferedNode, newTab);
+                transferredNode = getNewNode(currentNode);
+                bucketIndex = getBucketIndex(transferredNode.key);
+                putValue(bucketIndex, transferredNode, newTab);
                 currentNode = currentNode.next;
             }
         }
@@ -103,7 +103,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
