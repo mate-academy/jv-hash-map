@@ -25,12 +25,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> currElem = getElementByKeyOrLast(key, position);
 
-            if ((key == null && currElem.key == null)
-                            || (currElem.key != null && currElem.key.equals(key))
+            if ((key == null && currElem.getKey() == null)
+                            || (currElem.getKey() != null && currElem.getKey().equals(key))
             ) {
-                currElem.value = value;
+                currElem.setValue(value);
             } else {
-                currElem.next = newNode;
+                currElem.setNext(newNode);
 
                 size++;
             }
@@ -51,7 +51,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         Node<K, V> currElem = getElementByKeyOrLast(key, position);
 
-        return currElem.value;
+        return currElem.getValue();
     }
 
     @Override
@@ -66,11 +66,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V> getElementByKeyOrLast(K key, int position) {
         Node<K, V> currElem = table[position];
 
-        while (((currElem.key != null && !currElem.key.equals(key))
-                || (currElem.key == null && key != null))
-                && currElem.next != null
+        while (((currElem.getKey() != null && !currElem.getKey().equals(key))
+                || (currElem.getKey() == null && key != null))
+                && currElem.getNext() != null
         ) {
-            currElem = currElem.next;
+            currElem = currElem.getNext();
         }
 
         return currElem;
@@ -88,9 +88,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 Node<K, V> currElem = node;
 
                 while (currElem != null) {
-                    put(currElem.key, currElem.value);
+                    put(currElem.getKey(), currElem.getValue());
 
-                    currElem = currElem.next;
+                    currElem = currElem.getNext();
                 }
             }
         }
@@ -101,15 +101,47 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        int hash;
-        K key;
-        V value;
-        Node<K, V> next;
+        private int hash;
+        private K key;
+        private V value;
+        private Node<K, V> next;
 
         public Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
             this.key = key;
             this.value = value;
+            this.next = next;
+        }
+
+        public int getHash() {
+            return hash;
+        }
+
+        public void setHash(int hash) {
+            this.hash = hash;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public void setKey(K key) {
+            this.key = key;
+        }
+
+        public V getValue() {
+            return value;
+        }
+
+        public void setValue(V value) {
+            this.value = value;
+        }
+
+        public Node<K, V> getNext() {
+            return next;
+        }
+
+        public void setNext(Node<K, V> next) {
             this.next = next;
         }
     }
