@@ -9,7 +9,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-        size = 0;
     }
 
     @Override
@@ -25,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> currentNode = table[index];
             while (currentNode != null) {
-                if ((key == null && currentNode.key == null)
+                if ((key == currentNode.key)
                         || (key != null && key.equals(currentNode.key))) {
                     currentNode.value = value;
                     return;
@@ -46,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> currentNode = table[index];
 
         while (currentNode != null) {
-            if ((key == null && currentNode.key == null)
+            if ((key == currentNode.key)
                     || (key != null && key.equals(currentNode.key))) {
                 return currentNode.value;
             }
