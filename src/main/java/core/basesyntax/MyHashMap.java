@@ -1,17 +1,19 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 16;
     static final float DEFAULT_FACTOR = 0.75f;
-    private int currentCapacity;
+    private int capacity;
     private Node<K, V>[] table;
     private int threshold;
     private int size;
 
-    {
-        this.table = new Node[DEFAULT_INITIAL_CAPACITY];
-        this.currentCapacity = table.length;
-        this.threshold = (int) (currentCapacity * DEFAULT_FACTOR);
+    public MyHashMap() {
+        this.capacity = DEFAULT_INITIAL_CAPACITY;
+        this.table = (Node<K, V>[]) new Node[capacity];
+        this.threshold = (int) (capacity * DEFAULT_FACTOR);
     }
 
     @Override
@@ -29,8 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getBucketIndex(key);
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
-            if (key == null && currentNode.key == null
-                    || key != null && key.equals(currentNode.key)) {
+            if (Objects.equals(key, currentNode.key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
@@ -45,8 +46,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] newTable = new Node[table.length << 1];
-        currentCapacity = newTable.length;
-        threshold = (int) (currentCapacity * DEFAULT_FACTOR);
+        capacity = newTable.length;
+        threshold = (int) (capacity * DEFAULT_FACTOR);
         size = 0;
         table = transferData(table, newTable);
     }
@@ -74,7 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucketIndex(Object key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % currentCapacity;
+        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 
     private void putValue(int bucketIndex, Node<K, V> newNode, Node<K, V>[] dstArray) {
