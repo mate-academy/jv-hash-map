@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
@@ -15,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int position = getPositionInTable(key);
+        int position = getBucketIndex(key);
         Node<K, V> newNode = new Node<>(getKeyHashCode(key), key, value, null);
 
         if (table[position] == null) {
@@ -25,8 +27,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> currElem = getElementByKeyOrLast(key, position);
 
-            if ((key == null && currElem.getKey() == null)
-                            || (currElem.getKey() != null && currElem.getKey().equals(key))
+            if (key == currElem.getKey()
+                            || currElem.getKey() != null && currElem.getKey().equals(key)
             ) {
                 currElem.setValue(value);
             } else {
@@ -43,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int position = getPositionInTable(key);
+        int position = getBucketIndex(key);
 
         if (table[position] == null) {
             return null;
@@ -59,17 +61,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getPositionInTable(K key) {
+    private int getBucketIndex(K key) {
         return key == null ? 0 : getKeyHashCode(key) % table.length;
     }
 
     private Node<K, V> getElementByKeyOrLast(K key, int position) {
         Node<K, V> currElem = table[position];
 
-        while (((currElem.getKey() != null && !currElem.getKey().equals(key))
-                || (currElem.getKey() == null && key != null))
-                && currElem.getNext() != null
-        ) {
+        while (currElem.getNext() != null) {
+            if (Objects.equals(currElem.getKey(), key)) {
+                return currElem;
+            }
+
             currElem = currElem.getNext();
         }
 
@@ -100,25 +103,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : Math.abs(key.hashCode());
     }
 
-    private static class Node<K, V> {
-        private int hash;
+    private class Node<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
 
         public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
             this.key = key;
             this.value = value;
             this.next = next;
-        }
-
-        public int getHash() {
-            return hash;
-        }
-
-        public void setHash(int hash) {
-            this.hash = hash;
         }
 
         public K getKey() {
