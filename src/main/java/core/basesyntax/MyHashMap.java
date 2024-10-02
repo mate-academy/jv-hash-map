@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final int RESIZE_FACTOR = 2;
+    private static final int NEXT_ENTRY_SIZE = 1;
     private static final float LOAD_FACTOR = 0.75f;
     private int size;
     private int threshold;
@@ -17,6 +18,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if (size + NEXT_ENTRY_SIZE > threshold) {
+            resize();
+        }
         Node<K, V> newNode = new Node<>(hash(key), key, value, null);
         int tableIndex = hash(key);
         if (table[tableIndex] != null) {
@@ -42,9 +46,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             table[tableIndex] = newNode;
         }
-        if (++size > threshold) {
-            resize();
-        }
+        size++;
     }
 
     @Override
@@ -63,7 +65,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             return temp.value;
         }
-        return table[tableIndex].getValue();
+        return table[tableIndex].value;
     }
 
     @Override
@@ -101,38 +103,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.hash = hash;
             this.key = key;
             this.value = value;
-            this.next = next;
-        }
-
-        public int getHash() {
-            return hash;
-        }
-
-        public void setHash(int hash) {
-            this.hash = hash;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public void setKey(K key) {
-            this.key = key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
-        }
-
-        public Node<K, V> getNext() {
-            return next;
-        }
-
-        public void setNext(Node<K, V> next) {
             this.next = next;
         }
 
