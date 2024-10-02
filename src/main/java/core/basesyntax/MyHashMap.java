@@ -93,7 +93,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    class Node<K, V> {
+    private static class Node<K, V> {
         private int hash;
         private K key;
         private V value;
