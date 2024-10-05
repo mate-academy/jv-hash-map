@@ -20,7 +20,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-
+        if (size >= threshold) {
+            threshold *= DOUBLING_FACTOR;
+            resize();
+        }
+        Node<K, V> newNode = new Node<>(hash(key), key, value, null);
+        int index = (table.length - 1) & newNode.hash;
+        if (table[index] == null) {
+            justAddNewNode(index, newNode);
+        } else {
+            Node<K, V> current = table[index];
+            while (current.next != null) {
+                if (theseKeysAreEqual(current.key, newNode.key)) {
+                    reWrightValue(current, newNode);
+                    return;
+                } else {
+                    current = current.next;
+                }
+            }
+            if (theseKeysAreEqual(current.key, newNode.key)) {
+                reWrightValue(current, newNode);
+                return;
+            }
+            addNextNewNode(current, newNode);
+        }
     }
 
     @Override
