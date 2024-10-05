@@ -42,7 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 changeValue(current, newNode);
                 return;
             }
-            addNextNewNode(current, newNode);
+            appendNode(current, newNode);
         }
     }
 
@@ -86,7 +86,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private void addNextNewNode(Node<K, V> current, Node<K, V> newNode) {
+    private void appendNode(Node<K, V> current, Node<K, V> newNode) {
         current.next = newNode;
         size++;
     }
