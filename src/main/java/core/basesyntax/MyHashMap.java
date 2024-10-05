@@ -68,5 +68,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return 0;
         return size;
     }
+
+    @Override
+    public String toString() {
+        return "table=" + Arrays.toString(table);
+    }
     }
 }
