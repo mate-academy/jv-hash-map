@@ -32,14 +32,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> current = table[index];
             while (current.next != null) {
                 if (areKeysEqual(current.key, newNode.key)) {
-                    rewrightValue(current, newNode);
+                    changeValue(current, newNode);
                     return;
                 } else {
                     current = current.next;
                 }
             }
             if (areKeysEqual(current.key, newNode.key)) {
-                rewrightValue(current, newNode);
+                changeValue(current, newNode);
                 return;
             }
             addNextNewNode(current, newNode);
@@ -96,7 +96,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 && (Objects.equals(currentKey, newKey));
     }
 
-    private void rewrightValue(Node<K, V> current, Node<K, V> newNode) {
+    private void changeValue(Node<K, V> current, Node<K, V> newNode) {
         current.value = newNode.value;
     }
 
