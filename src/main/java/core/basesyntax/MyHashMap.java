@@ -73,6 +73,50 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public String toString() {
         return "table=" + Arrays.toString(table);
     }
+
+    @SuppressWarnings({"unchecked"})
+    private void resize() {
+        Node<K,V>[] oldTable = table;
+        table = (Node<K,V>[]) new Node[oldTable.length * DOUBLING_FACTOR];
+        size = 0;
+        transfer(oldTable);
+    }
+
+    private void justAddNewNode(int index, Node<K, V> newNode) {
+        table[index] = newNode;
+        size++;
+    }
+
+    private void addNextNewNode(Node<K, V> current, Node<K, V> newNode) {
+        current.next = newNode;
+        size++;
+    }
+
+    private boolean theseKeysAreEqual(K currentKey, K newKey) {
+        return hash(currentKey) == hash(newKey)
+                && (Objects.equals(currentKey, newKey));
+    }
+
+    private void reWrightValue(Node<K, V> current, Node<K, V> newNode) {
+        current.value = newNode.value;
+    }
+
+    private void transfer(Node<K, V>[] oldTable) {
+        for (Node<K, V> oldNode : oldTable) {
+            if (oldNode != null) {
+                Node<K, V> current = oldNode;
+                while (current != null) {
+                    put(current.key, current.value);
+                    current = current.next;
+                }
+            }
+        }
+    }
+
+    private int hash(Object key) {
+        return (key == null) ? 0 : key.hashCode();
+    }
+
     private static class Node<K, V> {
         private final int hash;
         private final K key;
