@@ -31,6 +31,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private int getHash(K key) {
+        if (key == null) {
+            return 0;
+        }
+        return Math.abs(key.hashCode() % table.length);
+    }
+
     private void resize() {
         Node<K, V>[] currentTable = table;
         table = (Node<K, V>[]) new Node[currentTable.length * RESIZE_NUMBER];
