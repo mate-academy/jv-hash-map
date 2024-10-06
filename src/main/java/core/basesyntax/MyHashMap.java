@@ -63,9 +63,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.abs(index) % table.length;
     }
 
-
     private void resize() {
-        Node<K, V>[] oldTable = table;
+        final Node<K, V>[] oldTable = table;
         int newCapacity = table.length * RESIZE_FACTOR;
         table = (Node<K, V>[]) new Node[newCapacity];
         threshold = (int) (newCapacity * LOAD_FACTOR);
@@ -79,10 +78,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     static class Node<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         public Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
