@@ -17,6 +17,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if (size > threshold) {
+            resize();
+        }
         Node<K, V> newNode = new Node<>(getBucketIndex(key), key, value, null);
         if (table[getBucketIndex(key)] != null) {
             Node<K, V> current = table[getBucketIndex(key)];
@@ -34,9 +37,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             table[getBucketIndex(key)] = newNode;
         }
-        if (++size > threshold) {
-            resize();
-        }
+        size++;
     }
 
     @Override
@@ -75,7 +76,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
