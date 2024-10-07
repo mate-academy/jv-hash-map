@@ -42,7 +42,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 changeValue(current, newNode);
                 return;
             }
-            appendNode(current, newNode);
+            current.next = newNode;
+            size++;
         }
     }
 
