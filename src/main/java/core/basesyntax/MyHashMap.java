@@ -7,17 +7,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private static final int RESIZE_FACTOR = 2;
     private int size;
-    private int threshold;
     private Node<K, V>[] table;
 
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
-        threshold = (int) (DEFAULT_INITIAL_CAPACITY * LOAD_FACTOR);
+        //threshold = (int) (DEFAULT_INITIAL_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size > threshold) {
+        if (size > table.length * LOAD_FACTOR) {
             resize();
         }
         Node<K, V> newNode = new Node<>(getBucketIndex(key), key, value, null);
@@ -66,7 +65,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         final Node<K, V>[] oldTable = table;
         int newCapacity = table.length * RESIZE_FACTOR;
         table = (Node<K, V>[]) new Node[newCapacity];
-        threshold = (int) (newCapacity * LOAD_FACTOR);
         size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
