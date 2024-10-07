@@ -14,7 +14,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @SuppressWarnings({"unchecked"})
     public MyHashMap() {
         this.table = (Node<K,V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
-        this.size = 0;
         this.threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
