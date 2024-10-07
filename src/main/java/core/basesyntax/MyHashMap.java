@@ -26,7 +26,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> newNode = new Node<>(hash(key), key, value, null);
         int index = (table.length - 1) & newNode.hash;
         if (table[index] == null) {
-            addNode(index, newNode);
+            table[index] = newNode;
+            size++;
         } else {
             Node<K, V> current = table[index];
             while (current.next != null) {
@@ -78,11 +79,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = (Node<K,V>[]) new Node[oldTable.length * DOUBLING_FACTOR];
         size = 0;
         transfer(oldTable);
-    }
-
-    private void addNode(int index, Node<K, V> newNode) {
-        table[index] = newNode;
-        size++;
     }
 
     private void appendNode(Node<K, V> current, Node<K, V> newNode) {
