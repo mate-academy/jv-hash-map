@@ -8,19 +8,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int DOUBLING_FACTOR = 2;
     private Node<K,V>[] table;
-    private int threshold;
     private int size;
 
     @SuppressWarnings({"unchecked"})
     public MyHashMap() {
         this.table = (Node<K,V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
-        this.threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
-        if (size >= threshold) {
-            threshold *= DOUBLING_FACTOR;
+        if (size >= table.length * DEFAULT_LOAD_FACTOR) {
             resize();
         }
         Node<K, V> newNode = new Node<>(hash(key), key, value, null);
