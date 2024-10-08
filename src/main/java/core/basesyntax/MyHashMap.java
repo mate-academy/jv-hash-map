@@ -126,34 +126,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         @Override
-        public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (obj.getClass().equals(Node.class)) {
-                Node<K,V> current = (Node<K,V>) obj;
-                return ((hash == current.hash)
-                        && Objects.equals(key, current.key)
-                        && Objects.equals(value, current.value)
-                        && Objects.equals(next, current.next));
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = 17;
-            result = 31 * result + hash;
-            result = 31 * result + (key == null ? 0 : key.hashCode());
-            result = 31 * result + (value == null ? 0 : value.hashCode());
-            result = 31 * result + (next == null ? 0 : next.hashCode());
-            return result;
-        }
-
-        @Override
         public String toString() {
             return "{"
                     + "key=" + key
