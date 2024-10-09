@@ -2,14 +2,14 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    private static int initialCapacity = 16;
-    private static double initialLoadFactor = 0.75;
-    private Entry<K, V>[] table = new Entry[initialCapacity];
+    private static final int INITIAL_CAPACITY = 16;
+    private static final double INITIAL_LOAD_FACTOR = 0.75;
+    private Entry<K, V>[] table = new Entry[INITIAL_CAPACITY];
     private int size = 0;
 
     @Override
     public void put(K key, V value) {
-        if (size >= initialLoadFactor * table.length) {
+        if (size >= INITIAL_LOAD_FACTOR * table.length) {
             resizing();
         }
         if (key == null) {
