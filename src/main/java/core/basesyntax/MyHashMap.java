@@ -5,14 +5,14 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private int treshhold;
+    private int threshold;
     private Node<K, V>[] table;
     private int size;
     private int capacity;
 
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
-        treshhold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
+        threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
         capacity = DEFAULT_CAPACITY;
         size = 0;
     }
@@ -23,7 +23,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> currentNode = table[getIndex(key)];
         if (currentNode == null) {
             size++;
-            resizeIfNeede();
+            resizeIfNeeded();
             table[getIndex(key)] = newNode;
             return;
         }
@@ -41,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             currentNode = currentNode.next;
         }
         size++;
-        if (resizeIfNeede()) {
+        if (resizeIfNeeded()) {
             put(newNode.key, newNode.value);
         }
         currentNode.next = newNode;
@@ -64,13 +64,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private boolean resizeIfNeede() {
-        if (size <= treshhold) {
+    private boolean resizeIfNeeded() {
+        if (size <= threshold) {
             return false;
         }
         final int oldCapacity = capacity;
         capacity *= 2;
-        treshhold = (int) (capacity * DEFAULT_LOAD_FACTOR);
+        threshold = (int) (capacity * DEFAULT_LOAD_FACTOR);
         Node<K, V>[] oldTab = table;
         table = (Node<K, V>[]) new Node[capacity];
         size = 0;
@@ -90,14 +90,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
         }
     }
 
-    public int getIndex(K key) {
+    private int getIndex(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
     }
 }
