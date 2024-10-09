@@ -2,14 +2,27 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    private static final int INITIAL_CAPACITY = 16;
-    private static final double INITIAL_LOAD_FACTOR = 0.75;
-    private Entry<K, V>[] table = new Entry[INITIAL_CAPACITY];
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final double DEFAULT_LOAD_FACTOR = 0.75;
+    private Entry<K, V>[] table = new Entry[DEFAULT_CAPACITY];
     private int size = 0;
+
+    private static class Entry<K, V> {
+
+        private final K key;
+        private V value;
+        private Entry<K, V> next;
+
+        private Entry(K key, V value, Entry<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+    }
 
     @Override
     public void put(K key, V value) {
-        if (size >= INITIAL_LOAD_FACTOR * table.length) {
+        if (size >= DEFAULT_LOAD_FACTOR * table.length) {
             resizing();
         }
         if (key == null) {
@@ -108,19 +121,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 put(currentEntry.key, currentEntry.value);
                 currentEntry = currentEntry.next;
             }
-        }
-    }
-
-    private static class Entry<K, V> {
-
-        private final K key;
-        private V value;
-        private Entry<K, V> next;
-
-        public Entry(K key, V value, Entry<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
         }
     }
 }
