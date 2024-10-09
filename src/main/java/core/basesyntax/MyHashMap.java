@@ -64,6 +64,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    static class Node<K, V> {
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        private Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+    }
+
     private boolean resizeIfNeeded() {
         if (size <= threshold) {
             return false;
@@ -83,18 +95,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         return true;
-    }
-
-    static class Node<K, V> {
-        private K key;
-        private V value;
-        private Node<K, V> next;
-
-        private Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
     }
 
     private int getIndex(K key) {
