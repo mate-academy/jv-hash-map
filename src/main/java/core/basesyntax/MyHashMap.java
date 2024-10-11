@@ -40,8 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] currentTable = table;
-        table = (Node<K, V>[]) new Node[currentTable.length * RESIZE_NUMBER];
-
+        table = new Node[currentTable.length * RESIZE_NUMBER];
     }
 
     private static class Node<K, V> {
