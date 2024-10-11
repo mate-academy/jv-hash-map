@@ -1,12 +1,19 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private int capasitu = 16;
-    private float loadFactor = 0.75f;
+    private final int defaulCapacity = 16;
+    private int capasity;
+    private final float loadFactor = 0.75f;
     private int size;
     private Node<K,V>[] table;
 
-    private class Node<K,V> {
+    public MyHashMap() {
+        capasity = defaulCapacity;
+        size = 0;
+        table = new Node[capasity];
+    }
+
+    static class Node<K,V> {
         private final K key;
         private V value;
         private Node<K,V> next;
@@ -16,11 +23,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-    }
-
-    public MyHashMap() {
-        size = 0;
-        table = new Node[capasitu];
     }
 
     @Override
@@ -88,12 +90,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(Object key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % capasitu);
+        return (key == null) ? 0 : Math.abs(key.hashCode() % capasity);
     }
 
     private void resize() {
-        capasitu = capasitu * 2;
-        Node<K, V>[] newTable = new Node[capasitu];
+        capasity = capasity * 2;
+        Node<K, V>[] newTable = new Node[capasity];
 
         for (int i = 0; i < table.length; i++) {
             Node<K, V> node = table[i];
