@@ -46,12 +46,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             node = node.next;
         }
         return null;
-
     }
 
     @Override
     public int getSize() {
-        return 0;
+        return size;
     }
 
     public void resize() {
@@ -59,7 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         capacity = capacity * 2;
         Node<K, V> []newTable = new Node[capacity];
         for (int i = 0; i < table.length; i++) {
-            table[i].hash = table[i].hashCode();
+            table[i].hash = table[i].hash % capacity;
             newTable[table[i].hash] = table[i];
             newTable[table[i].hash].next = newTable[table[i].hash + 1];
         }
@@ -67,34 +66,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public int getIndex(K key) {
-        int index = - 1;
+        int index = 0;
         for (int i = 0; i < table.length; i++) {
-            if (table[i].key == key || key != null && table[i].key.equals(key)) {
+            if (table[i].key == key || (table[i] != null && table[i].key.equals(key))) {
                 index = i;
             }
         }
         return index;
-    }
-
-    /*
-    @Override
-    public boolean equals(Node<K, V> node) {
-        if (this == node) {
-            return true;
-        }
-        if (node == null) {
-            return false;
-        }
-        return this.getKey() == node.getKey() || this.getKey != null
-        && this.getKey().equals(node.getKey());
-    }
-     */
-
-    @Override
-    public int hashCode() {
-        int result = 17;
-        result = (result * 31) % capacity;
-        return result;
     }
 
     class Node<K, V> {
