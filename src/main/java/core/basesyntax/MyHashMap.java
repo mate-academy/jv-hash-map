@@ -41,6 +41,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         Node<K, V>[] currentTable = table;
         table = new Node[currentTable.length * RESIZE_NUMBER];
+        size = 0;
+
     }
 
     private static class Node<K, V> {
