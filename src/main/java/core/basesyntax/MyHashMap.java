@@ -12,7 +12,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int hash = key == null ? 0 : key.hashCode();
+        int hash = key == null ? 0 : Math.abs(key.hashCode());
         int index = Math.abs(hash) % capacity;
         if (index < 0) {
             index += capacity;
