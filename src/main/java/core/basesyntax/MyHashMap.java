@@ -6,6 +6,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table = new Node[INITIAL_CAPACITY];
     private int size;
 
+    private static class Node<K,V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        private Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+    }
+
     @Override
     public void put(K key, V value) {
 
@@ -110,18 +122,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 current = current.next;
             }
         }
-    }
-
-    private static class Node<K,V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        private Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-
     }
 }
