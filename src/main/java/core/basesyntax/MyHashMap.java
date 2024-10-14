@@ -1,8 +1,14 @@
 package core.basesyntax;
 
+import java.util.HashMap;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final float LOAD_FACTORY = 0.75f;
-    private int initialCapacity = 16;
+    private static final float DEFAULT_LOAD_FACTORY = 0.75f;
+    private static final float LOAD_FACTORY = DEFAULT_LOAD_FACTORY;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final int INCREASE_TABLE = 2;
+    private static final int HASH_SHIFT = 16;
+    private int initialCapacity = DEFAULT_CAPACITY;
     private int threshold;
     private Node<K, V>[] table;
     private int size;
@@ -64,8 +70,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    Node<K, V>[] resize() {
-        int newCapacity = initialCapacity * 2;
+   private Node<K, V>[] resize() {
+        int newCapacity = initialCapacity * INCREASE_TABLE;
         Node<K, V>[] newTable = new Node[newCapacity];
 
         for (int i = 0; i < initialCapacity; i++) {
@@ -86,7 +92,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int hash(Object key) {
         int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> HASH_SHIFT);
     }
 
     static class Node<K, V> {
