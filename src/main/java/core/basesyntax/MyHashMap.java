@@ -2,7 +2,6 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTORY = 0.75f;
-    private static final float LOAD_FACTORY = DEFAULT_LOAD_FACTORY;
     private static final int DEFAULT_CAPACITY = 16;
     private static final int INCREASE_TABLE = 2;
     private static final int HASH_SHIFT = 16;
@@ -18,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        threshold = (int) (initialCapacity * LOAD_FACTORY);
+        threshold = (int) (initialCapacity * DEFAULT_LOAD_FACTORY);
         if (size >= threshold) {
             resize();
         }
@@ -29,14 +28,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             while (current != null) {
-                if (key == null && current.key == null) {
+                if (key == current.key || key != null && key.equals(current.key)) {
                     current.value = value;
                     return;
                 }
-                if (key != null && key.equals(current.key)) {
-                    current.value = value;
-                    return;
-                }
+
                 if (current.next == null) {
                     current.next = new Node<>(key, value, null);
                     size++;
@@ -52,10 +48,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = Math.abs(hash(key)) % table.length;
         Node<K, V> current = table[index];
         while (current != null) {
-            if (key == null && current.key == null) {
-                return current.value;
-            }
-            if (key != null && key.equals(current.key)) {
+            if (key == current.key || key != null && key.equals(current.key)) {
                 return current.value;
             }
             current = current.next;
@@ -68,7 +61,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    void resize() {
+    private void resize() {
         int newCapacity = initialCapacity * INCREASE_TABLE;
         Node<K, V>[] newTable = new Node[newCapacity];
 
@@ -86,12 +79,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         initialCapacity = newCapacity;
     }
 
-    public int hash(Object key) {
+    private int hash(Object key) {
         int h;
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> HASH_SHIFT);
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -103,6 +96,3 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 }
-
-
-
