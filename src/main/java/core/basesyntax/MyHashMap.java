@@ -3,50 +3,14 @@ package core.basesyntax;
 import static java.lang.Math.abs;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private final int DEFAULT_INITIAL_CAPACITY = 16;
-    private final double DEFAULT_LOAD_FACTOR = 0.75;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final double DEFAULT_LOAD_FACTOR = 0.75;
     private HashObject<K, V>[] hashMap;
     private int capacity = DEFAULT_INITIAL_CAPACITY;
     private int size = 0;
 
     public MyHashMap() {
         hashMap = new HashObject[DEFAULT_INITIAL_CAPACITY];
-    }
-
-    public class HashObject<K, V> {
-        private K key;
-        private V value;
-        private HashObject<K, V> next;
-
-        public HashObject(K key, V value, HashObject<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
-    public void enlarge() {
-        K[] listOfKeys = (K[]) new Object[size];
-        V[] listOfValues = (V[]) new Object[size];
-        for (int i = 0; i < size; i++) {
-            listOfKeys[i] = keySet()[i];
-            listOfValues[i] = getValue(keySet()[i]);
-        }
-        hashMap = new HashObject[capacity * 2];
-        size = 0;
-        capacity = capacity * 2;
-
-        for (int i = 0; i < listOfKeys.length; i++) {
-            put(listOfKeys[i], listOfValues[i]);
-        }
-    }
-
-    public int keyIndex(K key) {
-        if (key == null) {
-            return 0;
-        } else {
-            return abs(key.hashCode()) % capacity;
-        }
     }
 
     public K[] keySet() {
@@ -88,13 +52,72 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return values;
     }
 
-    private HashObject getHushObject(K key) {
+    private HashObject getHashObject(K key) {
         HashObject currentNode = hashMap[keyIndex(key)];
         while (!((currentNode.key != null && key != null && currentNode.key.equals(key))
                 || (currentNode.key == null && key == null))) {
             currentNode = currentNode.next;
         }
         return currentNode;
+    }
+
+    @Override
+    public void put(K key, V value) {
+        if (!containsKey(key)) {
+            add(key, value);
+        } else {
+            set(key, value);
+        }
+    }
+
+    @Override
+    public V getValue(K key) {
+        if (!containsKey(key)) {
+            return null;
+        } else {
+            return (V) getHashObject(key).value;
+        }
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    private static class HashObject<K, V> {
+        private K key;
+        private V value;
+        private HashObject<K, V> next;
+
+        public HashObject(K key, V value, HashObject<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+    }
+
+    private void enlarge() {
+        K[] listOfKeys = (K[]) new Object[size];
+        V[] listOfValues = (V[]) new Object[size];
+        for (int i = 0; i < size; i++) {
+            listOfKeys[i] = keySet()[i];
+            listOfValues[i] = getValue(keySet()[i]);
+        }
+        hashMap = new HashObject[capacity * 2];
+        size = 0;
+        capacity = capacity * 2;
+
+        for (int i = 0; i < listOfKeys.length; i++) {
+            put(listOfKeys[i], listOfValues[i]);
+        }
+    }
+
+    private int keyIndex(K key) {
+        if (key == null) {
+            return 0;
+        } else {
+            return abs(key.hashCode()) % capacity;
+        }
     }
 
     private void add(K key, V value) {
@@ -114,29 +137,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void set(K key, V value) {
-        getHushObject(key).value = value;
-    }
-
-    @Override
-    public void put(K key, V value) {
-        if (!containsKey(key)) {
-            add(key, value);
-        } else {
-            set(key, value);
-        }
-    }
-
-    @Override
-    public V getValue(K key) {
-        if (!containsKey(key)) {
-            return null;
-        } else {
-            return (V) getHushObject(key).value;
-        }
-    }
-
-    @Override
-    public int getSize() {
-        return size;
+        getHashObject(key).value = value;
     }
 }
