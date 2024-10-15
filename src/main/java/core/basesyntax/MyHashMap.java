@@ -7,20 +7,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private Node<K, V> [] table;
 
-    static class Node<K, V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
     public MyHashMap() {
         this.table = new Node[DEFAULT_CAPACITY];
         threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
@@ -28,7 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = hash(key) % table.length;
+        int index = (hash(key) & 0x7FFFFFFF) % table.length;
         Node<K, V> current = table[index];
         if (current == null) {
             table[index] = new Node<>(hash(key), key, value, null);
@@ -56,16 +42,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = hash(key) % table.length;
+        int index = (hash(key) & 0x7FFFFFFF) % table.length;
         Node<K, V> current = table[index];
         while (current != null) {
             if (current.key != null && current.key.equals(key)) {
                 return current.value;
             } else if (current.key == null && key == null) {
                 return current.value;
-            }
-            if (current.next == null) {
-                break;
             }
             current = current.next;
         }
@@ -79,8 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int hash(K key) {
         int h;
-        int hash = (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
-        return hash & (DEFAULT_CAPACITY - 1);
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
 
     private void resize() {
@@ -89,14 +71,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         for (Node<K, V> node : table) {
             while (node != null) {
-                int newIndex = node.hash & (newCapacity - 1);
                 Node<K, V> next = node.next;
+                int newIndex = (hash(node.key) & 0x7FFFFFFF) % newCapacity;
                 node.next = newTable[newIndex];
                 newTable[newIndex] = node;
                 node = next;
             }
         }
-
         table = newTable;
         threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
     }
@@ -104,6 +85,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void checkResize() {
         if (size >= threshold) {
             resize();
+        }
+    }
+
+    static class Node<K, V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(int hash, K key, V value, Node<K, V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
         }
     }
 }
