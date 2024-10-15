@@ -15,12 +15,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int hash = hash(key);
-        Node<K, V> newNode = new Node<>(hash, key, value, null);
+        int index = (table.length - 1) & hash;
+        Node<K, V> newNode = new Node(hash, key, value, null);
 
-        if (table[hash] == null) {
-            table[hash] = newNode;
+        if (table[index] == null) {
+            table[index] = newNode;
         } else {
-            Node<K, V> current = table[hash];
+            Node<K, V> current = table[index];
             while (current != null) {
                 if (current.hash == hash
                         && (current.key == key || (key != null && key.equals(current.key)))) {
@@ -41,17 +42,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key);
-        Node<K, V> node = table[hash];
-
-        while (node != null) {
-            if (node.hash == hash
-                    && (node.key == key || (key != null && key.equals(node.key)))) {
-                return node.value;
-            }
-            node = node.next;
-        }
-        return null;
+        Node<K, V> node = getNode(key);
+        return (node == null) ? null : node.value;
     }
 
     @Override
@@ -60,7 +52,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % DEFAULT_CAPACITY);
+        return (key == null) ? 0 : Math.abs(key.hashCode());
+    }
+
+    private Node<K, V> getNode(K key) {
+        int hash = hash(key);
+        int index = (table.length - 1) & hash;
+        Node<K, V> node = table[index];
+
+        while (node != null) {
+            if (node.hash == hash
+                    && (node.key == key || (key != null && key.equals(node.key)))) {
+                return node;
+            }
+            node = node.next;
+        }
+        return null;
     }
 
     private void resizeIfNeeded() {
@@ -76,7 +83,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         for (Node<K, V> node : table) {
             while (node != null) {
-                int newHash = Math.abs(node.hash % newCapacity);
+                int newHash = (newCapacity - 1) & node.hash;
                 Node<K, V> next = node.next;
                 node.next = newTable[newHash];
                 newTable[newHash] = node;
@@ -88,7 +95,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     static class Node<K, V> {
         private final int hash;
-        private K key;
+        private final K key;
         private V value;
         private Node<K, V> next;
 
