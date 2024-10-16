@@ -15,44 +15,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
-    private static class Node<K, V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-
-        public int getHash() {
-            return hash;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
-        }
-
-        public Node<K, V> getNext() {
-            return next;
-        }
-
-        public void setNext(Node<K, V> next) {
-            this.next = next;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         int hash = hash(key);
@@ -60,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
             if (node.hash == hash && Objects.equals(node.key, key)) {
-                node.value = value; // Заміняємо значення, якщо ключ уже є
+                node.value = value;
                 return;
             }
         }
@@ -73,6 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = hash(key);
         int index = indexFor(hash, table.length);
 
+        // Проходимо по вузлах у бакеті
         for (Node<K, V> node = table[index]; node != null; node = node.next) {
             if (node.hash == hash && Objects.equals(node.key, key)) {
                 return node.value;
@@ -87,6 +50,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    // Приватні методи
     private void addNode(int hash, K key, V value, int index) {
         Node<K, V> newNode = new Node<>(hash, key, value, table[index]);
         table[index] = newNode;
@@ -122,5 +86,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int indexFor(int hash, int length) {
         return hash & (length - 1);
     }
-}
 
+    private static class Node<K, V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(int hash, K key, V value, Node<K, V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+    }
+}
