@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.HashSet;
+
 import static java.lang.Math.abs;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -52,15 +54,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return values;
     }
 
-    private HashObject getHashObject(K key) {
-        HashObject currentNode = hashMap[keyIndex(key)];
-        while (!((currentNode.key != null && key != null && currentNode.key.equals(key))
-                || (currentNode.key == null && key == null))) {
-            currentNode = currentNode.next;
-        }
-        return currentNode;
-    }
-
     @Override
     public void put(K key, V value) {
         if (!containsKey(key)) {
@@ -96,20 +89,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private void enlarge() {
-        K[] listOfKeys = (K[]) new Object[size];
-        V[] listOfValues = (V[]) new Object[size];
-        for (int i = 0; i < size; i++) {
-            listOfKeys[i] = keySet()[i];
-            listOfValues[i] = getValue(keySet()[i]);
+    private HashObject getHashObject(K key) {
+        HashObject currentNode = hashMap[keyIndex(key)];
+        while (!((currentNode.key != null && key != null && currentNode.key.equals(key))
+                || (currentNode.key == null && key == null))) {
+            currentNode = currentNode.next;
         }
-        hashMap = new HashObject[capacity * 2];
-        size = 0;
-        capacity = capacity * 2;
+        return currentNode;
+    }
 
-        for (int i = 0; i < listOfKeys.length; i++) {
-            put(listOfKeys[i], listOfValues[i]);
+
+    private void enlarge() {
+        MyHashMap<K,V> temporaryNewHashMap = new MyHashMap<>();
+        temporaryNewHashMap.hashMap = new HashObject[capacity * 2];
+
+        for (K key : keySet()) {
+            temporaryNewHashMap.put(key, getValue(key));
         }
+
+        hashMap = temporaryNewHashMap.hashMap;
     }
 
     private int keyIndex(K key) {
