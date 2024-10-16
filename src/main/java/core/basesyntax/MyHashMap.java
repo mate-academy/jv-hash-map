@@ -1,52 +1,28 @@
 package core.basesyntax;
 
-import java.util.HashSet;
-
 import static java.lang.Math.abs;
+
+import java.util.HashSet;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
     private HashObject<K, V>[] hashMap;
+    private HashSet<K> keys;
     private int capacity = DEFAULT_INITIAL_CAPACITY;
     private int size = 0;
 
     public MyHashMap() {
         hashMap = new HashObject[DEFAULT_INITIAL_CAPACITY];
+        keys = new HashSet<K>();
     }
 
-    public K[] keySet() {
-        if (size == 0) {
-            return null;
-        } else {
-            K[] keys = (K[]) new Object[size];
-            int index = 0;
-            for (HashObject<K, V> object : hashMap) {
-                if (object != null) {
-                    HashObject<K,V> currnetNode = object;
-                    do {
-                        keys[index] = (K) currnetNode.key;
-                        currnetNode = currnetNode.next;
-                        index++;
-                    } while (currnetNode != null);
-                }
-            }
-            return keys;
-        }
+    public HashSet<K> keySet() {
+        return keys;
     }
 
     public boolean containsKey(K key) {
-        if (size == 0) {
-            return false;
-        }
-        int ifItWasFound = 0;
-        for (K currentKey : keySet()) {
-            if ((key != null && currentKey != null && currentKey.equals(key))
-                    || key == null && currentKey == null) {
-                ifItWasFound++;
-            }
-        }
-        return ifItWasFound != 0;
+        return keys.contains(key);
     }
 
     public V[] values() {
@@ -98,7 +74,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return currentNode;
     }
 
-
     private void enlarge() {
         MyHashMap<K,V> temporaryNewHashMap = new MyHashMap<>();
         temporaryNewHashMap.hashMap = new HashObject[capacity * 2];
@@ -132,6 +107,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             currentNode.next = new HashObject<>(key, value, null);
         }
         size++;
+        keys.add(key);
     }
 
     private void set(K key, V value) {
