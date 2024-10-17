@@ -25,11 +25,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return keys.contains(key);
     }
 
-    public V[] values() {
-        V[] values = (V[]) new Object[size];
-        return values;
-    }
-
     @Override
     public void put(K key, V value) {
         if (!containsKey(key)) {
@@ -65,8 +60,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private HashObject getHashObject(K key) {
-        HashObject currentNode = hashMap[keyIndex(key)];
+    private HashObject<K, V> getHashObject(K key) {
+        HashObject<K, V> currentNode = hashMap[keyIndex(key)];
         while (!((currentNode.key != null && key != null && currentNode.key.equals(key))
                 || (currentNode.key == null && key == null))) {
             currentNode = currentNode.next;
@@ -100,11 +95,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (hashMap[keyIndex(key)] == null) {
             hashMap[keyIndex(key)] = new HashObject<>(key, value, null);
         } else {
-            HashObject currentNode = hashMap[keyIndex(key)];
+            HashObject<K, V> currentNode = hashMap[keyIndex(key)];
             while (currentNode.next != null) {
                 currentNode = currentNode.next;
             }
-            currentNode.next = new HashObject<>(key, value, null);
+            currentNode.next = new HashObject<K, V>(key, value, null);
         }
         size++;
         keys.add(key);
