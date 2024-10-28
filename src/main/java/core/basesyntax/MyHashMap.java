@@ -18,19 +18,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         storage = new Node[capacity];
     }
 
-    private static class Node<K, V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value) {
-            hash = Math.abs(key == null ? 0 : key.hashCode());
-            this.key = key;
-            this.value = value;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         Node<K, V> node = findNode(key);
@@ -95,5 +82,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             node = node.next;
         }
         return node;
+    }
+
+    private static class Node<K, V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value) {
+            hash = Math.abs(key == null ? 0 : key.hashCode());
+            this.key = key;
+            this.value = value;
+        }
     }
 }
