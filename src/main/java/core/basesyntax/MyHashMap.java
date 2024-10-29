@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
@@ -31,7 +33,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
 
-        // For non-null keys, proceed with the determined index
         if (buckets[index] == null) {
             buckets[index] = new Node<>(key, value);
             size++;
@@ -43,14 +44,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void insertOrUpdateInBucket(Node<K, V> head, K key, V value) {
         Node<K, V> current = head;
 
-        // Traverse the linked list to find either the key or the end
         while (current != null) {
-            if (current.key == key || (current.key != null && current.key.equals(key))) {
-                current.value = value; // Update existing key
+            if (Objects.equals(current.key, key)) {
+                current.value = value;
                 return;
             }
             if (current.next == null) {
-                current.next = new Node<>(key, value); // Append new node
+                current.next = new Node<>(key, value);
                 size++;
                 return;
             }
@@ -98,7 +98,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int determineIndex(K key) {
-        return key == null ? 0 : key.hashCode() & (buckets.length - 1);
+        return key == null ? 0 : Math.abs(key.hashCode() & (buckets.length - 1));
     }
 
     private static class Node<K, V> {
