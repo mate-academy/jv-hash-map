@@ -134,16 +134,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         public final int hashCode() {
-            return Objects.hashCode(key) ^ Objects.hashCode(value);
+            return hash;
         }
 
         public final boolean equals(Object o) {
             if (o == this) {
                 return true;
             }
-            return o instanceof Map.Entry<?, ?> e
-                    && Objects.equals(key, e.getKey())
-                    && Objects.equals(value, e.getValue());
+            if (o instanceof Map.Entry<?, ?> e) {
+                return Objects.equals(key, e.getKey()) && Objects.equals(value, e.getValue());
+            }
+            return false;
         }
     }
 }
