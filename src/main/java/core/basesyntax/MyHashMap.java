@@ -14,7 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @SuppressWarnings("unchecked")
     private Node<K, V>[] createBucketArray(int capacity) {
-        return (Node<K, V>[]) new Node[capacity];
+        return new Node[capacity];
     }
 
     @Override
