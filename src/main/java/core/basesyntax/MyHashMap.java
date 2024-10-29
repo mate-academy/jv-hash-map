@@ -20,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = Math.abs(keyHashCode % table.length);
 
         if (table[index] == null) {
-            table[index] = new Node<>(keyHashCode, key, value, null);
+            table[index] = new Node<>(key, value, null);
             size++;
         } else {
             Node<K, V> currentNode = table[index];
@@ -30,7 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     return;
                 }
                 if (currentNode.next == null) {
-                    currentNode.next = new Node<>(keyHashCode, key, value, null);
+                    currentNode.next = new Node<>(key, value, null);
                     size++;
                     break;
                 }
@@ -86,7 +86,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void putForNullKey(V value) {
         if (table[0] == null) {
-            table[0] = new Node<>(0, null, value, null);
+            table[0] = new Node<>(null, value, null);
             size++;
         } else {
             Node<K, V> currentNode = table[0];
@@ -96,7 +96,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     return;
                 }
                 if (currentNode.next == null) {
-                    currentNode.next = new Node<>(0, null, value, null);
+                    currentNode.next = new Node<>(null, value, null);
                     size++;
                     return;
                 }
@@ -117,13 +117,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     static class Node<K,V> {
-        private final int hash;
         private final K key;
         private V value;
         private Node<K,V> next;
 
-        Node(int hash, K key, V value, Node<K,V> next) {
-            this.hash = hash;
+        Node(K key, V value, Node<K,V> next) {
+
             this.key = key;
             this.value = value;
             this.next = next;
@@ -133,16 +132,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return key + "=" + value;
         }
 
-        public final int hashCode() {
-            return hash;
-        }
-
         public final boolean equals(Object o) {
             if (o == this) {
                 return true;
             }
-            if (o instanceof Map.Entry<?, ?> e) {
-                return Objects.equals(key, e.getKey()) && Objects.equals(value, e.getValue());
+            if (o instanceof Node<?, ?> e) {
+                return Objects.equals(key, e.key) && Objects.equals(value, e.value);
             }
             return false;
         }
