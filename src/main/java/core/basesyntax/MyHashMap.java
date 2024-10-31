@@ -1,16 +1,16 @@
 package core.basesyntax;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
-    private int size;
+    private int size = 0;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        size = 0;
     }
 
     @Override
@@ -66,16 +66,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public void resize() {
-        Node<K, V>[] oldTable = table;
-        table = new Node[oldTable.length * 2];
-        size = 0;
+        int newCapacity = table.length * 2;
+        Node<K, V>[] newTable = new Node[newCapacity];
 
-        for (Node<K, V> node : oldTable) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+        for (int i = 0; i < table.length; i++) {
+            Node<K, V> current = table[i];
+            while (current != null) {
+                Node<K, V> next = current.next;
+
+                int newIndex = Math.abs(current.key.hashCode() % newCapacity);
+
+                current.next = newTable[newIndex];
+                newTable[newIndex] = current;
+
+                current = next;
             }
         }
+        table = newTable;
     }
 
     private static class Node<K, V> {
