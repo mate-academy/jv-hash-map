@@ -79,7 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return key == null ? 0 : (key.hashCode() & Integer.MAX_VALUE) % capacity;
+        return key == null ? 0 : (key.hashCode() & (capacity - 1));
     }
 
     private Node<K, V> getNode(K key) {
