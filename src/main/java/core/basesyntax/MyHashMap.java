@@ -14,9 +14,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         Node(K key, V value, Node<K, V> next) {
             this.key = key;
@@ -78,7 +78,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> headNode : table) {
             while (headNode != null) {
                 Node<K, V> nextNode = headNode.next;
-                int newIndex = (headNode.key == null) ? 0 : Math.abs(headNode.key.hashCode() % newCapacity);
+                int newIndex = (headNode.key == null) ? 0
+                        : Math.abs(headNode.key.hashCode() % newCapacity);
 
                 headNode.next = newTable[newIndex];
                 newTable[newIndex] = headNode;
