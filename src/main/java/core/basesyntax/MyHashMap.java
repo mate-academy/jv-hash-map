@@ -16,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         resizeIfNeed();
         int currentCapacity = elements.length;
 
-        int hash = (key == null) ? 0 : Math.abs(key.hashCode() % elements.length);
+        int hash = hashKey(key);
 
         Node<K, V> currentNode = elements[hash];
 
@@ -34,13 +34,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        for (Node<K, V> currentNode : elements) {
-            while (currentNode != null) {
-                if (currentNode.key == key || (key != null && key.equals(currentNode.key))) {
-                    return currentNode.value;
-                }
-                currentNode = currentNode.next;
+        int hash = hashKey(key);
+        Node<K, V> currentNode = elements[hash];
+        while (currentNode != null) {
+            if (currentNode.key == key || (key != null && key.equals(currentNode.key))) {
+                return currentNode.value;
             }
+            currentNode = currentNode.next;
         }
         return null;
     }
@@ -61,8 +61,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 while (currentNode != null) {
                     K key = currentNode.key;
                     V value = currentNode.value;
-                    int newHash = Math.abs(key.hashCode() % newCapacity);
-
+                    int newHash = (key == null) ? 0 : Math.abs(key.hashCode() % newCapacity);
                     Node<K, V> newNode = new Node<>(key, value, null);
                     if (newElements[newHash] != null) {
                         newNode.next = newElements[newHash];
@@ -74,6 +73,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             elements = newElements;
         }
+    }
+
+    private int hashKey(K key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode() % elements.length);
     }
 
     private static class Node<K, V> {
