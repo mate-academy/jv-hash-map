@@ -44,11 +44,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node = node.next;
             }
         }
-        size++;
-
         if (size >= threshold) {
             resize();
         }
+        size++;
     }
 
     @Override
@@ -78,12 +77,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = table;
         table = new Node[oldTable.length * 2];
         threshold = (int) (table.length * LOAD_FACTOR);
-        size = 0;
 
         for (Node<K, V> node : oldTable) {
             while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+                Node<K, V> next = node.next;
+                int index = (node.key == null) ? 0 : Math.abs(node.key.hashCode() % table.length);
+                node.next = table[index];
+                table[index] = node;
+                node = next;
             }
         }
     }
