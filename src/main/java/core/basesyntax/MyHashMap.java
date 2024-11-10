@@ -1,6 +1,5 @@
 package core.basesyntax;
 
-
 import java.util.LinkedList;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
@@ -11,8 +10,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     private static class Entry<K, V> {
-        K key;
-        V value;
+        private K key;
+        private V value;
 
         public Entry(K key, V value) {
             this.key = key;
