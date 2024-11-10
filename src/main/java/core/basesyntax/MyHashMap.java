@@ -77,17 +77,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         LinkedList<Entry<K, V>>[] oldTable = table;
         table = new LinkedList[oldTable.length * 2];
-        int oldSize = size; // Сохраняем текущий размер
-        size = 0; // Сброс размера, чтобы пересчитать его при добавлении элементов
+
+        int currentSize = size; // Сохраняем текущий размер
+
+        size = 0; // Сбрасываем размер перед добавлением элементов
 
         for (LinkedList<Entry<K, V>> bucket : oldTable) {
             if (bucket != null) {
                 for (Entry<K, V> entry : bucket) {
-                    put(entry.key, entry.value);
+                    put(entry.key, entry.value); // Метод put корректно увеличит size
                 }
             }
         }
-        size = oldSize; // Восстанавливаем значение размера
+
+        size = currentSize; // Восстанавливаем размер после перераспределения
     }
 
     @Override
