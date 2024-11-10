@@ -24,8 +24,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
     }
 
-    // Метод для расчета индекса ячейки на основе хэш-кода ключа
+    // Метод для расчета индекса ячейки на основе хэш-кода ключа, учитывает null
     private int hash(K key) {
+        if (key == null) {
+            return 0; // Назначаем null ключам индекс 0
+        }
         return Math.abs(key.hashCode()) % table.length;
     }
 
@@ -40,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         // Проверяем, есть ли уже ключ в цепочке
         for (Entry<K, V> entry : table[index]) {
-            if (entry.key.equals(key)) {
+            if ((entry.key == key) || (key != null && key.equals(entry.key))) {
                 entry.value = value; // Заменяем значение, если ключ уже есть
                 return;
             }
@@ -63,19 +66,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         if (bucket != null) {
             for (Entry<K, V> entry : bucket) {
-                if (entry.key.equals(key)) {
+                if ((entry.key == key) || (key != null && key.equals(entry.key))) {
                     return entry.value;
                 }
             }
         }
         return null; // Возвращаем null, если ключ не найден
-
     }
 
     private void resize() {
         LinkedList<Entry<K, V>>[] oldTable = table;
         table = new LinkedList[oldTable.length * 2];
-        size = 0;
+        int oldSize = size; // Сохраняем текущий размер
+        size = 0; // Сброс размера, чтобы пересчитать его при добавлении элементов
 
         for (LinkedList<Entry<K, V>> bucket : oldTable) {
             if (bucket != null) {
@@ -84,6 +87,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
+        size = oldSize; // Восстанавливаем значение размера
     }
 
     @Override
