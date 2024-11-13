@@ -3,6 +3,7 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final int GROW_FACTOR = 2;
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private int size;
@@ -61,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    public int hash(K key) {
+    private int hash(K key) {
         return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
@@ -70,8 +71,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (DEFAULT_LOAD_FACTOR * table.length);
     }
 
-    public Node<K, V>[] reWrite(Node<K, V>[] table) {
-        int length = table.length * 2;
+    private Node<K, V>[] reWrite(Node<K, V>[] table) {
+        int length = table.length * GROW_FACTOR;
         Node<K, V>[] newTable = new Node[length];
         for (int i = 0; i < table.length; i++) {
             Node<K, V> node = table[i];
@@ -86,7 +87,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return newTable;
     }
 
-    public static class Node<K, V> {
+    private static class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
@@ -98,6 +99,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-
     }
 }
