@@ -9,7 +9,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int SCALE_FACTOR = 2;
     private int size = 0;
     private int capacity = DEFAULT_INITIAL_CAPACITY;
-    private int threshold;
     private Node<K, V> [] table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
 
     @Override
