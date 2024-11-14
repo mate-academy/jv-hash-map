@@ -7,10 +7,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float LOAD_FACTOR = 0.75f;
     private LinkedList<Entry<K, V>>[] buckets;
     private int size;
-
     public MyHashMap() {
         buckets = new LinkedList[INITIAL_CAPACITY];
         size = 0;
+    }
+
+    private static class Entry<K, V> {
+        private K key;
+        private V value;
+
+        Entry(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 
     private int getBucketIndex(K key) {
@@ -70,15 +79,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         buckets = newBuckets;
-    }
-
-    private static class Entry<K, V> {
-        private K key;
-        private V value;
-
-        Entry(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
     }
 }
