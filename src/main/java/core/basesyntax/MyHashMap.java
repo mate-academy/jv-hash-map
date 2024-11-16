@@ -3,17 +3,31 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private final float loadFactor;
+    private final int scaleFactor;
+    private int size;
+    private int capacity;
+    private Node<K, V> [] table;
 
-    private static final int DEFAULT_INITIAL_CAPACITY = 16;
-    private static final float DEFAULT_LOAD_FACTOR = .75f;
-    private static final int SCALE_FACTOR = 2;
-    private int size = 0;
-    private int capacity = DEFAULT_INITIAL_CAPACITY;
-    private Node<K, V> [] table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
+    public MyHashMap() {
+        this(16, .75f);
+    }
+
+    public MyHashMap(int initialCapacity, float loadFactor) {
+        scaleFactor = 2;
+        if (initialCapacity <= 0) {
+            throw new IllegalArgumentException("Illegal Capacity: " + initialCapacity);
+        }
+        if (loadFactor < 0 || loadFactor > 1) {
+            throw new IllegalArgumentException("Illegal Load: " + loadFactor);
+        }
+        table = (Node<K, V>[]) new Node[initialCapacity];
+        this.loadFactor = loadFactor;
+    }
 
     @Override
     public void put(K key, V value) {
-        doubleSizeIfFilled();
+        resizeIfNeeded();
         Node<K, V> newNode = new Node<>(key, value);
         int index = calculateIndex(newNode.key);
         if (table[index] == null) {
@@ -54,17 +68,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void doubleSizeIfFilled() {
-        if (size == capacity * DEFAULT_LOAD_FACTOR) {
-            capacity *= SCALE_FACTOR;
+    private void resizeIfNeeded() {
+        if (size == capacity * loadFactor) {
+            capacity *= scaleFactor;
             size = 0;
             Node<K, V>[] oldTable = table;
             table = (Node<K, V>[])new Node[capacity];
-            for (Node<K, V> oldTableNode : oldTable) {
-                if (oldTableNode != null) {
-                    put(oldTableNode.key, oldTableNode.value);
-                    if (oldTableNode.next != null) {
-                        Node<K, V> nodeToTransfer = oldTableNode;
+            for (Node<K, V> node : oldTable) {
+                if (node != null) {
+                    put(node.key, node.value);
+                    if (node.next != null) {
+                        Node<K, V> nodeToTransfer = node;
                         while (nodeToTransfer.next != null) {
                             put(nodeToTransfer.next.key, nodeToTransfer.next.value);
                             nodeToTransfer = nodeToTransfer.next;
@@ -75,8 +89,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int calculateIndex(Object object) {
-        return object == null ? 0 : Math.abs(object.hashCode()) % capacity;
+    private int calculateIndex(K key) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 
     private static class Node<K, V> {
@@ -87,6 +101,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public Node(K key, V value) {
             this.key = key;
             this.value = value;
+
         }
     }
 }
