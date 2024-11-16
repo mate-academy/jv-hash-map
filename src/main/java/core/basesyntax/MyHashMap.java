@@ -18,6 +18,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (initialCapacity <= 0) {
             throw new IllegalArgumentException("Illegal Capacity: " + initialCapacity);
         }
+        capacity = initialCapacity;
         if (loadFactor < 0 || loadFactor > 1) {
             throw new IllegalArgumentException("Illegal Load: " + loadFactor);
         }
