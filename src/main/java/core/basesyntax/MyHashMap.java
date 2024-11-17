@@ -3,27 +3,32 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private final float loadFactor;
-    private final int scaleFactor;
+    private static final int INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = .75f;
+    private static final int SCALE_FACTOR = 2;
     private int size;
     private int capacity;
+    private float loadFactor;
     private Node<K, V> [] table;
 
     public MyHashMap() {
-        this(16, .75f);
+        size = 0;
+        loadFactor = DEFAULT_LOAD_FACTOR;
+        capacity = INITIAL_CAPACITY;
+        table= (Node<K, V>[]) new Node[capacity];
     }
 
     public MyHashMap(int initialCapacity, float loadFactor) {
-        scaleFactor = 2;
         if (initialCapacity <= 0) {
             throw new IllegalArgumentException("Illegal Capacity: " + initialCapacity);
         }
-        capacity = initialCapacity;
         if (loadFactor < 0 || loadFactor > 1) {
             throw new IllegalArgumentException("Illegal Load: " + loadFactor);
         }
-        table = (Node<K, V>[]) new Node[initialCapacity];
+        size = 0;
+        capacity = initialCapacity;
         this.loadFactor = loadFactor;
+        table = (Node<K, V>[]) new Node[capacity];
     }
 
     @Override
@@ -71,7 +76,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resizeIfNeeded() {
         if (size == capacity * loadFactor) {
-            capacity *= scaleFactor;
+            capacity *= SCALE_FACTOR;
             size = 0;
             Node<K, V>[] oldTable = table;
             table = (Node<K, V>[])new Node[capacity];
