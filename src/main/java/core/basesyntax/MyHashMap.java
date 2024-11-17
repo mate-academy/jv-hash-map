@@ -15,7 +15,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size = 0;
         loadFactor = DEFAULT_LOAD_FACTOR;
         capacity = INITIAL_CAPACITY;
-        table= (Node<K, V>[]) new Node[capacity];
+        table = (Node<K, V>[]) new Node[capacity];
     }
 
     public MyHashMap(int initialCapacity, float loadFactor) {
