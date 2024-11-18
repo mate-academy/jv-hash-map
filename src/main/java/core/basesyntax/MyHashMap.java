@@ -35,6 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             current = current.next;
         }
         table[index] = new Node<>(key, value, null);
+        size++;
     }
 
     @Override
