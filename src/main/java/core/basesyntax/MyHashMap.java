@@ -9,26 +9,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private int capacity;
     private float loadFactor;
+    private int threshold = (int) (loadFactor * capacity);
     private Node<K, V> [] table;
 
     public MyHashMap() {
-        size = 0;
         loadFactor = DEFAULT_LOAD_FACTOR;
         capacity = INITIAL_CAPACITY;
-        table = (Node<K, V>[]) new Node[capacity];
-    }
-
-    public MyHashMap(int initialCapacity, float loadFactor) {
-        if (initialCapacity <= 0) {
-            throw new IllegalArgumentException("Illegal Capacity: " + initialCapacity);
-        }
-        if (loadFactor < 0 || loadFactor > 1) {
-            throw new IllegalArgumentException("Illegal Load: " + loadFactor);
-        }
-        size = 0;
-        capacity = initialCapacity;
-        this.loadFactor = loadFactor;
-        table = (Node<K, V>[]) new Node[capacity];
+        table = new Node[capacity];
     }
 
     @Override
@@ -75,21 +62,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resizeIfNeeded() {
-        if (size == capacity * loadFactor) {
+        if (size == threshold) {
             capacity *= SCALE_FACTOR;
             size = 0;
             Node<K, V>[] oldTable = table;
-            table = (Node<K, V>[])new Node[capacity];
-            for (Node<K, V> node : oldTable) {
-                if (node != null) {
+            table = new Node[capacity];
+            for (Node<K,V> node : oldTable) {
+                while (node != null) {
                     put(node.key, node.value);
-                    if (node.next != null) {
-                        Node<K, V> nodeToTransfer = node;
-                        while (nodeToTransfer.next != null) {
-                            put(nodeToTransfer.next.key, nodeToTransfer.next.value);
-                            nodeToTransfer = nodeToTransfer.next;
-                        }
-                    }
+                    node = node.next;
                 }
             }
         }
