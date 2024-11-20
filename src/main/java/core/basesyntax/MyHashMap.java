@@ -65,9 +65,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode = currentNode.next;
             }
         }
-        if (size >= threshold) {
-            table = resize();
-        }
     }
 
     Node<K, V>[] resize() {
