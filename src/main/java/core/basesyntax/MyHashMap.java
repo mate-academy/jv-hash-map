@@ -5,16 +5,19 @@ import java.util.LinkedList;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-
     private LinkedList<Entry<K, V>>[] table;
     private int size;
 
+    @SuppressWarnings("unchecked")
     public MyHashMap() {
-        table = new LinkedList[INITIAL_CAPACITY];
+        table = (LinkedList<Entry<K, V>>[]) new LinkedList<?>[INITIAL_CAPACITY];
         size = 0;
     }
     @Override
     public void put(K key, V value) {
+        if (key == null) {
+            throw new IllegalArgumentException("Key cannot be null");
+        }
         int index = getIndex(key);
         if (table[index] == null) {
             table[index] = new LinkedList<>();
@@ -34,6 +37,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
     @Override
     public V getValue(K key) {
+        if (key == null) {
+            throw new IllegalArgumentException("Key cannot be null");
+        }
         int index = getIndex(key);
         if (table[index] != null) {
             for (Entry<K, V> entry : table[index]) {
@@ -52,7 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.abs(key.hashCode()) % table.length;
     }
     private void resize() {
-        LinkedList<Entry<K, V>>[] newTable = new LinkedList[table.length * 2];
+        LinkedList<Entry<K, V>>[] newTable = (LinkedList<Entry<K, V>>[]) new LinkedList<?>[table.length * 2];
         for (LinkedList<Entry<K, V>> bucket : table) {
             if (bucket != null) {
                 for (Entry<K, V> entry : bucket) {
