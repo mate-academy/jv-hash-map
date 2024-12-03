@@ -2,16 +2,13 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
+    private static final int GROW_FACTOR = 2;
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
-    }
-
-    public int calculateIndex(Object key, int tableCapacity) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % tableCapacity;
     }
 
     @Override
@@ -23,6 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[index] == null) {
             table[index] = new Node<>(key, value);
             size++;
+            return;
         } else {
             Node<K, V> current = table[index];
             while (current != null) {
@@ -36,18 +34,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     size++;
                     return;
                 }
-                current = current.next;
-            }
-        }
-    }
-
-    private void resize() {
-        Node<K, V>[] oldTable = table;
-        table = new Node[table.length * 2];
-        size = 0;
-        for (Node<K, V> current : oldTable) {
-            while (current != null) {
-                put(current.key, current.value);
                 current = current.next;
             }
         }
@@ -71,7 +57,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    static class Node<K, V> {
+    private void resize() {
+        Node<K, V>[] oldTable = table;
+        table = new Node[table.length * GROW_FACTOR];
+        size = 0;
+        for (Node<K, V> current : oldTable) {
+            while (current != null) {
+                put(current.key, current.value);
+                current = current.next;
+            }
+        }
+    }
+
+    private int calculateIndex(Object key, int tableCapacity) {
+        return key == null ? 0 : Math.abs(key.hashCode()) % tableCapacity;
+    }
+
+    private static class Node<K, V> {
         private K key;
         private V value;
         private Node<K, V> next;
