@@ -281,10 +281,11 @@ public class MyHashMapTest {
         myHashMap.put(firstCar, 3);
         myHashMap.put(secondCar, 5);
         myHashMap.put(thirdCar, 1);
+        myHashMap.put(null, 10);  // Додаємо елемент з ключем null
 
-        // Перевіряємо, що розмір мапи дорівнює 3
-        Assert.assertEquals("Test failed! The size isn't correct. Expected 3 but was "
-                + myHashMap.getSize(), 3, myHashMap.getSize());
+        // Перевіряємо, що розмір мапи дорівнює 4
+        Assert.assertEquals("Test failed! The size isn't correct. Expected 4 but was "
+                + myHashMap.getSize(), 4, myHashMap.getSize());
 
         // Видаляємо елемент за ключем `firstCar`
         Integer removedValue = myHashMap.remove(firstCar);
@@ -294,8 +295,8 @@ public class MyHashMapTest {
                 + " but was " + removedValue, Integer.valueOf(3), removedValue);
 
         // Перевіряємо, що розмір мапи зменшився на 1
-        Assert.assertEquals("Test failed! The size isn't correct after remove. Expected 2 but was "
-                + myHashMap.getSize(), 2, myHashMap.getSize());
+        Assert.assertEquals("Test failed! The size isn't correct after remove. Expected 3 but was "
+                + myHashMap.getSize(), 3, myHashMap.getSize());
 
         // Перевіряємо, що ключ `firstCar` більше не існує в мапі
         Assert.assertNull("Test failed! If key `firstCar` is removed, the value should be null.",
@@ -308,5 +309,20 @@ public class MyHashMapTest {
                 + " but was " + secondActualValue, Integer.valueOf(5), secondActualValue);
         Assert.assertEquals("Test failed! HashMap expects to contain value 1 for key `thirdCar`,"
                 + " but was " + thirdActualValue, Integer.valueOf(1), thirdActualValue);
+
+        // Видаляємо елемент за ключем null
+        Integer removedNullValue = myHashMap.remove(null);
+
+        // Перевіряємо, що видалене значення для ключа null відповідає очікуваному
+        Assert.assertEquals("Test failed! HashMap expects to remove value 10 for null key,"
+                + " but was " + removedNullValue, Integer.valueOf(10), removedNullValue);
+
+        // Перевіряємо, що розмір мапи зменшився на 1 після видалення null
+        Assert.assertEquals("Test failed! The size isn't correct after removing null key. Expected 2 but was "
+                + myHashMap.getSize(), 2, myHashMap.getSize());
+
+        // Перевіряємо, що ключ null більше не існує в мапі
+        Assert.assertNull("Test failed! If null key is removed, the value should be null.",
+                myHashMap.getValue(null));
     }
 }
