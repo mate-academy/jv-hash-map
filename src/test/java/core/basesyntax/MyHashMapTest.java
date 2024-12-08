@@ -273,4 +273,40 @@ public class MyHashMapTest {
             }
         }
     }
+
+
+    @Test
+    public void removeByKey() {
+        MyMap<Car, Integer> myHashMap = new MyHashMap<>();
+        myHashMap.put(firstCar, 3);
+        myHashMap.put(secondCar, 5);
+        myHashMap.put(thirdCar, 1);
+
+        // Перевіряємо, що розмір мапи дорівнює 3
+        Assert.assertEquals("Test failed! The size isn't correct. Expected 3 but was "
+                + myHashMap.getSize(), 3, myHashMap.getSize());
+
+        // Видаляємо елемент за ключем `firstCar`
+        Integer removedValue = myHashMap.remove(firstCar);
+
+        // Перевіряємо, що видалене значення відповідає очікуваному
+        Assert.assertEquals("Test failed! HashMap expects to remove value 3 for key `firstCar`,"
+                + " but was " + removedValue, Integer.valueOf(3), removedValue);
+
+        // Перевіряємо, що розмір мапи зменшився на 1
+        Assert.assertEquals("Test failed! The size isn't correct after remove. Expected 2 but was "
+                + myHashMap.getSize(), 2, myHashMap.getSize());
+
+        // Перевіряємо, що ключ `firstCar` більше не існує в мапі
+        Assert.assertNull("Test failed! If key `firstCar` is removed, the value should be null.",
+                myHashMap.getValue(firstCar));
+
+        // Перевіряємо, що інші елементи не були видалені
+        Integer secondActualValue = myHashMap.getValue(secondCar);
+        Integer thirdActualValue = myHashMap.getValue(thirdCar);
+        Assert.assertEquals("Test failed! HashMap expects to contain value 5 for key `secondCar`,"
+                + " but was " + secondActualValue, Integer.valueOf(5), secondActualValue);
+        Assert.assertEquals("Test failed! HashMap expects to contain value 1 for key `thirdCar`,"
+                + " but was " + thirdActualValue, Integer.valueOf(1), thirdActualValue);
+    }
 }
