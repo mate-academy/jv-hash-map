@@ -19,8 +19,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    public MyHashMap() {
+        table = new Node[capacity]; // Ініціалізація таблиці
+    }
+
     public int getIndex(K key) {
-        return key.hashCode() % capacity;
+        if (key == null) {
+            return 0; // Призначаємо індекс 0 для null ключа
+        }
+        return key.hashCode() % capacity; // Звичайне обчислення хешу
     }
 
     @Override
@@ -35,7 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             for (int i = 0; i < table.length; i++) {
                 Node<K, V> current = table[i];
                 while (current != null) {
-                    int newHash = current.key.hashCode() % capacity;
+                    int newHash = current.key == null ? 0 : current.key.hashCode() % capacity; // Якщо ключ null, використовуємо 0
                     Node<K, V> next = current.next;
                     current.next = newTable[newHash];
                     newTable[newHash] = current; // Оновлюємо індекс в новій таблиці
@@ -67,7 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hashcode = key.hashCode() % capacity;
+        int hashcode = getIndex(key);
         Node<K, V> current = table[hashcode];
         while (current != null) {
             if (current.key.equals(key)) {
