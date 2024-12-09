@@ -38,16 +38,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             capacity = capacity * 2; // Подвоюємо місткість таблиці
             threshold = (int) (capacity * loadFactor); // Перераховуємо поріг для нової місткості
-            Node<K, V>[] newTable = new Node[capacity]; // Створюємо нову таблицю з подвоєним розміром
+            Node<K, V>[] newTable = new Node[capacity];
+            // Створюємо нову таблицю з подвоєним розміром
 
             // Переміщаємо елементи в нову таблицю
             for (int i = 0; i < table.length; i++) { // Перебираємо стару таблицю
-                Node<K, V> current = table[i]; // Отримуємо поточний вузол
-                while (current != null) { // Перебираємо всі вузли, що знаходяться на поточному індексі
-                    int newHash = (current.key == null) ? 0 : Math.abs(current.key.hashCode() % capacity);
+                Node<K, V> current = table[i];
+                // Отримуємо поточний вузол
+                while (current != null) {
+                    // Перебираємо всі вузли, що знаходяться на поточному індексі
+                    int newHash = (current.key == null) ? 0
+                            : Math.abs(current.key.hashCode() % capacity);
                     // Обчислюємо новий індекс для поточного вузла
                     Node<K, V> next = current.next; // Запам'ятовуємо наступний вузол
-                    current.next = newTable[newHash]; // Встановлюємо зв'язок з новим ланцюгом на новому індексі
+                    current.next = newTable[newHash];
+                    // Встановлюємо зв'язок з новим ланцюгом на новому індексі
                     newTable[newHash] = current; // Поміщаємо поточний вузол в нову таблицю
                     current = next; // Переходимо до наступного вузла
                 }
