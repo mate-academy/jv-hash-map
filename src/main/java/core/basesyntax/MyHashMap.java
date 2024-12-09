@@ -1,18 +1,16 @@
 package core.basesyntax;
 
-import java.util.Map;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    int size;
-    Node<K, V>[] table;
-    int capacity = 16;
-    double load_factor = 0.75;
-    int threshold = (int) (capacity * load_factor);
+    private int size;
+    private Node<K, V>[] table;
+    private int capacity = 16;
+    private double loadFactor = 0.75;
+    private int threshold = (int) (capacity * loadFactor);
 
     static class Node<K, V> {
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         public Node(K key, V value) {
             this.key = key;
@@ -30,7 +28,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         // Якщо розмір більше порогу, подвоюємо розмір таблиці
         if (size >= threshold) {
             capacity = capacity * 2;
-            threshold = (int) (capacity * load_factor);
+            threshold = (int) (capacity * loadFactor);
             Node<K, V>[] newTable = new Node[capacity];
 
             // Переміщаємо елементи в нову таблицю
@@ -40,11 +38,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     int newHash = current.key.hashCode() % capacity;
                     Node<K, V> next = current.next;
                     current.next = newTable[newHash];
-                    newTable[newHash] = current;  // Оновлюємо індекс в новій таблиці
-                    current = next;  // Переходимо до наступного елемента в старій таблиці
+                    newTable[newHash] = current; // Оновлюємо індекс в новій таблиці
+                    current = next; // Переходимо до наступного елемента в старій таблиці
                 }
             }
-            table = newTable;  // Оновлюємо таблицю
+            table = newTable; // Оновлюємо таблицю
         }
 
         Node<K, V> newNode = new Node<>(key, value);
@@ -54,8 +52,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> current = table[index];
         while (current != null) {
             if (current.key.equals(key)) {
-                current.value = value;  // Оновлюємо значення
-                return;  // Виходимо, якщо елемент знайдено
+                current.value = value; // Оновлюємо значення
+                return; // Виходимо, якщо елемент знайдено
             }
             current = current.next;
         }
@@ -64,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         newNode.next = table[index];
         table[index] = newNode;
 
-        size++;  // Збільшуємо розмір хеш-мапи
+        size++; // Збільшуємо розмір хеш-мапи
     }
 
     @Override
@@ -73,15 +71,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> current = table[hashcode];
         while (current != null) {
             if (current.key.equals(key)) {
-                return current.value;  // Повертаємо значення, якщо знайдено
+                return current.value; // Повертаємо значення, якщо знайдено
             }
             current = current.next;
         }
-        return null;  // Якщо не знайдено, повертаємо null
+        return null; // Якщо не знайдено, повертаємо null
     }
 
     @Override
     public int getSize() {
-        return size;  // Повертаємо поточний розмір хеш-мапи
+        return size; // Повертаємо поточний розмір хеш-мапи
     }
 }
