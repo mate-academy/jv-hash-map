@@ -42,7 +42,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             for (int i = 0; i < table.length; i++) {
                 Node<K, V> current = table[i];
                 while (current != null) {
-                    int newHash = current.key == null ? 0 : current.key.hashCode() % capacity; // Якщо ключ null, використовуємо 0
+                    int newHash = current.key == null ? 0 : current.key.hashCode() % capacity; // Якщо ключ null,
+                    // використовуємо 0
                     Node<K, V> next = current.next;
                     current.next = newTable[newHash];
                     newTable[newHash] = current; // Оновлюємо індекс в новій таблиці
