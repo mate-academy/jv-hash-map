@@ -81,8 +81,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int calculateIndex(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() %
-                storage.length);
+        return (key == null) ? 0 : Math.abs(key.hashCode()
+                % storage.length);
     }
 
     private void checkLoadedCapacity() {
