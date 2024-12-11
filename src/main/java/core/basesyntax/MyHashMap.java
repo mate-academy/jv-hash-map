@@ -15,20 +15,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         checkLoadedCapacity();
-        if (key == null) {
-            putByIndex(null, value, 0);
-        } else {
-            int index;
-            index = definePosition(key);
-            putByIndex(key, value, index);
-        }
+        putByIndex(key, value, calculateIndex(key));
     }
 
     @Override
     public V getValue(K key) {
         if (size > 0) {
-            int index = (key == null) ? 0 : definePosition(key);
-            Node<K, V> temp = storage[index];
+            Node<K, V> temp = storage[calculateIndex(key)];
             while (temp != null) {
                 if (Objects.equals(key, temp.key)) {
                     return temp.value;
@@ -62,7 +55,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 boxes[i] = boxes[i].next;
                 temp.next = null;
                 size--;
-                putByIndex(temp.key, temp.value, definePosition(temp.key));
+                putByIndex(temp.key, temp.value, calculateIndex(temp.key));
             }
         }
     }
@@ -87,10 +80,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
-    private int definePosition(K key) {
-        int posDigit;
-        posDigit = Math.abs(key.hashCode() % storage.length);
-        return posDigit;
+    private int calculateIndex(K key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode() %
+                storage.length);
     }
 
     private void checkLoadedCapacity() {
