@@ -1,13 +1,13 @@
 package core.basesyntax;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-
-    private transient Node<K, V>[] table;
-    private transient int size;
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private transient int size;
+    private transient Node<K, V>[] table;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
@@ -46,7 +46,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             node = node.next;
         }
-
         return null;
     }
 
@@ -89,10 +88,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     static class Node<K, V> implements Map.Entry<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
@@ -124,8 +123,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         public boolean equals(Object o) {
-            if (o == this)
+            if (o == this) {
                 return true;
+            }
             if (o instanceof Map.Entry<?, ?>) {
                 Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
                 return Objects.equals(key, e.getKey()) && Objects.equals(value, e.getValue());
