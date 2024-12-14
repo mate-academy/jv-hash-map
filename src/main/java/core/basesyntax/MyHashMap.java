@@ -68,6 +68,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             newArray[i % newCapacity] = elements[i];
         }
         return newArray;
+
     }
 
 }
