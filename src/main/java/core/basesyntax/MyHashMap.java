@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import static java.lang.Math.abs;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
     static final int MAXIMUM_CAPACITY = 1 << 30;
@@ -46,14 +44,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K,V> currentNode;
         K keyCurrent;
         if (table != null && table.length > 0
-           && (currentNode = table[hash % table.length]) != null) {
+            && (currentNode = table[hash % table.length]) != null) {
             do {
                 if (currentNode.hash == hash && ((keyCurrent = currentNode.key) == key
-                    || (key != null && key.equals(keyCurrent)))) {
+                        || (key != null && key.equals(keyCurrent)))) {
                     return currentNode.value;
                 }
             } while ((currentNode = currentNode.next) != null);
-            }
+        }
         return null;
     }
 
@@ -63,15 +61,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static int hash(Object key) {
-        return (key == null) ? 0 : (Math.abs(key.hashCode()));
+        int h;
+        return (key == null) ? 0 : (((h = key.hashCode()) < 0) ? h * -1 : h);
     }
 
     private void resize() {
-        if (capacity == 0) {
+        if (table == null) {
             capacity = DEFAULT_INITIAL_CAPACITY;
             loadFactor = DEFAULT_LOAD_FACTOR;
             threshold = (int)(capacity * loadFactor);
-        } else if (capacity > 0) {
+        } else {
             if (capacity >= MAXIMUM_CAPACITY) {
                 threshold = Integer.MAX_VALUE;
             } else {
@@ -101,7 +100,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     while (currNode.next != null) {
                         currNode = currNode.next;
                     }
-                    currNode.next = new Node<K, V>(node.hash, node.key, node.value, null);;
+                    currNode.next = new Node<K, V>(node.hash, node.key, node.value, null);
                 }
                 node = node.next;
             }
