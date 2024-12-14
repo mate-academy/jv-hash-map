@@ -1,6 +1,6 @@
 package core.basesyntax;
 
-import java.lang.Math;
+import static java.lang.Math.abs;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
@@ -15,7 +15,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int hash = hash(key);
-        Node<K,V> currentNode, prev;
+        Node<K,V> currentNode;
+        Node<K,V> prev;
         if (table == null || table.length == 0) {
             resize();
         }
@@ -45,12 +46,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K,V> currentNode;
         K keyCurrent;
         if (table != null && table.length > 0
-                && (currentNode = table[hash % table.length]) != null) {
-                do {
-                    if (currentNode.hash == hash && ((keyCurrent = currentNode.key) == key
-                            || (key != null && key.equals(keyCurrent))))
-                        return currentNode.value;
-                } while ((currentNode = currentNode.next) != null);
+           && (currentNode = table[hash % table.length]) != null) {
+            do {
+                if (currentNode.hash == hash && ((keyCurrent = currentNode.key) == key
+                    || (key != null && key.equals(keyCurrent)))) {
+                    return currentNode.value;
+                }
+            } while ((currentNode = currentNode.next) != null);
             }
         return null;
     }
@@ -61,8 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static int hash(Object key) {
-        int h;
-        return (key == null) ? 0 : (Math.abs(h = key.hashCode()));
+        return (key == null) ? 0 : (Math.abs(key.hashCode()));
     }
 
     private void resize() {
@@ -73,8 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else if (capacity > 0) {
             if (capacity >= MAXIMUM_CAPACITY) {
                 threshold = Integer.MAX_VALUE;
-            }
-            else {
+            } else {
                 threshold = threshold << 1;
                 capacity = capacity << 1;
             }
