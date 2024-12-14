@@ -126,9 +126,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             if (o == this) {
                 return true;
             }
-            if (o instanceof Map.Entry<?, ?>) {
-                Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
-                return Objects.equals(key, e.getKey()) && Objects.equals(value, e.getValue());
+            if (o instanceof Map.Entry<?, ?> entry) {
+                return Objects.equals(key, entry.getKey()) && Objects.equals(value, entry.getValue());
             }
             return false;
         }
