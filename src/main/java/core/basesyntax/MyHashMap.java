@@ -44,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K,V> currentNode;
         K keyCurrent;
         if (table != null && table.length > 0
-            && (currentNode = table[hash % table.length]) != null) {
+                && (currentNode = table[hash % table.length]) != null) {
             do {
                 if (currentNode.hash == hash && ((keyCurrent = currentNode.key) == key
                         || (key != null && key.equals(keyCurrent)))) {
