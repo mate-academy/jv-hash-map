@@ -1,18 +1,13 @@
 package core.basesyntax;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    transient Node<K, V>[] table;
-    transient int size;
-    static final int DEFAULT_INITIAL_CAPACITY = 16;
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    static final int hash(Object key) {
-        int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
-    }
+    private transient Node<K, V>[] table;
+    private transient int size;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
@@ -20,26 +15,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        // Check if we need to resize the table
+
         if (size >= table.length * DEFAULT_LOAD_FACTOR) {
-            resize(table); // Resize the table when the threshold is exceeded
+            resize(table);
         }
 
         int hash = hash(key);
         int index = indexFor(hash, table.length);
 
-        // Look for an existing key
         Node<K, V> node = table[index];
         while (node != null) {
             if (node.hash == hash && Objects.equals(node.key, key)) {
-                // Key found, update value
                 node.value = value;
                 return;
             }
             node = node.next;
         }
-
-        // Key not found, add a new node
         addNode(hash, key, value, index);
     }
 
@@ -56,12 +47,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             node = node.next;
         }
 
-        return null; // Key not found
+        return null;
     }
 
     @Override
     public int getSize() {
         return size;
+    }
+
+    private static final int hash(Object key) {
+        int h;
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
 
     private void addNode(int hash, K key, V value, int index) {
@@ -71,31 +67,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static int indexFor(int hash, int length) {
-        return hash & (length - 1); // Use the low-order bits to find the index
+        return hash & (length - 1);
     }
 
-    // Resize the table to twice its current capacity
     private void resize(Node<K, V>[] oldTable) {
-        // Double the capacity
         int newCapacity = oldTable.length * 2;
         Node<K, V>[] newTable = new Node[newCapacity];
 
-        // Rehash all nodes from the old table and move them to the new table
         for (Node<K, V> node : oldTable) {
             while (node != null) {
-                // Calculate the index for the new table
                 int newIndex = indexFor(node.hash, newCapacity);
 
-                // Link current node to the new table at the new index
-                Node<K, V> nextNode = node.next;  // Save the next node
-                node.next = newTable[newIndex];    // Link current node to the new bucket
-                newTable[newIndex] = node;        // Place node in the new table
+                Node<K, V> nextNode = node.next;
+                node.next = newTable[newIndex];
+                newTable[newIndex] = node;
 
-                node = nextNode;  // Move to the next node in the chain
+                node = nextNode;
             }
         }
-
-        // Update the table reference to the new table
         table = newTable;
     }
 
