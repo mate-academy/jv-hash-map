@@ -6,33 +6,38 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
         private K key;
         private V value;
         private Node<K,V> next;
+
         public Node(K key,V value) {
             this.key = key;
             this.value = value;
         }
+
     }
-    private  Node<K,V> head;
+
     public static final int DEFAULT_CAPACITY = 16;
     public static final float LOAD_FACTOR = 0.75f;
+
+    private  Node<K,V> head;
     private int currentCapacity = DEFAULT_CAPACITY;
     private int threshold = (int) (currentCapacity * LOAD_FACTOR);
     private Node<K,V>[] table = new Node[DEFAULT_CAPACITY];
     private int count;
+
     @Override
     public void put(K key,V value) {
         Node<K,V> newNode = new Node<>(key,value);
-        if (key == null) { // check index(if it`s null we will put on the first position
+        if (key == null) {
             table[0] = newNode;
             head = newNode;
-        } else if (count == 0) { // if we don`t have any element in the array, we put an element on the first position, and it will be head of the array
+        } else if (count == 0) {
             int index = getIndex(key);
             table[index] = newNode;
             head = newNode;
-        } else if (count > threshold){
+        } else if (count > threshold) {
             table = resize(table);
         } else {
 
-            if (!keyExist(key)){
+            if (!keyExist(key)) {
                 int index = getIndex(key);
                 table[index] = newNode;
             } else {
@@ -45,14 +50,11 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
 
         }
         count++;
-
-
-
     }
 
     @Override
     public V getValue(K key) {
-        if (!keyExist(key)){
+        if (!keyExist(key)) {
             return null;
         }
         if (key == null ) {
@@ -71,7 +73,7 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
         return o.hashCode() % currentCapacity;
     }
 
-    private Node<K,V>[] resize(Node<K,V>[] nodes){
+    private Node<K,V>[] resize(Node<K,V>[] nodes) {
         currentCapacity = currentCapacity * 2;
         int index = 0;
         K key = null;
@@ -86,9 +88,10 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
         return newArray;
 
     }
-    private boolean keyExist(Object o){
+
+    private boolean keyExist(Object o) {
         for (Node<K,V> n : table) {// we check if current key already exist
-            if (n.key.equals(o)){
+            if (n.key.equals(o)) {
                 return true;
             }
         }
