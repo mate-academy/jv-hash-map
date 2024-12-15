@@ -30,7 +30,6 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
             head = newNode;
         } else if (count > threshold){
             table = resize(table);
-
         } else {
 
             if (!keyExist(key)){
