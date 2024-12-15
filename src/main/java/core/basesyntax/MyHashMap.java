@@ -1,7 +1,7 @@
 package core.basesyntax;
 
-public class MyHashMap<K , V> implements MyMap<K , V> {
-    public class Node<K , V> {
+public class MyHashMap<K,V> implements MyMap<K,V> {
+    public class Node<K,V> {
         private int hash;
         private K key;
         private V value;
@@ -21,7 +21,7 @@ public class MyHashMap<K , V> implements MyMap<K , V> {
     private Node<K , V>[] table = new Node[DEFAULT_CAPACITY];
     private int count;
     @Override
-    public void put(K key , V value) {
+    public void put(K key,V value) {
         Node<K , V> newNode = new Node<>(key,value);
         if (key == null) { // check index(if it`s null we will put on the first position
             table[0] = newNode;
