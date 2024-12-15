@@ -17,7 +17,7 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
     public static final int DEFAULT_CAPACITY = 16;
     public static final float LOAD_FACTOR = 0.75f;
 
-    private  Node<K,V> head;
+    private Node<K,V> head;
     private int currentCapacity = DEFAULT_CAPACITY;
     private int threshold = (int) (currentCapacity * LOAD_FACTOR);
     private Node<K,V>[] table = new Node[DEFAULT_CAPACITY];
@@ -57,7 +57,7 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
         if (!keyExist(key)) {
             return null;
         }
-        if (key == null ) {
+        if (key == null) {
             return table[0].value;
         }
         int index = getIndex(key);
@@ -69,7 +69,7 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
         return count;
     }
 
-    private int getIndex(Object o){
+    private int getIndex(Object o) {
         return o.hashCode() % currentCapacity;
     }
 
@@ -79,7 +79,7 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
         K key = null;
         Node<K,V>[] newArray = new Node[currentCapacity];
         for (int i = 0; i < table.length; i++) {
-            if (table[i].key != null){
+            if (table[i].key != null) {
                 key = table[i].key;
                 index = getIndex(key);
                 newArray[index] = table[i];
@@ -90,7 +90,7 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
     }
 
     private boolean keyExist(Object o) {
-        for (Node<K,V> n : table) {// we check if current key already exist
+        for (Node<K,V> n : table) {
             if (n.key.equals(o)) {
                 return true;
             }
