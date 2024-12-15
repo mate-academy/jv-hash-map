@@ -1,35 +1,28 @@
 package core.basesyntax;
 
-public class MyHashMap<K, V> implements MyMap<K, V> {
-    public class Node<K , V>{
+public class MyHashMap<K , V> implements MyMap<K , V> {
+    public class Node<K , V> {
         private int hash;
         private K key;
         private V value;
-        Node<K, V> next;
+        Node<K , V> next;
 
 
-        public Node(K key, V value) {
+        public Node(K key , V value) {
             this.key = key;
             this.value = value;
         }
     }
     private  Node<K, V> head;
-
     public static final int DEFAULT_CAPACITY = 16;
-
     public static final float LOAD_FACTOR = 0.75f;
-
     private int currentCapacity = DEFAULT_CAPACITY;
-
     private int threshold = (int) (currentCapacity * LOAD_FACTOR);
-
-    private Node<K, V>[] table = new Node[DEFAULT_CAPACITY];
-
+    private Node<K , V>[] table = new Node[DEFAULT_CAPACITY];
     private int count;
-
     @Override
-    public void put(K key, V value) {
-        Node<K, V> newNode = new Node<>(key,value);
+    public void put(K key , V value) {
+        Node<K , V> newNode = new Node<>(key,value);
         if (key == null) { // check index(if it`s null we will put on the first position
             table[0] = newNode;
             head = newNode;
@@ -46,7 +39,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 int index = getIndex(key);
                 table[index] = newNode;
             } else {
-                for (Node<K, V> n : table) {
+                for (Node<K , V> n : table) {
                     if (n.key.equals(key)) {
                         n.next = newNode;
                     }
@@ -81,7 +74,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return o.hashCode() % currentCapacity;
     }
 
-    private Node<K, V>[] resize(Node<K, V>[] nodes){
+    private Node<K , V>[] resize(Node<K, V>[] nodes){
         currentCapacity = currentCapacity * 2;
         int index = 0;
         K key = null;
@@ -97,7 +90,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     }
     private boolean keyExist(Object o){
-        for (Node<K, V> n : table) {// we check if current key already exist
+        for (Node<K , V> n : table) {// we check if current key already exist
             if (n.key.equals(o)){
                 return true;
             }
