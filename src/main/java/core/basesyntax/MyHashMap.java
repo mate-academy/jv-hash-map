@@ -62,7 +62,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        if (key == null) {
+        if (!keyExist(key)){
+            return null;
+        }
+        if (key == null ) {
             return table[0].value;
         }
         int index = getIndex(key);
@@ -84,16 +87,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         K key = null;
         Node<K, V>[] newArray = new Node[currentCapacity];
         for (int i = 0; i < table.length; i++) {
-            key = table[i].key;
-            index = getIndex(key);
-            newArray[index] = table[i];
+            if (table[i].key != null){
+                key = table[i].key;
+                index = getIndex(key);
+                newArray[index] = table[i];
+            }
         }
         return newArray;
 
     }
     private boolean keyExist(Object o){
         for (Node<K, V> n : table) {// we check if current key already exist
-            if (n.equals(o)){
+            if (n.key.equals(o)){
                 return true;
             }
         }
