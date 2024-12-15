@@ -13,42 +13,60 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
         }
     }
-    private  Node<K, V> tail;
+    private  Node<K, V> head;
 
     public static final int DEFAULT_CAPACITY = 16;
 
-    private Node<K, V>[] elements = new Node[DEFAULT_CAPACITY];
+    public static final float LOAD_FACTOR = 0.75f;
+
+    private int currentCapacity = DEFAULT_CAPACITY;
+
+    private int threshold = (int) (currentCapacity * LOAD_FACTOR);
+
+    private Node<K, V>[] table = new Node[DEFAULT_CAPACITY];
 
     private int count;
 
     @Override
     public void put(K key, V value) {
         Node<K, V> newNode = new Node<>(key,value);
-        if (count == 0){
-            elements[0] = newNode;
-            tail = newNode;
-        } else if (count > DEFAULT_CAPACITY){
-            elements = resize(elements);
+        if (key == null) { // check index(if it`s null we will put on the first position
+            table[0] = newNode;
+            head = newNode;
+        } else if (count == 0) { // if we don`t have any element in the array, we put an element on the first position, and it will be head of the array
+            int index = getIndex(key);
+            table[index] = newNode;
+            head = newNode;
+        } else if (count > threshold){
+            table = resize(table);
 
         } else {
-            int index = getIndex(key);
-            elements[index] = newNode;
-            tail.next = newNode;
+
+            if (!keyExist(key)){
+                int index = getIndex(key);
+                table[index] = newNode;
+            } else {
+                for (Node<K, V> n : table) {
+                    if (n.key.equals(key)) {
+                        n.next = newNode;
+                    }
+                }
+            }
+
         }
         count++;
+
 
 
     }
 
     @Override
     public V getValue(K key) {
-        for (Node<K, V> obj : elements) {
-            if (obj.key.equals(key)){
-                return obj.value;
-            }
+        if (key == null) {
+            return table[0].value;
         }
-
-        return null;
+        int index = getIndex(key);
+        return table[index].value;
     }
 
     @Override
@@ -57,18 +75,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(Object o){
-        return o.hashCode() % DEFAULT_CAPACITY;
+        return o.hashCode() % currentCapacity;
     }
 
     private Node<K, V>[] resize(Node<K, V>[] nodes){
-        int newCapacity = DEFAULT_CAPACITY * 2;
-        Node<K, V> [] newArray = new Node[newCapacity];
+        currentCapacity = currentCapacity * 2;
         int index = 0;
-        for (int i = 0; i < elements.length; i++) {
-            newArray[i % newCapacity] = elements[i];
+        K key = null;
+        Node<K, V>[] newArray = new Node[currentCapacity];
+        for (int i = 0; i < table.length; i++) {
+            key = table[i].key;
+            index = getIndex(key);
+            newArray[index] = table[i];
         }
         return newArray;
 
+    }
+    private boolean keyExist(Object o){
+        for (Node<K, V> n : table) {// we check if current key already exist
+            if (n.equals(o)){
+                return true;
+            }
+        }
+        return false;
     }
 
 }
