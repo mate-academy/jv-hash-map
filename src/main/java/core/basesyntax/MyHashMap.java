@@ -1,67 +1,69 @@
 package core.basesyntax;
 
-public class MyHashMap<K,V> implements MyMap<K,V> {
-    public class Node<K,V> {
-        private int hash;
+import org.w3c.dom.Node;
+
+public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static class Node<K, V> {
         private K key;
         private V value;
-        private Node<K,V> next;
-
-        public Node(K key,V value) {
-            this.key = key;
-            this.value = value;
-        }
-
+        private Node<K, V> next;
     }
+    private Node[] table;
 
-    public static final int DEFAULT_CAPACITY = 16;
-    public static final float LOAD_FACTOR = 0.75f;
-
-    private Node<K,V> head;
-    private int currentCapacity = DEFAULT_CAPACITY;
-    private int threshold = (int) (currentCapacity * LOAD_FACTOR);
-    private Node<K,V>[] table = new Node[DEFAULT_CAPACITY];
     private int count;
 
+    private double threshold;
+
+    public MyHashMap() {
+        this.table = new Node[16];
+        this.count = 0;
+        this.threshold = 0.75;
+    }
+
     @Override
-    public void put(K key,V value) {
-        Node<K,V> newNode = new Node<>(key,value);
-        if (key == null) {
-            table[0] = newNode;
-            head = newNode;
-        } else if (count == 0) {
-            int index = getIndex(key);
-            table[index] = newNode;
-            head = newNode;
-        } else if (count > threshold) {
-            table = resize(table);
-        } else {
-
-            if (!keyExist(key)) {
-                int index = getIndex(key);
-                table[index] = newNode;
-            } else {
-                for (Node<K,V> n : table) {
-                    if (n.key.equals(key)) {
-                        n.next = newNode;
-                    }
-                }
+    public void put(K key, V value) {
+        int index = getIndex(key);
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (node.key.equals(key)) {
+                node.value = value;
+                return;
             }
-
+            node = node.next;
         }
-        count++;
+        Node<K, V> newNode = new Node<>();
+        newNode.key = key;
+        newNode.value = value;
+        newNode.next = table[getIndex(key)];
+        table[getIndex(key)] = newNode;
+        if (++count > table.length * threshold) {
+            resize();
+        }
+        
+    }
+
+    private void resize() {
+        Node<K, V>[] oldArray = table;
+        table = new Node[table.length * 2];
+        for (Node<K, V> kvNode : oldArray) {
+            while (kvNode != null) {
+                int index = getIndex(kvNode.key);
+                Node<K, V> oldNext = kvNode.next;
+                kvNode.next = table[index];
+                table[index] = kvNode;
+                kvNode = oldNext;
+            }
+        }
     }
 
     @Override
     public V getValue(K key) {
-        if (!keyExist(key)) {
-            return null;
+        Node<K, V> node = table[getIndex(key)];
+        while (node != null && !node.key.equals(key)) {
+            node = node.next;
         }
-        if (key == null) {
-            return table[0].value;
-        }
-        int index = getIndex(key);
-        return table[index].value;
+        return node.value == null ? null : node.value;
+
     }
 
     @Override
@@ -69,33 +71,9 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
         return count;
     }
 
-    private int getIndex(Object o) {
-        return o.hashCode() % currentCapacity;
+    private int getIndex(K key){
+        return Math.abs(key.hashCode()) % table.length;
     }
 
-    private Node<K,V>[] resize(Node<K,V>[] nodes) {
-        currentCapacity = currentCapacity * 2;
-        int index = 0;
-        K key = null;
-        Node<K,V>[] newArray = new Node[currentCapacity];
-        for (int i = 0; i < table.length; i++) {
-            if (table[i].key != null) {
-                key = table[i].key;
-                index = getIndex(key);
-                newArray[index] = table[i];
-            }
-        }
-        return newArray;
-
-    }
-
-    private boolean keyExist(Object o) {
-        for (Node<K,V> n : table) {
-            if (n.key.equals(o)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
 }
