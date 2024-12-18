@@ -29,7 +29,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return key == null ? 0 : key.hashCode() & Integer.MAX_VALUE; // Безопасный хэш
+        if (key == null) {
+            return 0;
+        }
+        int hashCode = key.hashCode();
+        return hashCode == Integer.MIN_VALUE ? 0 : Math.abs(hashCode);
     }
 
     private void resize() {
@@ -54,7 +58,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        // Обработка null-ключа
         if (key == null) {
             if (table[0] == null) {
                 table[0] = new Node<>(null, value, null);
@@ -68,7 +71,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = hash(key) % capacity;
         Node<K, V> current = table[index];
 
-        // Если ячейка пуста, добавляем новый узел
         if (current == null) {
             table[index] = new Node<>(key, value, null);
             size++;
@@ -78,10 +80,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
 
-        // Проверяем цепочку узлов
         while (true) {
-            if (current.key.equals(key)) {
-                current.value = value; // Обновляем значение для существующего ключа
+            if (current.key == null ? key == null : current.key.equals(key)) {
+                current.value = value;
                 return;
             }
             if (current.next == null) {
@@ -90,7 +91,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             current = current.next;
         }
 
-        // Добавляем новый узел в конец цепочки
         current.next = new Node<>(key, value, null);
         size++;
         if (size >= threshold) {
@@ -108,7 +108,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> current = table[index];
 
         while (current != null) {
-            if (current.key.equals(key)) {
+            if (current.key == null ? key == null : current.key.equals(key)) {
                 return current.value;
             }
             current = current.next;
