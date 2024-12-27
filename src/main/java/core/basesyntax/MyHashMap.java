@@ -18,10 +18,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private final int DEFAULT_CAPACITY = 16;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final double DEFAULT_LOAD_FACTOR = 0.75;
     private Node<K, V>[] table;
     private int size;
-    private final double DEFAULT_LOAD_FACTOR = 0.75;
     private int threshold;
     private boolean isResized = false;
 
@@ -138,7 +138,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         for (Node<K, V> node : table) {
             while (node != null) {
-                int index = (node.key == null) ? 0 : Math.abs(node.key.hashCode() % newTable.length);
+                int index = (node.key == null) ? 0
+                        : Math.abs(node.key.hashCode() % newTable.length);
 
                 Node<K, V> nextNode = node.next;
                 node.next = newTable[index];
