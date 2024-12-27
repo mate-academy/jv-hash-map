@@ -23,7 +23,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
     private int threshold;
-    private boolean isResized = false;
 
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
