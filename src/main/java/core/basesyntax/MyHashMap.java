@@ -57,19 +57,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int calculateIndex(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
+        return (key == null) ? 0 : (key.hashCode() & 0x7FFFFFFF) % table.length;
     }
 
     private void resize() {
-        final Node<K, V>[ ]oldTable = table;
+        final Node<K, V>[] oldTable = table;
         int newCapacity = table.length * 2;
         table = new Node[newCapacity];
         threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
-        size = 0;
 
         for (Node<K, V> node : oldTable) {
             while (node != null) {
-                put(node.key, node.value);
+                int bucketIndex = calculateIndex(node.key);
+                Node<K, V> newNode = new Node<>(node.key, node.value, table[bucketIndex]);
+                table[bucketIndex] = newNode;
                 node = node.next;
             }
         }
