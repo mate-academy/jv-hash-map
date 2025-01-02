@@ -2,7 +2,7 @@ package core.basesyntax;
 
 import java.util.Objects;
 
-@SuppressWarnings("ALL")
+@SuppressWarnings("unchecked")
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final float LOAD_FACTOR = 0.75f;
     static final int INITIAL_CAPACITY = 1 << 4;
@@ -13,8 +13,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private MyNode<K, V>[] table;
 
     private static class MyNode<K, V> {
-        private int hash;
-        private K key;
+        private final int hash;
+        private final K key;
         private V value;
         private MyNode<K, V> next;
 
@@ -32,16 +32,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         int index = getIndex(key);
-        MyNode node = table[index];
+        MyNode<K, V> node = table[index];
 
         if (node == null) {
             table[index] = new MyNode<>(
                     hashCode(key),
                     key, value);
         } else {
-            MyNode pointer = node;
+            MyNode<K, V> pointer = node;
             while (pointer != null) {
-                if (pointer != null && pointer.hash == hashCode(key)
+                if (pointer.hash == hashCode(key)
                         && Objects.equals(pointer.key, key)) {
                     pointer.value = value;
                     return;
@@ -93,14 +93,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             MyNode<K, V> prev = null;
             while (found != null) {
                 if (found.hash == hash && Objects.equals(found.key, key)) {
-                    MyNode<K, V> toRemove = found;
                     if (prev == null) {
                         table[getIndex(key)] = found.next;
-                        found = found.next;
                     } else {
                         prev.next = found.next;
                     }
-                    return toRemove;
+                    return found;
                 } else {
                     prev = found;
                     found = found.next;
@@ -128,19 +126,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        int hash = key == null ? 0
-                    : hashCode(key);
+        if (table == null || table.length == 0) {
+            throw new IllegalStateException("Hash table is not initialized or has no capacity.");
+        }
+        int hash = key == null ? 0 : hashCode(key);
         return Math.abs(hash % table.length);
     }
 
-    private final int hashCode(Object key) {
+    private int hashCode(Object key) {
         if (key == null) {
             return 0;
         }
         return Math.abs(31 * key.hashCode());
     }
 
-    private MyNode[] resize() {
+    private void resize() {
         MyNode<K, V>[] oldTable = table;
         int oldCapacity = (oldTable == null) ? 0 : oldTable.length;
         int oldThreshold = threshold;
@@ -156,13 +156,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         threshold = newThreshold;
-        MyNode[] newTable = (MyNode<K,V>[]) new MyNode[newCapacity];
+        MyNode<K, V>[] newTable = new MyNode[newCapacity];
         table = newTable;
 
         if (oldTable != null) {
             MyNode<K,V> pointer;
-            for (int i = 0; i < oldTable.length; i++) {
-                pointer = oldTable[i];
+            for (MyNode<K, V> kvMyNode : oldTable) {
+                pointer = kvMyNode;
                 while (pointer != null) {
                     MyNode<K, V> next = pointer.next;
                     int index = getIndex(pointer.key);
@@ -172,7 +172,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-
-        return newTable;
     }
 }
