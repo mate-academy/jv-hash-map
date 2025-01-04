@@ -12,19 +12,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private MyNode<K, V>[] table;
 
-    private static class MyNode<K, V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private MyNode<K, V> next;
-
-        MyNode(int hash, K key, V value) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-        }
-    }
-
     @Override
     public void put(K key, V value) {
         if (table == null) {
@@ -63,21 +50,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        MyNode<K,V> e = getNode(key);
-        if (e == null) {
+        MyNode<K,V> received = getNode(key);
+        if (received == null) {
             return null;
         } else {
-            return e.value;
+            return received.value;
         }
     }
 
     @Override
     public V remove(K key) {
-        MyNode<K,V> e = removeNode(key);
-        if (e == null) {
+        MyNode<K,V> removed = removeNode(key);
+        if (removed == null) {
             return null;
         } else {
-            return e.value;
+            return removed.value;
         }
     }
 
@@ -155,6 +142,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             newThreshold = (int) (INITIAL_CAPACITY * LOAD_FACTOR);
         }
 
+        if (newCapacity >= MAXIMUM_CAPACITY) {
+            newCapacity = MAXIMUM_CAPACITY;
+            newThreshold = (int) (newCapacity * LOAD_FACTOR);
+        }
+
         threshold = newThreshold;
         MyNode<K, V>[] newTable = new MyNode[newCapacity];
         table = newTable;
@@ -171,6 +163,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     pointer = next;
                 }
             }
+        }
+    }
+
+    private static class MyNode<K, V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private MyNode<K, V> next;
+
+        MyNode(int hash, K key, V value) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
         }
     }
 }
