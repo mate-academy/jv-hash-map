@@ -1,60 +1,48 @@
 package core.basesyntax;
 
-import java.util.LinkedList;
+import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final float LOAD_FACTOR = 0.75f;
-    private LinkedList<Entry<K, V>>[] table;
-    private int size = 0;
+    private static final double DEFAULT_LOAD_FACTORY = 0.75;
+    private Node[] hashMap;
+    private int size;
 
     public MyHashMap() {
-        table = new LinkedList[DEFAULT_CAPACITY];
+        this.hashMap = new Node[DEFAULT_CAPACITY];
     }
 
-    private static class Entry<K, V> {
-        K key;
-        V value;
+    public class Node<K, V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private MyHashMap.Node next;
 
-        Entry(K key, V value) {
+        public Node(int hash, K key, V value) {
+            this.hash = hash;
             this.key = key;
             this.value = value;
+            this.next = null;
         }
     }
 
     @Override
     public void put(K key, V value) {
-        int index = indexFor(key.hashCode());
-        if (table[index] == null) {
-            table[index] = new LinkedList<>();
-        }
-
-        for (Entry<K, V> entry : table[index]) {
-            if (entry.key.equals(key)) {
-                entry.value = value;  // Update value if key exists
-                return;
-            }
-        }
-
-        table[index].add(new Entry<>(key, value));
+        resizeIfNeed();
+        addNodeToArray(hashMap, key, value);
         size++;
-
-        if (size > table.length * LOAD_FACTOR) {
-            resize();
-        }
     }
 
     @Override
     public V getValue(K key) {
-        int index = indexFor(key.hashCode());
-        if (table[index] != null) {
-            for (Entry<K, V> entry : table[index]) {
-                if (entry.key.equals(key)) {
-                    return entry.value;
-                }
+        Node currentNode = hashMap[getHashCode(key) % hashMap.length];
+        while (currentNode != null) {
+            if (Objects.equals(key, currentNode.key)) {
+                return (V) currentNode.value;
             }
+            currentNode = currentNode.next;
         }
-        return null; // Key not found
+        return null;
     }
 
     @Override
@@ -62,29 +50,46 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resize() {
-        LinkedList<Entry<K, V>>[] newTable = new LinkedList[table.length * 2];
+    private Node[] addNodeToArray(Node[] array, K key, V value) {
+        int keyHashCode = getHashCode(key);
+        Node node = new Node(keyHashCode, key, value);
+        int index = keyHashCode % array.length;
+        Node currentNode = array[index];
+        if (currentNode != null) {
+            Node oldNode = currentNode;
+            while (currentNode != null) {
+                oldNode = currentNode;
+                if (Objects.equals(key, currentNode.key)) {
+                    currentNode.value = value;
+                    size--;
+                    return array;
+                }
+                currentNode = currentNode.next;
+            }
+            oldNode.next = node;
+        } else {
+            array[index] = node;
+        }
+        return array;
+    }
 
-        for (LinkedList<Entry<K, V>> bucket : table) {
-            if (bucket != null) {
-                for (Entry<K, V> entry : bucket) {
-                    int newIndex = indexFor(entry.key.hashCode(), newTable.length);
-                    if (newTable[newIndex] == null) {
-                        newTable[newIndex] = new LinkedList<>();
-                    }
-                    newTable[newIndex].add(entry);
+    private void resizeIfNeed() {
+        if (size == (int) (DEFAULT_LOAD_FACTORY * hashMap.length)) {
+            Node[] newHashMap = new Node[hashMap.length * 2];
+            for (Node<K, V> node: hashMap) {
+                while (node != null) {
+                    addNodeToArray(newHashMap, node.key, node.value);
+                    node = node.next;
                 }
             }
+            hashMap = newHashMap;
         }
-
-        table = newTable;
     }
 
-    private int indexFor(int hashCode) {
-        return indexFor(hashCode, table.length);
-    }
-
-    private int indexFor(int hashCode, int length) {
-        return Math.abs(hashCode) % length;
+    private int getHashCode(K key) {
+        if (key == null) {
+            return 0;
+        }
+        return Math.abs(key.hashCode());
     }
 }
