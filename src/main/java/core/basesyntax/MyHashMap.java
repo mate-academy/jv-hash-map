@@ -1,57 +1,60 @@
 package core.basesyntax;
 
-import java.util.Objects;
+import java.util.LinkedList;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static final int INITIAL_CAPACITY = 16;
+    private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
-
-    private Node<K, V>[] table;
-    private int size;
+    private LinkedList<Entry<K, V>>[] table;
+    private int size = 0;
 
     public MyHashMap() {
-        table = new Node[INITIAL_CAPACITY];
-        size = 0;
+        table = new LinkedList[DEFAULT_CAPACITY];
+    }
+
+    private static class Entry<K, V> {
+        K key;
+        V value;
+
+        Entry(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 
     @Override
     public void put(K key, V value) {
-        int index = getIndex(key);
-        Node<K, V> newNode = new Node<>(key, value, null);
-
+        int index = indexFor(key.hashCode());
         if (table[index] == null) {
-            table[index] = newNode;
-        } else {
-            Node<K, V> current = table[index];
-            while (current != null) {
-                if (Objects.equals(current.key, key)) {
-                    current.value = value;
-                    return;
-                }
-                if (current.next == null) {
-                    current.next = newNode;
-                    break;
-                }
-                current = current.next;
+            table[index] = new LinkedList<>();
+        }
+
+        for (Entry<K, V> entry : table[index]) {
+            if (entry.key.equals(key)) {
+                entry.value = value;  // Update value if key exists
+                return;
             }
         }
+
+        table[index].add(new Entry<>(key, value));
         size++;
-        if (size >= table.length * LOAD_FACTOR) {
+
+        if (size > table.length * LOAD_FACTOR) {
             resize();
         }
     }
 
     @Override
     public V getValue(K key) {
-        int index = getIndex(key);
-        Node<K, V> current = table[index];
-        while (current != null) {
-            if (Objects.equals(current.key, key)) {
-                return current.value;
+        int index = indexFor(key.hashCode());
+        if (table[index] != null) {
+            for (Entry<K, V> entry : table[index]) {
+                if (entry.key.equals(key)) {
+                    return entry.value;
+                }
             }
-            current = current.next;
         }
-        return null;
+        return null; // Key not found
     }
 
     @Override
@@ -59,32 +62,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getIndex(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
-    }
-
     private void resize() {
-        Node<K, V>[] oldTable = table;
-        table = new Node[oldTable.length * 2];
-        size = 0;
+        LinkedList<Entry<K, V>>[] newTable = new LinkedList[table.length * 2];
 
-        for (Node<K, V> head : oldTable) {
-            while (head != null) {
-                put(head.key, head.value);
-                head = head.next;
+        for (LinkedList<Entry<K, V>> bucket : table) {
+            if (bucket != null) {
+                for (Entry<K, V> entry : bucket) {
+                    int newIndex = indexFor(entry.key.hashCode(), newTable.length);
+                    if (newTable[newIndex] == null) {
+                        newTable[newIndex] = new LinkedList<>();
+                    }
+                    newTable[newIndex].add(entry);
+                }
             }
         }
+
+        table = newTable;
     }
 
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
+    private int indexFor(int hashCode) {
+        return indexFor(hashCode, table.length);
+    }
 
-        public Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
+    private int indexFor(int hashCode, int length) {
+        return Math.abs(hashCode) % length;
     }
 }
