@@ -19,6 +19,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = Math.abs(key != null ? key.hashCode() : 0);
         int index = hash % table.length;
         Node<K, V> current = table[index];
+
+        if (current == null) {
+            table[index] = new Node<>(hash, key, value, null);
+            size++;
+            return;
+        }
+
         while (current != null) {
             if (Objects.equals(current.key, key)) {
                 if (Objects.equals(current.value, value)) {
@@ -35,9 +42,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             current = current.nextNode;
         }
-
-        table[index] = new Node<>(hash, key, value, null);
-        size++;
     }
 
     @Override
