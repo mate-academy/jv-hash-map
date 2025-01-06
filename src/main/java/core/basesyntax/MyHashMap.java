@@ -3,11 +3,10 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private final static int INITIAL_CAPACITY = 16;
-    private final static int LOAD_FACTOR = 2;
-    public K key;
-    public V value;
-    public int size;
+    private static final int INITIAL_CAPACITY = 16;
+    private static final int RESIZE_FACTOR = 2;
+    private static final double LOAD_FACTOR = 0.75;
+    private int size;
     private Node<K, V>[] table;
 
     public MyHashMap() {
@@ -61,9 +60,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (size >= table.length) {
+        if (size >= table.length * LOAD_FACTOR) {
             Node<K, V>[] oldTable = table;
-            table = new Node[oldTable.length * LOAD_FACTOR];
+            table = new Node[oldTable.length * RESIZE_FACTOR];
             size = 0;
             for (Node<K, V> node : oldTable) {
                 while (node != null) {
@@ -87,42 +86,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.nextNode = nextNode;
         }
 
-        public int getHash() {
-            return hash;
-        }
-
-        public void setHash(int hash) {
-            this.hash = hash;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public void setKey(K key) {
-            this.key = key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
-        }
-
-        public Node<K, V> getNextNode() {
-            return nextNode;
-        }
-
-        public void setNextNode(Node<K, V> nextNode) {
-            this.nextNode = nextNode;
-        }
-
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Node<?, ?> node = (Node<?, ?>) o;
             return Objects.equals(key, node.key) && Objects.equals(value, node.value);
         }
