@@ -67,14 +67,30 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= table.length * LOAD_FACTOR) {
             Node<K, V>[] oldTable = table;
             table = new Node[oldTable.length * RESIZE_FACTOR];
-            size = 0;
+
             for (Node<K, V> node : oldTable) {
                 while (node != null) {
-                    put(node.key, node.value);
+                    putWithoutSize(node.key, node.value);
                     node = node.nextNode;
                 }
             }
         }
+    }
+
+    private void putWithoutSize(K key, V value) {
+        int hash = Math.abs(key != null ? key.hashCode() : 0);
+        int index = hash % table.length;
+        Node<K, V> current = table[index];
+
+        while (current != null) {
+            if (Objects.equals(current.key, key)) {
+                current.value = value;
+                return;
+            }
+            current = current.nextNode;
+        }
+
+        table[index] = new Node<>(hash, key, value, table[index]);
     }
 
     private static class Node<K, V> {
