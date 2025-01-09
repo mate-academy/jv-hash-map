@@ -65,18 +65,26 @@ class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = table;
         table = new Node[oldTable.length * 2];
         threshold = (int) (table.length * LOAD_FACTOR);
-        size = 0;
 
         for (Node<K, V> node : oldTable) {
             while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+                int index = getIndex(node.key, table.length);
+                Node<K, V> next = node.next;
+                node.next = table[index];
+                table[index] = node;
+                node = next;
             }
         }
     }
 
+    private int getIndex(K key, int tableLength) {
+        int hash = key == null ? 0 : key.hashCode();
+        return Math.abs(hash) % tableLength;
+    }
+
     private int indexFor(K key) {
-        return (key == null ? 0 : Math.abs(key.hashCode())) % table.length;
+        int hash = (key == null) ? 0 : key.hashCode();
+        return Math.abs(hash == Integer.MIN_VALUE ? 0 : hash) % table.length;
     }
 
     private static class Node<K, V> {
