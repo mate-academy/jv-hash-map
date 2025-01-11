@@ -11,22 +11,21 @@ public class MyHashMap<K, V> implements MyMap<K,V> {
     private final float lf = 0.75f;
 
     private static class Entry<K, V> {
-        K key;
-        V value;
+        private K key;
+        private V value;
 
         Entry(K key, V value) {
             this.key = key;
             this.value = value;
         }
+
         @Override
         public String toString() {
-            return  "key=" + key +
-                    ", value=" + value;
+            return "key=" + key + ", value=" + value;
         }
     }
 
     public MyHashMap() {
-        // Ініціалізація масиву бакетів
         table = new LinkedList[INITIAL_CAPACITY];
         size = 0;
     }
