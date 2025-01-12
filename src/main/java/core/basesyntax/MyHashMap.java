@@ -1,15 +1,15 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    static final int DEFOULT_START_CAPACITY = 16;
-    static final double DEFOULT_LOAD_FACTOR = 0.75;
+    static final int DEFAULT_START_CAPACITY = 16;
+    static final double DEFAULT_LOAD_FACTOR = 0.75;
     private int size;
-    private int capasity;
+    private int capacity;
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        table = new Node[DEFOULT_START_CAPACITY];
-        capasity = DEFOULT_START_CAPACITY;
+        table = new Node[DEFAULT_START_CAPACITY];
+        capacity = DEFAULT_START_CAPACITY;
         size = 0;
     }
 
@@ -90,17 +90,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private boolean isFull() {
-        return size + 1 > (int) capasity * DEFOULT_LOAD_FACTOR;
+        return size + 1 > (int) capacity * DEFAULT_LOAD_FACTOR;
     }
 
     private void resize() {
-        capasity *= 2;
-        Node<K, V>[] newTable = new Node[capasity];
+        capacity *= 2;
+        Node<K, V>[] newTable = new Node[capacity];
 
         for (Node<K, V> bucket : table) {
             while (bucket != null) {
                 int newHash = (bucket.getKey() == null ? 0 : Math.abs(bucket.getKey().hashCode()))
-                        % capasity;
+                        % capacity;
                 Node<K, V> nextNode = bucket.next;
                 bucket.next = newTable[newHash];
                 newTable[newHash] = bucket;
@@ -112,7 +112,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return (key == null ? 0 : Math.abs(key.hashCode())) % capasity;
+        return (key == null ? 0 : Math.abs(key.hashCode())) % capacity;
     }
 
     private void nullAdd(K key, V value) {
