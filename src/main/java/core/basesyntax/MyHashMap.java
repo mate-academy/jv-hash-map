@@ -24,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size++;
         } else {
             Node<K, V> currNode = table[index];
-            do {
+            while (currNode != null) {
                 if (currNode.hash == hash && Objects.equals(currNode.key, key)) {
                     currNode.value = value;
                     break;
@@ -35,7 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     break;
                 }
                 currNode = currNode.next;
-            } while (true);
+            }
         }
         if (size > threshold) {
             resize();
