@@ -17,6 +17,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if (size >= threshold) {
+            resize();
+        }
         int hash = calculateHash(key);
         int index = calculateIndex(hash);
         if (table[index] == null) {
@@ -36,9 +39,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 currNode = currNode.next;
             }
-        }
-        if (size > threshold) {
-            resize();
         }
     }
 
