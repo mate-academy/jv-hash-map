@@ -17,8 +17,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int hash = hash(key);
-        int index = hash % table.length;
+        int hash = calculateHash(key);
+        int index = calculateIndex(hash);
         if (table[index] == null) {
             table[index] = new Node<>(hash, key, value);
             size++;
@@ -44,8 +44,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int hash = hash(key);
-        int index = hash % table.length;
+        int hash = calculateHash(key);
+        int index = calculateIndex(hash);
         if (table[index] == null) {
             return null;
         }
@@ -81,10 +81,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = newTable;
     }
 
-    private int hash(K key) {
+    private int calculateHash(K key) {
         int keyHashCode;
         return key == null ? 0
                 : ((keyHashCode = key.hashCode()) ^ (keyHashCode >>> 16)) & 0xfffffff;
+    }
+
+    private int calculateIndex(int hash) {
+        return hash & (table.length - 1);
     }
 
     private static class Node<K, V> {
