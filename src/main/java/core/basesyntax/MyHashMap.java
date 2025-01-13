@@ -7,14 +7,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
-    private final float loadFactor;
     private int threshold;
 
     @SuppressWarnings("unchecked")
     public MyHashMap() {
         this.table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
-        this.loadFactor = DEFAULT_LOAD_FACTOR;
-        this.threshold = (int) (loadFactor * DEFAULT_CAPACITY);
+        this.threshold = (int) (DEFAULT_LOAD_FACTOR * DEFAULT_CAPACITY);
     }
 
     @Override
@@ -70,7 +68,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int newCapacity = table.length << 1;
         @SuppressWarnings("unchecked")
         Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
-        threshold = (int) (loadFactor * newCapacity);
+        threshold = (int) (DEFAULT_LOAD_FACTOR * newCapacity);
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 Node<K, V> nextNode = node.next;
