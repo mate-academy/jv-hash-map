@@ -21,7 +21,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int hash = calculateHash(key);
-        int index = calculateIndex(hash);
+
+        int index = calculateIndex(hash, table.length);
         if (table[index] == null) {
             table[index] = new Node<>(hash, key, value);
             size++;
@@ -45,7 +46,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int hash = calculateHash(key);
-        int index = calculateIndex(hash);
+        int index = calculateIndex(hash, table.length);
         Node<K, V> currNode = table[index];
         while (currNode != null) {
             if (currNode.hash == hash && Objects.equals(currNode.key, key)) {
@@ -70,7 +71,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 Node<K, V> nextNode = node.next;
-                int index = node.hash % newCapacity;
+                int index = calculateIndex(node.hash, newCapacity);
                 node.next = newTable[index];
                 newTable[index] = node;
                 node = nextNode;
@@ -85,8 +86,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 : ((keyHashCode = key.hashCode()) ^ (keyHashCode >>> 16)) & 0xfffffff;
     }
 
-    private int calculateIndex(int hash) {
-        return hash & (table.length - 1);
+    private int calculateIndex(int hash, int capacity) {
+        return hash & (capacity - 1);
     }
 
     private static class Node<K, V> {
