@@ -46,15 +46,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int hash = calculateHash(key);
         int index = calculateIndex(hash);
-        if (table[index] == null) {
-            return null;
-        }
         Node<K, V> currNode = table[index];
-        do {
+        while (currNode != null) {
             if (currNode.hash == hash && Objects.equals(currNode.key, key)) {
                 return currNode.value;
             }
-        } while ((currNode = currNode.next) != null);
+            currNode = currNode.next;
+        }
         return null;
     }
 
