@@ -14,7 +14,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (key == null) {
-            Pair<K, V> current = table[0];
+            int nullKeyIndex = 0;
+            Pair<K, V> current = table[nullKeyIndex];
             while (current != null) {
                 if (current.key == null) {
                     current.value = value;
@@ -27,7 +28,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
                 current = current.next;
             }
-            table[0] = new Pair<>(key, value);
+
+            table[nullKeyIndex] = new Pair<>(key, value);
             size++;
             return;
         }
@@ -36,7 +38,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
 
-        int index = (key.hashCode() & 0x7FFFFFFF) % capacity;
+        int index = Math.abs(key.hashCode() % capacity);
 
         if (table[index] == null) {
             table[index] = new Pair<>(key, value);
@@ -72,11 +74,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
 
-        int index = (key.hashCode() & 0x7FFFFFFF) % capacity;
+        int index = Math.abs(key.hashCode() % capacity);
 
         Pair<K, V> current = table[index];
         while (current != null) {
-            if (current.key == key || (current.key != null && current.key.equals(key))) {
+            if (current.key != null && current.key.equals(key)) {
                 return current.value;
             }
             current = current.next;
@@ -95,8 +97,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         for (Pair<K, V> entry : table) {
             while (entry != null) {
-                int index = (entry.key == null) ? 0 :
-                        (entry.key.hashCode() & 0x7FFFFFFF) % capacity;
+                int index = Math.abs(entry.key.hashCode() % capacity);
                 Pair<K, V> newEntry = new Pair<>(entry.key, entry.value);
                 if (newTable[index] == null) {
                     newTable[index] = newEntry;
@@ -119,11 +120,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Pair<K, V> next;
 
-        public Pair(K key, V value) {
+        private Pair(K key, V value) {
             this.key = key;
             this.value = value;
         }
     }
 }
-
-
