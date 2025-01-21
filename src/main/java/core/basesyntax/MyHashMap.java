@@ -81,7 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 if (node.key == null) { // Found the node with a null key
                     return node.value;
                 }
-            } else if (node.hash == index && node.key.equals(key) || key != null && key.equals(node.key)) {
+            } else if (node.hash == index || key != null && key.equals(node.key)) {
                 // Found the node with a non-null key
                 return node.value;
             }
