@@ -22,16 +22,24 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public static class Node<K,V> {
-        public int hash;
-        public K key;
-        public V value;
-        public Node<K,V> next;
+        private int hash;
+        private K key;
+        private V value;
+        private Node<K,V> next;
 
         public Node(int hash, K key, V value, Node<K,V> item) {
             this.hash = hash;
             this.key = key;
             this.value = value;
             this.next = item;
+        }
+
+        public int getHash() {
+            return hash;
+        }
+
+        public K getKey() {
+            return key;
         }
     }
 
@@ -44,17 +52,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = new Node(index, key, value, null);
             size++;
         } else {
-            if (bucketEntry.hash == index && (bucketEntry.key == key || key != null && key.equals(bucketEntry.key))) {
+            if (bucketEntry.hash == table[index].hash && (bucketEntry.key == key || key != null && key.equals(bucketEntry.key))) {
                 bucketEntry.value = value;
                 return;
             }
 
             while (bucketEntry.next != null) {
-                if (bucketEntry.hash == index && (bucketEntry.key == key || key != null && key.equals(bucketEntry.key))) {
+                if (bucketEntry.hash == table[index].hash && (bucketEntry.key == key || key != null && key.equals(bucketEntry.key))) {
                     bucketEntry.value = value;
                     return;
                 }
-                bucketEntry = bucketEntry.next == null ? bucketEntry : bucketEntry.next;
+                bucketEntry = bucketEntry.next;
             }
 
             bucketEntry.next = new Node(index, key, value, null);
@@ -101,7 +109,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return 0;
         }
         int h = key.hashCode();
-        return (h ^ (h >>> 16)) & (table.length - 1);
+        return (h ^ (h >>> 16)) & (capacity - 1);
 //        return (key == null) ? 0 : abs(key.hashCode() % 16);
 //        return abs(key.hashCode() % 16);
     }
@@ -114,7 +122,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> node = table[i];
             while (node != null) {
                 Node<K, V> next = node.next; // Save reference to the next node
-                int newIndex = abs(node.key == null ? 0 : (node.hash ^ (node.hash >>> 16)) & (table.length - 1));
+                int newIndex = abs(node.key == null ? 0 : (node.hash ^ (node.hash >>> 16)) & (newCapacity - 1));
                 node.next = newTable[newIndex]; // Rehash the node to the new index
                 newTable[newIndex] = node; // Place the node in the new table
                 node = next; // Move to the next node
