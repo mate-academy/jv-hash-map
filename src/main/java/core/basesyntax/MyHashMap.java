@@ -52,15 +52,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = new Node(index, key, value, null);
             size++;
         } else {
-            if (bucketEntry.hash == table[index].hash && (bucketEntry.key == key || key != null
-                    && key.equals(bucketEntry.key))) {
+            if ((bucketEntry.key == key || key != null && key.equals(bucketEntry.key))) {
                 bucketEntry.value = value;
                 return;
             }
 
             while (bucketEntry.next != null) {
-                if (bucketEntry.hash == table[index].hash && (bucketEntry.key == key || key != null
-                        && key.equals(bucketEntry.key))) {
+                if ((bucketEntry.key == key || key != null && key.equals(bucketEntry.key))) {
                     bucketEntry.value = value;
                     return;
                 }
@@ -91,7 +89,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 if (node.key == null) { // Found the node with a null key
                     return node.value;
                 }
-            } else if (node.hash == index || key != null && key.equals(node.key)) {
+            } else if (key != null && key.equals(node.key)) {
                 // Found the node with a non-null key
                 return node.value;
             }
@@ -118,7 +116,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int newCapacity = capacity * 2;
         // Double the capacity
         Node<K, V>[] newTable = new Node[newCapacity]; // Create a new table
-        for (int i = 0; i < capacity * loadFactor; i++) {
+        for (int i = 0; i < capacity; i++) {
             Node<K, V> node = table[i];
             while (node != null) {
                 Node<K, V> next = node.next; // Save reference to the next node
