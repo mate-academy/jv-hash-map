@@ -15,7 +15,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (key == null) { // Handle null key
+        if (key == null) {
+            if (nullKeyValue == null) {
+                size++;
+            }
             nullKeyValue = value;
             return;
         }
@@ -54,21 +57,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public int getSize() {
-        return size + (nullKeyValue != null ? 1 : 0);
+        return size;
     }
 
     private void resize() {
         capacity *= 2;
         Node<K, V>[] oldTable = table;
         table = new Node[capacity];
-        size = 0;
-
+        int oldSize = size;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
             }
         }
+        size = oldSize;
     }
 
     private int getIndex(K key) {
