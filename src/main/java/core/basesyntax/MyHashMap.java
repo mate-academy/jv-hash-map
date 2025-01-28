@@ -54,13 +54,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        size = 0;
         Node<K, V>[] old = table;
         table = new Node[table.length * 2];
         for (Node<K, V> node : old) {
             while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+                Node<K, V> next = node.next;
+                node.next = table[getIndex(node.key)];
+                table[getIndex(node.key)] = node;
+                node = next;
             }
         }
     }
