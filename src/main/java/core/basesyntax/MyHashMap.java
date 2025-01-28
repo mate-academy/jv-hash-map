@@ -41,9 +41,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public V getValue(K key) {
         int index = getHash(key);
         while (keys[index] != null) {
-            if (Objects.equals(keys[index], key)) {
-               return (V) values[index];
-            }
+             if (Objects.equals(keys[index], key)) {
+                 return (V) values[index];
+             }
             index = (index + 1) % keys.length;
         }
         return null;
@@ -64,7 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             size = 0;
             for (int i = 0; i < oldKeys.length; i++) {
                 if (oldKeys[i] != null) {
-                    put ((K) oldKeys[i], (V) oldValues[i]);
+                    put((K) oldKeys[i], (V) oldValues[i]);
                 }
             }
         }
