@@ -6,7 +6,6 @@ public class Node<K, V> {
     private V value;
     private Node<K,V> next;
 
-    //
     public Node(K key, int hash, V value, Node<K,V> next) {
         this.key = key;
         this.hash = hash;
