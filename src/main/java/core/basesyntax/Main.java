@@ -11,5 +11,11 @@ public class Main {
         System.out.println("Value for 'key1': " + myHashMap.getValue("key1"));
         System.out.println("Value for 'key2': " + myHashMap.getValue("key2"));
         System.out.println("Value for 'key4': " + myHashMap.getValue("key4"));
+
+        myHashMap.put("key1", "newValue");
+        System.out.println("Updated Value for 'key1': " + myHashMap.getValue("key1"));
+
+        myHashMap.put(null, "nullValue");
+        System.out.println("Value for 'null': " + myHashMap.getValue(null));
     }
 }
