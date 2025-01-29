@@ -19,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public static class Node<K, V> {
         private final K key;
         private V value;
-        private final Node<K, V> next;
+        private Node<K, V> next;
 
         public Node(K key, V value, Node<K, V> next) {
             this.key = key;
@@ -66,18 +66,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        int hash = (key == null) ? 0 : key.hashCode() % capacity;
-        if (hash < 0) {
-            hash *= -1;
-        }
-        return hash;
+        return (key == null) ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 
     private void resize() {
         Node<K, V>[] oldTable;
         oldTable = table;
         capacity *= CAPACITY_ENLARGEMENT;
-        table = new Node[capacity];
+        table = (Node<K, V>[]) new Node[capacity];
         size = 0;
         for (Node<K, V> node : oldTable) {
             if (node != null) {
