@@ -8,10 +8,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private int threshold;
 
-    private int hash(Object key) {
-        return (key == null) ? 0 : key.hashCode() ^ (key.hashCode() >>> 16);
-    }
-
     @Override
     public void put(K key, V value) {
         putValue(hash(key), key, value);
@@ -58,6 +54,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (++size > threshold) {
             table = resize();
         }
+    }
+
+    private int hash(Object key) {
+        return (key == null) ? 0 : key.hashCode() ^ (key.hashCode() >>> 16);
     }
 
     @Override
