@@ -35,7 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= capacity * DEFAULT_LOAD_FACTOR) {
             resize();
         }
-        int index = (key == null) ? 0 : hash % capacity;
+        int index = (key == null) ? 0 : Math.abs(hash % capacity);
         if (table[index] == null) {
             table[index] = new Node<>(hash, key, value, null);
         } else {
