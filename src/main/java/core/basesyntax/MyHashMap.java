@@ -3,22 +3,43 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     public static final int DEFAULT_INITIAL_CAPACITY = 16;
     public static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    public static final float RESIZE_THRESHOLD = DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR;
 
-
-    Entry<K, V>[] entries;
-    int size = 0;
-    int currentCapacity = DEFAULT_INITIAL_CAPACITY;
-    float loadFactor = DEFAULT_LOAD_FACTOR;
+    private Entry<K, V>[] entries;
+    private int size = 0;
+    private int currentCapacity = DEFAULT_INITIAL_CAPACITY;
+    private int resizeThreshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
+    private float loadFactor = DEFAULT_LOAD_FACTOR;
 
     public MyHashMap() {
         entries = (Entry<K, V>[]) new Entry[DEFAULT_INITIAL_CAPACITY];
     }
 
     private void resize() {
-        Entry<K, V>[] oldEntries = entries;
-        entries = (Entry<K, V>[]) new Entry[currentCapacity << 1];
-        System.arraycopy(oldEntries, 0, entries, 0, oldEntries.length);
+        currentCapacity = currentCapacity << 1;
+        resizeThreshold = (int) (currentCapacity * loadFactor);
+        Entry<K, V>[] newEntries = (Entry<K, V>[]) new Entry[currentCapacity];
+        for (Entry<K, V> entry : entries) {
+            if (entry == null) {
+                continue;
+            }
+            Entry<K, V> currentRecord = entry;
+            while (currentRecord != null) {
+                int index = getIndexOfEntry(currentRecord.key);
+                if (newEntries[index] == null) {
+                    newEntries[index] = new Entry<>(currentRecord.key, currentRecord.value);
+                    newEntries[index].hash = currentRecord.hash;
+                } else {
+                    Entry<K, V> currentEntry = newEntries[index];
+                    while (currentEntry.next != null) {
+                        currentEntry = currentEntry.next;
+                    }
+                    currentEntry.next = new Entry<>(currentRecord.key, currentRecord.value);
+                    currentEntry.next.hash = currentRecord.hash;
+                }
+                currentRecord = currentRecord.next;
+            }
+        }
+        entries = newEntries;
     }
 
     private int getIndexOfEntry(K key) {
@@ -28,13 +49,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if(entries == null || entries.length == 0 ) {
+        if (entries == null || entries.length == 0) {
             resize();
         }
         int index = getIndexOfEntry(key);
         if (entries[index] == null) {
             entries[index] = new Entry<>(key, value);
-        }else{
+        } else {
             Entry<K, V> currentEntry = entries[index];
             Entry<K, V> tailEntry = entries[index];
             boolean equalsAccepted = false;
@@ -42,7 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 if (currentEntry.key != null && key != null) {
                     equalsAccepted = currentEntry.key.equals(key);
                 }
-                if ((currentEntry.key == null && key == null ) || equalsAccepted) {
+                if ((currentEntry.key == null && key == null) || equalsAccepted) {
                     currentEntry.value = value;
                     return;
                 }
@@ -54,7 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             tailEntry.next = new Entry<>(key, value);
         }
         size++;
-        if (size > RESIZE_THRESHOLD) {
+        if (size > resizeThreshold) {
             resize();
         }
     }
@@ -62,10 +83,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int index = getIndexOfEntry(key);
-        if (size == 0) {
+        if (size == 0 || entries[index] == null) {
             return null;
         }
-        if(entries[index].next == null) {
+        if (entries[index].next == null) {
             return (entries[index] == null) ? null : entries[index].value;
         }
         Entry<K, V> currentEntry = entries[index];
@@ -76,7 +97,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             } else if (currentEntry.key == null && key == null) {
                 equalsAccepted = true;
             }
-            if(currentEntry.hash == (key == null ? 0 : key.hashCode()) && equalsAccepted) {
+            if (currentEntry.hash == (key == null ? 0 : key.hashCode()) && equalsAccepted) {
                 return currentEntry.value;
             }
             currentEntry = currentEntry.next;
@@ -90,10 +111,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     static class Entry<K, V> {
-        private final K key;
+        private K key;
         private V value;
         private Entry<K, V> next;
-        private final int hash;
+        private int hash;
 
         public Entry(K key, V value) {
             this.key = key;
