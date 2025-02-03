@@ -43,7 +43,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    final void putVal(int h, K key, V value) {
+    private void putVal(int h, K key, V value) {
         if (size >= threshold) {
             resize();
         }
@@ -86,14 +86,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(Object key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
+        return key == null ? 0 : Math.abs(key.hashCode()) % capacity;
     }
 
     static class Node<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
@@ -102,18 +102,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
         }
 
-        public final K getKey() {
+        public int getHash() {
+            return hash;
+        }
+
+        public K getKey() {
             return key;
         }
 
-        public final V getValue() {
+        public V getValue() {
             return value;
         }
 
-        public final V setValue(V newValue) {
-            V oldValue = value;
-            value = newValue;
-            return oldValue;
+        public void setValue(V value) {
+            this.value = value;
+        }
+
+        public Node<K, V> getNext() {
+            return next;
+        }
+
+        public void setNext(Node<K, V> next) {
+            this.next = next;
         }
 
         public final String toString() {
@@ -133,7 +143,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return false;
             }
             Node<?, ?> node = (Node<?, ?>) o;
-            return hash == node.hash && Objects.equals(key, node.key) && Objects.equals(value, node.value) && Objects.equals(next, node.next);
+            return hash == node.hash &&
+                    Objects.equals(key, node.key) &&
+                    Objects.equals(value, node.value) &&
+                    Objects.equals(next, node.next);
         }
     }
 }
