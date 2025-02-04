@@ -27,24 +27,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         resizeIfNeeded();
         int index = getIndex(key);
-        Node<K, V> newNode = new Node<>(key, value);
+        Node<K, V> current = table[index];
 
-        if (table[index] == null) {
-            table[index] = newNode;
-        } else {
-            Node<K, V> current = table[index];
-            while (true) {
-                if (Objects.equals(current.key, key)) {
-                    current.value = value;
-                    return;
-                }
-                if (current.next == null) {
-                    current.next = newNode;
-                    break;
-                }
-                current = current.next;
+        while (current != null) {
+            if (Objects.equals(current.key, key)) {
+                current.value = value;
+                return;
             }
+            current = current.next;
         }
+
+        Node<K, V> newNode = new Node<>(key, value);
+        newNode.next = table[index];
+        table[index] = newNode;
         size++;
     }
 
@@ -67,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
+        return (key == null || table.length == 0) ? 0 : Math.abs(key.hashCode() % table.length);
     }
 
     private void resizeIfNeeded() {
