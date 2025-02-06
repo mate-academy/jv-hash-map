@@ -18,29 +18,49 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         int index = getIndex(key);
-        Node<K, V> newNode = new Node<>(key, value, null);
-        if (table[index] == null) {
-            table[index] = newNode;
-        } else {
-            Node<K, V> current = table[index];
-            while (current != null) {
-                if (Objects.equals(current.key, key)) {
-                    current.value = value;
-                    return;
-                }
-                if (current.next == null) {
-                    current.next = newNode;
-                    break;
-                }
-                current = current.next;
+
+        // Special case: handling null key
+        if (key == null) {
+            if (table[0] != null) {
+                table[0].value = value; // Update existing null key, don't increment size
+            } else {
+                table[0] = new Node<>(null, value, null);
+                size++; // New null key, increment size
             }
+            return;
         }
-        size++;
+
+        Node<K, V> current = table[index];
+        Node<K, V> last = null;
+
+        while (current != null) {
+            if (Objects.equals(current.key, key)) {
+                current.value = value; // Update existing key, don't increment size
+                return;
+            }
+            last = current;
+            current = current.next;
+        }
+
+        Node<K, V> newNode = new Node<>(key, value, null);
+        if (last == null) {
+            table[index] = newNode; // Insert at head
+        } else {
+            last.next = newNode; // Insert at tail
+        }
+        size++; // Only increment size for NEW elements
     }
+
+
 
     @Override
     public V getValue(K key) {
         int index = getIndex(key);
+
+        if (key == null) {
+            return table[0] != null ? table[0].value : null;
+        }
+
         Node<K, V> current = table[index];
         while (current != null) {
             if (Objects.equals(current.key, key)) {
@@ -57,17 +77,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode()) % table.length;
+        return (key == null) ? 0 : (key.hashCode() & 0x7FFFFFFF) % table.length;
     }
 
     private void resize() {
         Node<K, V>[] oldTable = table;
         table = new Node[oldTable.length * 2];
-        size = 0;
+
         for (Node<K, V> node : oldTable) {
             while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+                Node<K, V> next = node.next;
+                int index = getIndex(node.key);
+
+                node.next = table[index];
+                table[index] = node;
+                node = next;
             }
         }
     }
