@@ -6,7 +6,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     static final int DEFAULT_INITIAL_CAPACITY = 16;
-    static final float DEFAULT_LOAD_FACTORY = 0.75f;
+    static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
     static class Node<K, V> implements Map.Entry<K, V> {
         private int hash;
@@ -45,11 +45,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
-        threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTORY);
+        threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
     private int hash(K key) {
-        return (key == null) ? 0 : key.hashCode() % table.length;
+        return (key == null) ? 0 : key.hashCode() & (table.length - 1);
     }
 
     @Override
@@ -84,12 +84,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         Node<K, V> current = table[index];
         while (current != null) {
-            if (current.hash == hash && (current.key == key
-                    || (key != null && key.equals(current.key)))) {
+            if (current.hash == hash && (Objects.equals(key, current.key))) {
                 return current.value;
             }
             current = current.next;
         }
+
         return null;
     }
 
@@ -114,7 +114,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         table = newTable;
-        threshold = (int) (newCapacity * DEFAULT_LOAD_FACTORY);
+        threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
     }
 }
 
