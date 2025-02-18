@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int INITIAL_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
@@ -12,7 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
+        return (key == null ? 0 : (key.hashCode() & 0x7fffffff)) % table.length;
     }
 
     @Override
@@ -25,8 +27,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             Node<K, V> current = table[index];
             while (true) {
-                if (current.key == null && key == null
-                        || (current.key != null && current.key.equals(key))) {
+                if (Objects.equals(current.key, key)) {
                     current.value = value;
                     return;
                 }
@@ -65,17 +66,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         Node<K, V>[] oldTable = table;
         table = new Node[oldTable.length * 2];
-
-        int oldSize = size;
         size = 0;
-
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
                 node = node.next;
             }
         }
-        size = oldSize;
     }
 
     private static class Node<K, V> {
