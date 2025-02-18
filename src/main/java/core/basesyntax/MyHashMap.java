@@ -44,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
 
-        int index = Math.abs(key.hashCode() % buckets.length);
+        int index = Math.abs(key.hashCode() & 0x7FFFFFFF % buckets.length);
         if (buckets[index] == null) {
             buckets[index] = new LinkedList<>();
         }
@@ -63,7 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return (nullNode != null) ? nullNode.value : null;
         }
-        int index = Math.abs(key.hashCode() % buckets.length);
+        int index = Math.abs(key.hashCode() & 0x7FFFFFFF % buckets.length);
         if (buckets[index] == null) {
             return null;
         }
@@ -87,7 +87,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (LinkedList<Node<K, V>> bucket : buckets) {
             if (bucket != null) {
                 for (Node<K, V> node : bucket) {
-                    int newIndex = Math.abs(node.key.hashCode() % newCapacity);
+                    int newIndex = Math.abs(node.key.hashCode() & 0x7FFFFFFF % newCapacity);
                     if (newBuckets[newIndex] == null) {
                         newBuckets[newIndex] = new LinkedList<>();
                     }
@@ -98,5 +98,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         buckets = newBuckets;
         threshold = (int) (newCapacity * LOAD_FACTOR);
+
+        if (nullNode != null) {
+            int index = 0;
+            if (buckets[index] == null) {
+                buckets[index] = new LinkedList<>();
+            }
+            buckets[index].add(nullNode);
+        }
     }
 }
