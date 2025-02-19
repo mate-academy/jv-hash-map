@@ -91,6 +91,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         newCap = oldCap == 0 ? defaultCons : oldCap * 2;
         threshold = (int) (factory * newCap);
 
+        transfer(newCap);
+    }
+
+    private void transfer(int newCap) {
         Node<K, V>[] oldTable = table;
         table = new Node[newCap];
 
@@ -102,22 +106,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     node.next = table[x]; // Вставляем в новый массив, сохраняя цепочку
                     table[x] = node;
                     node = nextNode; // Переходим к следующему узлу
-                }
-            }
-        }
-    }
-
-    private void transfer(int newCap) {
-        Node<K, V>[] oldNode = table;
-        table = new Node[newCap];
-        size = 0;
-        for (int i = 0; i < oldNode.length; i++) {
-            if (oldNode[i] != null) {
-                put(oldNode[i].key, oldNode[i].value);
-                Node<K, V> node = oldNode[i];
-                while (node.next != null) {
-                    node = node.next;
-                    put(node.key, node.value);
                 }
             }
         }
