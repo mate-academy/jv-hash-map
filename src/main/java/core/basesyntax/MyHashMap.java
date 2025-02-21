@@ -16,7 +16,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
+        return (key == null) ? 0 : Math.floorMod(key.hashCode(), table.length);
     }
 
     @Override
@@ -65,9 +65,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldTable = table;
+        size = 0;
         table = new Node[oldTable.length * 2];
         threshold = (int) (table.length * LOAD_FACTOR);
-        size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 put(node.key, node.value);
