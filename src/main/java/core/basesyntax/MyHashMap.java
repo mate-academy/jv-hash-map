@@ -64,7 +64,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
 
-        int index = hash(key) % capacity;
+        int index = Math.abs(hash(key) % capacity);
         Node<K, V> current = table[index];
 
         if (current == null) {
@@ -100,7 +100,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return table[0] == null ? null : table[0].value;
         }
 
-        int index = hash(key) % capacity;
+        int index = Math.abs(hash(key) % capacity);
         Node<K, V> current = table[index];
 
         while (current != null) {
