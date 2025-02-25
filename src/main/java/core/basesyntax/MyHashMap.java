@@ -4,13 +4,14 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
+    private static final int CONSTANT_FOR_HASH = 0x7FFFFFFF;
     private static final double LOAD_FACTOR = 0.75;
     private Bucket<K, V>[] myHashMap;
     private int capacity;
     private int threshold;
     private int size;
 
-    private Node<K, V> currentNode = new Node<>(null, null);
+    private Node<K, V> currentNode = new Node<>();
     private int indexBucket;
 
     public MyHashMap() {
@@ -46,12 +47,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int indexByKey(K key) {
-        return currentNode.calculateHash(key) % capacity;
-    }
-
     private void checkThreshold() {
-        if (size > threshold) {
+        if (size >= threshold) {
             capacity = capacity << 1;
             resize();
         }
@@ -110,8 +107,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         size++;
     }
 
+    private int indexByKey(K key) {
+        return currentNode.calculateHash(key) % capacity;
+    }
+
     private static class Bucket<K, V> {
-        private final Node<K, V> node;
+        private Node<K, V> node;
         private int bucketSize;
 
         private Bucket(K key, V value) {
@@ -124,8 +125,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private final int hash;
-        private final K key;
+        private int hash;
+        private K key;
         private V value;
         private Node<K, V> next;
 
@@ -135,8 +136,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             hash = calculateHash(key);
         }
 
-        public int calculateHash(K key) {
-            return key == null ? 0 : Math.abs(key.hashCode());
+        private Node() {
+        }
+
+        private int calculateHash(K key) {
+            return key == null ? 0 : key.hashCode() & CONSTANT_FOR_HASH;
         }
     }
 }
