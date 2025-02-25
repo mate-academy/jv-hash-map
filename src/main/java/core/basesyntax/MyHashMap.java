@@ -3,22 +3,22 @@ package core.basesyntax;
 import java.util.Map;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    final private int DEFAULT_CAPACITY = 16;
-    final private double DEFAULT_LOAD_FACTOR = 0.75;
+    private final int defaultCapacity = 16;
+    private final double defaultLoadFactor = 0.75;
     private int size = 0;
     private int capacity;
     private Node<K, V>[] table;
 
     public MyHashMap() {
-        this.capacity = DEFAULT_CAPACITY;
+        this.capacity = defaultCapacity;
         this.table = new Node[capacity];
     }
 
     static class Node<K, V> implements Map.Entry<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
@@ -57,8 +57,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         while (currentNode != null) {
-            if ((currentNode.key == null && key == null) ||
-                    (currentNode.key != null && currentNode.key.equals(key))) {
+            if ((currentNode.key == null && key == null)
+                    || (currentNode.key != null && currentNode.key.equals(key))) {
                 currentNode.value = value;
                 return;
             }
@@ -107,7 +107,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public void checkSize() {
-        if ((double) size / capacity >= DEFAULT_LOAD_FACTOR) {
+        if ((double) size / capacity >= defaultLoadFactor) {
             resizeHashMap();
         }
     }
@@ -119,7 +119,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> current : table) {
             while (current != null) {
                 int index = getIndex((K) current.key);
-                Node<K, V> newNode = new Node<>(hash((K) current.key), current.key, current.value, null);
+                Node<K, V> newNode =
+                        new Node<>(hash((K) current.key), current.key, current.value, null);
 
                 if (newTable[index] == null) {
                     newTable[index] = newNode;
