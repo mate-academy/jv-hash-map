@@ -78,7 +78,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node currentNode = table[index];
         if (currentNode != null) {
             do {
-                if (currentNode.key == key || (currentNode.key != null && currentNode.key.equals(key))) {
+                if (currentNode.key == key || (currentNode.key != null
+                        && currentNode.key.equals(key))) {
                     return (V) currentNode.value;
                 }
                 currentNode = currentNode.next;
