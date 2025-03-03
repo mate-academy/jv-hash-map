@@ -23,7 +23,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (size >= threshold) {
             resize();
         }
-        insertNodeInMap(table, new Node<>(key, value));
+        Node<K, V> putNode = new Node<>(key, value);
+        int indexTable = indexByKey(key);
+        if (table[indexTable] != null) {
+            Node<K, V> currentNode = table[indexTable];
+            while (currentNode != null) {
+                if (Objects.equals(currentNode.key, putNode.key)) {
+                    currentNode.value = putNode.value;
+                    return;
+                }
+                currentNode.next = currentNode.next == null ? putNode : currentNode.next;
+                currentNode = currentNode.next == putNode ? null : currentNode.next;
+            }
+            size++;
+            return;
+        }
+        table[indexTable] = putNode;
+        size++;
     }
 
     @Override
@@ -31,15 +47,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int indexTable = indexByKey(key);
         if (table[indexTable] != null) {
             Node<K, V> currentNode = table[indexTable];
-            do {
+            while (currentNode != null) {
                 if (Objects.equals(currentNode.key, key)) {
                     return currentNode.value;
                 }
-                if (currentNode.next == null) {
-                    break;
-                }
                 currentNode = currentNode.next;
-            } while (currentNode != null);
+            }
         }
         return null;
     }
@@ -50,48 +63,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        capacity = capacity << DEFAULT_CAPACITY_INCREASE;
+        capacity = table.length << DEFAULT_CAPACITY_INCREASE;
         threshold = (int) (capacity * LOAD_FACTOR);
         Node<K, V>[] copyMap = table;
         table = new Node[capacity];
         size = 0;
         for (Node<K, V> node : copyMap) {
-            if (node == null) {
-                continue;
+            while (node != null) {
+                this.put(node.key, node.value);
+                Node<K, V> nextNode = node.next;
+                node.next = null;
+                node = nextNode;
             }
-            Node<K, V> currentNode = node;
-            do {
-                Node<K, V> nextNode = currentNode.next;
-                insertNodeInMap(table, currentNode);
-                if (nextNode == null) {
-                    break;
-                }
-                currentNode = nextNode;
-            } while (currentNode != null);
         }
-    }
-
-    private void insertNodeInMap(Node<K, V>[] map, Node<K, V> node) {
-        int indexTable = indexByKey(node.key);
-        if (map[indexTable] != null) {
-            Node<K, V> currentNode = map[indexTable];
-            do {
-                if (Objects.equals(currentNode.key, node.key)) {
-                    currentNode.value = node.value;
-                    return;
-                }
-                if (currentNode.next == null) {
-                    break;
-                }
-                currentNode = currentNode.next;
-            } while (currentNode != null);
-            currentNode.next = node;
-        }
-        if (map[indexTable] == null) {
-            map[indexTable] = node;
-        }
-        node.next = null;
-        size++;
     }
 
     private int indexByKey(K key) {
@@ -99,7 +83,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private static class Node<K, V> {
-        private int hash;
         private K key;
         private V value;
         private Node<K, V> next;
@@ -107,7 +90,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private Node(K key, V value) {
             this.key = key;
             this.value = value;
-            hash = key == null ? 0 : key.hashCode() & CONSTANT_FOR_HASH;
         }
     }
 }
