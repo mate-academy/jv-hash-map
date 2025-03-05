@@ -92,18 +92,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         for (Node<K, V> node : table) {
             while (node != null) {
-                Node<K, V> next = node.getNext();
-                int newIndex = getBucketIndex(node.getKey(), newCapacity);
+                Node<K, V> next = node.next;
+                int newIndex = getBucketIndex(node.key, newCapacity);
 
-                node.setNext(newTable[newIndex]);
+                node.next = newTable[newIndex];
                 newTable[newIndex] = node;
+
                 node = next;
             }
         }
         table = newTable;
     }
 
+
     private int getBucketIndex(K key, int capacity) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % capacity);
+        return (key == null) ? 0 : (key.hashCode() & 0x7fffffff) % capacity;
     }
 }
