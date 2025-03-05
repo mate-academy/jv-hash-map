@@ -57,7 +57,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             current = current.getNext();
         }
 
-
         Node<K, V> newNode = new Node<>(key, value, table[index]);
         table[index] = newNode;
         size++;
@@ -103,7 +102,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         table = newTable;
     }
-
 
     private int getBucketIndex(K key, int capacity) {
         return (key == null) ? 0 : (key.hashCode() & 0x7fffffff) % capacity;
