@@ -9,13 +9,33 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
 
     private static class Node<K, V> {
-        K key;
-        V value;
-        Node<K, V> next;
+        private K key;
+        private V value;
+        private Node<K, V> next;
 
         Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
+            this.next = next;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public V getValue() {
+            return value;
+        }
+
+        public void setValue(V value) {
+            this.value = value;
+        }
+
+        public Node<K, V> getNext() {
+            return next;
+        }
+
+        public void setNext(Node<K, V> next) {
             this.next = next;
         }
     }
@@ -26,23 +46,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size >= table.length * LOAD_FACTOR) {
-            resize();
-        }
         int index = getBucketIndex(key, table.length);
         Node<K, V> current = table[index];
 
         while (current != null) {
-            if (Objects.equals(current.key, key)) {
-                current.value = value;
+            if (Objects.equals(current.getKey(), key)) {
+                current.setValue(value);
                 return;
             }
-            current = current.next;
+            current = current.getNext();
         }
+
 
         Node<K, V> newNode = new Node<>(key, value, table[index]);
         table[index] = newNode;
         size++;
+
+        if (size > table.length * LOAD_FACTOR) {
+            resize();
+        }
     }
 
     @Override
@@ -51,10 +73,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> current = table[index];
 
         while (current != null) {
-            if (Objects.equals(current.key, key)) {
-                return current.value;
+            if (Objects.equals(current.getKey(), key)) {
+                return current.getValue();
             }
-            current = current.next;
+            current = current.getNext();
         }
         return null;
     }
@@ -70,9 +92,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         for (Node<K, V> node : table) {
             while (node != null) {
-                Node<K, V> next = node.next;
-                int newIndex = getBucketIndex(node.key, newCapacity);
-                node.next = newTable[newIndex];
+                Node<K, V> next = node.getNext();
+                int newIndex = getBucketIndex(node.getKey(), newCapacity);
+
+                node.setNext(newTable[newIndex]);
                 newTable[newIndex] = node;
                 node = next;
             }
