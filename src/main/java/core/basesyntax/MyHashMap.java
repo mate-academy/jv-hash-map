@@ -1,10 +1,12 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
     private int defaultCapacity = 16;
-    private int maxCapacity = (int) (defaultCapacity * 0.75);
+    private int maxCapacity;
 
     public MyHashMap() {
         size = 0;
@@ -17,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             resize();
         }
         boolean found = false;
-        int index = Math.abs(hash(key)) % table.length;
+        int index = getIndex(key);
         if (table[index] == null) {
             table[index] = new Node<>(hash(key), key, value, table[index]);
             size++;
@@ -26,14 +28,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> prev = null;
             while (current != null) {
                 prev = current;
-                if (key == current.getKey() || (key != null && current.getKey() != null
-                        && key.equals(current.getKey()))) {
+                if (Objects.equals(key, current.getKey()) || (key != null
+                        && current.getKey() != null && key.equals(current.getKey()))) {
                     current.setValue(value);
                     found = true;
                     break;
                 }
                 current = current.getNext();
             }
+
             if (!found) {
                 prev.setNext(new Node<>(hash(key), key, value, null));
                 size++;
@@ -43,11 +46,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = Math.abs(hash(key)) % table.length;
+        int index = getIndex(key);
         Node<K, V> current = table[index];
         while (current != null) {
-            if (key == current.getKey() || (key != null && current.getKey() != null
-                    && key.equals(current.getKey()))) {
+            if (Objects.equals(key, current.getKey()) || (key != null
+                    && current.getKey() != null && key.equals(current.getKey()))) {
                 return current.getValue();
             }
             current = current.getNext();
@@ -62,7 +65,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     static int hash(Object key) {
         int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+        return (key == null) ? 0 : Math.abs((h = key.hashCode()) ^ (h >>> 16));
+    }
+
+    private int getIndex(K key) {
+        return hash(key) % table.length;
     }
 
     private void resize() {
