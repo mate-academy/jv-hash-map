@@ -43,7 +43,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             } else {
                 Node<K,V> currentNode = table[index];
-                while (currentNode.next != null && currentNode.key != null) {
+                while (currentNode.next != null) {
+                    if (currentNode.key == null) {
+                        currentNode.value = value;
+                        return;
+                    }
                     currentNode = currentNode.next;
                 }
                 if (currentNode.key == null) {
@@ -64,14 +68,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode.value = value;
                 return;
             }
-            while (currentNode.next != null) {
+            while (currentNode != null) {
                 if (currentNode.key != null && currentNode.key.equals(key)) {
                     currentNode.value = value;
                     return;
                 }
+                if (currentNode.next == null) {
+                    currentNode.next = new Node<>(hash, key, value, null);
+                    break;
+                }
                 currentNode = currentNode.next;
             }
-            currentNode.next = new Node<>(hash,key,value,null);
         }
         size++;
     }
@@ -84,14 +91,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         Node<K,V> currentNode = table[index];
-        do {
+        while (currentNode != null) {
             if (currentNode.key == null ? key == null : currentNode.key.equals(key)) {
                 return currentNode.value;
             }
             currentNode = currentNode.next;
-        } while (currentNode.next != null);
-        if (currentNode.key == null ? key == null : currentNode.key.equals(key)) {
-            return currentNode.value;
         }
         return null;
     }
