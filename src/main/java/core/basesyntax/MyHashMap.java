@@ -17,7 +17,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private K key;
         private V value;
 
-        Entry(K key, V value) {
+        private Entry(K key, V value) {
             this.key = key;
             this.value = value;
         }
@@ -75,20 +75,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-    }
-
-    public static void main(String[] args) {
-        MyHashMap<String, Integer> map = new MyHashMap<>();
-        map.put("one", 1);
-        map.put("two", 2);
-        map.put("three", 3);
-        map.put(null, 4);
-
-        System.out.println("Value for key 'one': " + map.getValue("one"));
-        System.out.println("Value for key 'null': " + map.getValue(null));
-        System.out.println("Size of map: " + map.getSize());
-
-        map.put("one", 10);
-        System.out.println("Updated value for key 'one': " + map.getValue("one"));
     }
 }
