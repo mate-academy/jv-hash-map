@@ -1,18 +1,19 @@
 package core.basesyntax;
+
 import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     static final int DEFAULT_INITIAL_CAPACITY = 16;
-    int size = 0;
+    private int size = 0;
     @SuppressWarnings("unchecked")
-    Node<K,V>[] nodes = new Node[DEFAULT_INITIAL_CAPACITY];
+    private Node<K,V>[] nodes = new Node[DEFAULT_INITIAL_CAPACITY];
 
     static class Node<K,V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K,V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K,V> next;
 
         Node(int hash, K key, V value, Node<K,V> next) {
             this.hash = hash;
@@ -21,11 +22,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
         }
 
-        public final K getKey() { return key; }
+        public final K getKey() {
+            return key;
+        }
 
-        public final V getValue() { return value; }
+        public final V getValue() {
+            return value;
+        }
 
         public final int hashCode() {
+
             return Objects.hashCode(key) ^ Objects.hashCode(value);
         }
     }
@@ -40,7 +46,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = key == null ? 0 : Math.abs(key.hashCode());
         int nodeNumber = hash == 0 ? 0 : hash % nodes.length;
 
-        if (nodes[nodeNumber] == null) { return null; }
+        if (nodes[nodeNumber] == null) {
+            return null;
+        }
         if (nodes[nodeNumber].getKey() == null
                 || nodes[nodeNumber].getKey().equals(key)) {
             return nodes[nodeNumber].getValue();
@@ -61,11 +69,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void putPrivate (K key, V value) {
+    private void putPrivate(K key, V value) {
         int hash = key == null ? 0 : Math.abs(key.hashCode());
         int nodeNumber = hash == 0 ? 0 : hash % nodes.length;
         if (nodes[nodeNumber] == null) {
-            nodes[nodeNumber] =  new Node<>(hash, key, value, null);
+            nodes[nodeNumber] = new Node<>(hash, key, value, null);
             size++;
             resize();
         } else {
