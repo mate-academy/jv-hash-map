@@ -7,7 +7,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 16;
     private int size = 0;
     @SuppressWarnings("unchecked")
-    private Node<K,V>[] nodes = new Node[DEFAULT_INITIAL_CAPACITY];
+    private Node<K,V>[] nodes = (Node<K,V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
+
 
     static class Node<K,V> {
         private final int hash;
@@ -49,8 +50,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (nodes[nodeNumber] == null) {
             return null;
         }
-        if (nodes[nodeNumber].getKey() == null
-                || nodes[nodeNumber].getKey().equals(key)) {
+        if (((nodes[nodeNumber].getKey() == null
+                || nodes[nodeNumber].getKey().equals(key)))) {
             return nodes[nodeNumber].getValue();
         }
         Node<K,V> checkNext = nodes[nodeNumber];
@@ -96,19 +97,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        if (size > nodes.length * DEFAULT_LOAD_FACTOR) {
-            Node<K,V>[] nodesCopy = nodes;
+        if (size >= nodes.length * DEFAULT_LOAD_FACTOR) {
+            Node<K, V>[] oldNodes = nodes;
             nodes = new Node[nodes.length * 2];
-            size = 0;
-            for (Node<K,V> i : nodesCopy) {
-                if (i == null) {
-                    continue;
-                }
-                putPrivate(i.key, i.value);
-                Node<K,V> checkNext = i;
-                while (checkNext.next != null) {
-                    checkNext = checkNext.next;
-                    putPrivate(checkNext.key, checkNext.value);
+
+            for (Node<K, V> oldNode : oldNodes) {
+                while (oldNode != null) {
+                    Node<K, V> nextNode = oldNode.next;
+                    oldNode.next = null;
+
+                    int newIndex = Math.abs(oldNode.key.hashCode()) % nodes.length;
+
+                    if (nodes[newIndex] != null) {
+                        oldNode.next = nodes[newIndex];
+                    }
+                    nodes[newIndex] = oldNode;
+
+                    oldNode = nextNode;
                 }
             }
         }
