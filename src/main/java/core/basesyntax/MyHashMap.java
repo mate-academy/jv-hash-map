@@ -9,7 +9,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @SuppressWarnings("unchecked")
     private Node<K,V>[] nodes = (Node<K,V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
 
-
     static class Node<K,V> {
         private final int hash;
         private final K key;
@@ -103,19 +102,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
             for (Node<K, V> oldNode : oldNodes) {
                 while (oldNode != null) {
-                    Node<K, V> nextNode = oldNode.next;
-                    oldNode.next = null;
-
                     int newIndex = Math.abs(oldNode.key.hashCode()) % nodes.length;
-
-                    if (nodes[newIndex] != null) {
-                        oldNode.next = nodes[newIndex];
-                    }
+                    Node<K, V> nextNode = oldNode.next;
+                    oldNode.next = nodes[newIndex];
                     nodes[newIndex] = oldNode;
-
                     oldNode = nextNode;
                 }
             }
         }
     }
+
 }
