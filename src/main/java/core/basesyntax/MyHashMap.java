@@ -10,7 +10,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int size;
     private int capacity;
 
-    public static class Node<K, V> {
+    private static class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
@@ -34,9 +34,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public void put(K key, V value) {
-        if (table == null) {
-            table = new Node[capacity];
-        }
         int hash = hash(key);
         int index = hash % capacity;
 
@@ -80,16 +77,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int newCapacity = capacity * 2;
         Node<K, V>[] newTable = new Node[newCapacity];
 
-        for (Node<K, V> head : table) {
+        for (int i = 0; i < table.length; i++) {
+            Node<K, V> head = table[i];
             while (head != null) {
-                int newIndex = head.hash % newCapacity;
                 Node<K, V> next = head.next;
+                head.next = null;
+                int newIndex = head.hash % newCapacity;
 
                 head.next = newTable[newIndex];
                 newTable[newIndex] = head;
 
                 head = next;
             }
+            table[i] = null;
         }
 
         capacity = newCapacity;
