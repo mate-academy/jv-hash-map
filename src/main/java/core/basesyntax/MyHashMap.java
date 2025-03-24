@@ -1,15 +1,17 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+    private static final int DEFAULT_CAPACITY = 16;
     private Node<K, V>[] buckets;
 
     private final float loadFactor = 0.75f;
+
     private int threshold;
     private int size = 0;
 
     @Override
     public void put(K key, V value) {
-        if (buckets == null || buckets.length == 0 || size == threshold) {
+        if (buckets == null || buckets.length == 0 || size >= threshold) {
             buckets = resize();
         }
         if (key == null) {
@@ -97,7 +99,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             oldCapacity = buckets.length;
         }
         if (oldCapacity == 0) {
-            newCapacity = 16;
+            newCapacity = DEFAULT_CAPACITY;
             threshold = (int) (newCapacity * loadFactor);
             return new Node[newCapacity];
         } else {
@@ -109,23 +111,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V>[] transfer(int newCapacity) {
         Node<K, V>[] newBuckets = new Node[newCapacity];
-        for (Node<K,V> bucket : buckets) {
-            if (bucket != null) {
-                while (bucket != null) {
-                    Node<K,V> bucketNext = bucket.next;
-                    bucket.next = null;
-                    int index = bucket.hash & (newCapacity - 1);
-                    if (newBuckets[index] == null) {
-                        newBuckets[index] = bucket;
-                    } else {
-                        Node<K,V> currentNewBucket = newBuckets[index];
-                        while (currentNewBucket.next != null) {
-                            currentNewBucket = currentNewBucket.next;
-                        }
-                        currentNewBucket.next = bucket;
-                    }
-                    bucket = bucketNext;
-                }
+        for (int i = 0; i < buckets.length; i++) {
+            Node<K, V> node = buckets[i];
+            while (node != null) {
+                Node<K, V> nextNode = node.next;
+                int newIndex = node.hash & (newCapacity - 1);
+                node.next = newBuckets[newIndex];
+                newBuckets[newIndex] = node;
+                node = nextNode;
             }
         }
         return newBuckets;
