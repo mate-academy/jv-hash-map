@@ -2,8 +2,11 @@ package core.basesyntax;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.w3c.dom.ls.LSOutput;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.Map;
 
 public class MyHashMapTest {
     private static final Car firstCar = new Car("Audi", "black");
@@ -214,10 +217,14 @@ public class MyHashMapTest {
         for (int i = 0; i < 1000; i++) {
             Bus bus = new Bus("model_" + i, "color_" + i);
             myHashMap.put(bus, i);
+            System.out.println(bus.equals(new Bus("model_" + i, "color_" + i)));
+            System.out.println(myHashMap.getValue(new Bus("model_" + i, "color_" + i)));
         }
+        System.out.println(myHashMap.getValue(new Bus("model_" + 2, "color_" + 2)));
         Assert.assertEquals("Test failed! The size isn't correct. Expected 1000 but was "
                 + myHashMap.getSize(), 1000, myHashMap.getSize());
         for (int i = 0; i < 1000; i++) {
+//            System.out.println(myHashMap.getValue(new Bus("model_" + i, "color_" + i)));
             Assert.assertEquals(Integer.valueOf(i),
                     myHashMap.getValue(new Bus("model_" + i, "color_" + i)));
         }
@@ -230,6 +237,10 @@ public class MyHashMapTest {
             Plane plane = new Plane("model_" + i, "color_" + i);
             myHashMap.put(plane, i);
         }
+        System.out.println(myHashMap.getSize());
+        System.out.println(myHashMap.getValue(new Plane("model_" + 0, "color_" + 0)));
+        System.out.println(new Plane("model_" + 0, "color_" + 0).
+                equals(new Plane("model_" + 0, "color_" + 0)));
         Assert.assertEquals("Test failed! The size isn't correct. Expected 1000 but was "
                 + myHashMap.getSize(), 1000, myHashMap.getSize());
         for (int i = 0; i < 1000; i++) {
