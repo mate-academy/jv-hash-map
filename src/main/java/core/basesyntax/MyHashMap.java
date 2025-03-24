@@ -12,10 +12,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         buckets = new LinkedList[INITIAL_CAPACITY];
     }
 
-    private int hash(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % buckets.length);
-    }
-
     @Override
     public void put(K key, V value) {
         int index = hash(key);
@@ -74,18 +70,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    public LinkedList<Entry<K, V>>[] getBuckets() {
-        return buckets;
-    }
-
-    public void setBuckets(LinkedList<Entry<K, V>>[] buckets) {
-        this.buckets = buckets;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
-
     private static class Entry<K, V> {
         private K key;
         private V value;
@@ -94,21 +78,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
         }
+    }
 
-        public K getKey() {
-            return key;
-        }
-
-        public void setKey(K key) {
-            this.key = key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
-        }
+    private int hash(K key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode() % buckets.length);
     }
 }
