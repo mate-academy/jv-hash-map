@@ -90,6 +90,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private K key;
         private V value;
 
+        Entry(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
         public K getKey() {
             return key;
         }
@@ -103,11 +108,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         public void setValue(V value) {
-            this.value = value;
-        }
-
-        Entry(K key, V value) {
-            this.key = key;
             this.value = value;
         }
     }
