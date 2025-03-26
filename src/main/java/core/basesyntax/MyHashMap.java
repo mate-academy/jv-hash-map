@@ -1,8 +1,6 @@
 package core.basesyntax;
 
-import static java.awt.AWTEventMulticaster.add;
 import static java.lang.Math.abs;
-import static java.lang.reflect.Array.set;
 
 import java.util.HashSet;
 
