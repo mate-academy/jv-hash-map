@@ -69,19 +69,21 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
+        Node<K, V>[] oldTable = table;
         capacity = capacity * 2;
         threshold = (int) (capacity * loadFactor);
-        Node<K, V>[] oldTable = table;
         table = new Node[capacity];
-        size = 0;
         transfer(oldTable);
     }
 
     private void transfer(Node<K, V>[] oldTable) {
-        for (Node<K, V> node : oldTable) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
+        for (Node<K, V> oldNode : oldTable) {
+            while (oldNode != null) {
+               Node<K, V> next = oldNode.next;
+               int index = Math.abs(oldNode.hash % capacity);
+               oldNode.next = table[index];
+               table[index] = oldNode;
+               oldNode = next;
             }
         }
     }
