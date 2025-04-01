@@ -19,7 +19,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getHashIndex(key, capacity);
         Node<K, V> current = buckets[index];
         if (current == null) {
-            buckets[index] = new Node<K, V>(null, key, value);
+            buckets[index] = new Node<K, V>(key, value);
             size++;
         } else {
             Node<K, V> previous = null;
@@ -31,7 +31,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 previous = current;
                 current = current.next;
             }
-            previous.next = new Node<K, V>(null, key, value);
+            previous.next = new Node<K, V>(key, value);
             size++;
         }
         if ((float) size / capacity > LOAD_FACTOR) {
@@ -87,8 +87,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private K key;
         private V value;
 
-        public Node(Node<K, V> next, K key, V value) {
-            this.next = next;
+        public Node(K key, V value) {
             this.key = key;
             this.value = value;
 
