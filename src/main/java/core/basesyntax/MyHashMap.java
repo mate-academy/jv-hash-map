@@ -19,19 +19,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getHashIndex(key, capacity);
         Node<K, V> current = buckets[index];
         if (current == null) {
-            buckets[index] = new Node<K, V>(key, value);
+            buckets[index] = new Node<K, V>(null, key, value);
             size++;
         } else {
-            Node<K, V> previous = null;
             while (current != null) {
-                if (key == current.key || key != null & Objects.equals(key,current.key)) {
+                if (Objects.equals(key,current.key)) {
                     current.value = value;
                     return;
                 }
-                previous = current;
                 current = current.next;
             }
-            previous.next = new Node<K, V>(key, value);
+            buckets[index] = new Node<K, V>(buckets[index], key, value);
             size++;
         }
         if ((float) size / capacity > LOAD_FACTOR) {
@@ -44,7 +42,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getHashIndex(key, capacity);
         Node<K, V> current = buckets[index];
         while (current != null) {
-            if (key == current.key || key != null && Objects.equals(key, current.key)) {
+            if (Objects.equals(key, current.key)) {
                 return current.value;
             }
             current = current.next;
@@ -62,8 +60,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return 0;
         }
-        int hash = key.hashCode();
-        return Math.abs(hash % capacity);
+        return (key.hashCode() & Integer.MAX_VALUE) % capacity;
     }
 
     private void resize() {
@@ -82,12 +79,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private class Node<K, V> {
+    private static class Node<K, V> {
         private Node<K, V> next;
         private K key;
         private V value;
 
-        public Node(K key, V value) {
+        private Node(Node<K, V> next, K key, V value) {
+            this.next = next;
             this.key = key;
             this.value = value;
 
