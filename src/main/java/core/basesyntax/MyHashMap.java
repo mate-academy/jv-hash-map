@@ -57,15 +57,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private int getBucketIndex(K key) {
-        return getHash(key) & (buckets.length - 1);
-    }
-
-    private int getHash(K key) {
-        int hash = (key == null) ? 0 : key.hashCode();
-        return hash ^ (hash >>> 16);
-    }
-
     private void resize() {
         int newCapacity = buckets.length * 2;
         Node<K, V>[] newBuckets = new Node[newCapacity];
@@ -84,6 +75,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
     }
 
+    private int getBucketIndex(K key) {
+        return getHash(key) & (buckets.length - 1);
+    }
+
+    private int getHash(K key) {
+        int hash = (key == null) ? 0 : key.hashCode();
+        return hash ^ (hash >>> 16);
+    }
+
     private static class Node<K, V> {
         private final K key;
         private V value;
@@ -93,6 +93,22 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.key = key;
             this.value = value;
             this.next = next;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public V getValue() {
+            return value;
+        }
+
+        public Node<K, V> getNext() {
+            return next;
+        }
+
+        public void setValue(V value) {
+            this.value = value;
         }
     }
 }
