@@ -94,21 +94,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public Node<K, V> getNext() {
-            return next;
-        }
-
-        public void setValue(V value) {
-            this.value = value;
-        }
     }
 }
