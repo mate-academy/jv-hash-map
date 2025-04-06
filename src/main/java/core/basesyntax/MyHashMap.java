@@ -111,9 +111,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> node : oldTable) {
             while (node != null) {
                 Node<K, V> next = node.next;
-                int index = indexFor(node.hash, newCapacity);
-                node.next = newTable[index];
-                newTable[index] = node;
+                int newHash = node.key == null ? 0 : node.key.hashCode();
+                int newIndex = indexFor(newHash, newCapacity);
+
+                Node<K, V> newNode =
+                        new Node<>(node.hash, node.key, node.value, newTable[newIndex]);
+                newTable[newIndex] = newNode;
+
                 node = next;
             }
         }
