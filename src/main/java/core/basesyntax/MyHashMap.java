@@ -86,6 +86,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.size = size;
     }
 
+    public void testGit() {
+        System.out.println("Testing Git");
+        System.out.println("Hello World");
+    }
+
     private static class Entry<K, V> {
         private K key;
         private V value;
