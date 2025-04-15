@@ -9,6 +9,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         V value;
         Entry<K, V> next;
 
+
+
         Entry(K key, V value) {
             this.key = key;
             this.value = value;
