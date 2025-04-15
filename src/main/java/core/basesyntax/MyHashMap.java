@@ -35,7 +35,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         for (Entry<K, V> e = head; e != null; e = e.next) {
             if (Objects.equals(e.key, key)) {
-                e.value = value; // overwrite existing value
+                e.value = value;
                 return;
             }
         }
