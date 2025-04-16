@@ -24,4 +24,11 @@ public class Bus {
     public int hashCode() {
         return 0;
     }
+
+    @Override
+    public String toString() {
+        return "Car{model='" +
+                model + "',color='" +
+                color + "'}";
+    }
 }

@@ -9,6 +9,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
 
+    @SuppressWarnings("unchecked")
     public MyHashMap() {
         table = new Node[INITIAL_CAPACITY];
         size = 0;
@@ -56,6 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    @SuppressWarnings("unchecked")
     private void resize() {
         Node<K, V>[] oldTable = table;
         table = new Node[oldTable.length * 2];
@@ -70,7 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return Math.abs(key.hashCode()) % table.length;
+        return Math.abs(Objects.hashCode(key)) % table.length;
     }
 
     private static class Node<K, V> {
