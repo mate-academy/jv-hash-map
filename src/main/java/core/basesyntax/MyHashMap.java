@@ -4,6 +4,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
+    private boolean isResizing = false;
 
     private Node<K, V>[] buckets;
     private int size;
@@ -40,13 +41,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> newNode = new Node<>(key, value, buckets[index]);
         buckets[index] = newNode;
         size++;
-        if ((float) size / buckets.length >= LOAD_FACTOR) {
+        if (!isResizing && (float) size / buckets.length >= LOAD_FACTOR) {
             resize();
         }
     }
 
     @SuppressWarnings("unchecked")
     private void resize() {
+        isResizing = true; // Увімкнути прапорець, щоб уникнути рекурсії
         Node<K, V>[] oldBuckets = buckets;
         buckets = (Node<K, V>[]) new Node[oldBuckets.length * 2];
         size = 0;
@@ -57,6 +59,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node = node.next;
             }
         }
+
+        isResizing = false;
     }
 
     @Override
@@ -70,7 +74,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             current = current.next;
         }
-
         return null;
     }
 
