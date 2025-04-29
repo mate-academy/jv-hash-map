@@ -81,7 +81,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             while (oldNode != null) {
                 Node<K, V> next = oldNode.next;
                 int newIndex = (oldNode.key == null ? 0 :
-                        oldNode.key.hashCode() & 0x7fffffff) % newCapacity;
+                        (oldNode.key.hashCode() & 0x7fffffff) % newCapacity);
 
                 oldNode.next = newTable[newIndex];
                 newTable[newIndex] = oldNode;
