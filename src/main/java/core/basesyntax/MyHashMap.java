@@ -79,6 +79,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldBuckets = buckets;
         buckets = new Node[oldBuckets.length * 2];
 
+        count = 0; // Скидаємо лічильник перед перезаписом вузлів
+
         for (Node<K, V> node : oldBuckets) {
             while (node != null) {
                 int newIndex = getIndex(node.key);
@@ -86,9 +88,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 node.next = buckets[newIndex];
                 buckets[newIndex] = node;
                 node = nextNode;
+                count++; // Підраховуємо кількість елементів заново
             }
         }
     }
+
 
     private int getIndex(K key) {
         return (key == null) ? 0 : (key.hashCode() & (buckets.length - 1));
