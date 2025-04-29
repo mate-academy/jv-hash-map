@@ -20,7 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             reSize();
         }
         Node<K, V> node = new Node<>(key, value);
-        int index = (key == null) ? 0 : Math.abs(key.hashCode() % currentCapacity);
+        int index = Math.abs((node.hashKey) % currentCapacity);
         Node<K, V> current = nodes[index];
         if (nodes[index] == null) {
             nodes[index] = node;
@@ -68,8 +68,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         currentCapacity = currentCapacity * 2;
         for (Node<K, V> node: nodes) {
             while (node != null) {
-                int index = (node.key == null) ? 0
-                        : Math.abs(node.key.hashCode() % currentCapacity);
+                int index = Math.abs(node.hashKey % currentCapacity);
                 Node<K, V> newNode = new Node<>(node.key, node.value);
                 if (nodes2[index] == null) {
                     nodes2[index] = newNode;
