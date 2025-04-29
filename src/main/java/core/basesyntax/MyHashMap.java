@@ -68,7 +68,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         currentCapacity = currentCapacity * 2;
         for (Node<K, V> node: nodes) {
             while (node != null) {
-                int index = Math.abs(node.key.hashCode() % currentCapacity);
+                int index = (node.key == null) ? 0
+                        : Math.abs(node.key.hashCode() % currentCapacity);
                 Node<K, V> newNode = new Node<>(node.key, node.value);
                 if (nodes2[index] == null) {
                     nodes2[index] = newNode;
@@ -97,7 +98,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.hashKey = (key == null) ? 0 : key.hashCode();;
+            this.hashKey = (key == null) ? 0 : key.hashCode();
         }
     }
 }
