@@ -24,7 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int hash = hash(key);
-        int keyIndex = hash % capacity;
+        int keyIndex = Math.abs(hash % capacity);
 
         Node<K, V> current = table[keyIndex];
 
@@ -48,7 +48,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int getHash = hash(key);
-        int indexHash = getHash % capacity;
+        int indexHash = Math.abs(getHash % capacity);
 
         Node<K, V> getCurrent = table[indexHash];
         while (getCurrent != null) {
@@ -72,7 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> headNode = table[i];
             while (headNode != null) {
                 Node<K, V> next = headNode.next;
-                int newIndex = headNode.hash % newCapacity;
+                int newIndex = Math.abs(headNode.hash % newCapacity);
 
                 headNode.next = newTable[newIndex];
                 newTable[newIndex] = headNode;
