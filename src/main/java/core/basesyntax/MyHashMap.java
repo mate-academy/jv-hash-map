@@ -5,21 +5,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
     private int size;
     private Node<K,V>[] table;
-    private int capacity;
     private int threshold;
-    private double loadFactor;
 
     public MyHashMap() {
-        this.capacity = DEFAULT_INITIAL_CAPACITY;
-        this.loadFactor = DEFAULT_LOAD_FACTOR;
-        this.threshold = (int) (capacity * loadFactor);
-        this.table = new Node[capacity];
+        this.table = new Node[DEFAULT_INITIAL_CAPACITY];
+        this.threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
     }
 
     @Override
     public void put(K key, V value) {
         int hash = hash(key);
-        int index = Math.abs(hash % capacity);
+        int index = Math.abs(hash % table.length);
         Node<K, V> currentNode = table[index];
         if (currentNode == null) {
             table[index] = new Node<>(hash, key, value, null);
@@ -44,7 +40,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = Math.abs(hash(key) % capacity);
+        int index = Math.abs(hash(key) % table.length);
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
             if (key == currentNode.key || key != null && key.equals(currentNode.key)) {
@@ -69,10 +65,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        capacity = capacity * 2;
-        threshold = (int) (capacity * loadFactor);
         Node<K, V>[] oldTable = table;
-        table = new Node[capacity];
+        table = new Node[table.length * 2];
+        threshold = (int) (table.length * DEFAULT_LOAD_FACTOR);
         transfer(oldTable);
     }
 
@@ -80,7 +75,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> oldNode : oldTable) {
             while (oldNode != null) {
                 Node<K, V> next = oldNode.next;
-                int index = Math.abs(oldNode.hash % capacity);
+                int index = Math.abs(oldNode.hash % table.length);
                 oldNode.next = table[index];
                 table[index] = oldNode;
                 oldNode = next;
