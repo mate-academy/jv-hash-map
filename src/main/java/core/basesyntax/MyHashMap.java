@@ -1,7 +1,7 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-
+    int g;
     @Override
     public void put(K key, V value) {
 
