@@ -111,7 +111,6 @@ public class MyHashMapTest {
         Assert.assertEquals("Test failed! HashMap expects to contain value 1 for key `thirdPlane`,"
                 + " but was " + thirdActualValue, Integer.valueOf(1), thirdActualValue);
     }
-
     @Test
     public void putAndGetWithCollisionAndReplaceValue() {
         MyMap<Plane, Integer> myHashMap = new MyHashMap<>();
