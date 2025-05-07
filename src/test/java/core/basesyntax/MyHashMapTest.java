@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 
 public class MyHashMapTest {
     private static final Car firstCar = new Car("Audi", "black");
@@ -133,7 +134,6 @@ public class MyHashMapTest {
         Assert.assertEquals("Test failed! HashMap expects to contain value 1 for key `thirdPlane`,"
                 + " but was " + thirdActualValue, Integer.valueOf(1), thirdActualValue);
     }
-
     @Test
     public void putAndGetByNullKeyWithCollision() {
         MyMap<Bus, Integer> myHashMap = new MyHashMap<>();
