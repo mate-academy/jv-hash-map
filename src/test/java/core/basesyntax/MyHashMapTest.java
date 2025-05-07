@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 
 public class MyHashMapTest {
     private static final Car firstCar = new Car("Audi", "black");
@@ -225,6 +226,7 @@ public class MyHashMapTest {
 
     @Test
     public void getSizeWithCollisionAtFirstPosition() {
+
         MyMap<Plane, Integer> myHashMap = new MyHashMap<>();
         for (int i = 0; i < 1000; i++) {
             Plane plane = new Plane("model_" + i, "color_" + i);
