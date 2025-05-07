@@ -3,31 +3,12 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class Bus {
-    private String model;
-    private String color;
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
+    private final String model;
+    private final String color;
 
     public Bus(String model, String color) {
         this.model = model;
         this.color = color;
-    }
-
-    public Bus() {
     }
 
     @Override
@@ -42,5 +23,12 @@ public class Bus {
     @Override
     public int hashCode() {
         return 0;
+    }
+
+    @Override
+    public String toString() {
+        return "Car{model='" +
+                model + "',color='" +
+                color + "'}";
     }
 }
