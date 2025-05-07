@@ -182,6 +182,7 @@ public class MyHashMapTest {
         MyMap<Car, Integer> myHashMap = new MyHashMap<>();
         for (int i = 0; i < 1000; i++) {
             Car car = new Car("model_" + i, "color_" + i);
+
             myHashMap.put(car, i);
         }
         Assert.assertEquals("Test failed! The size isn't correct. Expected 1000 but was "
