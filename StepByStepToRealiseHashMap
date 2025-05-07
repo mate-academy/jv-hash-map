@@ -1,0 +1,33 @@
+1) Create a Nested Class Node<K,V>: +
+- hash key, K key, V value, Node<K,V> next + appropriate constructor;
+
+2) Create a Node <K,V> [] table for Storing Nodes: +
+- Define initial capacity when creating this array;
+
+3) Define the Hash Function; +
+
+4) Create the Following Fields: +
+- Load factory field = 0.75;
+- Initial capacity = 16;
+- Threshold = A field to keep track of when the map needs to resize. It is calculated as capacity * load factor.
+
+5) Create put(K key, V value) Method: +-
+- Before adding, check if the key already exists (by traversing the linked list at that index)
+to either replace the value or insert a new node.
+- After adding, check if resizing is necessary based on the current size.
+
+6) Create get(K key) Method: +
+- Compute the hash index for the key and search the linked list at that index for the correct Node<K,V>
+by matching the key.
+
+7) Create Resize Logic:
+- When the number of elements exceeds the threshold, double the size of the table and rehash
+all existing nodes to new indices;
+- Pay attention to copying the linked lists of nodes at each table index properly to avoid losing any entries;
+
+Additional Recommendations:
+8) Implement Collision Resolution (Chaining):
+- As part of handling collisions, ensure your Node<K,V> is designed to allow chaining via
+a linked list when multiple entries hash to the same index.
+- Ensure proper traversal of the linked list in put and get methods when there are collisions.
+10) Return the corresponding value or null if not found.
