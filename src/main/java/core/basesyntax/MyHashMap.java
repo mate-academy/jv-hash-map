@@ -57,7 +57,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return;
         }
 
-        while (node != null) {
+        while (true) {
             if ((key == null && node.getKey() == null)
                     || (key != null && key.equals(node.getKey()))) {
                 node.setValue(value);
@@ -80,9 +80,34 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         for (Node<K, V> node : oldBuckets) {
             while (node != null) {
-                put(node.key, node.value);
+                putForResize(node.key, node.value);
                 node = node.next;
             }
+        }
+    }
+
+    private void putForResize(K key, V value) {
+        int index = getBucketIndex(key);
+        Node<K, V> node = buckets[index];
+
+        if (node == null) {
+            buckets[index] = new Node<>(key, value);
+            size++;
+            return;
+        }
+
+        while (true) {
+            if ((key == null && node.getKey() == null)
+                    || (key != null && key.equals(node.getKey()))) {
+                node.setValue(value);
+                return;
+            }
+            if (node.getNext() == null) {
+                node.setNext(new Node<>(key, value));
+                size++;
+                return;
+            }
+            node = node.getNext();
         }
     }
 
