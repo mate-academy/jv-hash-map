@@ -16,4 +16,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public int getSize() {
         return 0;
     }
+
+    private static class Node<K, V> {
+        final K key;
+        V value;
+        Node<K, V> next;
+
+        public Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+    }
 }
