@@ -8,4 +8,6 @@ public interface MyMap<K, V> {
     int getSize();
 
     int getIndex(K key);
+
+    V remove(K key);
 }
