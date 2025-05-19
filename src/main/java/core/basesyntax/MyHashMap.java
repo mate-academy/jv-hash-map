@@ -13,7 +13,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @SuppressWarnings({"unchecked"})
     private void resize() {
-        size = 0;
         if (capacity >= MAXIMUM_CAPACITY) {
             return;
         }
@@ -21,6 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         capacity *= 2;
         Node<K,V>[] oldTable = table;
         table = (Node<K,V>[]) new Node[capacity];
+        size = 0;
         for (Node<K, V> kvNode : oldTable) {
             if (kvNode != null) {
                 Node<K, V> currentNode = kvNode;
