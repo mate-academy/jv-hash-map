@@ -7,7 +7,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
     static final int MAXIMUM_CAPACITY = 1 << 30;
     private int treeifyThreshold = 12;
-    private Node<K,V>[] table;
+    private Node<K, V>[] table;
     private int capacity;
     private int size;
 
@@ -18,17 +18,32 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         treeifyThreshold *= 2;
         capacity *= 2;
-        Node<K,V>[] oldTable = table;
-        table = (Node<K,V>[]) new Node[capacity];
-        size = 0;
+        Node<K, V>[] oldTable = table;
+        table = (Node<K, V>[]) new Node[capacity];
+
         for (Node<K, V> kvNode : oldTable) {
             if (kvNode != null) {
                 Node<K, V> currentNode = kvNode;
                 while (currentNode != null) {
-                    put(currentNode.getKey(), currentNode.getValue());
-                    currentNode = currentNode.next;
+                    Node<K, V> nextNode = currentNode.next;
+                    currentNode.next = null; // Удаляем старую цепочку
+                    putNode(currentNode);
+                    currentNode = nextNode;
                 }
             }
+        }
+    }
+
+    private void putNode(Node<K, V> node) {
+        int bucket = node.hash % capacity;
+        if (table[bucket] == null) {
+            table[bucket] = node;
+        } else {
+            Node<K, V> currentNode = table[bucket];
+            while (currentNode.next != null) {
+                currentNode = currentNode.next;
+            }
+            currentNode.next = node;
         }
     }
 
@@ -36,34 +51,28 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         if (table == null || table.length == 0) {
-            table = (MyHashMap.Node<K,V>[])new MyHashMap.Node[DEFAULT_INITIAL_CAPACITY];
+            table = (Node<K, V>[]) new Node[DEFAULT_INITIAL_CAPACITY];
             capacity = DEFAULT_INITIAL_CAPACITY;
         }
-        int hash = key == null ? 0 : key.hashCode() < 0 ? key.hashCode() * -1 : key.hashCode();
+        int hash = key == null ? 0 : Math.abs(key.hashCode());
         int bucket = hash % capacity;
-        Node<K,V> newNode = new Node<>(hash, key, value, null);
-        if (size + 1 >= treeifyThreshold) {
-            resize();
-        }
-        if (table[bucket] == null) {
-            table[bucket] = newNode;
-        } else {
-            Node<K,V> currentNode = table[bucket];
-            while (currentNode.next != null) {
-                if (Objects.equals(currentNode.getKey(), key)) {
-                    currentNode.setValue(value);
-                    return;
-                }
-                currentNode = currentNode.next;
-            }
+
+        Node<K, V> currentNode = table[bucket];
+        while (currentNode != null) {
             if (Objects.equals(currentNode.getKey(), key)) {
                 currentNode.setValue(value);
                 return;
             }
-            currentNode.next = newNode;
+            currentNode = currentNode.next;
         }
 
+        Node<K, V> newNode = new Node<>(hash, key, value, table[bucket]);
+        table[bucket] = newNode;
         size++;
+
+        if (size >= treeifyThreshold) {
+            resize();
+        }
     }
 
     @Override
@@ -71,9 +80,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (capacity == 0) {
             return null;
         }
-        int hash = key == null ? 0 : key.hashCode() < 0 ? key.hashCode() * -1 : key.hashCode();
+        int hash = key == null ? 0 : Math.abs(key.hashCode());
         int bucket = hash % capacity;
-        Node<K,V> currentNode = table[bucket];
+        Node<K, V> currentNode = table[bucket];
         while (currentNode != null) {
             if (Objects.equals(currentNode.getKey(), key)) {
                 return currentNode.getValue();
@@ -88,48 +97,50 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    static class Node<K,V> implements Map.Entry<K,V> {
+    static class Node<K, V> implements Map.Entry<K, V> {
         private final int hash;
         private final K key;
         private V value;
-        private MyHashMap.Node<K,V> next;
+        private Node<K, V> next;
 
-        Node(int hash, K key, V value, MyHashMap.Node<K,V> next) {
+        Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
             this.key = key;
             this.value = value;
             this.next = next;
         }
 
-        public final K getKey() {
+        public K getKey() {
             return key;
         }
 
-        public final V getValue() {
+        public V getValue() {
             return value;
         }
 
-        public final String toString() {
-            return key + "=" + value;
-        }
-
-        public final int hashCode() {
-            return Objects.hashCode(key) ^ Objects.hashCode(value);
-        }
-
-        public final V setValue(V newValue) {
+        public V setValue(V newValue) {
             V oldValue = value;
             value = newValue;
             return oldValue;
         }
 
-        public final boolean equals(Object o) {
-            if (o == this) {
+        public int hashCode() {
+            return Objects.hashCode(key) ^ Objects.hashCode(value);
+        }
+
+        public boolean equals(Object o) {
+            if (this == o) {
                 return true;
             }
-            return o instanceof Map.Entry<?, ?> e
-                    && Objects.equals(key, e.getKey())
-                    && Objects.equals(value, e.getValue());
+            if (!(o instanceof Map.Entry<?, ?> entry)) {
+                return false;
+            }
+            return Objects.equals(key, entry.getKey())
+                    && Objects.equals(value, entry.getValue());
+        }
+
+        public String toString() {
+            return key + "=" + value;
         }
     }
 }
