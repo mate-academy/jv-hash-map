@@ -40,10 +40,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[bucket] = node;
         } else {
             Node<K, V> currentNode = table[bucket];
-            while (currentNode.next != null && currentNode.key != node.key) {
+            while (currentNode.next != null && !Objects.equals(currentNode.key,node.key)) {
                 currentNode = currentNode.next;
             }
-            if (currentNode.key == node.key) {
+            if (Objects.equals(currentNode.key,node.key)) {
                 currentNode.value = node.value;
             } else {
                 currentNode.next = node;
