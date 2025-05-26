@@ -41,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = getIndex(key, table.length);
         Node<K, V> currentNode = table[index];
 
-        while (currentNode != null)  {
+        while (currentNode != null) {
             if (isKeyEquals(currentNode.key, key)) {
                 return currentNode.value;
             }
