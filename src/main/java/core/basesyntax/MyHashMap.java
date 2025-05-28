@@ -10,6 +10,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @SuppressWarnings("unchecked")
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+        threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
     }
 
     @Override
