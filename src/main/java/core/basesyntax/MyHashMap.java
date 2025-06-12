@@ -12,34 +12,29 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        while (table == null || (size >= threshold)) {
+        if (table == null || (size >= threshold)) {
             maxSize = resize();
         }
         int index = indexByHash(key);
-        Node<K, V>[] newTable = table;
-        if (newTable[index] == null) {
-            newTable[index] = createNode(key, value, null);
-            size++;
-        }
-        if (newTable[index] != null && Objects.equals(newTable[index].key, key)) {
-            newTable[index].value = value;
-        } else if (newTable[index] != null && !Objects.equals(newTable[index].key, key)) {
 
-            Node<K, V> node = table[index];
-            while (node != null) {
-                if (Objects.equals(key, node.key)) {
-                    node.value = value;
-                    return;
-                }
-                if (node.next == null) {
-                    break;
-                }
-                node = node.next;
-            }
-            node.next = createNode(key, value, null);
+        if (table[index] == null) {
+            table[index] = createNode(key, value, null);
             size++;
+            return;
         }
-        table = newTable;
+        Node<K, V> node = table[index];
+        while (node != null) {
+            if (Objects.equals(key, node.key)) {
+                node.value = value;
+                return;
+            }
+            if (node.next == null) {
+                break;
+            }
+            node = node.next;
+        }
+        node.next = createNode(key, value, null);
+        size++;
     }
 
     @Override
@@ -49,7 +44,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         if (table[indexByHash(key)] != null) {
             Node<K, V> node = table[indexByHash(key)];
-            while (node != key && node != null) {
+            while (node != null) {
                 if (Objects.equals(node.key, key)) {
                     return node.value;
                 } else {
