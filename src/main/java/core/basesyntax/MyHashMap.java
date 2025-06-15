@@ -56,7 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
+        return (key == null) ? 0 : (key.hashCode() & 0x7FFFFFFF) % table.length;
     }
 
     private void resize() {
@@ -67,7 +67,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         for (Node<K, V> node : table) {
             while (node != null) {
                 Node<K, V> next = node.next;
-                int index = (node.key == null) ? 0 : Math.abs(node.key.hashCode() % newCapacity);
+                int index = (node.key == null)
+                        ? 0
+                        : (node.key.hashCode() & 0x7FFFFFFF) % newCapacity;
                 node.next = newTable[index];
                 newTable[index] = node;
                 node = next;
