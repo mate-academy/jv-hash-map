@@ -7,10 +7,10 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     public static final float LOAD_FACTOR = 0.75f;
     public static final int INITIAL_CAPACITY = 16;
-    private Node<K, V>[] table;
     private int capacity = INITIAL_CAPACITY;
     private int size = 0;
     private float threshold = LOAD_FACTOR * capacity;
+    private Node<K, V>[] table = (Node<K, V>[]) new Node[capacity];
 
     private static class Node<K, V> implements Map.Entry<K, V> {
 
@@ -56,7 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
 
-        if (table == null || size >= threshold) {
+        if (size >= threshold) {
             resize();
         }
         int hash = hash(key);
@@ -135,13 +135,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
 
-        if (table == null) {
-
-            table = (Node<K, V>[]) new Node[capacity];
-            return;
-        }
-
-        if (table.length > 0 && size == threshold) {
+        if (size >= threshold) {
 
             int oldCapacity = capacity;
 
