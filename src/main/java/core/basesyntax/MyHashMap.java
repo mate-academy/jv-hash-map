@@ -90,15 +90,33 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = table;
         capacity *= 2;
         table = new Node[capacity];
-        size = 0;
 
         for (int i = 0; i < oldCapacity; i++) {
             Node<K, V> current = oldTable[i];
             while (current != null) {
-                put(current.key, current.value);
+                putInternal(current.key, current.value, this.table, this.capacity);
                 current = current.next;
             }
         }
+    }
+
+    private boolean putInternal(K key, V value, Node<K, V>[] targetTable, int targetCapacity) {
+        int bucketIndex = (key == null) ? 0 : (key.hashCode() & (targetCapacity - 1));
+        Node<K, V> head = targetTable[bucketIndex];
+        Node<K, V> current = head;
+
+        while (current != null) {
+            if (current.key == key || (key != null && key.equals(current.key))) {
+                current.value = value;
+                return false;
+            }
+            current = current.next;
+        }
+
+        Node<K, V> newNode = new Node<>(key, value);
+        newNode.next = head;
+        targetTable[bucketIndex] = newNode;
+        return true;
     }
 
     private static class Node<K, V> {
