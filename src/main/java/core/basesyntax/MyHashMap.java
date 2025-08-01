@@ -13,6 +13,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public MyHashMap() {
         loadFactor = DEFAULT_LOAD_FACTOR;
+        threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
