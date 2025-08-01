@@ -20,6 +20,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int hash = hash(key);
+        boolean isNew = true;
         Node<K, V>[] tab = table;
         Node<K, V> nodeAtPosition;
         int tableLength;
@@ -51,11 +52,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             if (existingMapping != null) {
                 existingMapping.setValue(value);
-                return;
+                isNew = false;
             }
         }
-        if (++size > threshold) {
-            resize();
+        if (isNew) {
+            if (++size > threshold) {
+                resize();
+            }
         }
 
     }
