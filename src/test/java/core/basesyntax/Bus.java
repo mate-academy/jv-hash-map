@@ -41,6 +41,9 @@ public class Bus {
 
     @Override
     public int hashCode() {
-        return 0;
+        int result = 31;
+        result = 17 * result + model.hashCode();
+        result = 17 * result + color.hashCode();
+        return result;
     }
 }
