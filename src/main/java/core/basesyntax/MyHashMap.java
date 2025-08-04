@@ -146,7 +146,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] resize() {
         Node<K, V>[] oldTable = table;
         int oldCapacity = (oldTable == null) ? 0 : oldTable.length;
-        int newCapacity = oldCapacity << 1;
+        int newCapacity = oldCapacity == 0 ? defaultInitialCapacity : oldCapacity << 1;
         if (newCapacity > maximumCapacity) {
             newCapacity = maximumCapacity;
         }
