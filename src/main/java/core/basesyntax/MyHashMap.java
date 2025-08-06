@@ -30,7 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
         table[index] = new Node<>(table[index], hash, key, value);
         hashMapSize++;
-        if (++hashMapSize > threshold) {
+        if (hashMapSize > threshold) {
             resize();
         }
     }
