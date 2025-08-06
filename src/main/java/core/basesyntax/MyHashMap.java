@@ -28,9 +28,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             current = current.next;
         }
-
         table[index] = new Node<>(table[index], hash, key, value);
         hashMapSize++;
+        if (++hashMapSize > threshold) {
+            resize();
+        }
     }
 
     @Override
@@ -49,9 +51,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             current = current.next;
         }
-        if (++hashMapSize > threshold) {
-            resize();
-        }
         return null;
     }
 
@@ -60,7 +59,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return hashMapSize;
     }
 
-    public Node<K, V>[] resize() {
+    private Node<K, V>[] resize() {
         Node<K, V>[] oldTable = table;
         int oldCapacity = (oldTable == null) ? 0 : oldTable.length;
         int oldThreshold = threshold;
