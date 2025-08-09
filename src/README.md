@@ -8,4 +8,4 @@ Be attentive to basic requirements for the implementation of the map (initial ca
 
 P.S.: you can implement other methods of the Map interface.
 
-[Try to avoid these common mistakes while solving task](./checklist.md)
+[Try to avoid these common mistakes while solving task](../checklist.md)
