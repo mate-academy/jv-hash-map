@@ -20,14 +20,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.size = 0;
     }
 
-    private static int spread(int h) {
-        return h ^ (h >>> 16);
-    }
-
-    private static <K> int hash(K key) {
-        return spread((key == null) ? 0 : key.hashCode());
-    }
-
     @Override
     public void put(K key, V value) {
         int hash = hash(key);
@@ -92,7 +84,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V>[] oldTable = this.table;
         int oldCapacity = this.capacity;
         int newCapacity = oldCapacity * RESIZE_MULTIPLIER;
-        Node<K, V>[] newTable = new Node[newCapacity];
+        @SuppressWarnings("unchecked")
+        Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
 
         for (Node<K, V> element : oldTable) {
             while (element != null) {
@@ -110,6 +103,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.threshold = newThr;
     }
 
+    private static int spread(int h) {
+        return h ^ (h >>> 16);
+    }
+
+    private static <K> int hash(K key) {
+        return spread((key == null) ? 0 : key.hashCode());
+    }
+
     private int indexFor(int hash) {
         return hash & (capacity - 1);
     }
@@ -124,7 +125,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, Node<K, V> next, V value, K key) {
+        Node(int hash, Node<K, V> next, V value, K key) {
             this.hash = hash;
             this.next = next;
             this.value = value;
