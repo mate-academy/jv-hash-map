@@ -3,17 +3,20 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_TABLE_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int RESIZE_MULTIPLIER = 2;
     private final float loadFactor;
-    private Node<K, V>[] table;
     private int size;
     private int capacity;
     private int threshold;
+    private Node<K,V>[] table;
 
     public MyHashMap() {
         this.capacity = DEFAULT_TABLE_CAPACITY;
         this.loadFactor = DEFAULT_LOAD_FACTOR;
         this.threshold = (int) (capacity * loadFactor);
-        this.table = new Node[capacity];
+        @SuppressWarnings("unchecked")
+        Node<K, V>[] temp = (Node<K, V>[]) new Node[capacity];
+        this.table = temp;
         this.size = 0;
     }
 
@@ -40,7 +43,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
             Node<K, V> newNode = new Node<>(0, table[0], value, null);
             table[0] = newNode;
+
+            if (size + 1 > threshold) {
+                resize();
+            }
+
             size++;
+
             return;
         }
 
@@ -53,11 +62,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         Node<K, V> newNode = new Node<>(hash, table[index], value, key);
         table[index] = newNode;
-        size++;
 
         if (size + 1 > threshold) {
             resize();
         }
+
+        size++;
     }
 
     @Override
@@ -81,7 +91,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         Node<K, V>[] oldTable = this.table;
         int oldCapacity = this.capacity;
-        int newCapacity = oldCapacity * 2;
+        int newCapacity = oldCapacity * RESIZE_MULTIPLIER;
         Node<K, V>[] newTable = new Node[newCapacity];
 
         for (Node<K, V> element : oldTable) {
@@ -100,8 +110,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.threshold = newThr;
     }
 
-    private int indexFor(int n) {
-        return n & (capacity - 1);
+    private int indexFor(int hash) {
+        return hash & (capacity - 1);
     }
 
     private boolean equals(K keyOne, K keyTwo) {
