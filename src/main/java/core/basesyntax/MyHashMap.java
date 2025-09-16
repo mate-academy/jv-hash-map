@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int RESIZE_MULTIPLIER = 2;
 
     private Node<K, V>[] table;
     private int size;
@@ -14,24 +15,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
         threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
-    }
-
-    private static class Node<K, V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
-    private int hash(Object key) {
-        return (key == null) ? 0 : key.hashCode() ^ (key.hashCode() >>> 16);
     }
 
     @Override
@@ -77,7 +60,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @SuppressWarnings("unchecked")
     private void resize() {
-        int newCapacity = table.length * 2;
+        int newCapacity = table.length * RESIZE_MULTIPLIER;
         Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
         threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
 
@@ -94,5 +77,23 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
         }
         table = newTable;
+    }
+
+    private int hash(Object key) {
+        return (key == null) ? 0 : key.hashCode() ^ (key.hashCode() >>> 16);
+    }
+
+    private static class Node<K, V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(int hash, K key, V value, Node<K, V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
