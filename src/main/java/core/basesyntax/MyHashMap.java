@@ -6,63 +6,20 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
 
-    // 2️⃣ Wewnętrzna klasa Node
-    static class Node<K, V> {
-        private K key;
-
-        public void setValue(V value) {
-            this.value = value;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public void setKey(K key) {
-            this.key = key;
-        }
-
-        public Node<K, V> getNext() {
-            return next;
-        }
-
-        public void setNext(Node<K, V> next) {
-            this.next = next;
-        }
-
-        // opcjonalny konstruktor Node(K key, V value)
-    }
-
-    // 3️⃣ Konstruktor MyHashMap
+    // 2️⃣ Konstruktor
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[4];
         size = 0;
-
     }
 
+    // 3️⃣ Metody
     @Override
     public void put(K key, V value) {
         int index = (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
-
         Node<K, V> newNode = new Node<>(key, value);
-        newNode.setKey(key);
-        newNode.setValue(value);
         newNode.setNext(table[index]);
         table[index] = newNode;
         size++;
-
     }
 
     @Override
@@ -71,9 +28,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> current = table[index];
         while (current != null) {
             if (current.getKey().equals(key)) {
-                return current.value;
+                return current.getValue();
             }
-            current = current.next;
+            current = current.getNext();
         }
         return null;
     }
@@ -82,5 +39,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public int getSize() {
         return size;
     }
-}
 
+    // 4️⃣ Wewnętrzna klasa Node
+    static class Node<K, V> {
+        // Pola
+        private K key;
+        private V value;
+        private Node<K, V> next;
+
+        // Konstruktor
+        public Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        // Gettery i settery
+        public K getKey() { return key; }
+        public void setKey(K key) { this.key = key; }
+        public V getValue() { return value; }
+        public void setValue(V value) { this.value = value; }
+        public Node<K, V> getNext() { return next; }
+        public void setNext(Node<K, V> next) { this.next = next; }
+    }
+}
