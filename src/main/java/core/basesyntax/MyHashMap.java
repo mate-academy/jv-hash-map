@@ -1,6 +1,6 @@
 package core.basesyntax;
 
-import java.io.OptionalDataException;
+import com.sun.jdi.Value;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
@@ -10,9 +10,39 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     // 2️⃣ Wewnętrzna klasa Node
     static class Node<K, V> {
-        K key;
-        V value;
-        Node<K, V> next;
+        private K key;
+
+        public void setValue(V value) {
+            this.value = value;
+        }
+
+        public V getValue() {
+            return value;
+        }
+
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public void setKey(K key) {
+            this.key = key;
+        }
+
+        public Node<K, V> getNext() {
+            return next;
+        }
+
+        public void setNext(Node<K, V> next) {
+            this.next = next;
+        }
 
         // opcjonalny konstruktor Node(K key, V value)
     }
@@ -29,9 +59,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
 
         Node<K, V> newNode = new Node<>();
-        newNode.key = key;
-        newNode.value = value;
-        newNode.next = table[index];
+        newNode.setKey(key);
+        newNode.setValue(value);
+        newNode.setNext(table[index]);
         table[index] = newNode;
         size++;
 
@@ -42,7 +72,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int index = (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
         Node<K, V> current = table[index];
         while (current != null) {
-            if (current.key.equals(key)) {
+            if (current.getKey().equals(key)) {
                 return current.value;
             }
             current = current.next;
