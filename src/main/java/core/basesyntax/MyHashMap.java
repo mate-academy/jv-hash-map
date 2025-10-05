@@ -1,6 +1,10 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
+
+    private static final int INITIAL_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75f;
+
     private Node<K, V>[] table;
     private int size;
 
@@ -16,10 +20,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         public K getKey() {
             return key;
-        }
-
-        public void setKey(K key) {
-            this.key = key;
         }
 
         public V getValue() {
@@ -40,13 +40,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     public MyHashMap() {
-        table = (Node<K, V>[]) new Node[4];
+        table = (Node<K, V>[]) new Node[INITIAL_CAPACITY];
         size = 0;
     }
 
     @Override
     public void put(K key, V value) {
+        if (size >= table.length * LOAD_FACTOR) {
+            resize();
+        }
+
         int index = (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
+
+        Node<K, V> current = table[index];
+        while (current != null) {
+            if ((key == null && current.getKey() == null) ||
+                    (key != null && key.equals(current.getKey()))) {
+                current.setValue(value);
+                return; // nadpisujemy wartość, size się nie zmienia
+            }
+            current = current.getNext();
+        }
 
         Node<K, V> newNode = new Node<>(key, value);
         newNode.setNext(table[index]);
@@ -60,7 +74,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> current = table[index];
 
         while (current != null) {
-            if (current.getKey().equals(key)) {
+            if ((key == null && current.getKey() == null) ||
+                    (key != null && key.equals(current.getKey()))) {
                 return current.getValue();
             }
             current = current.getNext();
@@ -72,5 +87,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private void resize() {
+        Node<K, V>[] oldTable = table;
+        table = (Node<K, V>[]) new Node[oldTable.length * 2];
+        size = 0;
+
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.getKey(), node.getValue()); // dodajemy do nowej tabeli
+                node = node.getNext();
+            }
+        }
     }
 }
