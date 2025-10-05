@@ -58,7 +58,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         int index = (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
 
-        Node<K, V> newNode = new Node<>();
+        Node<K, V> newNode = new Node<>(key, value);
         newNode.setKey(key);
         newNode.setValue(value);
         newNode.setNext(table[index]);
