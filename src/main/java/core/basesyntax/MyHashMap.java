@@ -37,11 +37,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     }
 
-
     @Override
     public V getValue(K key) {
         int index = (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
-        Node<K,V> current = table[index];
+        Node<K, V> current = table[index];
         while (current != null) {
             if (current.key.equals(key)) {
                 return current.value;
