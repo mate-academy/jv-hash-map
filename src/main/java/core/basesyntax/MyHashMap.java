@@ -1,7 +1,5 @@
 package core.basesyntax;
 
-import com.sun.jdi.Value;
-
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     // 1️⃣ Pola klasy
