@@ -3,23 +3,10 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_CAPACITY = 16;
-
+    private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
     private int capacity;
-    private float loadFactor = 0.75f;
-
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
 
     public MyHashMap() {
         this.capacity = DEFAULT_CAPACITY;
@@ -39,7 +26,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             table[0] = new Node<>(null, value, table[0]);
             size++;
-            if (size > capacity * loadFactor) {
+            if (size > capacity * LOAD_FACTOR) {
                 resize();
             }
             return;
@@ -49,7 +36,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
             size++;
-            if (size > capacity * loadFactor) {
+            if (size > capacity * LOAD_FACTOR) {
                 resize();
             }
         } else {
@@ -62,7 +49,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 if (current.next == null) {
                     current.next = new Node<>(key, value, null);
                     size++;
-                    if (size > capacity * loadFactor) {
+                    if (size > capacity * LOAD_FACTOR) {
                         resize();
                     }
                     return;
@@ -101,9 +88,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    void resize() {
+    private void resize() {
         int newCapacity = capacity * 2;
-        Node<K,V>[] newTable = new Node[newCapacity];
+        Node<K,V>[] newTable = (Node<K,V>[]) new Node[newCapacity];
 
         for (int i = 0; i < table.length; i++) {
             Node<K,V> node = table[i];
@@ -127,5 +114,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int getIndex(K key, int modCapacity) {
         return Math.abs(key.hashCode() % modCapacity);
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
