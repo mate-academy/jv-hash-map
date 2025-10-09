@@ -1,7 +1,6 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
@@ -31,6 +30,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             return;
         }
+
         int index = getIndex(key, capacity);
 
         if (table[index] == null) {
@@ -71,8 +71,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             return null;
         }
-        int index = getIndex(key, capacity);
 
+        int index = getIndex(key, capacity);
         Node<K, V> current = table[index];
         while (current != null) {
             if (key.equals(current.key)) {
@@ -90,24 +90,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         int newCapacity = capacity * 2;
-        Node<K,V>[] newTable = (Node<K,V>[]) new Node[newCapacity];
+        Node<K, V>[] newTable = (Node<K, V>[]) new Node[newCapacity];
 
         for (int i = 0; i < table.length; i++) {
-            Node<K,V> node = table[i];
+            Node<K, V> node = table[i];
             while (node != null) {
                 int newIndex;
+                Node<K, V> next = node.next;
 
-                Node<K,V> next = node.next;
                 if (node.key == null) {
                     newIndex = 0;
                 } else {
                     newIndex = Math.abs(node.key.hashCode() % newCapacity);
                 }
+
                 node.next = newTable[newIndex];
                 newTable[newIndex] = node;
                 node = next;
             }
         }
+
         table = newTable;
         capacity = newCapacity;
     }
@@ -121,7 +123,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        Node(K key, V value, Node<K, V> next) {
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
