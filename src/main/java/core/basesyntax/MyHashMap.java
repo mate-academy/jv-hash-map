@@ -11,36 +11,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int threshold;
     private final float loadFactor;
 
-    private static class Node<K,V> {
-        private final int hash; // = key == null ? 0 : key.hashCode()
-        private final K key;
-        private V value;
-        private Node<K,V> next;
-
-        Node(int hash, K key, V value, Node<K,V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
-    public MyHashMap() {
-        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR);
-    }
-
-    public MyHashMap(int initialCapacity, float loadFactor) {
-        if (initialCapacity <= 0) {
-            throw new IllegalArgumentException("Illegal capacity");
-        }
-        if (loadFactor <= 0) {
-            throw new IllegalArgumentException("Illegal load factor");
-        }
-        this.loadFactor = loadFactor;
-        this.table = (Node<K,V>[]) new Node[initialCapacity];
-        this.threshold = (int)(initialCapacity * loadFactor);
-    }
-
     @Override
     public void put(K key, V value) {
         int hash = rawHash(key);
@@ -75,6 +45,36 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private static class Node<K,V> {
+        private final int hash; // = key == null ? 0 : key.hashCode()
+        private final K key;
+        private V value;
+        private Node<K,V> next;
+
+        public Node(int hash, K key, V value, Node<K,V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+    }
+
+    public MyHashMap() {
+        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR);
+    }
+
+    public MyHashMap(int initialCapacity, float loadFactor) {
+        if (initialCapacity <= 0) {
+            throw new IllegalArgumentException("Illegal capacity");
+        }
+        if (loadFactor <= 0) {
+            throw new IllegalArgumentException("Illegal load factor");
+        }
+        this.loadFactor = loadFactor;
+        this.table = (Node<K,V>[]) new Node[initialCapacity];
+        this.threshold = (int)(initialCapacity * loadFactor);
     }
 
     private static int rawHash(Object key) {
