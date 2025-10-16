@@ -14,7 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @SuppressWarnings("unchecked")
     public MyHashMap() {
         threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
-        table = new Node[DEFAULT_CAPACITY];
+        table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -28,7 +28,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (tab == null || (tableLength = tab.length) == 0) {
             tableLength = (tab = resize()).length;
         }
-        if ((nodeAtPosition = tab[pointer = (hash & tableLength - 1)]) == null) {
+        if ((nodeAtPosition = tab[pointer = (hash & (tableLength - 1))]) == null) {
             tab[pointer] = new Node<>(key, value, hash, null);
         } else {
             K exKey = nodeAtPosition.key;
@@ -68,7 +68,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
         int hash = hash(key);
-        Node<K, V> currNode = table[hash & table.length - 1];
+        Node<K, V> currNode = table[hash & (table.length - 1)];
         while (currNode != null) {
             if (currNode.hash == hash
                     && (Objects.equals(key, currNode.key))) {
@@ -157,7 +157,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return newTab;
     }
 
-    static class Node<K, V> {
+    private static class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
