@@ -1,5 +1,7 @@
 package core.basesyntax;
 
+import java.util.Objects;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
@@ -9,8 +11,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private Node<K, V>[] table;
 
+    @SuppressWarnings("unchecked")
     public MyHashMap() {
-        double loadFactor = DEFAULT_LOAD_FACTOR;
         threshold = (int) (DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR);
         table = new Node[DEFAULT_CAPACITY];
     }
@@ -29,27 +31,27 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if ((nodeAtPosition = tab[pointer = (hash & tableLength - 1)]) == null) {
             tab[pointer] = new Node<>(key, value, hash, null);
         } else {
-            K exKey = nodeAtPosition.getKey();
+            K exKey = nodeAtPosition.key;
             Node<K, V> existingMapping;
-            if (nodeAtPosition.getHash() == hash
-                    && (exKey == key || (key != null && key.equals(exKey)))) {
+            if (nodeAtPosition.hash == hash
+                    && (Objects.equals(key, exKey))) {
                 existingMapping = nodeAtPosition;
             } else {
                 for (int bucket = 0; ; ++bucket) {
-                    if ((existingMapping = nodeAtPosition.getNext()) == null) {
-                        nodeAtPosition.setNext(new Node<>(key, value, hash, null));
+                    if ((existingMapping = nodeAtPosition.next) == null) {
+                        nodeAtPosition.next = new Node<>(key, value, hash, null);
                         break;
                     }
-                    exKey = existingMapping.getKey();
-                    if (existingMapping.getHash() == hash
-                            && (exKey == key || (key != null && key.equals(exKey)))) {
+                    exKey = existingMapping.key;
+                    if (existingMapping.hash == hash
+                            && (Objects.equals(key, exKey))) {
                         break;
                     }
                     nodeAtPosition = existingMapping;
                 }
             }
             if (existingMapping != null) {
-                existingMapping.setValue(value);
+                existingMapping.value = value;
                 isNew = false;
             }
         }
@@ -68,12 +70,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hash = hash(key);
         Node<K, V> currNode = table[hash & table.length - 1];
         while (currNode != null) {
-            if (currNode.getHash() == hash
-                    && (currNode.getKey() == key
-                    || (key != null && key.equals(currNode.getKey())))) {
-                return currNode.getValue();
+            if (currNode.hash == hash
+                    && (Objects.equals(key, currNode.key))) {
+                return currNode.value;
             } else {
-                currNode = currNode.getNext();
+                currNode = currNode.next;
             }
         }
         return null;
@@ -108,6 +109,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return transfering(oldCap, newCap);
     }
 
+    @SuppressWarnings("unchecked")
     private Node<K, V>[] transfering(int oldCap, int newCap) {
         Node<K, V>[] oldTab = table;
         Node<K, V>[] newTab = (Node<K, V>[]) new Node[newCap];
@@ -117,41 +119,55 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> node;
             if ((node = oldTab[i]) != null) {
                 oldTab[i] = null;
-                if (node.getNext() == null) {
-                    newTab[node.getHash() & (newCap - 1)] = node;
+                if (node.next == null) {
+                    newTab[node.hash & (newCap - 1)] = node;
                 } else {
                     Node<K, V> loHead = null;
                     Node<K, V> loTail = null;
                     Node<K, V> hiHead = null;
                     Node<K, V> hiTail = null;
                     do {
-                        if ((node.getHash() & oldCap) == 0) {
+                        if ((node.hash & oldCap) == 0) {
                             if (loTail == null) {
                                 loHead = node;
                             } else {
-                                loTail.setNext(node);
+                                loTail.next = node;
                             }
                             loTail = node;
                         } else {
                             if (hiTail == null) {
                                 hiHead = node;
                             } else {
-                                hiTail.setNext(node);
+                                hiTail.next = node;
                             }
                             hiTail = node;
                         }
-                    } while ((node = node.getNext()) != null);
+                    } while ((node = node.next) != null);
                     if (loTail != null) {
-                        loTail.setNext(null);
+                        loTail.next = null;
                         newTab[i] = loHead;
                     }
                     if (hiTail != null) {
-                        hiTail.setNext(null);
+                        hiTail.next = null;
                         newTab[i + oldCap] = hiHead;
                     }
                 }
             }
         }
         return newTab;
+    }
+
+    static class Node<K, V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(K key, V value, int hash, Node<K,V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
