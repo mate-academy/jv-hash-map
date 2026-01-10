@@ -18,11 +18,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (existingNode != null) {
             existingNode.value = value;
         } else {
-            actualSize++;
             if (actualSize >= actualThreshold) {
                 resize();
-                actualSize++;
             }
+            actualSize++;
             Node<K, V> checkNode = buckets[hash(key) % actualCapacity];
             if (checkNode != null) {
                 while (checkNode.next != null) {
@@ -41,19 +40,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> existingNode = existingNode(key);
         if (existingNode != null) {
             return existingNode.value;
-        }
-        return null;
-    }
-
-    private Node<K, V> existingNode(K key) {
-        int bucketNumber = hash(key) % buckets.length;
-        Node<K, V> node = buckets[bucketNumber];
-        while (node != null) {
-            if (Objects.equals(node.key, key)) {
-                return node;
-            } else {
-                node = node.next;
-            }
         }
         return null;
     }
@@ -91,12 +77,25 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private Node<K, V> existingNode(K key) {
+        int bucketNumber = hash(key) % buckets.length;
+        Node<K, V> node = buckets[bucketNumber];
+        while (node != null) {
+            if (Objects.equals(node.key, key)) {
+                return node;
+            } else {
+                node = node.next;
+            }
+        }
+        return null;
+    }
+
     private static class Node<K,V> {
         private final K key;
         private V value;
         private Node<K, V> next;
 
-        Node(K key, V value) {
+        private Node(K key, V value) {
             this.key = key;
             this.value = value;
             this.next = null;
