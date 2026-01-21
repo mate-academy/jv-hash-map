@@ -62,7 +62,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(int hash, K key, V value, Node<K, V> next) {
+        private Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
             this.key = key;
             this.value = value;
@@ -71,11 +71,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getHash(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode());
+        return (key == null) ? 0 : key.hashCode();
     }
 
     private int getBucketIndex(int hash) {
-        return hash % table.length;
+        return Math.floorMod(hash, table.length);
     }
 
     private void resize() {
@@ -99,6 +99,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
             }
         }
-
     }
 }
