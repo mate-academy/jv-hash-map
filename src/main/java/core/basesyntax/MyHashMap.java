@@ -10,6 +10,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
 
+    @SuppressWarnings("unchecked")
     public MyHashMap() {
         table = new Node[DEFAULT_INITIAL_CAPACITY];
     }
@@ -78,6 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return Math.floorMod(hash, table.length);
     }
 
+    @SuppressWarnings("unchecked")
     private void resize() {
         Node<K, V>[] oldTable = table;
         int newCapacity = oldTable.length * CAPACITY_MULTIPLIER;
