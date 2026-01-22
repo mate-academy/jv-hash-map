@@ -7,3 +7,4 @@ public interface MyMap<K, V> {
 
     int getSize();
 }
+
