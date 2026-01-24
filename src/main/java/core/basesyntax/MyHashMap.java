@@ -41,11 +41,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void resize() {
+     private void resize() {
         int newCapacity = table.length * CAPACITY_MULTIPLIER;
-        Node<K, V>[] oldTable = table;
-        table = new Node[newCapacity];
         threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
+        final Node<K, V>[] oldTable = table; 
+        table = new Node[newCapacity];
         size = 0;
         for (Node<K, V> node : oldTable) {
             while (node != null) {
