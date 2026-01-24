@@ -4,6 +4,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final int CAPACITY_MULTIPLIER = 2;
+    private static final int HASH_MASK = 0x7fffffff;
     private Node<K, V>[] table;
     private int size;
     private int threshold;
@@ -23,8 +24,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (existingNode != null) {
             existingNode.value = value;
         } else {
-            Node<K, V> newNode = new Node<>(key, value, table[index]);
-            table[index] = newNode;
+            table[index] = new Node<>(key, value, table[index]);
             size++;
         }
     }
@@ -41,10 +41,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-     private void resize() {
+    private void resize() {
         int newCapacity = table.length * CAPACITY_MULTIPLIER;
         threshold = (int) (newCapacity * DEFAULT_LOAD_FACTOR);
-        final Node<K, V>[] oldTable = table; 
+        final Node<K, V>[] oldTable = table;
         table = new Node[newCapacity];
         size = 0;
         for (Node<K, V> node : oldTable) {
@@ -56,7 +56,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucketIndex(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
+        return (key == null) ? 0 : (key.hashCode() & HASH_MASK) % table.length;
     }
 
     private Node<K, V> findNode(K key, int index) {
