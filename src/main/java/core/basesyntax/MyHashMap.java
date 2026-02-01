@@ -5,6 +5,9 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    // Виправляємо зауваження #2: Магічне число
+    private static final int RESIZE_FACTOR = 2;
+
     private Node<K, V>[] table;
     private int size;
 
@@ -25,14 +28,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 currentNode.value = value;
                 return;
             }
-            if (currentNode.next == null) {
-                break;
-            }
             currentNode = currentNode.next;
         }
 
-        Node<K, V> newNode = new Node<>(key, value, table[index]);
-        table[index] = newNode;
+        table[index] = new Node<>(key, value, table[index]);
         size++;
     }
 
@@ -55,12 +54,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getBucketIndex(K key) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
+        // Виправляємо зауваження #1: Безпечне обчислення індексу
+        return (key == null) ? 0 : (key.hashCode() & 0x7fffffff) % table.length;
     }
 
     private void resize() {
         Node<K, V>[] oldTable = table;
-        table = new Node[oldTable.length * 2];
+        // Використовуємо константу RESIZE_FACTOR
+        table = new Node[oldTable.length * RESIZE_FACTOR];
         size = 0;
         for (Node<K, V> headNode : oldTable) {
             while (headNode != null) {
@@ -75,7 +76,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        public Node(K key, V value, Node<K, V> next) {
+        // Виправляємо зауваження #6: Конструктор тепер private
+        private Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
