@@ -43,7 +43,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             }
             currentNode = currentNode.next;
         }
-
         table[index] = new Node<>(key, value, table[index]);
         size++;
     }
