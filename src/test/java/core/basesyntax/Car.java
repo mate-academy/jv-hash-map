@@ -3,6 +3,8 @@ package core.basesyntax;
 import java.util.Objects;
 
 public class Car {
+    private static final int INITIAL_HASH = 17;
+    private static final int MULTIPLIER = 31;
 
     private String model;
     private String color;
@@ -34,14 +36,21 @@ public class Car {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Car car = (Car) o;
-        return Objects.equals(model, car.model) &&
-                Objects.equals(color, car.color);
+        if (o == null) return false;
+        if (o.getClass().equals(Car.class)) {
+            Car car = (Car) o;
+            return Objects.equals(this.model, car.model)
+                    && Objects.equals(this.color, car.color);
+        }
+        return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(model, color);
+        int result = INITIAL_HASH;
+        result = MULTIPLIER * result + (model == null ? 0 : model.hashCode());
+        result = MULTIPLIER * result + (color == null ? 0 : color.hashCode());
+
+        return result;
     }
 }
