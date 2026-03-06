@@ -3,6 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int RESIZE_FACTOR = 2;
 
     // The only array field allowed by tests
     private Node<K, V>[] table;
@@ -17,10 +18,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size + 1 > threshold) {
-            resize();
-        }
-
         int hash = hash(key);
         int index = indexFor(hash, table.length);
 
@@ -31,6 +28,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 return;
             }
             current = current.next;
+        }
+
+        // We are sure we're going to add a NEW element
+        if (size + 1 > threshold) {
+            resize();
+            index = indexFor(hash, table.length);
         }
 
         Node<K, V> newNode = new Node<>(key, value, hash, table[index]);
@@ -60,7 +63,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         Node<K, V>[] oldTable = table;
-        int newCapacity = oldTable.length * 2;
+        int newCapacity = oldTable.length * RESIZE_FACTOR;
 
         Node<K, V>[] newTable = createTable(newCapacity);
 
@@ -86,7 +89,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int indexFor(int hash, int length) {
-        // length is always power of two in this task (16, 32, 64, ...)
         return hash & (length - 1);
     }
 
