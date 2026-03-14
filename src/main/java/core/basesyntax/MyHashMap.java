@@ -1,11 +1,15 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private int size = 0;
     private static final int CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
 
+    private int size = 0;
     private Node<K, V>[] table;
+
+    public MyHashMap() {
+        table = new Node[CAPACITY];
+    }
 
     @Override
     public void put(K key, V value) {
@@ -58,10 +62,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         int hashCode = (key == null) ? 0 : key.hashCode();
         int index = Math.abs(hashCode) % table.length;
         return index;
-    }
-
-    public MyHashMap() {
-        table = new Node[CAPACITY];
     }
 
     private boolean isKeysEqual(K key1, K key2) {
