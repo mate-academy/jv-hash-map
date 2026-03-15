@@ -5,6 +5,7 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
+    private static final int RESIZE_MULTIPLIER = 2;
 
     private Node<K, V>[] table;
     private int size;
@@ -25,17 +26,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         table = new Node[DEFAULT_CAPACITY];
     }
 
-    private int getIndex(K key) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode()) % table.length;
-    }
-
     @Override
     public void put(K key, V value) {
         if (size >= table.length * LOAD_FACTOR) {
-            relize();
+            resize();
         }
 
         int index = getIndex(key);
@@ -72,10 +66,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
-    private void relize() {
+    private int getIndex(K key) {
+        if (key == null) {
+            return 0;
+        }
+        return Math.abs(key.hashCode()) % table.length;
+    }
+
+    private void resize() {
         Node<K, V>[] oldTable = table;
 
-        table = new Node[oldTable.length * 2];
+        table = new Node[oldTable.length * RESIZE_MULTIPLIER];
         size = 0;
 
         for (Node<K, V> head : oldTable) {
