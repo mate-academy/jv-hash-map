@@ -12,10 +12,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
-    private int size = 0;
     private static final int DEFAULT_CAPACITY = 16;
-    private int capacity = DEFAULT_CAPACITY;
+    private static final int CAPACITY_MULTIPLIER = 2;
     private static final double LOADFACTOR = 0.75;
+
+    private int size = 0;
+    private int capacity = DEFAULT_CAPACITY;
     private Node<K, V>[] buckets = (Node<K, V>[]) new Node[capacity];
 
     @Override
@@ -62,8 +64,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V>[] oldBuckets = buckets;
-        capacity *= 2;
+        final Node<K, V>[] oldBuckets = buckets; // ✅ fixed
+        capacity *= CAPACITY_MULTIPLIER;
         buckets = (Node<K, V>[]) new Node[capacity];
         size = 0;
 
