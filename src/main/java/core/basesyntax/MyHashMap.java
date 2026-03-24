@@ -5,6 +5,7 @@ import java.util.Map;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
+    private static final int RESIZE_CONSTANT = 2;
     private transient Node<K, V> [] table = new Node[DEFAULT_INITIAL_CAPACITY];
     private int threshold = (int) (table.length * LOAD_FACTOR);
     private int size;
@@ -49,8 +50,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int hash(Object key) {
-        int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+        int hashCode;
+        return (key == null) ? 0 : (hashCode = key.hashCode()) ^ (hashCode >>> 16);
     }
 
     private void putVal(int hash, K key, V val) {
@@ -95,7 +96,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void resize() {
-        Node<K, V> [] newArr = new Node[table.length * 2];
+        Node<K, V> [] newArr = new Node[table.length * RESIZE_CONSTANT];
         Node<K, V> [] oldArr = table;
         table = newArr;
         threshold = (int) (newArr.length * LOAD_FACTOR);
@@ -153,7 +154,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         @Override
         public V setValue(V value) {
-            return null;
+            V oldValue = this.value;
+            this.value = value;
+            return oldValue;
         }
     }
 }
