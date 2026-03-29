@@ -3,42 +3,13 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
+    private static final int RESIZE_MULTIPLIER = 2
 
     private Node<K, V>[] table;
     private int size;
 
     public MyHashMap() {
         table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
-    }
-
-    public void resize() {
-        Node<K, V>[] oldTable = table;
-        table = (Node<K, V>[]) new Node[oldTable.length * 2];
-        size = 0;
-
-        for (Node<K, V> node : oldTable) {
-            while (node != null) {
-                put(node.key, node.value);
-                node = node.next;
-            }
-        }
-    }
-
-    private int getIndex(K key, int length) {
-        if (key == null) {
-            return 0;
-        }
-        return Math.abs(key.hashCode()) % length;
-    }
-
-    private boolean keysAreEqual(K firstKey, K secondKey) {
-        if (firstKey == null && secondKey == null) {
-            return true;
-        }
-        if (firstKey == null || secondKey == null) {
-            return false;
-        }
-        return firstKey.equals(secondKey);
     }
 
     @Override
@@ -82,6 +53,36 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private void resize() {
+        Node<K, V>[] oldTable = table;
+        table = (Node<K, V>[]) new Node[oldTable.length * RESIZE_MULTIPLIER];
+        size = 0;
+
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
+        }
+    }
+
+    private int getIndex(K key, int length) {
+        if (key == null) {
+            return 0;
+        }
+        return Math.abs(key.hashCode()) % length;
+    }
+
+    private boolean keysAreEqual(K firstKey, K secondKey) {
+        if (firstKey == null && secondKey == null) {
+            return true;
+        }
+        if (firstKey == null || secondKey == null) {
+            return false;
+        }
+        return firstKey.equals(secondKey);
     }
 
     private class Node<K, V> {
