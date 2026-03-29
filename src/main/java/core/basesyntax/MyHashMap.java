@@ -3,7 +3,7 @@ package core.basesyntax;
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
-    private static final int RESIZE_MULTIPLIER = 2
+    private static final int RESIZE_MULTIPLIER = 2;
 
     private Node<K, V>[] table;
     private int size;
