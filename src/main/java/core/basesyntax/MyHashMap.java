@@ -9,6 +9,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int capacity;
     private int threshold;
     private Entry<K, V>[] table;
+    
     public MyHashMap() {
         this.capacity = INITIAL_CAPACITY;
         this.threshold = (int)(capacity * LOAD_FACTOR);
@@ -105,6 +106,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Entry<K, V> next;
         private int hash;
+
         public Entry(K key, V value) {
             this.key = key;
             this.value = value;
