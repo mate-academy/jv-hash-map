@@ -1,8 +1,8 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private final static int INITIAL_CAPACITY = 16;
-    private final static float LOAD_FACTOR = 0.75f;
+    private static final int INITIAL_CAPACITY = 16;
+    private static final float LOAD_FACTOR = 0.75f;
     private int size;
     private int capacity;
     private int threshold;
