@@ -2,13 +2,13 @@ package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    private final static int SIZE_OF_NODE = 16;
-    public final static double LOAD_FACTOR = 0.75;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final double LOAD_FACTOR = 0.75;
 
-    private Node<K, V>[] table = new Node[SIZE_OF_NODE];
+    private Node<K, V>[] table = new Node[DEFAULT_INITIAL_CAPACITY];
     private int size;
 
-    private static class Node<K, V > {
+    private static class Node<K, V> {
         private final K key;
         private V value;
         private Node<K, V> next;
@@ -21,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private int getIndex(K key, int length) {
-        return (key == null) ? 0 : Math.abs(key.hashCode() % table.length);
+        return (key == null) ? 0 : Math.abs(key.hashCode() % length);
     }
 
     private boolean keysAreEqual(K key1, K key2) {
@@ -53,7 +53,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         Node<K, V> currentNode = table[index];
         while (currentNode != null) {
-            if(keysAreEqual(currentNode.key, key)) {
+            if (keysAreEqual(currentNode.key, key)) {
                 currentNode.value = value;
                 return;
             }
@@ -68,6 +68,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
+        int index = getIndex(key, table.length);
+        Node<K, V> currentNode = table[index];
+        while (currentNode != null) {
+            if (keysAreEqual(currentNode.key, key)) {
+                return currentNode.value;
+            }
+            currentNode = currentNode.next;
+        }
         return null;
     }
 
