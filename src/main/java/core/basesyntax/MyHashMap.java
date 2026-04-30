@@ -55,15 +55,9 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return null;
     }
 
-    private static class Entry<K, V> {
-        private K key;
-        private V value;
-        private Entry<K, V> next;
-
-        Entry(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
+    @Override
+    public int getSize() {
+        return size;
     }
 
     private int getIndex(K key) {
@@ -100,8 +94,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         capacity = newCapacity;
     }
 
-    @Override
-    public int getSize() {
-        return size;
+    private static class Entry<K, V> {
+        private K key;
+        private V value;
+        private Entry<K, V> next;
+
+        Entry(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 }
