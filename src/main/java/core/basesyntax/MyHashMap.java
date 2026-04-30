@@ -1,16 +1,6 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static class Entry<K, V> {
-        K key;
-        V value;
-        Entry<K, V> next;
-
-        Entry(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-    }
 
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
@@ -63,6 +53,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             current = current.next;
         }
         return null;
+    }
+
+    private static class Entry<K, V> {
+        private K key;
+        private V value;
+        private Entry<K, V> next;
+
+        Entry(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 
     private int getIndex(K key) {
