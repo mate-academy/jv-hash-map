@@ -4,25 +4,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final double LOAD_FACTOR = 0.75;
 
-    private static class Node<K, V> {
-        private final int hash;
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-
+    @SuppressWarnings("unchecked")
     private Node<K, V>[] table;
     private int size;
     private int threshold;
 
-    @SuppressWarnings("unchecked")
     public MyHashMap() {
         table = new Node[DEFAULT_CAPACITY];
         threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
@@ -102,5 +88,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private static class Node<K, V> {
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        public Node(int hash, K key, V value, Node<K, V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
