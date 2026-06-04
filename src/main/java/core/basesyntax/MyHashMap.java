@@ -32,10 +32,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         while (currNode != null) {
-            if(Objects.equals(currNode.key, key)) {
+            if (Objects.equals(currNode.key, key)) {
                 currNode.value = value;
                 return;
-            } else if(currNode.next == null) {
+            } else if (currNode.next == null) {
                 currNode.next = newNode;
                 size++;
                 return;
@@ -70,7 +70,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private int mapIndex(K key, int capacity) {
         return key != null ? key.hashCode() & (capacity - 1) : 0;
     }
-
 
     @Override
     public V getValue(K key) {
