@@ -79,7 +79,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private void resize() {
         if ((double) size / capacity > loadFactor) {
             Node<K, V>[] oldTable = table;
-            table = new Node[capacity * 2];
+            table = (Node<K, V>[]) new Node[capacity * 2];
             capacity = capacity * 2;
             for (Node<K, V> node : oldTable) {
                 while (node != null) {
