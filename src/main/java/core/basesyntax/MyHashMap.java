@@ -13,7 +13,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public MyHashMap() {
         this.capacity = MAP_CAPACITY;
         this.loadFactor = LOAD_FACTOR;
-        this.table = new Node[capacity];
+        this.table = (Node<K, V>[]) new Node[capacity];
     }
 
     @Override
@@ -94,7 +94,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void addNode(Node<K, V> node, Node<K, V>[] targetTable) {
         int index = hash(node.key) % targetTable.length;
-
         if (targetTable[index] == null) {
             targetTable[index] = node;
         } else {
