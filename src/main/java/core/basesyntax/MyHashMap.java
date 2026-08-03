@@ -9,6 +9,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size;
 
+    public MyHashMap() {
+        table = new Node[DEFAULT_CAPACITY];
+        size = 0;
+    }
+
     private static class Node<K, V> {
         private K key;
         private V value;
@@ -19,28 +24,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.value = value;
             this.next = next;
         }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
     }
 
-    public MyHashMap() {
-        table = new Node[DEFAULT_CAPACITY];
-        size = 0;
-    }
-
-    private int getBucketIndex(K key) {
+    private int getBucketIndex(K key, int capacity) {
         if (key == null) {
             return 0;
         }
         int hash = key.hashCode();
-        return Math.abs(hash % table.length);
+        return Math.abs(hash % capacity);
     }
 
     private void resize() {
@@ -50,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> current = table[i];
             while (current != null) {
                 Node<K, V> next = current.next;
-                int newIndex = Math.abs(current.key.hashCode() % newTable.length);
+                int newIndex = Math.abs(getBucketIndex(current.key, newCapacity) % newTable.length);
                 current.next = newTable[newIndex];
                 newTable[newIndex] = current;
                 current = next;
@@ -61,7 +52,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        int index = getBucketIndex(key);
+        int index = getBucketIndex(key, table.length);
         if (table[index] == null) {
             table[index] = new Node<>(key, value, null);
             size++;
@@ -87,7 +78,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
-        int index = getBucketIndex(key);
+        int index = getBucketIndex(key, table.length);
         if (table[index] == null) {
             return null;
         } else {
