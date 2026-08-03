@@ -41,7 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             Node<K, V> current = table[i];
             while (current != null) {
                 Node<K, V> next = current.next;
-                int newIndex = Math.abs(getBucketIndex(current.key, newCapacity) % newTable.length);
+                int newIndex = getBucketIndex(current.key, newCapacity);
                 current.next = newTable[newIndex];
                 newTable[newIndex] = current;
                 current = next;
