@@ -47,7 +47,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         Node<K, V> newNode = new Node<>(key, value);
-        newNode.hash = hash;
         newNode.next = table[index];
         table[index] = newNode;
         size++;
