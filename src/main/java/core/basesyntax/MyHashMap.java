@@ -1,7 +1,8 @@
 package core.basesyntax;
+
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
-    private static final int DEFAULT_RESIZE = 2;
+    private static final int RESIZE_MULTIPLIER = 2;
     private static final float LOAD_FACTOR = 0.75f;
     private Node<K, V>[] table;
     private int size;
@@ -12,14 +13,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void checkThreshold() {
-        if (size >= table.length * LOAD_FACTOR) {
+        if (size > table.length * LOAD_FACTOR) {
             resize();
         }
     }
 
     private void resize() {
         Node<K, V>[] oldTable = table;
-        table = new Node[oldTable.length * DEFAULT_RESIZE];
+        table = new Node[oldTable.length * RESIZE_MULTIPLIER];
         size = 0;
 
         for (Node<K, V> node : oldTable) {
@@ -77,7 +78,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static class Node<K, V> {
         private final K key;
         private V value;
-        private int hash;
         private Node<K, V> next;
 
         public Node(K key, V value) {
