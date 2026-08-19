@@ -5,27 +5,46 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_CAPACITY = 16;
-    private int size = 0;
+    private static final float SIZE_TO_RESIZE = 0.75f;
+    private int size;
     private Node<K, V>[] table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
+
+    void resize() {
+
+        Node<K, V>[] oldTable = table;
+        table = (Node<K, V>[]) new Node[oldTable.length * 2];
+        size = 0;
+
+        for (Node<K, V> node : oldTable) {
+            Node<K, V> current = node;
+            while (current != null) {
+                put(current.key, current.value);
+                current = current.next;
+            }
+        }
+
+    }
 
     @Override
     public void put(K key, V value) {
+
+        if (size >= table.length * SIZE_TO_RESIZE) {
+            resize();
+        }
+
         int index = getBucketIndex(key);
-        int keyHash = key == null ? 0 : key.hashCode();
-        Node<K, V> head = table[index];
-        Node<K, V> current = head;
+        int keyHash = (key == null) ? 0 : key.hashCode();
+        Node<K, V> current = table[index];
 
         while (current != null) {
-            if (current.hash == keyHash && (current.key == key) 
-                || key != null && key.equals(current.key)) {
+            if (current.hash == keyHash && Objects.equals(current.key, key)) {
                 current.value = value;
                 return;
             }
             current = current.next;
         }
 
-        Node<K, V> newNode = new Node<>(keyHash, key, value, head);
-        table[index] = newNode;
+        table[index] = new Node<>(keyHash, key, value, table[index]);
         size++;
 
     }
@@ -55,10 +74,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return 0;
         }
-        return Math.abs(key.hashCode()) % DEFAULT_CAPACITY;
+        return Math.abs(key.hashCode()) % table.length;
     }
 
-    private class Node<K, V> {
+    private static class Node<K, V> {
         private final int hash;
         private final K key;
         private V value;
@@ -71,42 +90,5 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
         }
 
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + getEnclosingInstance().hashCode();
-            result = prime * result + ((key == null) ? 0 : key.hashCode());
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            Node other = (Node) obj;
-            if (!getEnclosingInstance().equals(other.getEnclosingInstance())) {
-                return false;
-            }
-            if (key == null) {
-                if (other.key != null) {
-                    return false;
-                }
-            } else if (!key.equals(other.key)) {
-                return false;
-            }
-            return true;
-        }
-
-        private MyHashMap getEnclosingInstance() {
-            return MyHashMap.this;
-        }
     }
 }
