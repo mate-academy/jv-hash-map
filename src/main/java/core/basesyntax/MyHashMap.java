@@ -62,11 +62,11 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return key == null ? 0 : key.hashCode() & (capacity - 1);
     }
 
-    public int hash(K key) {
+    private int hash(K key) {
         return hash(key, table.length);
     }
 
-    public void resize() {
+    private void resize() {
         Node<K, V>[] newTable = new Node[table.length * 2];
         for (int i = 0; i < table.length; i++) {
             Node<K, V> current = table[i];
