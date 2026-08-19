@@ -4,9 +4,9 @@ import java.util.Objects;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
-    final int START_CAPACITY = 16;
-    int size = 0;
-    Node<K, V>[] table = (Node<K, V>[]) new Node[START_CAPACITY];
+    private static final int DEFAULT_CAPACITY = 16;
+    private int size = 0;
+    private Node<K, V>[] table = (Node<K, V>[]) new Node[DEFAULT_CAPACITY];
 
     @Override
     public void put(K key, V value) {
@@ -16,7 +16,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         Node<K, V> current = head;
 
         while (current != null) {
-            if (current.hash == keyHash && (current.key == key) || key != null && key.equals(current.key)) {
+            if (current.hash == keyHash && (current.key == key) 
+                || key != null && key.equals(current.key)) {
                 current.value = value;
                 return;
             }
@@ -54,14 +55,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (key == null) {
             return 0;
         }
-        return Math.abs(key.hashCode()) % START_CAPACITY;
+        return Math.abs(key.hashCode()) % DEFAULT_CAPACITY;
     }
 
     private class Node<K, V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K, V> next;
+        private final int hash;
+        private final K key;
+        private V value;
+        private Node<K, V> next;
 
         Node(int hash, K key, V value, Node<K, V> next) {
             this.hash = hash;
@@ -81,20 +82,26 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
+            if (this == obj) {
                 return true;
-            if (obj == null)
+            }
+            if (obj == null) {
                 return false;
-            if (getClass() != obj.getClass())
+            }
+            if (getClass() != obj.getClass()) {
                 return false;
+            }
             Node other = (Node) obj;
-            if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
+            if (!getEnclosingInstance().equals(other.getEnclosingInstance())) {
                 return false;
+            }
             if (key == null) {
-                if (other.key != null)
+                if (other.key != null) {
                     return false;
-            } else if (!key.equals(other.key))
+                }
+            } else if (!key.equals(other.key)) {
                 return false;
+            }
             return true;
         }
 
