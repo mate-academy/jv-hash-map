@@ -9,20 +9,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K,V>[] table;
     private int threshold;
     
-    static class Node<K, V> {
-        private int hash;
-        private K key;
-        private V value;
-        private Node<K,V> next;
-        
-        public Node(int hash, K key, V value, Node<K, V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-    }
-    
     @Override
     public void put(K key, V value) {
         if (needResizing()) {
@@ -135,5 +121,19 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     
     private boolean needResizing() {
         return table == null || size >= threshold;
+    }
+    
+    static class Node<K, V> {
+        private int hash;
+        private K key;
+        private V value;
+        private Node<K,V> next;
+        
+        public Node(int hash, K key, V value, Node<K, V> next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
