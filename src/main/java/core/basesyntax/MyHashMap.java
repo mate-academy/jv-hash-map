@@ -6,6 +6,8 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
+    private static final int NON_NEGATIVE_HASH_MASK = 0x7fffffff;
+    private static final int RESIZE_MULTIPLIER = 2;
 
     private int size;
     private Node<K, V>[] table;
@@ -19,7 +21,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public void put(K key, V value) {
         int hash = (key == null) ? 0 : key.hashCode();
-        int index = (hash & 0x7fffffff) % table.length;
+        int index = (hash & NON_NEGATIVE_HASH_MASK) % table.length;
 
         Node<K, V> current = table[index];
         Node<K, V> previous = null;
@@ -47,7 +49,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public V getValue(K key) {
         int hash = (key == null) ? 0 : key.hashCode();
-        int index = (hash & 0x7fffffff) % table.length;
+        int index = (hash & NON_NEGATIVE_HASH_MASK) % table.length;
 
         Node<K, V> current = table[index];
         while (current != null) {
@@ -80,14 +82,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private void resize() {
         int oldCapacity = table.length;
-        int newCapacity = oldCapacity * 2;
+        int newCapacity = oldCapacity * RESIZE_MULTIPLIER;
         Node<K, V>[] newTable = new Node[newCapacity];
 
-        for (int i = 0; i < table.length; i++) {
-            Node<K, V> current = table[i];
+        for (int bucketIndex = 0; bucketIndex < table.length; bucketIndex++) {
+            Node<K, V> current = table[bucketIndex];
             while (current != null) {
                 Node<K, V> nextNode = current.next;
-                int newIndex = (current.hash & 0x7fffffff) % newTable.length;
+                int newIndex = (current.hash & NON_NEGATIVE_HASH_MASK) % newTable.length;
                 current.next = newTable[newIndex];
                 newTable[newIndex] = current;
                 current = nextNode;
